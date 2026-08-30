@@ -31,7 +31,7 @@ export default function AdminBeritaPage() {
         <h1 className="text-xl font-bold text-slate-900">Kelola Berita</h1>
         <Link
           href="/admin/berita/baru"
-          className="inline-flex h-8 items-center justify-center rounded-lg bg-blue-700 px-3 text-sm font-medium text-white hover:bg-blue/80"
+          className="inline-flex h-8 items-center justify-center rounded-lg bg-blue-700 px-3 text-sm font-medium text-white hover:bg-blue-700/80"
         >
           <Plus className="mr-2 h-4 w-4" />
           Tambah Artikel
