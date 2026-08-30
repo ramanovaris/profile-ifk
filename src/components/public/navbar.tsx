@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Pill } from "lucide-react";
 
 import { siteConfig } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
@@ -29,8 +29,8 @@ export function Navbar() {
             href="/"
             className="flex items-center gap-2 font-semibold tracking-tight text-heading"
           >
-            <Pill className="h-5 w-5 text-brand-600" strokeWidth={1.5} />
-            <span className="text-sm">{siteConfig.shortName}</span>
+            <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 rounded-full" />
+            <span className="text-sm font-semibold tracking-tight">{siteConfig.shortName}</span>
           </Link>
 
           {/* Desktop nav */}

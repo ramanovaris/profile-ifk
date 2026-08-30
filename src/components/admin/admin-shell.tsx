@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -10,7 +11,6 @@ import {
   UserCog,
   LogOut,
   Menu,
-  Pill,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -63,7 +63,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
   return (
     <>
       <div className="flex items-center gap-2 px-3 py-4">
-        <Pill className="h-5 w-5 text-brand-700" />
+        <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 rounded-full" />
         <span className="text-sm font-bold text-slate-900">Admin IFK</span>
       </div>
       <Separator />

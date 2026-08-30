@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pill } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-sm">
         <CardContent className="pt-8">
           <div className="text-center">
-            <Pill className="mx-auto h-10 w-10 text-brand-700" />
+            <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={48} height={48} unoptimized className="mx-auto h-12 w-12 rounded-full" />
             <h1 className="mt-3 text-lg font-bold text-slate-900">{siteConfig.shortName}</h1>
             <p className="text-sm text-slate-500">Panel Administrasi</p>
           </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowUpRight, Pill, Mail, Phone, MapPin } from "lucide-react";
+import Image from "next/image";
+import { ArrowUpRight, Mail, Phone, MapPin } from "lucide-react";
 
 import { siteConfig } from "@/lib/dummy-data";
 
@@ -18,8 +19,8 @@ export function Footer() {
           {/* Kolom 1 — Info Instansi + Motto */}
           <div>
             <div className="flex items-center gap-2 font-semibold tracking-tight text-white">
-              <Pill className="h-5 w-5 text-brand-400" strokeWidth={1.5} />
-              <span>{siteConfig.shortName}</span>
+            <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 rounded-full" />
+            <span className="font-semibold tracking-tight text-white">{siteConfig.shortName}</span>
             </div>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-zinc-400">
               {siteConfig.address}
