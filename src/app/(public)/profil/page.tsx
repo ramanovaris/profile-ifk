@@ -1,24 +1,16 @@
 import Image from "next/image";
-import { Breadcrumb } from "@/components/public/breadcrumb";
+
+import { PageHero } from "@/components/public/page-hero";
 
 export default function ProfilPage() {
   return (
     <>
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <section className="page-hero pb-24 pt-36 text-white">
-        <div className="section-container">
-          <Breadcrumb items={[{ label: "Beranda", href: "/" }, { label: "Profil" }]} />
-          <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
-            Tentang Kami
-          </span>
-          <h1 className="mt-4 text-5xl font-bold tracking-tighter sm:text-6xl">
-            Profil Instansi
-          </h1>
-          <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-zinc-400">
-            UPTD Instalasi Farmasi Kab. Kotabaru — Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Profil" }]}
+        eyebrow="Tentang Kami"
+        title="Profil Instansi"
+        subtitle="UPTD Instalasi Farmasi Kab. Kotabaru — Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat."
+      />
 
       {/* ── Sambutan Kepala ───────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">

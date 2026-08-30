@@ -1,25 +1,15 @@
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
-import { Breadcrumb } from "@/components/public/breadcrumb";
+import { PageHero } from "@/components/public/page-hero";
 import { siteConfig } from "@/lib/dummy-data";
-
 export default function KontakPage() {
   return (
     <>
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <section className="page-hero pb-24 pt-36 text-white">
-        <div className="section-container">
-          <Breadcrumb items={[{ label: "Beranda", href: "/" }, { label: "Kontak" }]} />
-          <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
-            Hubungi
-          </span>
-          <h1 className="mt-4 text-5xl font-bold tracking-tighter sm:text-6xl">
-            Kontak Kami
-          </h1>
-          <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-zinc-400">
-            Hubungi kami untuk informasi lebih lanjut seputar layanan kefarmasian.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Kontak" }]}
+        eyebrow="Hubungi"
+        title="Kontak Kami"
+        subtitle="Hubungi kami untuk informasi lebih lanjut seputar layanan kefarmasian."
+      />
 
       {/* ── 2-kolom ───────────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">

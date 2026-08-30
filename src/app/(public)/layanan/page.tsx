@@ -1,24 +1,15 @@
 import { Thermometer, Snowflake, PackageCheck, AlertTriangle } from "lucide-react";
-import { Breadcrumb } from "@/components/public/breadcrumb";
 
+import { PageHero } from "@/components/public/page-hero";
 export default function LayananPage() {
   return (
     <>
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <section className="page-hero pb-24 pt-36 text-white">
-        <div className="section-container">
-          <Breadcrumb items={[{ label: "Beranda", href: "/" }, { label: "Layanan" }]} />
-          <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
-            Pelayanan
-          </span>
-          <h1 className="mt-4 text-5xl font-bold tracking-tighter sm:text-6xl">
-            Standar Pelayanan Operasional
-          </h1>
-          <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-zinc-400">
-            Pedoman pelayanan lengkap mulai dari jadwal operasional hingga alur distribusi obat.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Layanan" }]}
+        eyebrow="Pelayanan"
+        title="Standar Pelayanan Operasional"
+        subtitle="Pedoman pelayanan lengkap mulai dari jadwal operasional hingga alur distribusi obat."
+      />
 
       {/* ── Jam Pelayanan ─────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">

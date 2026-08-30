@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Breadcrumb } from "@/components/public/breadcrumb";
+import { PageHero } from "@/components/public/page-hero";
 import { dummyArticles } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
 
@@ -29,21 +29,12 @@ export default function BeritaPage() {
 
   return (
     <>
-      {/* ── Header ────────────────────────────────────────────────── */}
-      <section className="page-hero pb-24 pt-36 text-white">
-        <div className="section-container">
-          <Breadcrumb items={[{ label: "Beranda", href: "/" }, { label: "Berita" }]} />
-          <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
-            Informasi
-          </span>
-          <h1 className="mt-4 text-5xl font-bold tracking-tighter sm:text-6xl">
-            Berita &amp; Informasi
-          </h1>
-          <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-zinc-400">
-            Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Berita" }]}
+        eyebrow="Informasi"
+        title={<>Berita &amp; Informasi</>}
+        subtitle="Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian."
+      />
 
       {/* ── Filter & Grid ─────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
