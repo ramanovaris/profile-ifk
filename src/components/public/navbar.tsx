@@ -1,18 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, Pill } from "lucide-react";
+import { Pill } from "lucide-react";
 
-
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { siteConfig } from "@/lib/dummy-data";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/", label: "Beranda" },
@@ -24,59 +18,105 @@ const navLinks = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo / Nama */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-slate-800">
-          <Pill className="h-6 w-6 text-blue-700" />
-          <span className="hidden text-sm sm:inline">{siteConfig.shortName}</span>
-        </Link>
-
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Mobile hamburger */}
-        <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger
-            className="md:hidden rounded-md p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-            aria-label="Buka menu"
+    <>
+      {/* ── Floating glass pill, detached dari tepi atas ─────────────── */}
+      <header className="fixed inset-x-0 top-4 z-50 px-4">
+        <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between rounded-full border border-black/5 bg-white/70 pl-5 pr-2 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-semibold tracking-tight text-heading"
           >
-            <Menu className="h-5 w-5" />
-          </SheetTrigger>
-          <SheetContent side="right" className="w-72">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
-                <Pill className="h-5 w-5 text-blue-700" />
-                {siteConfig.shortName}
-              </SheetTitle>
-            </SheetHeader>
-            <nav className="mt-6 flex flex-col gap-1">
-              {navLinks.map((link) => (
+            <Pill className="h-5 w-5 text-brand-600" strokeWidth={1.5} />
+            <span className="text-sm">{siteConfig.shortName}</span>
+          </Link>
+
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => {
+              const isActive =
+                link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+              return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                  className={cn(
+                    "rounded-full px-4 py-1.5 text-sm transition-all duration-300 ease-luxe",
+                    isActive
+                      ? "bg-black/5 font-medium text-heading"
+                      : "text-muted hover:text-heading"
+                  )}
                 >
                   {link.label}
                 </Link>
-              ))}
-            </nav>
-          </SheetContent>
-        </Sheet>
+              );
+            })}
+          </nav>
+
+          {/* Hamburger — dua garis morph ke X */}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Tutup menu" : "Buka menu"}
+            aria-expanded={open}
+            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-black/5 transition-transform duration-300 ease-luxe active:scale-95 md:hidden"
+          >
+            <span
+              className={cn(
+                "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
+                open ? "rotate-45" : "-translate-y-[3px]"
+              )}
+            />
+            <span
+              className={cn(
+                "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
+                open ? "-rotate-45" : "translate-y-[3px]"
+              )}
+            />
+          </button>
+        </div>
+      </header>
+
+      {/* ── Fullscreen glass overlay (mobile) + staggered reveal ─────── */}
+      <div
+        className={cn(
+          "fixed inset-0 z-40 flex flex-col justify-center bg-zinc-950/80 px-8 backdrop-blur-3xl transition-all duration-700 ease-luxe md:hidden",
+          open ? "visible opacity-100" : "invisible opacity-0"
+        )}
+      >
+        <nav className="flex flex-col gap-3">
+          {navLinks.map((link, i) => {
+            const isActive =
+              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                style={{ transitionDelay: open ? `${120 + i * 60}ms` : "0ms" }}
+                className={cn(
+                  "text-4xl font-bold tracking-tighter transition-all duration-700 ease-luxe",
+                  isActive ? "text-brand-400" : "text-white hover:text-brand-400",
+                  open ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <p
+          style={{ transitionDelay: open ? "460ms" : "0ms" }}
+          className={cn(
+            "mt-12 text-xs uppercase tracking-[0.2em] text-zinc-500 transition-all duration-700 ease-luxe",
+            open ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+          )}
+        >
+          {siteConfig.name}
+        </p>
       </div>
-    </header>
+    </>
   );
 }

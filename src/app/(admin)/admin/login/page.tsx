@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-sm">
         <CardContent className="pt-8">
           <div className="text-center">
-            <Pill className="mx-auto h-10 w-10 text-blue-700" />
+            <Pill className="mx-auto h-10 w-10 text-brand-700" />
             <h1 className="mt-3 text-lg font-bold text-slate-900">{siteConfig.shortName}</h1>
             <p className="text-sm text-slate-500">Panel Administrasi</p>
           </div>

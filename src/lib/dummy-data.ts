@@ -93,7 +93,7 @@ export const dummyArticles: Article[] = [
       <p>Selain itu, sosialisasi ini juga menjadi wadah untuk menampung masukan dan kendala yang dihadapi oleh para apoteker faskes dalam penggunaan sistem informasi kefarmasian.</p>
     `,
     coverImage:
-      "https://placehold.co/1200x630/1e3a5f/ffffff?text=Kegiatan+IFK",
+      "https://picsum.photos/seed/kegiatan-ifk/1200/630",
     isPublished: true,
     authorId: "usr-1",
     authorName: "Administrator",
@@ -110,7 +110,7 @@ export const dummyArticles: Article[] = [
       <p>Hasil evaluasi menunjukkan bahwa tingkat pemenuhan permintaan obat mencapai 95%, dengan beberapa catatan perbaikan untuk obat-obatan yang mengalami keterlambatan pengadaan dari pemasok.</p>
     `,
     coverImage:
-      "https://placehold.co/1200x630/1e3a5f/ffffff?text=Evaluasi+Distribusi+Obat",
+      "https://picsum.photos/seed/evaluasi-obat/1200/630",
     isPublished: true,
     authorId: "usr-2",
     authorName: "Siti Nurhaliza, S.Farm",
@@ -127,7 +127,7 @@ export const dummyArticles: Article[] = [
       <p>Pelayanan normal akan kembali beroperasi sesuai jam kerja yang berlaku setelah masa libur nasional berakhir.</p>
     `,
     coverImage:
-      "https://placehold.co/1200x630/2d5a27/ffffff?text=Informasi+Pelayanan",
+      "https://picsum.photos/seed/info-layanan/1200/630",
     isPublished: true,
     authorId: "usr-1",
     authorName: "Administrator",
@@ -144,7 +144,7 @@ export const dummyArticles: Article[] = [
       <p>Faskes binaan diimbau untuk memperbarui referensi formularium di masing-masing institusi agar sesuai dengan daftar terbaru yang berlaku.</p>
     `,
     coverImage:
-      "https://placehold.co/1200x630/2d5a27/ffffff?text=e-Formularium",
+      "https://picsum.photos/seed/e-formularium/1200/630",
     isPublished: true,
     authorId: "usr-2",
     authorName: "Siti Nurhaliza, S.Farm",
@@ -161,7 +161,7 @@ export const dummyArticles: Article[] = [
       <p>Sosialisasi dilakukan melalui pertemuan langsung dengan warga di beberapa kecamatan, serta penyebaran brosur dan materi edukasi tentang penggunaan obat yang bijak.</p>
     `,
     coverImage:
-      "https://placehold.co/1200x630/5a3a1e/ffffff?text=Sosialisasi+Masyarakat",
+      "https://picsum.photos/seed/sosialisasi-masyarakat/1200/630",
     isPublished: true,
     authorId: "usr-3",
     authorName: "Ahmad Rizky, S.Farm",
@@ -178,7 +178,7 @@ export const dummyArticles: Article[] = [
       <p>Pesan utama kampanye: "Gunakan Antibiotik Sesuai Resep Dokter, Selamatkan Masa Depan Kesehatan Kita." Kegiatan ini mendapat sambutan positif dari masyarakat dan tenaga kesehatan di Kabupaten Kotabaru.</p>
     `,
     coverImage:
-      "https://placehold.co/1200x630/5a3a1e/ffffff?text=Kampanye+Antibiotik",
+      "https://picsum.photos/seed/kampanye-antibiotik/1200/630",
     isPublished: false,
     authorId: "usr-1",
     authorName: "Administrator",

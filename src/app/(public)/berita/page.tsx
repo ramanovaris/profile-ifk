@@ -2,11 +2,13 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Breadcrumb } from "@/components/public/breadcrumb";
 import { dummyArticles } from "@/lib/dummy-data";
+import { cn } from "@/lib/utils";
 
 const categories = ["Semua", "Kegiatan", "Informasi", "Sosialisasi"] as const;
 
@@ -28,80 +30,91 @@ export default function BeritaPage() {
   return (
     <>
       {/* ── Header ────────────────────────────────────────────────── */}
-      <section className="bg-slate-50 py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <p className="text-sm text-slate-500">Beranda / Berita</p>
-          <h1 className="mt-2 text-3xl font-bold text-slate-900">Berita &amp; Informasi</h1>
+      <section className="page-hero pb-24 pt-36 text-white">
+        <div className="section-container">
+          <Breadcrumb items={[{ label: "Beranda", href: "/" }, { label: "Berita" }]} />
+          <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
+            Informasi
+          </span>
+          <h1 className="mt-4 text-5xl font-bold tracking-tighter sm:text-6xl">
+            Berita &amp; Informasi
+          </h1>
+          <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-zinc-400">
+            Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian.
+          </p>
         </div>
       </section>
 
       {/* ── Filter & Grid ─────────────────────────────────────────── */}
-      <section className="bg-white py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="border-t border-border bg-surface py-24">
+        <div className="section-container">
           {/* Search bar */}
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.5} />
             <Input
               placeholder="Cari berita..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
+              className="border-border pl-9 focus:border-brand-600"
             />
           </div>
 
           {/* Category filter */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className="cursor-pointer"
-              >
-                <Badge
-                  variant={activeCategory === cat ? "default" : "secondary"}
-                  className="transition"
+          <div className="mt-6 flex flex-wrap gap-2">
+            {categories.map((cat) => {
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={cn(
+                    "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-500 ease-luxe",
+                    isActive
+                      ? "bg-zinc-950 text-white"
+                      : "bg-surface-alt text-muted hover:bg-zinc-200",
+                  )}
                 >
                   {cat}
-                </Badge>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
 
           {/* Article grid */}
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-8 sm:grid-cols-2">
             {filtered.map((article) => (
-              <Link key={article.id} href={`/berita/${article.slug}`}>
-                <Card className="h-full overflow-hidden transition hover:shadow-md">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={article.coverImage}
-                    alt={article.title}
-                    className="h-48 w-full object-cover"
-                  />
-                  <CardContent className="pt-4">
-                    <Badge variant="secondary">{article.category}</Badge>
-                    <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900">
-                      {article.title}
-                    </h3>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {new Date(article.publishedAt).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}{" "}
-                      &middot; {article.authorName}
-                    </p>
-                    <p className="mt-2 line-clamp-2 text-sm text-slate-600">
-                      {article.content.replace(/<[^>]+>/g, "").slice(0, 100)}...
-                    </p>
-                  </CardContent>
-                </Card>
+              <Link key={article.id} href={`/berita/${article.slug}`} className="group block">
+                <div className="bezel">
+                  <div className="bezel-inner relative aspect-[16/10]">
+                    <Image
+                      src={article.coverImage}
+                      alt={article.title}
+                      fill
+                      className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-[1.03]"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <Badge variant="default" className="bg-white/90 text-brand-700">
+                        {article.category}
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+                <h3 className="mt-4 text-lg font-semibold text-heading line-clamp-2 group-hover:text-brand-800">
+                  {article.title}
+                </h3>
+                <p className="mt-1 font-mono text-xs text-muted">
+                  {new Date(article.publishedAt).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
               </Link>
             ))}
           </div>
 
           {filtered.length === 0 && (
-            <p className="mt-12 text-center text-sm text-slate-500">
+            <p className="mt-12 text-center text-sm text-muted">
               Tidak ada berita yang cocok dengan pencarian Anda.
             </p>
           )}
