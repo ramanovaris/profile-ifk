@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { PageHero } from "@/components/public/page-hero";
+import { Reveal } from "@/components/public/reveal";
 
 export default function ProfilPage() {
   return (
@@ -15,9 +16,11 @@ export default function ProfilPage() {
       {/* ── Sambutan Kepala ───────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Sambutan Kepala UPTD
           </h2>
+          </Reveal>
           <div className="mt-12 grid gap-12 md:grid-cols-[280px_1fr]">
             <div className="bezel w-full">
               <div className="bezel-inner relative aspect-[3/4]">
@@ -58,9 +61,11 @@ export default function ProfilPage() {
       {/* ── Visi & Misi ───────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Visi &amp; Misi
           </h2>
+          </Reveal>
 
           {/* Visi */}
           <div className="mt-12">
@@ -102,9 +107,11 @@ export default function ProfilPage() {
       {/* ── Tupoksi ───────────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Tugas Pokok &amp; Fungsi
           </h2>
+          </Reveal>
 
           {/* Tugas Pokok */}
           <div className="mt-12">
@@ -133,9 +140,11 @@ export default function ProfilPage() {
       {/* ── Struktur Organisasi ───────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24 text-center">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Struktur Organisasi
           </h2>
+          </Reveal>
           <div className="bezel mx-auto mt-12 max-w-3xl">
             <div className="bezel-inner">
               <Image

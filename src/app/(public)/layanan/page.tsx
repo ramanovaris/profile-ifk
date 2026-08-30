@@ -1,6 +1,7 @@
 import { Thermometer, Snowflake, PackageCheck, AlertTriangle } from "lucide-react";
 
 import { PageHero } from "@/components/public/page-hero";
+import { Reveal } from "@/components/public/reveal";
 export default function LayananPage() {
   return (
     <>
@@ -14,9 +15,11 @@ export default function LayananPage() {
       {/* ── Jam Pelayanan ─────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Jam Pelayanan
           </h2>
+          </Reveal>
           <div className="mt-8 overflow-x-auto font-mono">
             <table className="w-full text-sm">
               <thead>
@@ -47,9 +50,11 @@ export default function LayananPage() {
       {/* ── Standar Mutu & Penyimpanan ────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Standar Mutu &amp; Penyimpanan
           </h2>
+          </Reveal>
           <div className="mt-12 space-y-0 divide-y divide-border">
             {[
               { icon: PackageCheck, title: "FEFO", desc: "First Expired First Out — obat dengan tanggal kedaluwarsa paling depan didistribusikan terlebih dahulu." },
@@ -71,13 +76,14 @@ export default function LayananPage() {
       {/* ── Alur Pelayanan Rutin (LPLPO) ──────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Alur Pelayanan Rutin (LPLPO)
           </h2>
           <p className="mt-2 max-w-[65ch] text-base text-muted">
             Layanan Pengadaan Logistik Pemerintah Obligasi — distribusi obat rutin tiap periode.
           </p>
-
+          </Reveal>
           <div className="mt-12 border-l-2 border-brand-300 pl-6">
             {[
               {
@@ -126,9 +132,11 @@ export default function LayananPage() {
       {/* ── Permintaan Bon / Sewaktu ──────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Permintaan Bon / Sewaktu
           </h2>
+          </Reveal>
 
           <div className="rounded-[2rem] border border-brand-200/60 bg-brand-50/60 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
             <div className="flex items-center gap-3">
@@ -173,9 +181,11 @@ export default function LayananPage() {
       {/* ── Obat Rusak & Kedaluwarsa ──────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <h2 className="text-2xl font-bold tracking-tight text-heading sm:text-3xl">
             Penanganan Obat Rusak &amp; Kedaluwarsa
           </h2>
+          </Reveal>
 
           <div className="rounded-[2rem] border border-red-200/60 bg-red-50/60 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
             <div className="flex items-center gap-3">

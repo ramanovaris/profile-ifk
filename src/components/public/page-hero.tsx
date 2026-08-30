@@ -31,7 +31,7 @@ export function PageHero({
       />
       <div className="section-container relative z-10 py-24">
         <div className="max-w-2xl">
-          <Breadcrumb items={breadcrumb} />
+          <Breadcrumb items={breadcrumb} variant="dark" />
           <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden />
             {eyebrow}

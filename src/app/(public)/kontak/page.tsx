@@ -1,5 +1,6 @@
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
+import { Reveal } from "@/components/public/reveal";
 import { siteConfig } from "@/lib/dummy-data";
 export default function KontakPage() {
   return (
@@ -11,11 +12,10 @@ export default function KontakPage() {
         subtitle="Hubungi kami untuk informasi lebih lanjut seputar layanan kefarmasian."
       />
 
-      {/* ── 2-kolom ───────────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
+          <Reveal>
           <div className="grid gap-12 md:grid-cols-[1fr_1.2fr]">
-            {/* Kiri — Info Kontak */}
             <div>
               <h2 className="text-xl font-bold text-heading">Informasi Kontak</h2>
               <div className="mt-8 space-y-0 divide-y divide-border">
@@ -103,6 +103,7 @@ export default function KontakPage() {
               </div>
             </div>
           </div>
+          </Reveal>
         </div>
       </section>
     </>

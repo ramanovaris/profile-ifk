@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHero } from "@/components/public/page-hero";
+import { Reveal } from "@/components/public/reveal";
 import { dummyArticles } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
 
@@ -36,10 +37,10 @@ export default function BeritaPage() {
         subtitle="Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian."
       />
 
-      {/* ── Filter & Grid ─────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-24">
         <div className="section-container">
           {/* Search bar */}
+          <Reveal>
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.5} />
             <Input
@@ -70,8 +71,10 @@ export default function BeritaPage() {
               );
             })}
           </div>
+          </Reveal>
 
           {/* Article grid */}
+          <Reveal delay={100}>
           <div className="mt-10 grid gap-8 sm:grid-cols-2">
             {filtered.map((article) => (
               <Link key={article.id} href={`/berita/${article.slug}`} className="group block">
@@ -103,7 +106,7 @@ export default function BeritaPage() {
               </Link>
             ))}
           </div>
-
+          </Reveal>
           {filtered.length === 0 && (
             <p className="mt-12 text-center text-sm text-muted">
               Tidak ada berita yang cocok dengan pencarian Anda.
