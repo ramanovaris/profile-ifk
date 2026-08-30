@@ -106,13 +106,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         {/* Top bar */}
         <header className="flex h-14 shrink-0 items-center justify-between border-b bg-white px-4">
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger>
-              <button
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 md:hidden"
-                aria-label="Buka menu"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
+            <SheetTrigger
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 md:hidden"
+              aria-label="Buka menu"
+            >
+              <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="left" className="w-60 p-0">
               <SheetHeader>

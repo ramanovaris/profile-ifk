@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, Pill } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+
 import {
   Sheet,
   SheetContent,
@@ -49,13 +49,11 @@ export function Navbar() {
 
         {/* Mobile hamburger */}
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger>
-            <button
-              className="rounded-md p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 md:hidden"
-              aria-label="Buka menu"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+          <SheetTrigger
+            className="md:hidden rounded-md p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            aria-label="Buka menu"
+          >
+            <Menu className="h-5 w-5" />
           </SheetTrigger>
           <SheetContent side="right" className="w-72">
             <SheetHeader>
