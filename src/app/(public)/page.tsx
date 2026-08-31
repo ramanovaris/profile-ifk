@@ -9,7 +9,7 @@ import { siteConfig, dummyArticles } from "@/lib/dummy-data";
 const stats = [
   { icon: Building2, value: "23 Faskes", label: "Jaringan Kesehatan Binaan" },
   { icon: ShieldCheck, value: "100%", label: "Standar Mutu Terjamin" },
-  { icon: Clock, value: "Tepat Waktu", label: "SLA Distribusi" },
+  { icon: Clock, value: "Tepat Waktu", label: "Pengiriman Tepat Waktu" },
 ] as const;
 
 export default function HomePage() {
@@ -76,14 +76,14 @@ export default function HomePage() {
               </div>
 
               {/* Trust line — mini stats */}
-              <div className="mt-7 flex flex-wrap gap-x-10 gap-y-6 border-t border-white/10 pt-5 lg:mt-14 lg:pt-8">
+              <div className="mt-7 flex flex-wrap gap-x-8 gap-y-6 border-t border-white/10 pt-5 lg:mt-14 lg:flex-nowrap lg:pt-8">
                 {stats.map((stat) => (
                   <div key={stat.label}>
                     <p className="flex items-center gap-2 text-2xl font-bold tracking-tighter">
                       <stat.icon className="h-5 w-5 text-brand-400" strokeWidth={1} />
                       {stat.value}
                     </p>
-                    <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-zinc-500">
+                    <p className="mt-1 whitespace-nowrap text-[11px] uppercase tracking-[0.15em] text-zinc-500">
                       {stat.label}
                     </p>
                   </div>
