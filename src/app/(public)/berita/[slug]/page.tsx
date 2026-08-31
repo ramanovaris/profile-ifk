@@ -28,6 +28,8 @@ export default async function BeritaDetailPage(props: { params: Promise<{ slug: 
           src={article.coverImage}
           alt={article.title}
           fill
+          unoptimized={article.coverImage.startsWith("https://picsum.photos/")}
+          sizes="100vw"
           className="object-cover"
           priority
         />
@@ -83,6 +85,8 @@ export default async function BeritaDetailPage(props: { params: Promise<{ slug: 
                           src={a.coverImage}
                           alt={a.title}
                           fill
+                          unoptimized={a.coverImage.startsWith("https://picsum.photos/")}
+                          sizes="(min-width: 768px) 33vw, 100vw"
                           className="object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       </div>

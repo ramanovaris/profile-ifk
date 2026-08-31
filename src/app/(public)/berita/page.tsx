@@ -84,6 +84,8 @@ export default function BeritaPage() {
                       src={article.coverImage}
                       alt={article.title}
                       fill
+                      sizes="(min-width: 640px) 50vw, 100vw"
+                      unoptimized={article.coverImage.startsWith("https://picsum.photos/")}
                       className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-[1.03]"
                     />
                     <div className="absolute top-4 left-4">

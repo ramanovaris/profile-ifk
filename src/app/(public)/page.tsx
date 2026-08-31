@@ -5,6 +5,7 @@ import { ArrowRight, Building2, ShieldCheck, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
 import { siteConfig, dummyArticles } from "@/lib/dummy-data";
+import { placeholderImage } from "@/lib/placeholder";
 
 const stats = [
   { icon: Building2, value: "28 Faskes", label: "Jaringan Kesehatan Binaan" },
@@ -168,9 +169,10 @@ export default function HomePage() {
               <div className="bezel">
                 <div className="bezel-inner relative aspect-[4/3]">
                   <Image
-                    src="https://picsum.photos/seed/ifk-layanan/600/450"
+                    src={placeholderImage(600, 450, "Distribusi Obat", "Layanan")}
                     alt="Distribusi obat"
                     fill
+                    unoptimized
                     sizes="(min-width: 768px) 33vw, 100vw"
                     className="object-cover"
                   />
@@ -185,9 +187,10 @@ export default function HomePage() {
               <div className="bezel md:order-1">
                 <div className="bezel-inner relative aspect-[4/3]">
                   <Image
-                    src="https://picsum.photos/seed/ifk-berita/600/450"
+                    src={placeholderImage(600, 450, "Berita & Informasi", "Informasi")}
                     alt="Berita kegiatan"
                     fill
+                    unoptimized
                     sizes="(min-width: 768px) 33vw, 100vw"
                     className="object-cover"
                   />

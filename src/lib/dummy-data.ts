@@ -1,3 +1,5 @@
+import { placeholderImage } from "./placeholder";
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export type Article = {
@@ -92,8 +94,7 @@ export const dummyArticles: Article[] = [
       <p>Kegiatan ini bertujuan untuk memastikan setiap faskes dapat menggunakan sistem dengan baik dalam pengelolaan distribusi dan pemantauan stok obat. Para peserta mendapatkan penjelasan lengkap mulai dari cara login, input data stok, hingga laporan penggunaan obat.</p>
       <p>Selain itu, sosialisasi ini juga menjadi wadah untuk menampung masukan dan kendala yang dihadapi oleh para apoteker faskes dalam penggunaan sistem informasi kefarmasian.</p>
     `,
-    coverImage:
-      "https://picsum.photos/seed/kegiatan-ifk/1200/630",
+    coverImage: placeholderImage(1200, 630, "Sosialisasi Sistem Informasi Kefarmasian", "Kegiatan"),
     isPublished: true,
     authorId: "usr-1",
     authorName: "Administrator",
@@ -109,8 +110,7 @@ export const dummyArticles: Article[] = [
       <p>Evaluasi ini mencakup analisis ketersediaan obat di seluruh faskes binaan, tingkat pemenuhan permintaan, serta efektivitas proses distribusi yang telah dilaksanakan selama periode tersebut.</p>
       <p>Hasil evaluasi menunjukkan bahwa tingkat pemenuhan permintaan obat mencapai 95%, dengan beberapa catatan perbaikan untuk obat-obatan yang mengalami keterlambatan pengadaan dari pemasok.</p>
     `,
-    coverImage:
-      "https://picsum.photos/seed/evaluasi-obat/1200/630",
+    coverImage: placeholderImage(1200, 630, "Evaluasi Distribusi Obat Triwulan IV", "Kegiatan"),
     isPublished: true,
     authorId: "usr-2",
     authorName: "Siti Nurhaliza, S.Farm",
@@ -126,8 +126,7 @@ export const dummyArticles: Article[] = [
       <p>Selama libur nasional, pelayanan distribusi obat akan dititipkan pada jadwal pengajuan sebelum masa libur. Faskes binaan diimbau untuk mengajuan permintaan obat paling lambat H-7 sebelum hari libur nasional dimulai.</p>
       <p>Pelayanan normal akan kembali beroperasi sesuai jam kerja yang berlaku setelah masa libur nasional berakhir.</p>
     `,
-    coverImage:
-      "https://picsum.photos/seed/info-layanan/1200/630",
+    coverImage: placeholderImage(1200, 630, "Jadwal Pelayanan Libur Nasional", "Informasi"),
     isPublished: true,
     authorId: "usr-1",
     authorName: "Administrator",
@@ -143,8 +142,7 @@ export const dummyArticles: Article[] = [
       <p>Beberapa obat yang mengalami perubahan meliputi penambahan obat generik baru, penghapusan obat yang sudah tidak diproduksi, serta penyesuaian harga obat berdasarkan keputusan terbaru dari Kementerian Kesehatan.</p>
       <p>Faskes binaan diimbau untuk memperbarui referensi formularium di masing-masing institusi agar sesuai dengan daftar terbaru yang berlaku.</p>
     `,
-    coverImage:
-      "https://picsum.photos/seed/e-formularium/1200/630",
+    coverImage: placeholderImage(1200, 630, "Pembaruan e-Formularium Nasional", "Informasi"),
     isPublished: true,
     authorId: "usr-2",
     authorName: "Siti Nurhaliza, S.Farm",
@@ -160,8 +158,7 @@ export const dummyArticles: Article[] = [
       <p>Kegiatan ini bertujuan untuk meningkatkan kesadaran masyarakat tentang pentingnya menggunakan obat yang aman, berkhasiat, dan berkualitas. Masyarakat diedukasi untuk mengenali obat-obatan yang tidak memiliki izin edar dari BPOM.</p>
       <p>Sosialisasi dilakukan melalui pertemuan langsung dengan warga di beberapa kecamatan, serta penyebaran brosur dan materi edukasi tentang penggunaan obat yang bijak.</p>
     `,
-    coverImage:
-      "https://picsum.photos/seed/sosialisasi-masyarakat/1200/630",
+    coverImage: placeholderImage(1200, 630, "Pelibatan Masyarakat Pengawasan Obat", "Sosialisasi"),
     isPublished: true,
     authorId: "usr-3",
     authorName: "Ahmad Rizky, S.Farm",
@@ -177,8 +174,7 @@ export const dummyArticles: Article[] = [
       <p>Kampanye ini menekankan pentingnya tidak menggunakan antibiotik tanpa resep dokter, serta bahaya resistensi antibiotik yang dapat mengancam kesehatan masyarakat secara luas.</p>
       <p>Pesan utama kampanye: "Gunakan Antibiotik Sesuai Resep Dokter, Selamatkan Masa Depan Kesehatan Kita." Kegiatan ini mendapat sambutan positif dari masyarakat dan tenaga kesehatan di Kabupaten Kotabaru.</p>
     `,
-    coverImage:
-      "https://picsum.photos/seed/kampanye-antibiotik/1200/630",
+    coverImage: placeholderImage(1200, 630, "Kampanye Antibiotik Bijak", "Sosialisasi"),
     isPublished: false,
     authorId: "usr-1",
     authorName: "Administrator",

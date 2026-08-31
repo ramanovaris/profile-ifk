@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
+import { placeholderImage } from "@/lib/placeholder";
 
 export default function ProfilPage() {
   return (
@@ -25,9 +26,10 @@ export default function ProfilPage() {
             <div className="bezel w-full">
               <div className="bezel-inner relative aspect-[3/4]">
                 <Image
-                  src="https://picsum.photos/seed/ifk-kepala/300/400"
+                  src={placeholderImage(300, 400, "Kepala IFK", "Profil")}
                   alt="Kepala UPTD Instalasi Farmasi"
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>
@@ -148,10 +150,11 @@ export default function ProfilPage() {
           <div className="bezel mx-auto mt-12 max-w-3xl">
             <div className="bezel-inner">
               <Image
-                src="https://picsum.photos/seed/ifk-struktur/800/500"
+                src={placeholderImage(800, 500, "Struktur Organisasi", "Profil")}
                 alt="Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru"
                 width={800}
                 height={500}
+                unoptimized
                 className="h-auto w-full"
               />
             </div>
