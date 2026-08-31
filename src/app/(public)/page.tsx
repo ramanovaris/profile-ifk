@@ -7,7 +7,7 @@ import { Reveal } from "@/components/public/reveal";
 import { siteConfig, dummyArticles } from "@/lib/dummy-data";
 
 const stats = [
-  { icon: Building2, value: "23 Faskes", label: "Jaringan Kesehatan Binaan" },
+  { icon: Building2, value: "28 Faskes", label: "Jaringan Kesehatan Binaan" },
   { icon: ShieldCheck, value: "100%", label: "Standar Mutu Terjamin" },
   { icon: Clock, value: "Tepat Waktu", label: "Pengiriman Tepat Waktu" },
 ] as const;
