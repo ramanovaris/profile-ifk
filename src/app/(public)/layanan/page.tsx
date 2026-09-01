@@ -81,7 +81,7 @@ export default function LayananPage() {
             Alur Pelayanan Rutin (LPLPO)
           </h2>
           <p className="mt-2 max-w-[65ch] text-base text-muted">
-            Layanan Pengadaan Logistik Pemerintah Obligasi — distribusi obat rutin tiap periode.
+            Laporan Pemakaian dan Lembar Permintaan Obat — distribusi obat rutin tiap periode.
           </p>
           </Reveal>
           <div className="mt-12 border-l-2 border-brand-300 pl-6">
