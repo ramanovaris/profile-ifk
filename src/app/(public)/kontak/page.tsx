@@ -91,13 +91,12 @@ export default function KontakPage() {
                 <iframe
                   src={siteConfig.googleMapsEmbedUrl}
                   width="100%"
-                  height="500"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   title="Lokasi UPTD Instalasi Farmasi Kab. Kotabaru"
-                  className="h-full w-full grayscale"
+                  className="h-[360px] w-full md:h-[440px]"
                 />
                 </div>
               </div>

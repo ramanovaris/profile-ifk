@@ -48,7 +48,7 @@ export const siteConfig: SiteConfig = {
   email: "instalasifarmasi4@gmail.com",
   whatsappLink: "https://wa.me/6281234567890",
   googleMapsEmbedUrl:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.19449070628!2d116.149!3d-3.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f1e2f6f1f1f%3A0x1234567890abcdef!2sKotabaru%2C+Kalimantan+Selatan!5e0!3m2!1sid!2sid!4v1234567890123!5m2!1sid!2sid",
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.402205111195!2d116.22363550000001!3d-3.2497904999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2def302cb3e8dcff%3A0xb7c86d7dc7737d8c!2sInstalasi%20Farmasi!5e0!3m2!1sen!2sid!4v1788250580948!5m2!1sen!2sid",
   operationalHours:
     "Senin - Kamis: 08.00 - 16.30 WITA\nJumat: 08.00 - 11.00 WITA",
   sp4nLaporUrl: "https://www.lapor.go.id",
