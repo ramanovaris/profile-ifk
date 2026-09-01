@@ -34,6 +34,7 @@ export type SiteConfig = {
   operationalHours: string;
   sp4nLaporUrl: string;
   motto: string;
+  tagline: string;
 };
 
 // ── Site Config ───────────────────────────────────────────────────────────────
@@ -42,9 +43,9 @@ export const siteConfig: SiteConfig = {
   name: "UPTD Instalasi Farmasi Kab. Kotabaru",
   shortName: "IFK Kotabaru",
   address:
-    "Jl. Veteran No. 17, Kotabaru, Kalimantan Selatan 72112",
-  phone: "(0518) 62107",
-  email: "ifk.kotabaru@gmail.com",
+    "Jl. Kenanga Desa Dirgahayu, Kotabaru 72116. Telp/Fax (0518) 21603",
+  phone: "(0518) 21603",
+  email: "instalasifarmasi4@gmail.com",
   whatsappLink: "https://wa.me/6281234567890",
   googleMapsEmbedUrl:
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.19449070628!2d116.149!3d-3.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f1e2f6f1f1f%3A0x1234567890abcdef!2sKotabaru%2C+Kalimantan+Selatan!5e0!3m2!1sid!2sid!4v1234567890123!5m2!1sid!2sid",
@@ -53,6 +54,7 @@ export const siteConfig: SiteConfig = {
   sp4nLaporUrl: "https://www.lapor.go.id",
   motto:
     "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat",
+  tagline: "Stok Valid, Team Solid",
 };
 
 // ── Dummy Users ───────────────────────────────────────────────────────────────

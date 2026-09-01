@@ -124,8 +124,8 @@ export default function HomePage() {
                   <ShieldCheck className="h-5 w-5 text-sand" strokeWidth={1.5} />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-white">100% Mutu Terjamin</p>
-                  <p className="text-xs text-zinc-400">Standar mutu nasional</p>
+                  <p className="text-sm font-semibold text-white">{siteConfig.tagline}</p>
+                  <p className="text-xs text-zinc-400">Komitmen pelayanan kami</p>
                 </div>
               </div>
             </div>
