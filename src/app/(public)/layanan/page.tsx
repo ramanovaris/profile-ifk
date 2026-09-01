@@ -112,7 +112,7 @@ export default function LayananPage() {
               },
               {
                 step: "5",
-                title: "SLA",
+                title: "Komitmen Waktu",
                 detail:
                   "Penyelesaian permintaan dan distribusi obat dilakukan maksimal 10 hari kerja sejak berkas lengkap diterima.",
               },
@@ -168,7 +168,7 @@ export default function LayananPage() {
                 </p>
               </div>
               <div>
-                <h4 className="font-semibold text-heading">SLA</h4>
+                <h4 className="font-semibold text-heading">Komitmen Waktu</h4>
                 <p className="mt-1 text-sm text-muted">
                   Maksimal <strong>1×24 jam</strong> sejak berkas permintaan lengkap dan disetujui.
                 </p>
