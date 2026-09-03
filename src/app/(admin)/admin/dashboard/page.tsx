@@ -5,7 +5,7 @@ import { AdminShell } from "@/components/admin/admin-shell";
 import { dummyArticles, dummyUsers, dummyStats } from "@/lib/dummy-data";
 
 const statCards = [
-  { label: "Total Artikel", value: dummyStats.totalArticles, icon: FileText, color: "text-blue-700" },
+  { label: "Total Artikel", value: dummyStats.totalArticles, icon: FileText, color: "text-brand-700" },
   { label: "Terbit", value: dummyStats.published, icon: CheckCircle, color: "text-green-600" },
   { label: "Draft", value: dummyStats.draft, icon: FilePen, color: "text-amber-600" },
   { label: "Total Pengguna", value: dummyStats.totalUsers, icon: Users, color: "text-purple-600" },
@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
           {dummyUsers.map((user) => (
             <Card key={user.id}>
               <CardContent className="flex items-center gap-3 pt-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-700">
                   {user.name.charAt(0)}
                 </div>
                 <div>

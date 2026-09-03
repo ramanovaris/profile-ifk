@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -10,7 +11,6 @@ import {
   UserCog,
   LogOut,
   Menu,
-  Pill,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,7 +48,7 @@ function SidebarLink({
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition",
         active
-          ? "bg-blue-50 text-blue-700"
+          ? "bg-brand-50 text-brand-700"
           : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
       )}
     >
@@ -63,7 +63,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
   return (
     <>
       <div className="flex items-center gap-2 px-3 py-4">
-        <Pill className="h-5 w-5 text-blue-700" />
+        <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 rounded-full" />
         <span className="text-sm font-bold text-slate-900">Admin IFK</span>
       </div>
       <Separator />
@@ -125,7 +125,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-slate-700">Admin</span>
             <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-blue-100 text-xs text-blue-700">AD</AvatarFallback>
+              <AvatarFallback className="bg-brand-100 text-xs text-brand-700">AD</AvatarFallback>
             </Avatar>
           </div>
         </header>

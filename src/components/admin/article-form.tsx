@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,12 +83,14 @@ export function ArticleForm({ article }: { article?: Article }) {
           className="mt-1"
         />
         {(preview || article?.coverImage) && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={preview ?? article?.coverImage}
-            alt="Preview"
-            className="mt-2 h-40 w-full rounded object-cover"
-          />
+          <div className="relative mt-2 h-40 w-full">
+            <Image
+              src={preview ?? article?.coverImage ?? ""}
+              alt="Preview"
+              fill
+              className="h-40 w-full rounded object-cover"
+            />
+          </div>
         )}
       </div>
 

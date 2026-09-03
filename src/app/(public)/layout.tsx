@@ -7,6 +7,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
+      {/* Film grain overlay — fixed, non-interaktif */}
+      <div aria-hidden className="noise-layer" />
     </>
   );
 }
