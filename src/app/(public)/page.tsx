@@ -14,7 +14,10 @@ const stats = [
 ] as const;
 
 export default function HomePage() {
-  const latestArticles = dummyArticles.filter((a) => a.isPublished).slice(0, 3);
+  const latestArticles = dummyArticles
+    .filter((a) => a.isPublished)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, 3);
   const featuredArticle = latestArticles[0];
   const otherArticles = latestArticles.slice(1);
 
