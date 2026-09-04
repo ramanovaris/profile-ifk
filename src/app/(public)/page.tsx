@@ -42,7 +42,7 @@ export default function HomePage() {
         <div aria-hidden className="hero-aurora pointer-events-none absolute inset-0" />
         {/* Grid halus bermask */}
         <div aria-hidden className="hero-grid pointer-events-none absolute inset-0" />
-        <div className="section-container relative z-10 flex flex-1 flex-col justify-center pb-[clamp(1.5rem,6vh,4rem)] pt-[clamp(3rem,12vh,9rem)]">
+        <div className="section-container relative z-10 flex flex-1 flex-col justify-center pb-[clamp(1rem,3vh,2rem)] pt-[clamp(2rem,5vh,3.5rem)] md:pb-[clamp(1.5rem,6vh,4rem)] md:pt-[clamp(3rem,12vh,9rem)]">
           <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_1fr]">
             {/* Kiri — massive typography */}
             <div>
@@ -50,18 +50,18 @@ export default function HomePage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden />
                 Dinas Kesehatan Kabupaten Kotabaru
               </span>
-              <h1 className="mt-6 text-[clamp(2.5rem,4.6vw,4.5rem)] font-bold leading-[1.04] tracking-tighter [@media(max-height:759px)]:text-[clamp(2.25rem,4vw,3rem)] lg:mt-8">
+              <h1 className="mt-5 text-[clamp(2.1rem,4.6vw,4.5rem)] font-bold leading-[1.04] tracking-tighter [@media(max-height:759px)]:text-[clamp(2rem,4vw,3rem)] lg:mt-8">
                 UPTD Instalasi{" "}
                 <span className="italic text-brand-400">Farmasi</span>
                 <span className="block">Kabupaten Kotabaru</span>
               </h1>
-              <p className="mt-5 max-w-[54ch] text-base leading-relaxed text-zinc-400 lg:mt-7 lg:text-lg">
+              <p className="mt-4 max-w-[54ch] text-[15px] leading-relaxed text-zinc-400 lg:mt-7 lg:text-lg">
                 <span className="font-medium text-zinc-100">Melayani dengan Integritas.</span>{" "}
                 Menjamin mutu obat untuk kesehatan masyarakat — distribusi kefarmasian tepat
                 waktu, tepat mutu, ke seluruh fasilitas kesehatan binaan.
               </p>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3 lg:mt-10">
+              <div className="mt-5 flex flex-wrap items-center gap-3 lg:mt-10">
                 <Link
                   href="/layanan"
                   className="group inline-flex items-center gap-3 rounded-full bg-brand-600 py-2.5 pl-6 pr-2.5 text-sm font-medium text-white transition-all duration-500 ease-luxe hover:bg-brand-500 active:scale-[0.98]"
@@ -80,18 +80,40 @@ export default function HomePage() {
               </div>
 
               {/* Trust line — mini stats */}
-              <div className="mt-7 flex flex-wrap gap-x-8 gap-y-6 border-t border-white/10 pt-5 lg:mt-14 lg:flex-nowrap lg:pt-8">
-                {stats.map((stat) => (
-                  <div key={stat.label}>
-                    <p className="flex items-center gap-2 text-2xl font-bold tracking-tighter">
-                      <stat.icon className="h-5 w-5 text-brand-400" strokeWidth={1} />
-                      {stat.value}
-                    </p>
-                    <p className="mt-1 whitespace-nowrap text-[11px] uppercase tracking-[0.15em] text-zinc-500">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
+              <div className="mt-6 flex flex-wrap items-start justify-between gap-x-6 gap-y-3 border-t border-white/10 pt-4 sm:flex-nowrap sm:gap-x-6 lg:mt-14 lg:flex-nowrap lg:gap-x-8 lg:pt-8">
+                {stats.map((stat, i) => {
+                  const isCenteredMobile = i === 2;
+                  return (
+                    <div
+                      key={stat.label}
+                      className={
+                        isCenteredMobile
+                          ? "basis-full lg:basis-auto"
+                          : ""
+                      }
+                    >
+                      <p
+                        className={
+                          isCenteredMobile
+                            ? "flex items-center justify-center gap-2 text-xl font-bold tracking-tighter lg:justify-start lg:text-2xl"
+                            : "flex items-center gap-2 text-xl font-bold tracking-tighter lg:text-2xl"
+                        }
+                      >
+                        <stat.icon className="h-4 w-4 text-brand-400 lg:h-5 lg:w-5" strokeWidth={1} />
+                        {stat.value}
+                      </p>
+                      <p
+                        className={
+                          isCenteredMobile
+                            ? "mt-0.5 text-center text-[10px] font-medium tracking-wide text-zinc-400 lg:mt-1 lg:text-left lg:whitespace-nowrap lg:text-[11px] lg:font-normal lg:uppercase lg:tracking-[0.15em] lg:text-zinc-500"
+                            : "mt-0.5 text-[10px] font-medium tracking-wide text-zinc-400 lg:mt-1 lg:whitespace-nowrap lg:text-[11px] lg:font-normal lg:uppercase lg:tracking-[0.15em] lg:text-zinc-500"
+                        }
+                      >
+                        {stat.label}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
