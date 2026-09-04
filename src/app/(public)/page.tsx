@@ -157,10 +157,10 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="pointer-events-none absolute bottom-6 right-10 hidden flex-col items-center gap-3 md:flex">
+        {/* Scroll indicator — mobile centered, desktop kanan-bawah */}
+        <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:left-auto md:right-10 md:bottom-6 md:translate-x-0 md:gap-3">
           <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Gulir</span>
-          <span className="relative h-12 w-px overflow-hidden bg-white/10">
+          <span className="relative h-10 w-px overflow-hidden bg-white/10 md:h-12">
             <span className="scroll-line absolute inset-0 bg-brand-400" aria-hidden />
           </span>
         </div>
