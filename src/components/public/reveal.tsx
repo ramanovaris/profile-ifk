@@ -22,20 +22,34 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
     const el = ref.current;
     if (!el) return;
 
+    // Cek preferensi reduced-motion: langsung tampil tanpa animasi
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) {
+      el.classList.add("is-visible");
+      return;
+    }
+
+    // Fallback: kalau IO tidak support atau gagal, tampilkan setelah 1.5s
+    const fallback = window.setTimeout(() => el.classList.add("is-visible"), 1500);
+
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             entry.target.classList.add("is-visible");
+            window.clearTimeout(fallback);
             io.unobserve(entry.target);
           }
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0, rootMargin: "0px 0px -10% 0px" }
     );
 
     io.observe(el);
-    return () => io.disconnect();
+    return () => {
+      window.clearTimeout(fallback);
+      io.disconnect();
+    };
   }, []);
 
   return (
