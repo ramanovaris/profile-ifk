@@ -209,18 +209,7 @@ export default function HomePage() {
           {/* Item 2: gambar kiri, teks kanan (reverse) */}
           <Reveal>
             <div className="grid gap-10 md:grid-cols-[1fr_2fr] md:items-center">
-              <div className="bezel md:order-1">
-                <div className="bezel-inner relative aspect-[4/3]">
-                  <Image
-                    src={placeholderImage(600, 450, "Berita & Informasi", "Informasi")}
-                    alt="Berita kegiatan"
-                    fill
-                    unoptimized
-                    sizes="(min-width: 768px) 33vw, 100vw"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
+              {/* Text duluan di DOM (mobile: text-top). md:order-2 paksa text ke kanan di desktop. */}
               <div className="md:order-2">
                 <span className="eyebrow bg-brand-50 text-brand-700">Informasi</span>
                 <h2 className="mt-4 text-4xl font-bold tracking-tighter text-heading sm:text-5xl">
@@ -238,6 +227,19 @@ export default function HomePage() {
                     <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
                   </span>
                 </Link>
+              </div>
+              {/* Image kedua di DOM (mobile: image-bottom). md:order-1 paksa image ke kiri di desktop. */}
+              <div className="bezel md:order-1">
+                <div className="bezel-inner relative aspect-[4/3]">
+                  <Image
+                    src={placeholderImage(600, 450, "Berita & Informasi", "Informasi")}
+                    alt="Berita kegiatan"
+                    fill
+                    unoptimized
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
               </div>
             </div>
           </Reveal>
