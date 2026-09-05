@@ -9,13 +9,30 @@ interface RevealProps {
   className?: string;
   /** delay ms sebelum animasi berjalan (untuk stagger) */
   delay?: number;
+  /** override IntersectionObserver rootMargin (default: "0px 0px -10% 0px") */
+  rootMargin?: string;
+  /** override IntersectionObserver threshold (default: 0) */
+  threshold?: number;
+  /** override fallback setTimeout dalam ms (default: 1500) */
+  fallbackMs?: number;
 }
 
 /**
  * Wrapper scroll-reveal via IntersectionObserver.
  * CSS-driven: hanya animasi opacity/transform/filter (GPU-safe).
+ *
+ * Props `rootMargin`, `threshold`, `fallbackMs` opsional untuk override
+ * per-instance — pakai ketika section tinggi butuh trigger lebih awal
+ * atau fallback lebih cepat. Default cocok untuk section pendek.
  */
-export function Reveal({ children, className, delay = 0 }: RevealProps) {
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  rootMargin = "0px 0px -10% 0px",
+  threshold = 0,
+  fallbackMs = 1500,
+}: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,8 +46,8 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
       return;
     }
 
-    // Fallback: kalau IO tidak support atau gagal, tampilkan setelah 1.5s
-    const fallback = window.setTimeout(() => el.classList.add("is-visible"), 1500);
+    // Fallback: kalau IO tidak support atau gagal, tampilkan setelah fallbackMs
+    const fallback = window.setTimeout(() => el.classList.add("is-visible"), fallbackMs);
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -42,7 +59,7 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
           }
         }
       },
-      { threshold: 0, rootMargin: "0px 0px -10% 0px" }
+      { threshold, rootMargin }
     );
 
     io.observe(el);
@@ -50,7 +67,7 @@ export function Reveal({ children, className, delay = 0 }: RevealProps) {
       window.clearTimeout(fallback);
       io.disconnect();
     };
-  }, []);
+  }, [rootMargin, threshold, fallbackMs]);
 
   return (
     <div
