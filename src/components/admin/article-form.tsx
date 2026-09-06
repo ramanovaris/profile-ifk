@@ -13,6 +13,7 @@ import {
   Sparkles,
   Tag,
   ImageIcon,
+  Type,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,8 +83,9 @@ export function ArticleForm({ article }: { article?: Article }) {
       <div className="rounded-2xl border border-white/5 bg-zinc-900/60 p-6 backdrop-blur-xl shadow-xl sm:p-8 space-y-6">
         {/* Judul Artikel & Slug */}
         <div className="space-y-2">
-          <Label htmlFor="title" className="text-sm font-medium text-zinc-200">
-            Judul Artikel <span className="text-red-400">*</span>
+          <Label htmlFor="title" className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
+            <Type className="h-3.5 w-3.5 text-brand-400" />
+            <span>Judul Artikel</span> <span className="text-red-400">*</span>
           </Label>
           <Input
             id="title"
