@@ -33,7 +33,7 @@ export default function AdminBeritaPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const filteredArticles = dummyArticles.filter((article) => {
     const matchesSearch =
@@ -238,13 +238,32 @@ export default function AdminBeritaPage() {
         {/* Pagination Bar */}
         {filteredArticles.length > 0 && (
           <div className="flex flex-col gap-3 border-t border-white/5 bg-white/[0.01] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-zinc-400">
-              Menampilkan{" "}
-              <span className="font-medium text-white">
-                {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredArticles.length)}
-              </span>{" "}
-              dari <span className="font-medium text-white">{filteredArticles.length}</span> artikel
-            </p>
+            <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+              <p>
+                Menampilkan{" "}
+                <span className="font-medium text-white">
+                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredArticles.length)}
+                </span>{" "}
+                dari <span className="font-medium text-white">{filteredArticles.length}</span> artikel
+              </p>
+
+              {/* Selector Baris Per Halaman */}
+              <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
+                <span className="text-zinc-500">Baris:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="rounded-md border border-white/10 bg-zinc-950 px-2 py-1 text-xs text-zinc-300 outline-none transition-colors hover:border-white/20 focus:border-brand-500/50"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                </select>
+              </div>
+            </div>
 
             <div className="flex items-center gap-1.5 self-end sm:self-auto">
               <button
