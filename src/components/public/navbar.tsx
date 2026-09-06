@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { LogIn } from "lucide-react";
 
 import { siteConfig } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,15 @@ export function Navbar() {
                 </Link>
               );
             })}
+
+            {/* Desktop CTA Masuk */}
+            <Link
+              href="/admin/login"
+              className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-4 py-1.5 text-xs font-semibold tracking-wide text-white shadow-sm transition-all duration-300 ease-luxe hover:bg-brand-700 active:scale-95"
+            >
+              <LogIn className="h-3.5 w-3.5" strokeWidth={2} />
+              <span>Masuk</span>
+            </Link>
           </nav>
 
           {/* Hamburger — dua garis morph ke X */}
@@ -63,19 +73,19 @@ export function Navbar() {
             aria-expanded={open}
             className="relative flex h-10 w-10 items-center justify-center rounded-full bg-black/5 transition-transform duration-300 ease-luxe active:scale-95 md:hidden"
           >
-            <span
-              className={cn(
-                "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
-                open ? "rotate-45" : "-translate-y-[3px]"
-              )}
-            />
-            <span
-              className={cn(
-                "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
-                open ? "-rotate-45" : "translate-y-[3px]"
-              )}
-            />
-          </button>
+              <span
+                className={cn(
+                  "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
+                  open ? "rotate-45" : "-translate-y-[3px]"
+                )}
+              />
+              <span
+                className={cn(
+                  "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
+                  open ? "-rotate-45" : "translate-y-[3px]"
+                )}
+              />
+            </button>
         </div>
       </header>
 
@@ -106,11 +116,29 @@ export function Navbar() {
               </Link>
             );
           })}
+
+          {/* Fullscreen Mobile Menu Login Button */}
+          <div
+            style={{ transitionDelay: open ? `${120 + navLinks.length * 60}ms` : "0ms" }}
+            className={cn(
+              "mt-4 pt-2 transition-all duration-700 ease-luxe",
+              open ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+            )}
+          >
+            <Link
+              href="/admin/login"
+              onClick={() => setOpen(false)}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-3.5 text-base font-semibold text-white shadow-lg transition-transform duration-200 active:scale-98"
+            >
+              <LogIn className="h-4 w-4" strokeWidth={2} />
+              <span>Masuk Admin</span>
+            </Link>
+          </div>
         </nav>
         <p
-          style={{ transitionDelay: open ? "460ms" : "0ms" }}
+          style={{ transitionDelay: open ? "520ms" : "0ms" }}
           className={cn(
-            "mt-12 text-xs uppercase tracking-[0.2em] text-zinc-500 transition-all duration-700 ease-luxe",
+            "mt-10 text-xs uppercase tracking-[0.2em] text-zinc-500 transition-all duration-700 ease-luxe",
             open ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
           )}
         >
