@@ -66,7 +66,7 @@ export function ArticleForm({ article }: { article?: Article }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Top action / back link */}
-      <div className="flex items-center justify-between pb-2">
+      <div className="pb-2">
         <Link
           href="/admin/berita"
           className="inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-400 backdrop-blur-md transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
@@ -74,9 +74,6 @@ export function ArticleForm({ article }: { article?: Article }) {
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Kembali ke Kelola Berita</span>
         </Link>
-        <span className="text-xs text-zinc-400">
-          {article ? "Mode Edit Artikel" : "Mode Pembuatan Baru"}
-        </span>
       </div>
 
       {/* Main Form Container Card */}
