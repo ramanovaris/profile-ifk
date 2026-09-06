@@ -65,24 +65,14 @@ export function Navbar() {
             </Link>
           </nav>
 
-          {/* Mobile Right Controls: Tombol Masuk compact + Hamburger */}
-          <div className="flex items-center gap-1.5 md:hidden">
-            <Link
-              href="/admin/login"
-              className="inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-medium text-white shadow-sm transition-transform duration-200 active:scale-95"
-            >
-              <LogIn className="h-3 w-3" strokeWidth={2} />
-              <span>Masuk</span>
-            </Link>
-
-            {/* Hamburger — dua garis morph ke X */}
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              aria-label={open ? "Tutup menu" : "Buka menu"}
-              aria-expanded={open}
-              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-black/5 transition-transform duration-300 ease-luxe active:scale-95"
-            >
+          {/* Hamburger — dua garis morph ke X */}
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Tutup menu" : "Buka menu"}
+            aria-expanded={open}
+            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-black/5 transition-transform duration-300 ease-luxe active:scale-95 md:hidden"
+          >
               <span
                 className={cn(
                   "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
@@ -96,7 +86,6 @@ export function Navbar() {
                 )}
               />
             </button>
-          </div>
         </div>
       </header>
 
