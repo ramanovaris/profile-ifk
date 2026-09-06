@@ -11,6 +11,8 @@ import {
   SlidersHorizontal,
   Newspaper,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,6 +32,8 @@ export default function AdminBeritaPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const filteredArticles = dummyArticles.filter((article) => {
     const matchesSearch =
@@ -39,6 +43,14 @@ export default function AdminBeritaPage() {
       selectedCategory === "Semua" || article.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredArticles.length / itemsPerPage));
+  const validPage = Math.min(currentPage, totalPages);
+  const startIndex = (validPage - 1) * itemsPerPage;
+  const paginatedArticles = filteredArticles.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   function handleDelete() {
     alert("Artikel berhasil dihapus (dummy mode)");
@@ -77,7 +89,10 @@ export default function AdminBeritaPage() {
             type="text"
             placeholder="Cari judul atau topik artikel..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/40 focus:ring-1 focus:ring-brand-500/30"
           />
         </div>
@@ -92,7 +107,10 @@ export default function AdminBeritaPage() {
             <button
               key={cat}
               type="button"
-              onClick={() => setSelectedCategory(cat)}
+              onClick={() => {
+                setSelectedCategory(cat);
+                setCurrentPage(1);
+              }}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
                 selectedCategory === cat
                   ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 shadow-sm shadow-brand-500/10"
@@ -119,7 +137,7 @@ export default function AdminBeritaPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {filteredArticles.length === 0 ? (
+              {paginatedArticles.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-zinc-400">
                     <Newspaper className="mx-auto h-8 w-8 text-zinc-400/80 mb-2" />
@@ -127,7 +145,7 @@ export default function AdminBeritaPage() {
                   </td>
                 </tr>
               ) : (
-                filteredArticles.map((article) => (
+                paginatedArticles.map((article) => (
                   <tr
                     key={article.id}
                     className="transition-colors hover:bg-white/[0.02]"
@@ -216,6 +234,58 @@ export default function AdminBeritaPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Bar */}
+        {filteredArticles.length > 0 && (
+          <div className="flex flex-col gap-3 border-t border-white/5 bg-white/[0.01] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-zinc-400">
+              Menampilkan{" "}
+              <span className="font-medium text-white">
+                {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredArticles.length)}
+              </span>{" "}
+              dari <span className="font-medium text-white">{filteredArticles.length}</span> artikel
+            </p>
+
+            <div className="flex items-center gap-1.5 self-end sm:self-auto">
+              <button
+                type="button"
+                disabled={validPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                <span>Sebelumnya</span>
+              </button>
+
+              <div className="flex items-center gap-1 px-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setCurrentPage(page)}
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                      validPage === page
+                        ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 font-semibold shadow-sm shadow-brand-500/10"
+                        : "border border-transparent text-zinc-400 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                disabled={validPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+              >
+                <span>Selanjutnya</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Dialog Konfirmasi Hapus Dark Theme */}
