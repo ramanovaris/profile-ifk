@@ -2,9 +2,17 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import Image from "next/image";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  SlidersHorizontal,
+  Newspaper,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -16,90 +24,227 @@ import {
 import { AdminShell } from "@/components/admin/admin-shell";
 import { dummyArticles } from "@/lib/dummy-data";
 
+const categories = ["Semua", "Kegiatan", "Informasi", "Sosialisasi"] as const;
+
 export default function AdminBeritaPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
+
+  const filteredArticles = dummyArticles.filter((article) => {
+    const matchesSearch =
+      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      article.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "Semua" || article.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   function handleDelete() {
-    // Dummy — tidak menghapus apa-apa
-    alert("Artikel berhasil dihapus (dummy)");
+    alert("Artikel berhasil dihapus (dummy mode)");
     setDeleteId(null);
   }
 
   return (
     <AdminShell>
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-slate-900">Kelola Berita</h1>
-        <Link
-          href="/admin/berita/baru"
-          className="inline-flex h-8 items-center justify-center rounded-lg bg-blue-700 px-3 text-sm font-medium text-white hover:bg-blue-700/80"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Tambah Artikel
-        </Link>
+      {/* Header section */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            Kelola Berita
+          </h1>
+          <p className="mt-1 text-sm text-zinc-400">
+            Daftar publikasi, pengumuman, dan artikel informasi farmasi.
+          </p>
+        </div>
+        <div>
+          <Link
+            href="/admin/berita/baru"
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Tambah Artikel</span>
+          </Link>
+        </div>
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-lg border bg-white">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-slate-50 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
-              <th className="px-4 py-3">Judul</th>
-              <th className="px-4 py-3">Kategori</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Tanggal</th>
-              <th className="px-4 py-3 text-right">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dummyArticles.map((article) => (
-              <tr key={article.id} className="border-b last:border-b-0">
-                <td className="px-4 py-3 font-medium text-slate-900">{article.title}</td>
-                <td className="px-4 py-3 text-slate-600">{article.category}</td>
-                <td className="px-4 py-3">
-                  <Badge variant={article.isPublished ? "default" : "secondary"}>
-                    {article.isPublished ? "Terbit" : "Draft"}
-                  </Badge>
-                </td>
-                <td className="px-4 py-3 text-slate-500">
-                  {new Date(article.publishedAt).toLocaleDateString("id-ID")}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/admin/berita/${article.id}/edit`}
-                    className="inline-flex h-6 w-6 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Link>
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    className="text-red-600 hover:text-red-700"
-                    onClick={() => setDeleteId(article.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </td>
+      {/* Filter and Search Toolbar */}
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+        {/* Search input */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <input
+            type="text"
+            placeholder="Cari judul atau topik artikel..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/40 focus:ring-1 focus:ring-brand-500/30"
+          />
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <span className="mr-1 hidden items-center gap-1 text-xs text-zinc-400 lg:flex">
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            <span>Kategori:</span>
+          </span>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setSelectedCategory(cat)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                selectedCategory === cat
+                  ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 shadow-sm shadow-brand-500/10"
+                  : "border border-transparent bg-white/[0.03] text-zinc-400 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Table Container */}
+      <div className="mt-4 overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 backdrop-blur-xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-white/5 bg-white/[0.02] text-xs font-medium uppercase tracking-wider text-zinc-400">
+                <th className="px-4 py-3">Artikel</th>
+                <th className="px-4 py-3">Kategori</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Tanggal Terbit</th>
+                <th className="px-4 py-3 text-right">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {filteredArticles.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-zinc-400">
+                    <Newspaper className="mx-auto h-8 w-8 text-zinc-400/80 mb-2" />
+                    <p className="text-sm">Tidak ada artikel yang cocok dengan pencarian.</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredArticles.map((article) => (
+                  <tr
+                    key={article.id}
+                    className="transition-colors hover:bg-white/[0.02]"
+                  >
+                    {/* Judul & Cover */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+                          {article.coverImage ? (
+                            <Image
+                              src={article.coverImage}
+                              alt={article.title}
+                              fill
+                              unoptimized
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-[10px] text-zinc-400">
+                              IFK
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 max-w-md">
+                          <p className="truncate font-medium text-zinc-200">
+                            {article.title}
+                          </p>
+                          <p className="truncate text-xs text-zinc-400">
+                            /{article.slug}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Kategori */}
+                    <td className="px-4 py-3 text-zinc-300">
+                      <span className="rounded-md border border-white/5 bg-white/[0.03] px-2.5 py-1 text-xs">
+                        {article.category}
+                      </span>
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      {article.isPublished ? (
+                        <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
+                          Terbit
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-400">
+                          Draft
+                        </span>
+                      )}
+                    </td>
+
+                    {/* Tanggal */}
+                    <td className="px-4 py-3 text-xs text-zinc-400">
+                      {new Date(article.publishedAt).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </td>
+
+                    {/* Aksi */}
+                    <td className="px-4 py-3 text-right">
+                      <div className="inline-flex items-center gap-1">
+                        <Link
+                          href={`/admin/berita/${article.id}/edit`}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
+                          title="Edit Artikel"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteId(article.id)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-400"
+                          title="Hapus Artikel"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Dialog hapus */}
+      {/* Dialog Konfirmasi Hapus Dark Theme */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent>
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl">
           <DialogHeader>
-            <DialogTitle>Hapus Artikel</DialogTitle>
-            <DialogDescription>
-              Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.
+            <DialogTitle className="text-lg font-bold text-white">
+              Hapus Artikel?
+            </DialogTitle>
+            <DialogDescription className="text-sm text-zinc-400">
+              Apakah Anda yakin ingin menghapus artikel ini? Data artikel akan
+              dihapus dari daftar dan tindakan ini tidak dapat dibatalkan.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteId(null)}>
+          <DialogFooter className="mt-4 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setDeleteId(null)}
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
+            >
               Batal
-            </Button>
-            <Button variant="destructive" onClick={handleDelete}>
-              Hapus
-            </Button>
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="rounded-lg border border-red-500/30 bg-red-600/80 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors"
+            >
+              Hapus Artikel
+            </button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
