@@ -8,6 +8,11 @@ import {
   Tags,
   CheckCircle,
   XCircle,
+  Type,
+  Globe,
+  AlertTriangle,
+  AlertCircle,
+  Check,
 } from "lucide-react";
 import {
   Dialog,
@@ -30,6 +35,7 @@ import {
 
 type CategoryInput = {
   name: string;
+  status: "ACTIVE" | "INACTIVE";
 };
 
 export default function AdminKategoriPage() {
@@ -39,19 +45,35 @@ export default function AdminKategoriPage() {
   const [editCategory, setEditCategory] = useState<Category | null>(null);
 
   // Form State
-  const [formData, setFormData] = useState<CategoryInput>({ name: "" });
+  const [formData, setFormData] = useState<CategoryInput>({
+    name: "",
+    status: "ACTIVE",
+  });
   const [error, setError] = useState<string | null>(null);
+
+  // Target Kategori yang sedang akan dihapus
+  const catToDelete = categories.find((c) => c.id === deleteId);
+  const catArticleCount = catToDelete
+    ? getArticleCountByCategory(catToDelete.name, dummyArticles)
+    : 0;
+
+  // Real-time calculated slug preview
+  const liveSlug = formData.name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
 
   const handleOpenAdd = () => {
     setEditCategory(null);
-    setFormData({ name: "" });
+    setFormData({ name: "", status: "ACTIVE" });
     setError(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (cat: Category) => {
     setEditCategory(cat);
-    setFormData({ name: cat.name });
+    setFormData({ name: cat.name, status: cat.status });
     setError(null);
     setIsModalOpen(true);
   };
@@ -77,6 +99,9 @@ export default function AdminKategoriPage() {
       return;
     }
 
+    const generatedSlug =
+      liveSlug || trimmedName.toLowerCase().replace(/\s+/g, "-");
+
     if (editCategory) {
       // Proses Edit
       setCategories((prev) =>
@@ -85,7 +110,8 @@ export default function AdminKategoriPage() {
             ? {
                 ...c,
                 name: trimmedName as ArticleCategory,
-                slug: trimmedName.toLowerCase().replace(/\s+/g, "-"),
+                slug: generatedSlug,
+                status: formData.status,
               }
             : c
         )
@@ -95,8 +121,8 @@ export default function AdminKategoriPage() {
       const newCategory: Category = {
         id: `cat-${Date.now()}`,
         name: trimmedName as ArticleCategory,
-        slug: trimmedName.toLowerCase().replace(/\s+/g, "-"),
-        status: "ACTIVE",
+        slug: generatedSlug,
+        status: formData.status,
       };
       setCategories((prev) => [...prev, newCategory]);
     }
@@ -106,12 +132,10 @@ export default function AdminKategoriPage() {
 
   const handleDelete = () => {
     if (!deleteId) return;
-    // Jika kategori sedang dipakai artikel, cegah hapus atau beri peringatan
-    const catToDelete = categories.find((c) => c.id === deleteId);
-    if (catToDelete) {
-      const count = getArticleCountByCategory(catToDelete.name, dummyArticles);
+    const cat = categories.find((c) => c.id === deleteId);
+    if (cat) {
+      const count = getArticleCountByCategory(cat.name, dummyArticles);
       if (count > 0) {
-        alert(`Tidak dapat menghapus kategori "${catToDelete.name}" karena masih digunakan oleh ${count} artikel.`);
         setDeleteId(null);
         return;
       }
@@ -251,50 +275,125 @@ export default function AdminKategoriPage() {
 
       {/* Modal Tambah/Edit Kategori */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-white">
-              {editCategory ? "Edit Kategori" : "Tambah Kategori Baru"}
-            </DialogTitle>
-            <DialogDescription className="text-sm text-zinc-400">
-              {editCategory
-                ? "Perbarui nama kategori artikel. Slug akan diperbarui otomatis."
-                : "Masukkan nama kategori baru yang akan digunakan untuk pengelompokan artikel."}
-            </DialogDescription>
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+                {editCategory ? (
+                  <Pencil className="h-5 w-5" />
+                ) : (
+                  <Tags className="h-5 w-5" />
+                )}
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                  {editCategory ? "Edit Kategori" : "Tambah Kategori Baru"}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                  {editCategory
+                    ? "Perbarui informasi nama dan status kategori artikel."
+                    : "Tambahkan kategori baru untuk pengelompokan artikel publik."}
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+            {/* Field Nama Kategori */}
             <div className="space-y-2">
-              <Label htmlFor="categoryName" className="text-sm font-medium text-zinc-200">
-                Nama Kategori
+              <Label
+                htmlFor="categoryName"
+                className="flex items-center gap-1.5 text-xs font-medium text-zinc-200"
+              >
+                <Type className="h-3.5 w-3.5 text-zinc-400" />
+                <span>Nama Kategori</span>
               </Label>
               <Input
                 id="categoryName"
                 value={formData.name}
                 onChange={(e) => {
-                  setFormData({ name: e.target.value });
+                  setFormData((prev) => ({ ...prev, name: e.target.value }));
                   if (error) setError(null);
                 }}
-                placeholder="Contoh: Regulasi, Vaksinasi, dll."
-                className="border-white/10 bg-zinc-950/60 text-white focus:border-brand-500/50"
+                placeholder="Contoh: Regulasi, Vaksinasi, Panduan..."
+                className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                 autoFocus
               />
-              {error && <p className="text-xs text-red-400">{error}</p>}
+              {error && (
+                <p className="flex items-center gap-1 text-xs text-red-400 mt-1">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                  <span>{error}</span>
+                </p>
+              )}
             </div>
 
-            <DialogFooter className="mt-6 flex gap-2">
+            {/* Live Slug Preview Card */}
+            <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5">
+              <div className="flex items-center gap-2 text-xs text-zinc-400">
+                <Globe className="h-3.5 w-3.5 text-zinc-500" />
+                <span>URL Slug:</span>
+              </div>
+              <code className="max-w-[200px] truncate rounded border border-white/5 bg-black/40 px-2 py-0.5 font-mono text-xs text-brand-400">
+                /{liveSlug || "..."}
+              </code>
+            </div>
+
+            {/* Status Switcher di dalam Modal */}
+            <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-3">
+              <div>
+                <p className="text-xs font-medium text-zinc-200">
+                  Status Kategori
+                </p>
+                <p className="text-[11px] text-zinc-400">
+                  {formData.status === "ACTIVE"
+                    ? "Kategori aktif dan dapat dipilih di form artikel"
+                    : "Kategori dinonaktifkan dari form artikel"}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={formData.status === "ACTIVE"}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: prev.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+                  }))
+                }
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                  formData.status === "ACTIVE"
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                    : "border-zinc-700 bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800"
+                }`}
+              >
+                {formData.status === "ACTIVE" ? (
+                  <>
+                    <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Aktif</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-3.5 w-3.5 text-zinc-400" />
+                    <span>Non-Aktif</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
+                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="rounded-lg border border-brand-500/30 bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
               >
-                {editCategory ? "Simpan Perubahan" : "Tambah Kategori"}
+                <Check className="h-4 w-4" />
+                <span>{editCategory ? "Simpan Perubahan" : "Tambah Kategori"}</span>
               </button>
             </DialogFooter>
           </form>
@@ -303,31 +402,111 @@ export default function AdminKategoriPage() {
 
       {/* Dialog Konfirmasi Hapus */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-white">
-              Hapus Kategori?
-            </DialogTitle>
-            <DialogDescription className="text-sm text-zinc-400">
-              Apakah Anda yakin ingin menghapus kategori ini? Kategori yang masih
-              digunakan oleh artikel tidak dapat dihapus.
-            </DialogDescription>
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                  Hapus Kategori?
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                  Tindakan ini permanen dan akan menghapus kategori dari sistem.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <DialogFooter className="mt-4 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setDeleteId(null)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
-            >
-              Batal
-            </button>
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="rounded-lg border border-red-500/30 bg-red-600/80 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors"
-            >
-              Hapus Kategori
-            </button>
+
+          {catToDelete && (
+            <div className="space-y-3 mt-2">
+              {/* Category Info Preview Card */}
+              <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 font-medium text-zinc-200">
+                    <Tags className="h-4 w-4 text-brand-400" />
+                    <span>{catToDelete.name}</span>
+                  </div>
+                  <code className="rounded bg-black/40 px-1.5 py-0.5 font-mono text-xs text-zinc-400">
+                    /{catToDelete.slug}
+                  </code>
+                </div>
+                <div className="flex items-center justify-between text-xs text-zinc-400 pt-1 border-t border-white/5">
+                  <span>Status Kategori:</span>
+                  <span
+                    className={
+                      catToDelete.status === "ACTIVE"
+                        ? "text-emerald-400 font-medium"
+                        : "text-zinc-500"
+                    }
+                  >
+                    {catToDelete.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-zinc-400">
+                  <span>Artikel Terhubung:</span>
+                  <span
+                    className={
+                      catArticleCount > 0
+                        ? "font-medium text-amber-400"
+                        : "text-zinc-400"
+                    }
+                  >
+                    {catArticleCount} artikel
+                  </span>
+                </div>
+              </div>
+
+              {/* Dependency Guard Notice */}
+              {catArticleCount > 0 ? (
+                <div className="flex items-start gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">
+                  <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-1 leading-relaxed">
+                    <p className="font-semibold text-amber-200">
+                      Kategori tidak dapat dihapus
+                    </p>
+                    <p className="text-amber-300/90">
+                      Masih ada <span className="font-bold underline">{catArticleCount} artikel</span> yang menggunakan kategori ini. Silakan ubah atau pindahkan kategori artikel terkait terlebih dahulu.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3 text-xs text-zinc-400">
+                  Kategori ini tidak digunakan oleh artikel manapun dan aman untuk dihapus.
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-2 pt-2">
+            {catArticleCount > 0 ? (
+              <button
+                type="button"
+                onClick={() => setDeleteId(null)}
+                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                Tutup / Mengerti
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setDeleteId(null)}
+                  className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-500"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Hapus Kategori</span>
+                </button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
