@@ -11,6 +11,7 @@ import {
   UserCog,
   LogOut,
   Menu,
+  Tags,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ import { cn } from "@/lib/utils";
 const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/berita", label: "Berita", icon: Newspaper },
+  { href: "/admin/kategori", label: "Kategori", icon: Tags },
   { href: "/admin/pengguna", label: "Pengguna", icon: Users },
   { href: "/admin/profil", label: "Profil", icon: UserCog },
 ];

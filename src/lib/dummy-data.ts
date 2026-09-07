@@ -5,6 +5,26 @@ import { placeholderImage } from "./placeholder";
 export const ARTICLE_CATEGORIES = ["Kegiatan", "Informasi", "Sosialisasi"] as const;
 export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
 
+// Simulasi data master kategori dengan status aktif/non-aktif
+export type CategoryStatus = "ACTIVE" | "INACTIVE";
+
+export type Category = {
+  id: string;
+  name: ArticleCategory;
+  slug: string;
+  status: CategoryStatus;
+};
+
+export const initialCategories: Category[] = [
+  { id: "cat-1", name: "Kegiatan", slug: "kegiatan", status: "ACTIVE" },
+  { id: "cat-2", name: "Informasi", slug: "informasi", status: "ACTIVE" },
+  { id: "cat-3", name: "Sosialisasi", slug: "sosialisasi", status: "ACTIVE" },
+];
+
+export function getArticleCountByCategory(categoryName: ArticleCategory, articles: Article[]): number {
+  return articles.filter((a) => a.category === categoryName).length;
+}
+
 export type Article = {
   id: string;
   title: string;
