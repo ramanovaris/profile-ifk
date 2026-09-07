@@ -14,7 +14,6 @@ import {
   MapPin,
   Phone,
   Mail,
-  Clock,
   ExternalLink,
   Camera,
   Upload,
