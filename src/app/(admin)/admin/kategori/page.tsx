@@ -19,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -373,22 +372,22 @@ export default function AdminKategoriPage() {
               </button>
             </div>
 
-            <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-2 pt-2">
+            <div className="mt-6 flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                className="rounded-lg border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
+                className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
               >
                 <Save className="h-4 w-4" />
                 <span>Simpan Kategori</span>
               </button>
-            </DialogFooter>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
@@ -472,12 +471,12 @@ export default function AdminKategoriPage() {
             </div>
           )}
 
-          <DialogFooter className="mt-6 flex flex-row items-center justify-end gap-2 pt-2">
+          <div className="mt-6 flex items-center justify-center gap-3">
             {catArticleCount > 0 ? (
               <button
                 type="button"
                 onClick={() => setDeleteId(null)}
-                className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                className="rounded-lg border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
               >
                 Tutup / Mengerti
               </button>
@@ -486,21 +485,21 @@ export default function AdminKategoriPage() {
                 <button
                   type="button"
                   onClick={() => setDeleteId(null)}
-                  className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                  className="rounded-lg border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
                 >
                   Batal
                 </button>
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-500"
+                  className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-600 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-500"
                 >
                   <Trash2 className="h-4 w-4" />
                   <span>Hapus Kategori</span>
                 </button>
               </>
             )}
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </AdminShell>
