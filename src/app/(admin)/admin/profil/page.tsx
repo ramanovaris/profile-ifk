@@ -9,12 +9,9 @@ import {
   ShieldCheck,
   Save,
   Camera,
-  CheckCircle2,
-  AlertCircle,
   Eye,
   EyeOff,
   Shield,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +19,6 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { toast } from "@/components/ui/toast";
-import { cn } from "@/lib/utils";
 
 export default function AdminProfilPage() {
   // Informasi Akun State
@@ -42,17 +38,6 @@ export default function AdminProfilPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Feedback Banners State
-  const [infoFeedback, setInfoFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
-  const [passwordFeedback, setPasswordFeedback] = useState<{
-    type: "success" | "error";
-    message: string;
-  } | null>(null);
-
   // Helper Inisial Avatar
   const getInitials = (name: string) => {
     const parts = name.trim().split(" ");
@@ -68,10 +53,6 @@ export default function AdminProfilPage() {
     if (file) {
       const url = URL.createObjectURL(file);
       setAvatarUrl(url);
-      setInfoFeedback({
-        type: "success",
-        message: "Foto profil sementara berhasil diperbarui.",
-      });
       toast.success("Foto profil berhasil diperbarui.");
     }
   };
@@ -80,18 +61,10 @@ export default function AdminProfilPage() {
   function handleSaveInfo(e: FormEvent) {
     e.preventDefault();
     if (!displayName.trim()) {
-      setInfoFeedback({
-        type: "error",
-        message: "Nama lengkap / nama tampilan tidak boleh kosong.",
-      });
       toast.error("Nama lengkap tidak boleh kosong.");
       return;
     }
     setSavedName(displayName.trim());
-    setInfoFeedback({
-      type: "success",
-      message: "Informasi profil dan kontak berhasil disimpan.",
-    });
     toast.success("Informasi profil berhasil disimpan.");
   }
 
@@ -100,36 +73,20 @@ export default function AdminProfilPage() {
     e.preventDefault();
 
     if (!oldPassword) {
-      setPasswordFeedback({
-        type: "error",
-        message: "Silakan masukkan kata sandi saat ini.",
-      });
       toast.error("Silakan masukkan kata sandi saat ini.");
       return;
     }
 
     if (newPassword.length < 8) {
-      setPasswordFeedback({
-        type: "error",
-        message: "Kata sandi baru minimal harus 8 karakter.",
-      });
-      toast.error("Kata sandi baru minimal 8 karakter.");
+      toast.error("Kata sandi baru minimal harus 8 karakter.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordFeedback({
-        type: "error",
-        message: "Konfirmasi kata sandi tidak cocok dengan kata sandi baru.",
-      });
       toast.error("Konfirmasi kata sandi tidak cocok.");
       return;
     }
 
-    setPasswordFeedback({
-      type: "success",
-      message: "Kata sandi Anda berhasil diperbarui dengan aman.",
-    });
     toast.success("Kata sandi berhasil diperbarui.");
     setOldPassword("");
     setNewPassword("");
@@ -244,35 +201,6 @@ export default function AdminProfilPage() {
               </div>
             </div>
 
-            {/* In-page Feedback Banner Informasi */}
-            {infoFeedback && (
-              <div
-                className={cn(
-                  "mb-5 flex items-center justify-between rounded-xl border p-3.5 text-xs transition-all",
-                  infoFeedback.type === "success"
-                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
-                    : "border-red-500/20 bg-red-500/10 text-red-300"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  {infoFeedback.type === "success" ? (
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-                  ) : (
-                    <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
-                  )}
-                  <span>{infoFeedback.message}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setInfoFeedback(null)}
-                  className="text-zinc-400 [@media(hover:hover)]:hover:text-white p-1 transition-colors cursor-pointer"
-                  aria-label="Tutup notifikasi"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
-
             <form onSubmit={handleSaveInfo} className="space-y-4">
               <div>
                 <Label
@@ -357,35 +285,6 @@ export default function AdminProfilPage() {
                 </p>
               </div>
             </div>
-
-            {/* In-page Feedback Banner Password */}
-            {passwordFeedback && (
-              <div
-                className={cn(
-                  "mb-5 flex items-center justify-between rounded-xl border p-3.5 text-xs transition-all",
-                  passwordFeedback.type === "success"
-                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
-                    : "border-red-500/20 bg-red-500/10 text-red-300"
-                )}
-              >
-                <div className="flex items-center gap-2">
-                  {passwordFeedback.type === "success" ? (
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-                  ) : (
-                    <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
-                  )}
-                  <span>{passwordFeedback.message}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setPasswordFeedback(null)}
-                  className="text-zinc-400 [@media(hover:hover)]:hover:text-white p-1 transition-colors cursor-pointer"
-                  aria-label="Tutup notifikasi"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
 
             <form onSubmit={handleChangePassword} className="space-y-4">
               {/* Password Lama */}
