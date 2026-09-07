@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { dummyUsers, type User } from "@/lib/dummy-data";
 
@@ -81,7 +80,16 @@ export default function AdminPenggunaPage() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       if (params.get("tambah") === "true") {
-        handleOpenAdd();
+        setEditUser(null);
+        setFormData({
+          name: "",
+          username: "",
+          password: "",
+          confirmPassword: "",
+          role: "STAFF",
+        });
+        setFormError(null);
+        setIsUserModalOpen(true);
         window.history.replaceState({}, "", window.location.pathname);
       }
     }
