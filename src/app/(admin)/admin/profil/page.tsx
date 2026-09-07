@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 
 export default function AdminProfilPage() {
@@ -71,6 +72,7 @@ export default function AdminProfilPage() {
         type: "success",
         message: "Foto profil sementara berhasil diperbarui.",
       });
+      toast.success("Foto profil berhasil diperbarui.");
     }
   };
 
@@ -82,6 +84,7 @@ export default function AdminProfilPage() {
         type: "error",
         message: "Nama lengkap / nama tampilan tidak boleh kosong.",
       });
+      toast.error("Nama lengkap tidak boleh kosong.");
       return;
     }
     setSavedName(displayName.trim());
@@ -89,6 +92,7 @@ export default function AdminProfilPage() {
       type: "success",
       message: "Informasi profil dan kontak berhasil disimpan.",
     });
+    toast.success("Informasi profil berhasil disimpan.");
   }
 
   // Handler Ubah Kata Sandi
@@ -100,6 +104,7 @@ export default function AdminProfilPage() {
         type: "error",
         message: "Silakan masukkan kata sandi saat ini.",
       });
+      toast.error("Silakan masukkan kata sandi saat ini.");
       return;
     }
 
@@ -108,6 +113,7 @@ export default function AdminProfilPage() {
         type: "error",
         message: "Kata sandi baru minimal harus 8 karakter.",
       });
+      toast.error("Kata sandi baru minimal 8 karakter.");
       return;
     }
 
@@ -116,6 +122,7 @@ export default function AdminProfilPage() {
         type: "error",
         message: "Konfirmasi kata sandi tidak cocok dengan kata sandi baru.",
       });
+      toast.error("Konfirmasi kata sandi tidak cocok.");
       return;
     }
 
@@ -123,6 +130,7 @@ export default function AdminProfilPage() {
       type: "success",
       message: "Kata sandi Anda berhasil diperbarui dengan aman.",
     });
+    toast.success("Kata sandi berhasil diperbarui.");
     setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");

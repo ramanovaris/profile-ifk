@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { toast } from "@/components/ui/toast";
 import {
   initialCategories,
   dummyArticles,
@@ -99,6 +100,7 @@ export default function AdminKategoriPage() {
 
     if (!trimmedName) {
       setError("Nama kategori tidak boleh kosong.");
+      toast.error("Nama kategori tidak boleh kosong.");
       return;
     }
 
@@ -111,6 +113,7 @@ export default function AdminKategoriPage() {
 
     if (isDuplicate) {
       setError("Nama kategori sudah ada. Gunakan nama yang berbeda.");
+      toast.error("Nama kategori sudah ada.");
       return;
     }
 
@@ -135,6 +138,7 @@ export default function AdminKategoriPage() {
             : c
         )
       );
+      toast.success(`Kategori "${trimmedName}" berhasil diperbarui.`);
     } else {
       // Proses Tambah
       const newCategory: Category = {
@@ -144,6 +148,7 @@ export default function AdminKategoriPage() {
         status: formData.status,
       };
       setCategories((prev) => [...prev, newCategory]);
+      toast.success(`Kategori "${trimmedName}" berhasil ditambahkan.`);
     }
 
     setIsModalOpen(false);
@@ -155,23 +160,29 @@ export default function AdminKategoriPage() {
     if (cat) {
       const count = getArticleCountByCategory(cat.name, dummyArticles);
       if (count > 0) {
+        toast.error(`Kategori "${cat.name}" masih digunakan oleh ${count} artikel.`);
         setDeleteId(null);
         return;
       }
     }
 
     setCategories((prev) => prev.filter((c) => c.id !== deleteId));
+    toast.success("Kategori berhasil dihapus.");
     setDeleteId(null);
   };
 
   const toggleStatus = (id: string) => {
+    let toggledName = "";
     setCategories((prev) =>
-      prev.map((c) =>
-        c.id === id
-          ? { ...c, status: c.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }
-          : c
-      )
+      prev.map((c) => {
+        if (c.id === id) {
+          toggledName = c.name;
+          return { ...c, status: c.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" };
+        }
+        return c;
+      })
     );
+    if (toggledName) toast.info(`Status "${toggledName}" berhasil diubah.`);
   };
 
   return (

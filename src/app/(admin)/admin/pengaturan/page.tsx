@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { toast } from "@/components/ui/toast";
 import { siteConfig } from "@/lib/dummy-data";
 import { placeholderImage } from "@/lib/placeholder";
 import { cn } from "@/lib/utils";
@@ -98,14 +99,17 @@ export default function AdminPengaturanPage() {
     e.preventDefault();
     if (!identityForm.name.trim() || !identityForm.shortName.trim()) {
       showFeedback("error", "Nama instansi dan nama singkat tidak boleh kosong.");
+      toast.error("Nama instansi dan nama singkat tidak boleh kosong.");
       return;
     }
     showFeedback("success", "Pengaturan identitas dan kontak lembaga berhasil disimpan.");
+    toast.success("Identitas dan kontak lembaga berhasil disimpan.");
   };
 
   const handleIdentityReset = () => {
     setIdentityForm(initialIdentity);
     showFeedback("success", "Form identitas dan kontak berhasil dikembalikan ke data default.");
+    toast.info("Form identitas dikembalikan ke data default.");
   };
 
   const handleProfilePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -114,6 +118,7 @@ export default function AdminPengaturanPage() {
       const url = URL.createObjectURL(file);
       setProfileForm((prev) => ({ ...prev, headPhoto: url }));
       showFeedback("success", "Foto pimpinan sementara berhasil diperbarui.");
+      toast.success("Foto pimpinan berhasil diperbarui.");
     }
   };
 
@@ -121,19 +126,23 @@ export default function AdminPengaturanPage() {
     e.preventDefault();
     if (!profileForm.headName.trim()) {
       showFeedback("error", "Nama Kepala UPTD tidak boleh kosong.");
+      toast.error("Nama Kepala UPTD tidak boleh kosong.");
       return;
     }
     showFeedback("success", "Konten profil UPTD (Sambutan, Visi & Misi, Tupoksi) berhasil disimpan.");
+    toast.success("Konten profil UPTD berhasil disimpan.");
   };
 
   const handleProfileReset = () => {
     setProfileForm(initialProfile);
     showFeedback("success", "Form konten profil berhasil dikembalikan ke data default.");
+    toast.info("Form konten profil dikembalikan ke data default.");
   };
 
   const handleLinksSave = (e: FormEvent) => {
     e.preventDefault();
     showFeedback("success", "Tautan layanan eksternal, media sosial, dan banner pengumuman berhasil disimpan.");
+    toast.success("Tautan layanan eksternal berhasil disimpan.");
   };
 
   const handleLinksReset = () => {

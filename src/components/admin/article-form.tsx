@@ -23,6 +23,7 @@ import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import type { Article, ArticleCategory } from "@/lib/dummy-data";
 import { initialCategories, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/toast";
 
 export function ArticleForm({ article }: { article?: Article }) {
   const router = useRouter();
@@ -103,13 +104,13 @@ export function ArticleForm({ article }: { article?: Article }) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!content || content.trim() === "" || content === "<p></p>") {
-      alert("Isi konten artikel wajib diisi.");
+      toast.error("Isi konten artikel wajib diisi.");
       return;
     }
-    alert(
+    toast.success(
       article
-        ? "Artikel berhasil diperbarui (dummy mode)"
-        : "Artikel berhasil disimpan (dummy mode)"
+        ? "Artikel berhasil diperbarui."
+        : "Artikel berhasil disimpan."
     );
     router.push("/admin/berita");
   }

@@ -21,6 +21,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { toast } from "@/components/ui/toast";
 import { CategoryMultiSelectFilter } from "@/components/admin/category-multi-select-filter";
 import { dummyArticles, initialCategories } from "@/lib/dummy-data";
 
@@ -50,7 +51,7 @@ export default function AdminBeritaPage() {
   );
 
   function handleDelete() {
-    alert("Artikel berhasil dihapus (dummy mode)");
+    toast.success("Artikel berhasil dihapus.");
     setDeleteId(null);
   }
 
