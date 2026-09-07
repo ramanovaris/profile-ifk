@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+import { Extension } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -20,8 +21,142 @@ import {
   Unlink,
   Undo2,
   Redo2,
+  Indent as IndentIcon,
+  Outdent as OutdentIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    indent: {
+      indent: () => ReturnType;
+      outdent: () => ReturnType;
+    };
+  }
+}
+
+// Ekstensi Indentasi Paragraf, Heading, & Blockquote dengan dukungan Tab, Shift+Tab, dan Backspace
+const IndentExtension = Extension.create({
+  name: "indent",
+
+  addOptions() {
+    return {
+      types: ["paragraph", "heading", "blockquote"],
+      minLevel: 0,
+      maxLevel: 4,
+    };
+  },
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          indent: {
+            default: 0,
+            parseHTML: (element) => {
+              const level = Number(element.getAttribute("data-indent")) || 0;
+              return level;
+            },
+            renderHTML: (attributes) => {
+              const level = Number(attributes.indent) || 0;
+              if (level <= 0) {
+                return {};
+              }
+              return {
+                "data-indent": level,
+                style: `margin-left: ${level * 2}rem;`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      indent:
+        () =>
+        ({ tr, state, dispatch }) => {
+          const { selection } = state;
+          tr = tr.setSelection(selection);
+          const { from, to } = selection;
+          let changed = false;
+          state.doc.nodesBetween(from, to, (node, pos) => {
+            if (this.options.types.includes(node.type.name)) {
+              const currentLevel = Number(node.attrs.indent) || 0;
+              if (currentLevel < this.options.maxLevel) {
+                tr = tr.setNodeMarkup(pos, undefined, {
+                  ...node.attrs,
+                  indent: currentLevel + 1,
+                });
+                changed = true;
+              }
+            }
+          });
+          if (changed && dispatch) {
+            dispatch(tr);
+            return true;
+          }
+          return false;
+        },
+      outdent:
+        () =>
+        ({ tr, state, dispatch }) => {
+          const { selection } = state;
+          tr = tr.setSelection(selection);
+          const { from, to } = selection;
+          let changed = false;
+          state.doc.nodesBetween(from, to, (node, pos) => {
+            if (this.options.types.includes(node.type.name)) {
+              const currentLevel = Number(node.attrs.indent) || 0;
+              if (currentLevel > this.options.minLevel) {
+                tr = tr.setNodeMarkup(pos, undefined, {
+                  ...node.attrs,
+                  indent: currentLevel - 1,
+                });
+                changed = true;
+              }
+            }
+          });
+          if (changed && dispatch) {
+            dispatch(tr);
+            return true;
+          }
+          return false;
+        },
+    };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      Tab: () => {
+        if (this.editor.can().sinkListItem("listItem")) {
+          return this.editor.chain().sinkListItem("listItem").run();
+        }
+        return this.editor.chain().indent().run();
+      },
+      "Shift-Tab": () => {
+        if (this.editor.can().liftListItem("listItem")) {
+          return this.editor.chain().liftListItem("listItem").run();
+        }
+        return this.editor.chain().outdent().run();
+      },
+      Backspace: ({ editor }) => {
+        const { selection } = editor.state;
+        const { $from, empty } = selection;
+        if (empty && $from.parentOffset === 0) {
+          const currentIndent = Number($from.parent.attrs.indent) || 0;
+          if (currentIndent > 0) {
+            return editor.chain().outdent().run();
+          }
+        }
+        return false;
+      },
+    };
+  },
+});
 
 export interface RichTextEditorProps {
   value: string;
@@ -86,6 +221,7 @@ export function RichTextEditor({
           levels: [2, 3],
         },
       }),
+      IndentExtension,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -147,6 +283,24 @@ export function RichTextEditor({
 
     const validUrl = /^https?:\/\//i.test(url) ? url : `https://${url}`;
     editor.chain().focus().extendMarkRange("link").setLink({ href: validUrl }).run();
+  }, [editor]);
+
+  const handleIndent = React.useCallback(() => {
+    if (!editor) return;
+    if (editor.can().sinkListItem("listItem")) {
+      editor.chain().focus().sinkListItem("listItem").run();
+    } else {
+      editor.chain().focus().indent().run();
+    }
+  }, [editor]);
+
+  const handleOutdent = React.useCallback(() => {
+    if (!editor) return;
+    if (editor.can().liftListItem("listItem")) {
+      editor.chain().focus().liftListItem("listItem").run();
+    } else {
+      editor.chain().focus().outdent().run();
+    }
   }, [editor]);
 
   return (
@@ -211,7 +365,7 @@ export function RichTextEditor({
 
         <ToolbarDivider />
 
-        {/* Grup 3: Lists */}
+        {/* Grup 3: Lists & Indentation */}
         <ToolbarButton
           icon={List}
           label="Daftar Poin (Bullet List)"
@@ -224,6 +378,18 @@ export function RichTextEditor({
           label="Daftar Berurutan (Numbered List)"
           isActive={editor?.isActive("orderedList")}
           onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+          disabled={!editor || disabled}
+        />
+        <ToolbarButton
+          icon={OutdentIcon}
+          label="Geser Kiri / Outdent (Shift+Tab)"
+          onClick={handleOutdent}
+          disabled={!editor || disabled}
+        />
+        <ToolbarButton
+          icon={IndentIcon}
+          label="Menjorok ke Dalam / Indent (Tab)"
+          onClick={handleIndent}
           disabled={!editor || disabled}
         />
 
