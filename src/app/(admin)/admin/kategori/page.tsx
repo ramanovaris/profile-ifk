@@ -9,7 +9,6 @@ import {
   CheckCircle,
   XCircle,
   Type,
-  Globe,
   AlertTriangle,
   AlertCircle,
   Check,
@@ -57,13 +56,6 @@ export default function AdminKategoriPage() {
     ? getArticleCountByCategory(catToDelete.name, dummyArticles)
     : 0;
 
-  // Real-time calculated slug preview
-  const liveSlug = formData.name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
-
   const handleOpenAdd = () => {
     setEditCategory(null);
     setFormData({ name: "", status: "ACTIVE" });
@@ -100,7 +92,11 @@ export default function AdminKategoriPage() {
     }
 
     const generatedSlug =
-      liveSlug || trimmedName.toLowerCase().replace(/\s+/g, "-");
+      trimmedName
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .trim()
+        .replace(/\s+/g, "-") || trimmedName.toLowerCase().replace(/\s+/g, "-");
 
     if (editCategory) {
       // Proses Edit
@@ -325,17 +321,6 @@ export default function AdminKategoriPage() {
                   <span>{error}</span>
                 </p>
               )}
-            </div>
-
-            {/* Live Slug Preview Card */}
-            <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2.5">
-              <div className="flex items-center gap-2 text-xs text-zinc-400">
-                <Globe className="h-3.5 w-3.5 text-zinc-500" />
-                <span>URL Slug:</span>
-              </div>
-              <code className="max-w-[200px] truncate rounded border border-white/5 bg-black/40 px-2 py-0.5 font-mono text-xs text-brand-400">
-                /{liveSlug || "..."}
-              </code>
             </div>
 
             {/* Status Switcher di dalam Modal */}
