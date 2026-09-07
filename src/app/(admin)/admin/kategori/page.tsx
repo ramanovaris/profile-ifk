@@ -12,6 +12,9 @@ import {
   AlertTriangle,
   AlertCircle,
   Save,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   Dialog,
@@ -41,6 +44,27 @@ export default function AdminKategoriPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
+
+  // Search & Pagination State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+  const filteredCategories = categories.filter((cat) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      cat.name.toLowerCase().includes(query) ||
+      cat.slug.toLowerCase().includes(query)
+    );
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredCategories.length / itemsPerPage));
+  const validPage = Math.min(currentPage, totalPages);
+  const startIndex = (validPage - 1) * itemsPerPage;
+  const paginatedCategories = filteredCategories.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   // Form State
   const [formData, setFormData] = useState<CategoryInput>({
@@ -173,8 +197,25 @@ export default function AdminKategoriPage() {
         </div>
       </div>
 
+      {/* Search Toolbar */}
+      <div className="relative z-20 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <input
+            type="text"
+            placeholder="Cari nama kategori atau slug..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+          />
+        </div>
+      </div>
+
       {/* Table Container */}
-      <div className="mt-6 overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 backdrop-blur-xl">
+      <div className="mt-4 overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 backdrop-blur-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
@@ -193,85 +234,169 @@ export default function AdminKategoriPage() {
               </tr>
             </thead>
             <tbody>
-              {categories.map((cat) => {
-                const articleCount = getArticleCountByCategory(
-                  cat.name,
-                  dummyArticles
-                );
-                return (
-                  <tr
-                    key={cat.id}
-                    className="border-b border-white/5 last:border-b-0 transition-colors [@media(hover:hover)]:hover:bg-white/[0.02]"
-                  >
-                    {/* Nama Kategori */}
-                    <td className="px-3 sm:px-4 py-3 align-middle">
-                      <div className="flex items-center gap-1.5 sm:gap-2 font-medium text-zinc-200 min-w-0">
-                        <Tags className="hidden sm:inline-block h-4 w-4 text-brand-400 shrink-0" />
-                        <span className="truncate max-w-[110px] sm:max-w-none">{cat.name}</span>
-                      </div>
-                    </td>
+              {paginatedCategories.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-zinc-400">
+                    <Tags className="mx-auto h-8 w-8 text-zinc-400/80 mb-2" />
+                    <p className="text-sm">
+                      {categories.length === 0
+                        ? "Belum ada kategori yang ditambahkan."
+                        : "Tidak ada kategori yang cocok dengan pencarian."}
+                    </p>
+                  </td>
+                </tr>
+              ) : (
+                paginatedCategories.map((cat) => {
+                  const articleCount = getArticleCountByCategory(
+                    cat.name,
+                    dummyArticles
+                  );
+                  return (
+                    <tr
+                      key={cat.id}
+                      className="border-b border-white/5 last:border-b-0 transition-colors [@media(hover:hover)]:hover:bg-white/[0.02]"
+                    >
+                      {/* Nama Kategori */}
+                      <td className="px-3 sm:px-4 py-3 align-middle">
+                        <div className="flex items-center gap-1.5 sm:gap-2 font-medium text-zinc-200 min-w-0">
+                          <Tags className="hidden sm:inline-block h-4 w-4 text-brand-400 shrink-0" />
+                          <span className="truncate max-w-[110px] sm:max-w-none">{cat.name}</span>
+                        </div>
+                      </td>
 
-                    {/* Slug */}
-                    <td className="hidden md:table-cell px-4 py-3 align-middle">
-                      <code className="rounded bg-black/40 px-1.5 py-0.5 text-xs text-zinc-400 font-mono">
-                        /{cat.slug}
-                      </code>
-                    </td>
+                      {/* Slug */}
+                      <td className="hidden md:table-cell px-4 py-3 align-middle">
+                        <code className="rounded bg-black/40 px-1.5 py-0.5 text-xs text-zinc-400 font-mono">
+                          /{cat.slug}
+                        </code>
+                      </td>
 
-                    {/* Jumlah Artikel */}
-                    <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
-                      <span className="inline-flex min-w-[24px] items-center justify-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-zinc-300">
-                        {articleCount} artikel
-                      </span>
-                    </td>
+                      {/* Jumlah Artikel */}
+                      <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
+                        <span className="inline-flex min-w-[24px] items-center justify-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-zinc-300">
+                          {articleCount} artikel
+                        </span>
+                      </td>
 
-                    {/* Status Toggle */}
-                    <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
-                      <button
-                        type="button"
-                        onClick={() => toggleStatus(cat.id)}
-                        className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
-                          cat.status === "ACTIVE"
-                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 [@media(hover:hover)]:hover:bg-emerald-500/20 active:bg-emerald-500/30"
-                            : "border-zinc-600 bg-zinc-800/50 text-zinc-400 [@media(hover:hover)]:hover:bg-zinc-800 active:bg-zinc-700"
-                        }`}
-                      >
-                        {cat.status === "ACTIVE" ? (
-                          <CheckCircle className="h-3.5 w-3.5 shrink-0" />
-                        ) : (
-                          <XCircle className="h-3.5 w-3.5 shrink-0" />
-                        )}
-                        <span>{cat.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}</span>
-                      </button>
-                    </td>
-
-                    {/* Aksi */}
-                    <td className="px-3 sm:px-4 py-3 text-right align-middle whitespace-nowrap">
-                      <div className="inline-flex items-center gap-1">
+                      {/* Status Toggle */}
+                      <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
                         <button
                           type="button"
-                          onClick={() => handleOpenEdit(cat)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-white/10 [@media(hover:hover)]:hover:bg-white/5 [@media(hover:hover)]:hover:text-white active:bg-white/10 active:text-white"
-                          title="Edit Kategori"
+                          onClick={() => toggleStatus(cat.id)}
+                          className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                            cat.status === "ACTIVE"
+                              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 [@media(hover:hover)]:hover:bg-emerald-500/20 active:bg-emerald-500/30"
+                              : "border-zinc-600 bg-zinc-800/50 text-zinc-400 [@media(hover:hover)]:hover:bg-zinc-800 active:bg-zinc-700"
+                          }`}
                         >
-                          <Pencil className="h-3.5 w-3.5" />
+                          {cat.status === "ACTIVE" ? (
+                            <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+                          ) : (
+                            <XCircle className="h-3.5 w-3.5 shrink-0" />
+                          )}
+                          <span>{cat.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}</span>
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeleteId(cat.id)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-400 active:bg-red-500/20 active:text-red-400"
-                          title="Hapus Kategori"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+
+                      {/* Aksi */}
+                      <td className="px-3 sm:px-4 py-3 text-right align-middle whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEdit(cat)}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-white/10 [@media(hover:hover)]:hover:bg-white/5 [@media(hover:hover)]:hover:text-white active:bg-white/10 active:text-white"
+                            title="Edit Kategori"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeleteId(cat.id)}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-400 active:bg-red-500/20 active:text-red-400"
+                            title="Hapus Kategori"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Bar */}
+        {filteredCategories.length > 0 && (
+          <div className="flex flex-col gap-3 border-t border-white/5 bg-white/[0.01] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+              <p>
+                Menampilkan{" "}
+                <span className="font-medium text-white">
+                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredCategories.length)}
+                </span>{" "}
+                dari <span className="font-medium text-white">{filteredCategories.length}</span> kategori
+              </p>
+
+              {/* Selector Baris Per Halaman */}
+              <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
+                <span className="text-zinc-500">Baris:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="rounded-md border border-white/10 bg-zinc-950 px-2 py-1 text-xs text-zinc-300 outline-none transition-colors hover:border-white/20 focus:border-brand-500/50"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 self-end sm:self-auto">
+              <button
+                type="button"
+                disabled={validPage <= 1}
+                onClick={() => setCurrentPage(Math.max(1, validPage - 1))}
+                className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                <span>Sebelumnya</span>
+              </button>
+
+              <div className="flex items-center gap-1 px-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => setCurrentPage(page)}
+                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                      validPage === page
+                        ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 font-semibold shadow-sm shadow-brand-500/10"
+                        : "border border-transparent text-zinc-400 hover:bg-white/5 hover:text-white"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                disabled={validPage >= totalPages}
+                onClick={() => setCurrentPage(Math.min(totalPages, validPage + 1))}
+                className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+              >
+                <span>Selanjutnya</span>
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal Tambah/Edit Kategori */}
