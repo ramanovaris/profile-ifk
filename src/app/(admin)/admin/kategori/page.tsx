@@ -179,14 +179,20 @@ export default function AdminKategoriPage() {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02] text-xs font-medium uppercase tracking-wider text-zinc-400">
-                <th className="px-3 sm:px-4 py-3">Nama Kategori</th>
-                <th className="hidden md:table-cell px-4 py-3">Slug</th>
-                <th className="px-2 sm:px-4 py-3 text-center">Jumlah Artikel</th>
-                <th className="px-2 sm:px-4 py-3 text-center">Status</th>
-                <th className="px-3 sm:px-4 py-3 text-right">Aksi</th>
+                <th className="px-3 sm:px-4 py-3 align-middle">
+                  <span className="sm:hidden">Kategori</span>
+                  <span className="hidden sm:inline">Nama Kategori</span>
+                </th>
+                <th className="hidden md:table-cell px-4 py-3 align-middle w-[140px]">Slug</th>
+                <th className="px-2 sm:px-4 py-3 text-center align-middle w-[90px] sm:w-[130px]">
+                  <span className="sm:hidden">Artikel</span>
+                  <span className="hidden sm:inline">Jumlah Artikel</span>
+                </th>
+                <th className="px-2 sm:px-4 py-3 text-center align-middle w-[100px] sm:w-[120px]">Status</th>
+                <th className="px-3 sm:px-4 py-3 text-right align-middle w-[75px] sm:w-[90px]">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody>
               {categories.map((cat) => {
                 const articleCount = getArticleCountByCategory(
                   cat.name,
@@ -195,36 +201,36 @@ export default function AdminKategoriPage() {
                 return (
                   <tr
                     key={cat.id}
-                    className="transition-colors [@media(hover:hover)]:hover:bg-white/[0.02]"
+                    className="border-b border-white/5 last:border-b-0 transition-colors [@media(hover:hover)]:hover:bg-white/[0.02]"
                   >
                     {/* Nama Kategori */}
-                    <td className="px-3 sm:px-4 py-3">
-                      <div className="flex items-center gap-1.5 sm:gap-2 font-medium text-zinc-200">
-                        <Tags className="h-4 w-4 text-brand-400 shrink-0" />
-                        <span className="truncate max-w-[120px] sm:max-w-none">{cat.name}</span>
+                    <td className="px-3 sm:px-4 py-3 align-middle">
+                      <div className="flex items-center gap-1.5 sm:gap-2 font-medium text-zinc-200 min-w-0">
+                        <Tags className="hidden sm:inline-block h-4 w-4 text-brand-400 shrink-0" />
+                        <span className="truncate max-w-[110px] sm:max-w-none">{cat.name}</span>
                       </div>
                     </td>
 
                     {/* Slug */}
-                    <td className="hidden md:table-cell px-4 py-3">
+                    <td className="hidden md:table-cell px-4 py-3 align-middle">
                       <code className="rounded bg-black/40 px-1.5 py-0.5 text-xs text-zinc-400 font-mono">
                         /{cat.slug}
                       </code>
                     </td>
 
                     {/* Jumlah Artikel */}
-                    <td className="px-2 sm:px-4 py-3 text-center whitespace-nowrap">
+                    <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
                       <span className="inline-flex min-w-[24px] items-center justify-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-zinc-300">
                         {articleCount} artikel
                       </span>
                     </td>
 
                     {/* Status Toggle */}
-                    <td className="px-2 sm:px-4 py-3 text-center whitespace-nowrap">
+                    <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
                       <button
                         type="button"
                         onClick={() => toggleStatus(cat.id)}
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
+                        className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] leading-none font-medium transition-colors ${
                           cat.status === "ACTIVE"
                             ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 [@media(hover:hover)]:hover:bg-emerald-500/20 active:bg-emerald-500/30"
                             : "border-zinc-600 bg-zinc-800/50 text-zinc-400 [@media(hover:hover)]:hover:bg-zinc-800 active:bg-zinc-700"
@@ -240,7 +246,7 @@ export default function AdminKategoriPage() {
                     </td>
 
                     {/* Aksi */}
-                    <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
+                    <td className="px-3 sm:px-4 py-3 text-right align-middle whitespace-nowrap">
                       <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
