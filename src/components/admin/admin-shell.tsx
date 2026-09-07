@@ -9,6 +9,7 @@ import {
   Newspaper,
   Users,
   UserCog,
+  Settings,
   LogOut,
   Menu,
   Tags,
@@ -31,6 +32,7 @@ const sidebarLinks = [
   { href: "/admin/kategori", label: "Kategori", icon: Tags },
   { href: "/admin/pengguna", label: "Pengguna", icon: Users },
   { href: "/admin/profil", label: "Profil", icon: UserCog },
+  { href: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
 ];
 
 function SidebarLink({
