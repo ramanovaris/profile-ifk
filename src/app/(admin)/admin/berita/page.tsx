@@ -8,7 +8,6 @@ import {
   Pencil,
   Trash2,
   Search,
-  SlidersHorizontal,
   Newspaper,
   ChevronLeft,
   ChevronRight,
@@ -22,14 +21,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { dummyArticles, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
-
-const filterCategories = ["Semua", ...ARTICLE_CATEGORIES] as const;
+import { CategoryMultiSelectFilter } from "@/components/admin/category-multi-select-filter";
+import { dummyArticles, initialCategories } from "@/lib/dummy-data";
 
 export default function AdminBeritaPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("Semua");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
@@ -38,7 +36,8 @@ export default function AdminBeritaPage() {
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.category.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
-      selectedCategory === "Semua" || article.category === selectedCategory;
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(article.category);
     return matchesSearch && matchesCategory;
   });
 
@@ -79,7 +78,7 @@ export default function AdminBeritaPage() {
       </div>
 
       {/* Filter and Search Toolbar */}
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+      <div className="relative z-20 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
         {/* Search input */}
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -91,34 +90,22 @@ export default function AdminBeritaPage() {
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/40 focus:ring-1 focus:ring-brand-500/30"
+            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
           />
         </div>
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-          <span className="mr-1 hidden items-center gap-1 text-xs text-zinc-400 lg:flex">
-            <SlidersHorizontal className="h-3.5 w-3.5" />
-            <span>Kategori:</span>
-          </span>
-          {filterCategories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => {
-                setSelectedCategory(cat);
-                setCurrentPage(1);
-              }}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
-                selectedCategory === cat
-                  ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 shadow-sm shadow-brand-500/10"
-                  : "border border-transparent bg-white/[0.03] text-zinc-400 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+        {/* Category Multi-Select Filter */}
+        <CategoryMultiSelectFilter
+          categories={initialCategories}
+          selectedCategories={selectedCategories}
+          onChange={(cats) => {
+            setSelectedCategories(cats);
+            setCurrentPage(1);
+          }}
+          getArticleCount={(catName) =>
+            dummyArticles.filter((a) => a.category === catName).length
+          }
+        />
       </div>
 
       {/* Table Container */}
