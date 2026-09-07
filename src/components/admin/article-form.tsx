@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import type { Article, ArticleCategory } from "@/lib/dummy-data";
 import { initialCategories, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
@@ -30,9 +30,7 @@ export function ArticleForm({ article }: { article?: Article }) {
   const [category, setCategory] = useState<Article["category"]>(
     article?.category ?? ARTICLE_CATEGORIES[0]
   );
-  const [content, setContent] = useState(
-    article?.content.replace(/<[^>]+>/g, "").trim() ?? ""
-  );
+  const [content, setContent] = useState(article?.content ?? "");
   const [isPublished, setIsPublished] = useState(article?.isPublished ?? false);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -104,6 +102,10 @@ export function ArticleForm({ article }: { article?: Article }) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!content || content.trim() === "" || content === "<p></p>") {
+      alert("Isi konten artikel wajib diisi.");
+      return;
+    }
     alert(
       article
         ? "Artikel berhasil diperbarui (dummy mode)"
@@ -395,7 +397,8 @@ export function ArticleForm({ article }: { article?: Article }) {
                 onKeyDown={(e) => {
                   if (e.key === "ArrowDown") {
                     e.preventDefault();
-                    document.getElementById("content")?.focus();
+                    const editorEl = document.querySelector<HTMLElement>(".ProseMirror");
+                    editorEl?.focus();
                   } else if (e.key === "ArrowUp") {
                     e.preventDefault();
                     document.getElementById("status-publikasi")?.focus();
@@ -427,7 +430,7 @@ export function ArticleForm({ article }: { article?: Article }) {
 
         {/* Konten Artikel */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <Label
               htmlFor="content"
               className="text-sm font-medium text-zinc-200 flex items-center gap-1.5"
@@ -436,23 +439,19 @@ export function ArticleForm({ article }: { article?: Article }) {
               <span>Isi Konten Artikel</span> <span className="text-red-400">*</span>
             </Label>
             <span className="text-[11px] text-zinc-500">
-              Mendukung teks deskriptif
+              Mendukung formatting visual &amp; shortcut (Ctrl+B, Ctrl+I, Ctrl+Enter)
             </span>
           </div>
-          <Textarea
-            id="content"
-            required
-            rows={10}
+          <RichTextEditor
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={setContent}
+            placeholder="Tuliskan berita, informasi kegiatan, atau sosialisasi obat dan perbekalan kesehatan di sini..."
             onKeyDown={(e) => {
               if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
                 e.preventDefault();
                 handleSubmit(e as unknown as React.FormEvent);
               }
             }}
-            placeholder="Tuliskan berita, informasi kegiatan, atau sosialisasi obat dan perbekalan kesehatan di sini..."
-            className="border-white/10 bg-zinc-950/60 font-sans text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 leading-relaxed"
           />
         </div>
 
