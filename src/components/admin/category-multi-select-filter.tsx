@@ -185,7 +185,7 @@ export function CategoryMultiSelectFilter({
   return (
     <div
       ref={containerRef}
-      className={`relative inline-block ${className}`}
+      className={`relative inline-block w-full sm:w-auto ${className}`}
       onKeyDown={handleKeyDown}
     >
       {/* Trigger Button */}
@@ -232,7 +232,7 @@ export function CategoryMultiSelectFilter({
           role="listbox"
           id={listboxId}
           aria-multiselectable="true"
-          className="absolute right-0 top-full z-30 mt-1.5 w-72 origin-top-right rounded-xl border border-white/10 bg-zinc-900/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+          className="absolute right-0 top-full z-50 mt-1.5 w-72 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-white/10 bg-zinc-900/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
         >
           {/* Mini Search Input */}
           <div className="relative mb-2 flex items-center">
