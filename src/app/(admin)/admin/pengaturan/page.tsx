@@ -9,8 +9,6 @@ import {
   Link2,
   Save,
   RotateCcw,
-  CheckCircle2,
-  AlertCircle,
   MapPin,
   Phone,
   Mail,
@@ -19,7 +17,6 @@ import {
   Upload,
   Globe,
   Radio,
-  X,
   Share2,
   Megaphone,
 } from "lucide-react";
@@ -35,14 +32,8 @@ import { cn } from "@/lib/utils";
 
 type TabKey = "identitas" | "profil" | "tautan";
 
-interface FeedbackState {
-  type: "success" | "error";
-  message: string;
-}
-
 export default function AdminPengaturanPage() {
   const [activeTab, setActiveTab] = useState<TabKey>("identitas");
-  const [feedback, setFeedback] = useState<FeedbackState | null>(null);
 
   // ── Tab 1: Identitas & Kontak State ───────────────────────────────────────
   const initialIdentity = {
@@ -87,28 +78,17 @@ export default function AdminPengaturanPage() {
   const [linksForm, setLinksForm] = useState(initialLinks);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
-  const showFeedback = (type: "success" | "error", message: string) => {
-    setFeedback({ type, message });
-    // Scroll smoothly to top on mobile for visibility
-    if (typeof window !== "undefined" && window.innerWidth < 768) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   const handleIdentitySave = (e: FormEvent) => {
     e.preventDefault();
     if (!identityForm.name.trim() || !identityForm.shortName.trim()) {
-      showFeedback("error", "Nama instansi dan nama singkat tidak boleh kosong.");
       toast.error("Nama instansi dan nama singkat tidak boleh kosong.");
       return;
     }
-    showFeedback("success", "Pengaturan identitas dan kontak lembaga berhasil disimpan.");
     toast.success("Identitas dan kontak lembaga berhasil disimpan.");
   };
 
   const handleIdentityReset = () => {
     setIdentityForm(initialIdentity);
-    showFeedback("success", "Form identitas dan kontak berhasil dikembalikan ke data default.");
     toast.info("Form identitas dikembalikan ke data default.");
   };
 
@@ -117,7 +97,6 @@ export default function AdminPengaturanPage() {
     if (file) {
       const url = URL.createObjectURL(file);
       setProfileForm((prev) => ({ ...prev, headPhoto: url }));
-      showFeedback("success", "Foto pimpinan sementara berhasil diperbarui.");
       toast.success("Foto pimpinan berhasil diperbarui.");
     }
   };
@@ -125,29 +104,25 @@ export default function AdminPengaturanPage() {
   const handleProfileSave = (e: FormEvent) => {
     e.preventDefault();
     if (!profileForm.headName.trim()) {
-      showFeedback("error", "Nama Kepala UPTD tidak boleh kosong.");
       toast.error("Nama Kepala UPTD tidak boleh kosong.");
       return;
     }
-    showFeedback("success", "Konten profil UPTD (Sambutan, Visi & Misi, Tupoksi) berhasil disimpan.");
     toast.success("Konten profil UPTD berhasil disimpan.");
   };
 
   const handleProfileReset = () => {
     setProfileForm(initialProfile);
-    showFeedback("success", "Form konten profil berhasil dikembalikan ke data default.");
     toast.info("Form konten profil dikembalikan ke data default.");
   };
 
   const handleLinksSave = (e: FormEvent) => {
     e.preventDefault();
-    showFeedback("success", "Tautan layanan eksternal, media sosial, dan banner pengumuman berhasil disimpan.");
     toast.success("Tautan layanan eksternal berhasil disimpan.");
   };
 
   const handleLinksReset = () => {
     setLinksForm(initialLinks);
-    showFeedback("success", "Form tautan layanan berhasil dikembalikan ke data default.");
+    toast.info("Form tautan layanan dikembalikan ke data default.");
   };
 
   return (
@@ -171,43 +146,11 @@ export default function AdminPengaturanPage() {
           </div>
         </div>
 
-        {/* In-Page Feedback Notification Banner */}
-        {feedback && (
-          <div
-            className={cn(
-              "flex items-center justify-between rounded-xl border p-4 shadow-lg backdrop-blur-md transition-all duration-200 animate-in fade-in",
-              feedback.type === "success"
-                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-emerald-500/5"
-                : "border-rose-500/30 bg-rose-500/10 text-rose-300 shadow-rose-500/5"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              {feedback.type === "success" ? (
-                <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
-              ) : (
-                <AlertCircle className="h-5 w-5 shrink-0 text-rose-400" />
-              )}
-              <p className="text-sm font-medium">{feedback.message}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setFeedback(null)}
-              className="rounded-lg p-1 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
-              aria-label="Tutup notifikasi"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-
         {/* Horizontal Segmented Tab Bar */}
         <div className="inline-flex max-w-full gap-1.5 overflow-x-auto rounded-xl border border-white/5 bg-zinc-900/80 p-1.5 backdrop-blur-xl scrollbar-none">
           <button
             type="button"
-            onClick={() => {
-              setActiveTab("identitas");
-              setFeedback(null);
-            }}
+            onClick={() => setActiveTab("identitas")}
             className={cn(
               "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
               activeTab === "identitas"
@@ -221,10 +164,7 @@ export default function AdminPengaturanPage() {
 
           <button
             type="button"
-            onClick={() => {
-              setActiveTab("profil");
-              setFeedback(null);
-            }}
+            onClick={() => setActiveTab("profil")}
             className={cn(
               "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
               activeTab === "profil"
@@ -238,10 +178,7 @@ export default function AdminPengaturanPage() {
 
           <button
             type="button"
-            onClick={() => {
-              setActiveTab("tautan");
-              setFeedback(null);
-            }}
+            onClick={() => setActiveTab("tautan")}
             className={cn(
               "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
               activeTab === "tautan"
