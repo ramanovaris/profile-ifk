@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from "lucide-react";
 
 // ── Toast Types ──────────────────────────────────────────────────────────────
@@ -110,14 +110,13 @@ function ToastCard({ item }: { item: ToastItem }) {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleDismiss = useCallback(() => {
+  const handleDismiss = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     setExiting(true);
     setTimeout(() => dismissToast(item.id), 300);
-  }, [item.id]);
+  };
 
   return (
     <div
