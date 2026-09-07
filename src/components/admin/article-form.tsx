@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,19 +14,16 @@ import {
   Tag,
   ImageIcon,
   Type,
+  Search,
+  ChevronDown,
+  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type { Article } from "@/lib/dummy-data";
-import { ARTICLE_CATEGORIES } from "@/lib/dummy-data";
+import type { Article, Category, ArticleCategory } from "@/lib/dummy-data";
+import { initialCategories, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
+import { cn } from "@/lib/utils";
 
 export function ArticleForm({ article }: { article?: Article }) {
   const router = useRouter();
@@ -39,6 +36,38 @@ export function ArticleForm({ article }: { article?: Article }) {
   );
   const [isPublished, setIsPublished] = useState(article?.isPublished ?? false);
   const [preview, setPreview] = useState<string | null>(null);
+
+  // Combobox State
+  const [isComboboxOpen, setIsComboboxOpen] = useState(false);
+  const [comboboxSearch, setComboboxSearch] = useState("");
+  const comboboxRef = useRef<HTMLDivElement>(null);
+
+  // Filter kategori yang hanya ACTIVE
+  const activeCategories = initialCategories.filter(
+    (cat) => cat.status === "ACTIVE"
+  );
+
+  const filteredCategories = activeCategories.filter((cat) =>
+    cat.name.toLowerCase().includes(comboboxSearch.toLowerCase())
+  );
+
+  const selectedCategoryData = activeCategories.find(
+    (cat) => cat.name === category
+  );
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        comboboxRef.current &&
+        !comboboxRef.current.contains(event.target as Node)
+      ) {
+        setIsComboboxOpen(false);
+        setComboboxSearch("");
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const generatedSlug = title
     .toLowerCase()
@@ -106,29 +135,89 @@ export function ArticleForm({ article }: { article?: Article }) {
 
         {/* Kategori & Status Grid */}
         <div className="grid gap-6 sm:grid-cols-2">
-          {/* Kategori */}
+          {/* Combobox Kategori */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
               <Tag className="h-3.5 w-3.5 text-brand-400" />
               <span>Kategori</span>
             </Label>
-            <Select
-              value={category}
-              onValueChange={(v: string | null) =>
-                v && setCategory(v as Article["category"])
-              }
-            >
-              <SelectTrigger className="border-white/10 bg-zinc-950/60 text-white focus:border-brand-500/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-white/10 bg-zinc-950 text-white">
-                {ARTICLE_CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div ref={comboboxRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setIsComboboxOpen(!isComboboxOpen)}
+                className={cn(
+                  "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors",
+                  isComboboxOpen
+                    ? "border-brand-500/50 ring-1 ring-brand-500/30"
+                    : "border-white/10 hover:border-white/20"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  {selectedCategoryData ? (
+                    <span className="text-white">{selectedCategoryData.name}</span>
+                  ) : (
+                    <span className="text-zinc-500">Pilih kategori...</span>
+                  )}
+                </div>
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 text-zinc-400 transition-transform",
+                    isComboboxOpen && "rotate-180"
+                  )}
+                />
+              </button>
+
+              {isComboboxOpen && (
+                <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-2xl backdrop-blur-2xl">
+                  {/* Search Input inside Dropdown */}
+                  <div className="border-b border-white/5 p-2">
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+                      <input
+                        type="text"
+                        placeholder="Cari kategori..."
+                        value={comboboxSearch}
+                        onChange={(e) => setComboboxSearch(e.target.value)}
+                        className="w-full rounded-lg border border-white/5 bg-white/[0.03] py-1.5 pl-8 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+
+                  {/* Options List */}
+                  <div className="max-h-48 overflow-y-auto p-1.5">
+                    {filteredCategories.length === 0 ? (
+                      <div className="py-4 text-center text-xs text-zinc-400">
+                        Tidak ada kategori ditemukan.
+                      </div>
+                    ) : (
+                      filteredCategories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => {
+                            setCategory(cat.name as ArticleCategory);
+                            setIsComboboxOpen(false);
+                            setComboboxSearch("");
+                          }}
+                          className={cn(
+                            "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
+                            category === cat.name
+                              ? "bg-brand-500/15 text-brand-300"
+                              : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                          )}
+                        >
+                          <span>{cat.name}</span>
+                          {category === cat.name && (
+                            <Check className="h-4 w-4 text-brand-400" />
+                          )}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Publikasi Switch Box */}
