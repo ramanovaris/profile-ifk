@@ -159,7 +159,7 @@ export function ArticleForm({ article }: { article?: Article }) {
               }
             }}
             placeholder="Misal: Sosialisasi Pelayanan Kefarmasian Puskesmas Se-Kotabaru"
-            className="border-white/10 bg-zinc-950/60 text-white placeholder-zinc-500 focus:border-brand-500/50"
+            className="border-white/10 bg-zinc-950/60 text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           />
           {title && (
             <div className="flex items-center gap-1.5 text-xs text-zinc-400 pt-1">
@@ -211,9 +211,9 @@ export function ArticleForm({ article }: { article?: Article }) {
                 aria-expanded={isComboboxOpen}
                 aria-haspopup="listbox"
                 className={cn(
-                  "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50",
+                  "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
                   isComboboxOpen
-                    ? "border-brand-500/50 ring-1 ring-brand-500/30"
+                    ? "border-brand-500/60 ring-2 ring-brand-500/40"
                     : "border-white/10 hover:border-white/20"
                 )}
               >
@@ -275,7 +275,7 @@ export function ArticleForm({ article }: { article?: Article }) {
                             triggerButtonRef.current?.focus();
                           }
                         }}
-                        className="w-full rounded-lg border border-white/5 bg-white/[0.03] py-1.5 pl-8 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
+                        className="w-full rounded-lg border border-white/5 bg-white/[0.03] py-1.5 pl-8 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
                         autoFocus
                       />
                     </div>
@@ -328,7 +328,7 @@ export function ArticleForm({ article }: { article?: Article }) {
           {/* Publikasi Switch Box */}
           <div className="space-y-2">
             <Label htmlFor="status-publikasi" className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+              <Sparkles className="h-3.5 w-3.5 text-brand-400" />
               <span>Status Publikasi</span>
             </Label>
             <button
@@ -345,9 +345,9 @@ export function ArticleForm({ article }: { article?: Article }) {
                 }
               }}
               className={cn(
-                "flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border px-3.5 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50",
+                "flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border px-3.5 text-left transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
                 isPublished
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                  ? "border-brand-500/30 bg-brand-500/10 text-brand-300"
                   : "border-white/10 bg-zinc-950/60 text-zinc-400"
               )}
             >
@@ -358,7 +358,7 @@ export function ArticleForm({ article }: { article?: Article }) {
                 className={cn(
                   "flex h-5 w-5 items-center justify-center rounded-full border transition-all",
                   isPublished
-                    ? "border-emerald-400 bg-emerald-500 text-black"
+                    ? "border-brand-400 bg-brand-500 text-black"
                     : "border-zinc-600 bg-zinc-800"
                 )}
               >
@@ -378,7 +378,7 @@ export function ArticleForm({ article }: { article?: Article }) {
           <div className="grid gap-4 sm:grid-cols-2 sm:items-center">
             <label
               htmlFor="cover-image"
-              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-950/40 p-6 text-center hover:border-brand-500/50 hover:bg-zinc-950/70 cursor-pointer transition-colors group focus-within:border-brand-500/80 focus-within:ring-2 focus-within:ring-brand-500/40 focus-within:bg-zinc-950/70"
+              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-950/40 p-6 text-center hover:border-brand-500/50 hover:bg-zinc-950/70 cursor-pointer transition-colors group focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/40 focus-within:bg-zinc-950/70"
             >
               <Upload className="h-7 w-7 text-zinc-400 group-hover:text-brand-400 group-focus-within:text-brand-400 transition-colors" />
               <p className="mt-2 text-xs font-medium text-zinc-300">
@@ -452,7 +452,7 @@ export function ArticleForm({ article }: { article?: Article }) {
               }
             }}
             placeholder="Tuliskan berita, informasi kegiatan, atau sosialisasi obat dan perbekalan kesehatan di sini..."
-            className="border-white/10 bg-zinc-950/60 font-sans text-sm text-white placeholder-zinc-500 focus:border-brand-500/50 leading-relaxed"
+            className="border-white/10 bg-zinc-950/60 font-sans text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 leading-relaxed"
           />
         </div>
 
@@ -460,14 +460,14 @@ export function ArticleForm({ article }: { article?: Article }) {
         <div className="flex items-center gap-3 pt-4 border-t border-white/5">
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-zinc-950"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           >
             {article ? "Simpan Perubahan" : "Publikasikan Artikel"}
           </button>
           <button
             type="button"
             onClick={() => router.push("/admin/berita")}
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-zinc-950"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           >
             Batal
           </button>
