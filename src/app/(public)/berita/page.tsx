@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
-import { dummyArticles } from "@/lib/dummy-data";
+import { dummyArticles, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
 
-const categories = ["Semua", "Kegiatan", "Informasi", "Sosialisasi"] as const;
+const filterCategories = ["Semua", ...ARTICLE_CATEGORIES] as const;
 
 export default function BeritaPage() {
   const [search, setSearch] = useState("");
@@ -53,7 +53,7 @@ export default function BeritaPage() {
 
           {/* Category filter */}
           <div className="mt-6 flex flex-wrap gap-2">
-            {categories.map((cat) => {
+            {filterCategories.map((cat) => {
               const isActive = activeCategory === cat;
               return (
                 <button
