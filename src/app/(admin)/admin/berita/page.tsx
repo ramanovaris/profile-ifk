@@ -24,9 +24,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { dummyArticles } from "@/lib/dummy-data";
+import { dummyArticles, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
 
-const categories = ["Semua", "Kegiatan", "Informasi", "Sosialisasi"] as const;
+const filterCategories = ["Semua", ...ARTICLE_CATEGORIES] as const;
 
 export default function AdminBeritaPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export default function AdminBeritaPage() {
             <SlidersHorizontal className="h-3.5 w-3.5" />
             <span>Kategori:</span>
           </span>
-          {categories.map((cat) => (
+          {filterCategories.map((cat) => (
             <button
               key={cat}
               type="button"

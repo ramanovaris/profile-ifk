@@ -26,12 +26,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Article } from "@/lib/dummy-data";
+import { ARTICLE_CATEGORIES } from "@/lib/dummy-data";
 
 export function ArticleForm({ article }: { article?: Article }) {
   const router = useRouter();
   const [title, setTitle] = useState(article?.title ?? "");
   const [category, setCategory] = useState<Article["category"]>(
-    article?.category ?? "Kegiatan"
+    article?.category ?? ARTICLE_CATEGORIES[0]
   );
   const [content, setContent] = useState(
     article?.content.replace(/<[^>]+>/g, "").trim() ?? ""
@@ -121,9 +122,11 @@ export function ArticleForm({ article }: { article?: Article }) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="border-white/10 bg-zinc-950 text-white">
-                <SelectItem value="Kegiatan">Kegiatan</SelectItem>
-                <SelectItem value="Informasi">Informasi</SelectItem>
-                <SelectItem value="Sosialisasi">Sosialisasi</SelectItem>
+                {ARTICLE_CATEGORIES.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

@@ -1,12 +1,15 @@
 import { placeholderImage } from "./placeholder";
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+// ── Types & Constants ────────────────────────────────────────────────────────
+
+export const ARTICLE_CATEGORIES = ["Kegiatan", "Informasi", "Sosialisasi"] as const;
+export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
 
 export type Article = {
   id: string;
   title: string;
   slug: string;
-  category: "Kegiatan" | "Informasi" | "Sosialisasi";
+  category: ArticleCategory;
   content: string; // HTML string
   coverImage: string;
   isPublished: boolean;
