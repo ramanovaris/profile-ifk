@@ -11,7 +11,7 @@ import {
   Type,
   AlertTriangle,
   AlertCircle,
-  Check,
+  Save,
 } from "lucide-react";
 import {
   Dialog,
@@ -385,8 +385,8 @@ export default function AdminKategoriPage() {
                 type="submit"
                 className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
               >
-                <Check className="h-4 w-4" />
-                <span>{editCategory ? "Simpan Perubahan" : "Tambah Kategori"}</span>
+                <Save className="h-4 w-4" />
+                <span>Simpan Kategori</span>
               </button>
             </DialogFooter>
           </form>
