@@ -43,7 +43,7 @@ const IndentExtension = Extension.create({
     return {
       types: ["paragraph", "heading", "blockquote"],
       minLevel: 0,
-      maxLevel: 4,
+      maxLevel: 8,
     };
   },
 
@@ -97,9 +97,8 @@ const IndentExtension = Extension.create({
           });
           if (changed && dispatch) {
             dispatch(tr);
-            return true;
           }
-          return false;
+          return true;
         },
       outdent:
         () =>
@@ -122,9 +121,8 @@ const IndentExtension = Extension.create({
           });
           if (changed && dispatch) {
             dispatch(tr);
-            return true;
           }
-          return false;
+          return true;
         },
     };
   },
@@ -133,15 +131,19 @@ const IndentExtension = Extension.create({
     return {
       Tab: () => {
         if (this.editor.can().sinkListItem("listItem")) {
-          return this.editor.chain().sinkListItem("listItem").run();
+          this.editor.chain().sinkListItem("listItem").run();
+          return true;
         }
-        return this.editor.chain().indent().run();
+        this.editor.chain().indent().run();
+        return true;
       },
       "Shift-Tab": () => {
         if (this.editor.can().liftListItem("listItem")) {
-          return this.editor.chain().liftListItem("listItem").run();
+          this.editor.chain().liftListItem("listItem").run();
+          return true;
         }
-        return this.editor.chain().outdent().run();
+        this.editor.chain().outdent().run();
+        return true;
       },
       Backspace: ({ editor }) => {
         const { selection } = editor.state;
