@@ -32,7 +32,6 @@ export function placeholderImage(
   category: Category = "Kegiatan",
 ): string {
   const { from, to, accent } = PALETTE[category];
-  const safeLabel = escapeXml(label);
   // Bungkus label panjang jadi 2 baris (maks ~22 char per baris)
   const words = label.split(/\s+/);
   const lines: string[] = [];

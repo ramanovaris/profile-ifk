@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
   Plus,
   Pencil,
@@ -9,7 +8,6 @@ import {
   Tags,
   CheckCircle,
   XCircle,
-  ExternalLink,
 } from "lucide-react";
 import {
   Dialog,

@@ -8,7 +8,6 @@ import {
   ArrowUpRight,
   ExternalLink,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { dummyArticles, dummyUsers, dummyStats } from "@/lib/dummy-data";
 

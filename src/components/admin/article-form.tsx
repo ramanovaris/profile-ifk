@@ -16,12 +16,11 @@ import {
   Type,
   Search,
   ChevronDown,
-  X,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { Article, Category, ArticleCategory } from "@/lib/dummy-data";
+import type { Article, ArticleCategory } from "@/lib/dummy-data";
 import { initialCategories, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
 
@@ -73,24 +72,20 @@ export function ArticleForm({ article }: { article?: Article }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const safeActiveIndex =
+    filteredCategories.length === 0
+      ? -1
+      : activeIndex >= filteredCategories.length
+      ? 0
+      : activeIndex;
+
   // Sync scroll to active item
   useEffect(() => {
-    if (activeIndex >= 0 && optionsRef.current) {
-      const activeEl = optionsRef.current.children[activeIndex] as HTMLElement | undefined;
+    if (safeActiveIndex >= 0 && optionsRef.current) {
+      const activeEl = optionsRef.current.children[safeActiveIndex] as HTMLElement | undefined;
       activeEl?.scrollIntoView({ block: "nearest" });
     }
-  }, [activeIndex]);
-
-  // Adjust activeIndex when filter changes
-  useEffect(() => {
-    if (isComboboxOpen) {
-      setActiveIndex((prev) => {
-        if (filteredCategories.length === 0) return -1;
-        if (prev >= filteredCategories.length) return 0;
-        return prev === -1 ? 0 : prev;
-      });
-    }
-  }, [comboboxSearch, isComboboxOpen, filteredCategories.length]);
+  }, [safeActiveIndex]);
 
   const selectCategory = (catName: string) => {
     setCategory(catName as ArticleCategory);
@@ -247,7 +242,10 @@ export function ArticleForm({ article }: { article?: Article }) {
                         type="text"
                         placeholder="Cari kategori..."
                         value={comboboxSearch}
-                        onChange={(e) => setComboboxSearch(e.target.value)}
+                        onChange={(e) => {
+                          setComboboxSearch(e.target.value);
+                          setActiveIndex(0);
+                        }}
                         onKeyDown={(e) => {
                           if (e.key === "ArrowDown") {
                             e.preventDefault();
@@ -261,13 +259,13 @@ export function ArticleForm({ article }: { article?: Article }) {
                             }
                           } else if (e.key === "Enter") {
                             e.preventDefault();
-                            if (activeIndex >= 0 && activeIndex < filteredCategories.length) {
-                              selectCategory(filteredCategories[activeIndex].name);
+                            if (safeActiveIndex >= 0 && safeActiveIndex < filteredCategories.length) {
+                              selectCategory(filteredCategories[safeActiveIndex].name);
                             }
                           } else if (e.key === "Tab") {
-                            if (activeIndex >= 0 && activeIndex < filteredCategories.length) {
+                            if (safeActiveIndex >= 0 && safeActiveIndex < filteredCategories.length) {
                               e.preventDefault();
-                              selectCategory(filteredCategories[activeIndex].name);
+                              selectCategory(filteredCategories[safeActiveIndex].name);
                             }
                           } else if (e.key === "Escape") {
                             e.preventDefault();
@@ -292,7 +290,7 @@ export function ArticleForm({ article }: { article?: Article }) {
                     ) : (
                       filteredCategories.map((cat, idx) => {
                         const isSelected = category === cat.name;
-                        const isActive = activeIndex === idx;
+                        const isActive = safeActiveIndex === idx;
 
                         return (
                           <button
