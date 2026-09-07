@@ -188,7 +188,7 @@ export default function AdminKategoriPage() {
                   <span className="sm:hidden">Artikel</span>
                   <span className="hidden sm:inline">Jumlah Artikel</span>
                 </th>
-                <th className="px-2 sm:px-4 py-3 text-center align-middle w-[100px] sm:w-[120px]">Status</th>
+                <th className="px-2 sm:px-4 py-3 text-center align-middle w-[105px] sm:w-[120px]">Status</th>
                 <th className="px-3 sm:px-4 py-3 text-right align-middle w-[75px] sm:w-[90px]">Aksi</th>
               </tr>
             </thead>
@@ -220,7 +220,7 @@ export default function AdminKategoriPage() {
 
                     {/* Jumlah Artikel */}
                     <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
-                      <span className="inline-flex min-w-[24px] items-center justify-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-zinc-300">
+                      <span className="inline-flex min-w-[24px] items-center justify-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-medium text-zinc-300">
                         {articleCount} artikel
                       </span>
                     </td>
@@ -230,16 +230,16 @@ export default function AdminKategoriPage() {
                       <button
                         type="button"
                         onClick={() => toggleStatus(cat.id)}
-                        className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] leading-none font-medium transition-colors ${
+                        className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
                           cat.status === "ACTIVE"
                             ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 [@media(hover:hover)]:hover:bg-emerald-500/20 active:bg-emerald-500/30"
                             : "border-zinc-600 bg-zinc-800/50 text-zinc-400 [@media(hover:hover)]:hover:bg-zinc-800 active:bg-zinc-700"
                         }`}
                       >
                         {cat.status === "ACTIVE" ? (
-                          <CheckCircle className="h-3 w-3 shrink-0" />
+                          <CheckCircle className="h-3.5 w-3.5 shrink-0" />
                         ) : (
-                          <XCircle className="h-3 w-3 shrink-0" />
+                          <XCircle className="h-3.5 w-3.5 shrink-0" />
                         )}
                         <span>{cat.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}</span>
                       </button>
