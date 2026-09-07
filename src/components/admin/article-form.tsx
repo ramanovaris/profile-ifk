@@ -43,6 +43,7 @@ export function ArticleForm({ article }: { article?: Article }) {
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const comboboxRef = useRef<HTMLDivElement>(null);
   const optionsRef = useRef<HTMLDivElement>(null);
+  const triggerButtonRef = useRef<HTMLButtonElement>(null);
 
   // Filter kategori yang hanya ACTIVE
   const activeCategories = initialCategories.filter(
@@ -90,6 +91,16 @@ export function ArticleForm({ article }: { article?: Article }) {
       });
     }
   }, [comboboxSearch, isComboboxOpen, filteredCategories.length]);
+
+  const selectCategory = (catName: string) => {
+    setCategory(catName as ArticleCategory);
+    setIsComboboxOpen(false);
+    setComboboxSearch("");
+    setActiveIndex(-1);
+    setTimeout(() => {
+      document.getElementById("status-publikasi")?.focus();
+    }, 0);
+  };
 
   const generatedSlug = title
     .toLowerCase()
@@ -165,6 +176,7 @@ export function ArticleForm({ article }: { article?: Article }) {
             </Label>
             <div ref={comboboxRef} className="relative">
               <button
+                ref={triggerButtonRef}
                 type="button"
                 onClick={() => {
                   if (isComboboxOpen) {
@@ -236,16 +248,19 @@ export function ArticleForm({ article }: { article?: Article }) {
                           } else if (e.key === "Enter") {
                             e.preventDefault();
                             if (activeIndex >= 0 && activeIndex < filteredCategories.length) {
-                              setCategory(filteredCategories[activeIndex].name as ArticleCategory);
-                              setIsComboboxOpen(false);
-                              setComboboxSearch("");
-                              setActiveIndex(-1);
+                              selectCategory(filteredCategories[activeIndex].name);
+                            }
+                          } else if (e.key === "Tab") {
+                            if (activeIndex >= 0 && activeIndex < filteredCategories.length) {
+                              e.preventDefault();
+                              selectCategory(filteredCategories[activeIndex].name);
                             }
                           } else if (e.key === "Escape") {
                             e.preventDefault();
                             setIsComboboxOpen(false);
                             setComboboxSearch("");
                             setActiveIndex(-1);
+                            triggerButtonRef.current?.focus();
                           }
                         }}
                         className="w-full rounded-lg border border-white/5 bg-white/[0.03] py-1.5 pl-8 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
@@ -272,12 +287,7 @@ export function ArticleForm({ article }: { article?: Article }) {
                             role="option"
                             aria-selected={isSelected}
                             onMouseEnter={() => setActiveIndex(idx)}
-                            onClick={() => {
-                              setCategory(cat.name as ArticleCategory);
-                              setIsComboboxOpen(false);
-                              setComboboxSearch("");
-                              setActiveIndex(-1);
-                            }}
+                            onClick={() => selectCategory(cat.name)}
                             className={cn(
                               "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors text-left",
                               isActive
@@ -305,31 +315,35 @@ export function ArticleForm({ article }: { article?: Article }) {
 
           {/* Publikasi Switch Box */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
+            <Label htmlFor="status-publikasi" className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
               <span>Status Publikasi</span>
             </Label>
-            <div
+            <button
+              id="status-publikasi"
+              type="button"
               onClick={() => setIsPublished(!isPublished)}
-              className={`flex h-10 cursor-pointer items-center justify-between rounded-lg border px-3.5 transition-colors ${
+              className={cn(
+                "flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border px-3.5 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50",
                 isPublished
                   ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
                   : "border-white/10 bg-zinc-950/60 text-zinc-400"
-              }`}
+              )}
             >
               <span className="text-sm font-medium">
                 {isPublished ? "Langsung Terbitkan" : "Simpan Sebagai Draft"}
               </span>
               <div
-                className={`flex h-5 w-5 items-center justify-center rounded-full border transition-all ${
+                className={cn(
+                  "flex h-5 w-5 items-center justify-center rounded-full border transition-all",
                   isPublished
                     ? "border-emerald-400 bg-emerald-500 text-black"
                     : "border-zinc-600 bg-zinc-800"
-                }`}
+                )}
               >
                 {isPublished && <Check className="h-3 w-3 stroke-[3]" />}
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
