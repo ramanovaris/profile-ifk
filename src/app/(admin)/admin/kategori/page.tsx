@@ -324,20 +324,34 @@ export default function AdminKategoriPage() {
             </div>
 
             {/* Status Switcher di dalam Modal */}
-            <div className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] p-3">
-              <div>
-                <p className="text-xs font-medium text-zinc-200">
-                  Status Kategori
-                </p>
+            <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-3.5">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-zinc-200">
+                    Status Kategori
+                  </span>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors ${
+                      formData.status === "ACTIVE"
+                        ? "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                        : "border border-zinc-700 bg-zinc-800/80 text-zinc-400"
+                    }`}
+                  >
+                    {formData.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}
+                  </span>
+                </div>
                 <p className="text-[11px] text-zinc-400">
                   {formData.status === "ACTIVE"
                     ? "Kategori aktif dan dapat dipilih di form artikel"
                     : "Kategori dinonaktifkan dari form artikel"}
                 </p>
               </div>
+
+              {/* Sliding Toggle Switch */}
               <button
                 type="button"
                 role="switch"
+                aria-label="Status Kategori"
                 aria-checked={formData.status === "ACTIVE"}
                 onClick={() =>
                   setFormData((prev) => ({
@@ -345,23 +359,17 @@ export default function AdminKategoriPage() {
                     status: prev.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
                   }))
                 }
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border p-0.5 transition-colors duration-200 ease-in-out focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none ${
                   formData.status === "ACTIVE"
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                    : "border-zinc-700 bg-zinc-800/60 text-zinc-400 hover:bg-zinc-800"
+                    ? "border-emerald-500/50 bg-emerald-600 shadow-sm shadow-emerald-500/30"
+                    : "border-white/10 bg-zinc-800"
                 }`}
               >
-                {formData.status === "ACTIVE" ? (
-                  <>
-                    <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
-                    <span>Aktif</span>
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-3.5 w-3.5 text-zinc-400" />
-                    <span>Non-Aktif</span>
-                  </>
-                )}
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in-out ${
+                    formData.status === "ACTIVE" ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
               </button>
             </div>
 
