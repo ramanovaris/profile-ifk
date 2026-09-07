@@ -43,7 +43,7 @@ const IndentExtension = Extension.create({
     return {
       types: ["paragraph", "heading", "blockquote"],
       minLevel: 0,
-      maxLevel: 8,
+      maxLevel: 6,
     };
   },
 
@@ -65,7 +65,7 @@ const IndentExtension = Extension.create({
               }
               return {
                 "data-indent": level,
-                style: `margin-left: ${level * 2}rem;`,
+                style: `margin-left: min(${level * 1.25}rem, 45%);`,
               };
             },
           },
@@ -192,7 +192,7 @@ function ToolbarButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-colors outline-none",
+        "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-medium transition-colors outline-none",
         isActive
           ? "bg-brand-500/20 text-brand-400 border border-brand-500/40 shadow-xs"
           : "text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent",
@@ -205,7 +205,7 @@ function ToolbarButton({
 }
 
 function ToolbarDivider() {
-  return <div className="h-4 w-px bg-white/10 mx-0.5" aria-hidden="true" />;
+  return <div className="h-4 w-px shrink-0 bg-white/10 mx-0.5" aria-hidden="true" />;
 }
 
 export function RichTextEditor({
@@ -316,7 +316,7 @@ export function RichTextEditor({
       )}
     >
       {/* Sticky Toolbar */}
-      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-1 border-b border-white/10 bg-zinc-900/90 p-1.5 rounded-t-xl backdrop-blur-md">
+      <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-white/10 bg-zinc-900/90 p-1.5 rounded-t-xl backdrop-blur-md overflow-x-auto sm:flex-wrap">
         {/* Grup 1: Text Style */}
         <ToolbarButton
           icon={Bold}

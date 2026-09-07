@@ -430,7 +430,7 @@ export function ArticleForm({ article }: { article?: Article }) {
 
         {/* Konten Artikel */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
             <Label
               htmlFor="content"
               className="text-sm font-medium text-zinc-200 flex items-center gap-1.5"
