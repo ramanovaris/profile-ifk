@@ -179,11 +179,11 @@ export default function AdminKategoriPage() {
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02] text-xs font-medium uppercase tracking-wider text-zinc-400">
-                <th className="px-4 py-3">Nama Kategori</th>
-                <th className="px-4 py-3">Slug</th>
-                <th className="px-4 py-3 text-center">Jumlah Artikel</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
+                <th className="px-3 sm:px-4 py-3">Nama Kategori</th>
+                <th className="hidden md:table-cell px-4 py-3">Slug</th>
+                <th className="px-2 sm:px-4 py-3 text-center">Jumlah Artikel</th>
+                <th className="px-2 sm:px-4 py-3 text-center">Status</th>
+                <th className="px-3 sm:px-4 py-3 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -195,57 +195,57 @@ export default function AdminKategoriPage() {
                 return (
                   <tr
                     key={cat.id}
-                    className="transition-colors hover:bg-white/[0.02]"
+                    className="transition-colors [@media(hover:hover)]:hover:bg-white/[0.02]"
                   >
                     {/* Nama Kategori */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2 font-medium text-zinc-200">
-                        <Tags className="h-4 w-4 text-brand-400" />
-                        <span>{cat.name}</span>
+                    <td className="px-3 sm:px-4 py-3">
+                      <div className="flex items-center gap-1.5 sm:gap-2 font-medium text-zinc-200">
+                        <Tags className="h-4 w-4 text-brand-400 shrink-0" />
+                        <span className="truncate max-w-[120px] sm:max-w-none">{cat.name}</span>
                       </div>
                     </td>
 
                     {/* Slug */}
-                    <td className="px-4 py-3">
+                    <td className="hidden md:table-cell px-4 py-3">
                       <code className="rounded bg-black/40 px-1.5 py-0.5 text-xs text-zinc-400 font-mono">
                         /{cat.slug}
                       </code>
                     </td>
 
                     {/* Jumlah Artikel */}
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-2 sm:px-4 py-3 text-center whitespace-nowrap">
                       <span className="inline-flex min-w-[24px] items-center justify-center rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-medium text-zinc-300">
                         {articleCount} artikel
                       </span>
                     </td>
 
                     {/* Status Toggle */}
-                    <td className="px-4 py-3">
+                    <td className="px-2 sm:px-4 py-3 text-center whitespace-nowrap">
                       <button
                         type="button"
                         onClick={() => toggleStatus(cat.id)}
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
                           cat.status === "ACTIVE"
-                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            : "border-zinc-600 bg-zinc-800/50 text-zinc-400 hover:bg-zinc-800"
+                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 [@media(hover:hover)]:hover:bg-emerald-500/20 active:bg-emerald-500/30"
+                            : "border-zinc-600 bg-zinc-800/50 text-zinc-400 [@media(hover:hover)]:hover:bg-zinc-800 active:bg-zinc-700"
                         }`}
                       >
                         {cat.status === "ACTIVE" ? (
-                          <CheckCircle className="h-3 w-3" />
+                          <CheckCircle className="h-3 w-3 shrink-0" />
                         ) : (
-                          <XCircle className="h-3 w-3" />
+                          <XCircle className="h-3 w-3 shrink-0" />
                         )}
-                        {cat.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}
+                        <span>{cat.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}</span>
                       </button>
                     </td>
 
                     {/* Aksi */}
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-3 sm:px-4 py-3 text-right whitespace-nowrap">
                       <div className="inline-flex items-center gap-1">
                         <button
                           type="button"
                           onClick={() => handleOpenEdit(cat)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-white/10 [@media(hover:hover)]:hover:bg-white/5 [@media(hover:hover)]:hover:text-white active:bg-white/10 active:text-white"
                           title="Edit Kategori"
                         >
                           <Pencil className="h-3.5 w-3.5" />
@@ -253,7 +253,7 @@ export default function AdminKategoriPage() {
                         <button
                           type="button"
                           onClick={() => setDeleteId(cat.id)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-400"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-400 active:bg-red-500/20 active:text-red-400"
                           title="Hapus Kategori"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
