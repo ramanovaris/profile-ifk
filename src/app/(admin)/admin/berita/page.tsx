@@ -10,11 +10,9 @@ import {
   Search,
   SlidersHorizontal,
   Newspaper,
-  ExternalLink,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,

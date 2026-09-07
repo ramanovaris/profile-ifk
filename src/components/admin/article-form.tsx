@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,19 +14,15 @@ import {
   Tag,
   ImageIcon,
   Type,
+  Search,
+  ChevronDown,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type { Article } from "@/lib/dummy-data";
-import { ARTICLE_CATEGORIES } from "@/lib/dummy-data";
+import type { Article, ArticleCategory } from "@/lib/dummy-data";
+import { initialCategories, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
+import { cn } from "@/lib/utils";
 
 export function ArticleForm({ article }: { article?: Article }) {
   const router = useRouter();
@@ -39,6 +35,67 @@ export function ArticleForm({ article }: { article?: Article }) {
   );
   const [isPublished, setIsPublished] = useState(article?.isPublished ?? false);
   const [preview, setPreview] = useState<string | null>(null);
+
+  // Combobox State
+  const [isComboboxOpen, setIsComboboxOpen] = useState(false);
+  const [comboboxSearch, setComboboxSearch] = useState("");
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const comboboxRef = useRef<HTMLDivElement>(null);
+  const optionsRef = useRef<HTMLDivElement>(null);
+  const triggerButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Filter kategori yang hanya ACTIVE
+  const activeCategories = initialCategories.filter(
+    (cat) => cat.status === "ACTIVE"
+  );
+
+  const filteredCategories = activeCategories.filter((cat) =>
+    cat.name.toLowerCase().includes(comboboxSearch.toLowerCase())
+  );
+
+  const selectedCategoryData = activeCategories.find(
+    (cat) => cat.name === category
+  );
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        comboboxRef.current &&
+        !comboboxRef.current.contains(event.target as Node)
+      ) {
+        setIsComboboxOpen(false);
+        setComboboxSearch("");
+        setActiveIndex(-1);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const safeActiveIndex =
+    filteredCategories.length === 0
+      ? -1
+      : activeIndex >= filteredCategories.length
+      ? 0
+      : activeIndex;
+
+  // Sync scroll to active item
+  useEffect(() => {
+    if (safeActiveIndex >= 0 && optionsRef.current) {
+      const activeEl = optionsRef.current.children[safeActiveIndex] as HTMLElement | undefined;
+      activeEl?.scrollIntoView({ block: "nearest" });
+    }
+  }, [safeActiveIndex]);
+
+  const selectCategory = (catName: string) => {
+    setCategory(catName as ArticleCategory);
+    setIsComboboxOpen(false);
+    setComboboxSearch("");
+    setActiveIndex(-1);
+    setTimeout(() => {
+      document.getElementById("status-publikasi")?.focus();
+    }, 0);
+  };
 
   const generatedSlug = title
     .toLowerCase()
@@ -90,8 +147,19 @@ export function ArticleForm({ article }: { article?: Article }) {
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                setIsComboboxOpen(true);
+                const idx = filteredCategories.findIndex((c) => c.name === category);
+                setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+              } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                triggerButtonRef.current?.focus();
+              }
+            }}
             placeholder="Misal: Sosialisasi Pelayanan Kefarmasian Puskesmas Se-Kotabaru"
-            className="border-white/10 bg-zinc-950/60 text-white placeholder-zinc-500 focus:border-brand-500/50"
+            className="border-white/10 bg-zinc-950/60 text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           />
           {title && (
             <div className="flex items-center gap-1.5 text-xs text-zinc-400 pt-1">
@@ -106,58 +174,197 @@ export function ArticleForm({ article }: { article?: Article }) {
 
         {/* Kategori & Status Grid */}
         <div className="grid gap-6 sm:grid-cols-2">
-          {/* Kategori */}
+          {/* Combobox Kategori */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
               <Tag className="h-3.5 w-3.5 text-brand-400" />
               <span>Kategori</span>
             </Label>
-            <Select
-              value={category}
-              onValueChange={(v: string | null) =>
-                v && setCategory(v as Article["category"])
-              }
-            >
-              <SelectTrigger className="border-white/10 bg-zinc-950/60 text-white focus:border-brand-500/50">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-white/10 bg-zinc-950 text-white">
-                {ARTICLE_CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div ref={comboboxRef} className="relative">
+              <button
+                ref={triggerButtonRef}
+                type="button"
+                onClick={() => {
+                  if (isComboboxOpen) {
+                    setIsComboboxOpen(false);
+                    setComboboxSearch("");
+                    setActiveIndex(-1);
+                  } else {
+                    setIsComboboxOpen(true);
+                    const idx = filteredCategories.findIndex((cat) => cat.name === category);
+                    setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    if (!isComboboxOpen) {
+                      setIsComboboxOpen(true);
+                      const idx = filteredCategories.findIndex((cat) => cat.name === category);
+                      setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+                    }
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    document.getElementById("title")?.focus();
+                  }
+                }}
+                aria-expanded={isComboboxOpen}
+                aria-haspopup="listbox"
+                className={cn(
+                  "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
+                  isComboboxOpen
+                    ? "border-brand-500/60 ring-2 ring-brand-500/40"
+                    : "border-white/10 hover:border-white/20"
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  {selectedCategoryData ? (
+                    <span className="text-white">{selectedCategoryData.name}</span>
+                  ) : (
+                    <span className="text-zinc-500">Pilih kategori...</span>
+                  )}
+                </div>
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 text-zinc-400 transition-transform",
+                    isComboboxOpen && "rotate-180"
+                  )}
+                />
+              </button>
+
+              {isComboboxOpen && (
+                <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-2xl backdrop-blur-2xl">
+                  {/* Search Input inside Dropdown */}
+                  <div className="border-b border-white/5 p-2">
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+                      <input
+                        type="text"
+                        placeholder="Cari kategori..."
+                        value={comboboxSearch}
+                        onChange={(e) => {
+                          setComboboxSearch(e.target.value);
+                          setActiveIndex(0);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            if (filteredCategories.length > 0) {
+                              setActiveIndex((prev) => (prev < filteredCategories.length - 1 ? prev + 1 : 0));
+                            }
+                          } else if (e.key === "ArrowUp") {
+                            e.preventDefault();
+                            if (filteredCategories.length > 0) {
+                              setActiveIndex((prev) => (prev > 0 ? prev - 1 : filteredCategories.length - 1));
+                            }
+                          } else if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (safeActiveIndex >= 0 && safeActiveIndex < filteredCategories.length) {
+                              selectCategory(filteredCategories[safeActiveIndex].name);
+                            }
+                          } else if (e.key === "Tab") {
+                            if (safeActiveIndex >= 0 && safeActiveIndex < filteredCategories.length) {
+                              e.preventDefault();
+                              selectCategory(filteredCategories[safeActiveIndex].name);
+                            }
+                          } else if (e.key === "Escape") {
+                            e.preventDefault();
+                            setIsComboboxOpen(false);
+                            setComboboxSearch("");
+                            setActiveIndex(-1);
+                            triggerButtonRef.current?.focus();
+                          }
+                        }}
+                        className="w-full rounded-lg border border-white/5 bg-white/[0.03] py-1.5 pl-8 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+
+                  {/* Options List */}
+                  <div ref={optionsRef} role="listbox" className="max-h-48 overflow-y-auto p-1.5">
+                    {filteredCategories.length === 0 ? (
+                      <div className="py-4 text-center text-xs text-zinc-400">
+                        Tidak ada kategori ditemukan.
+                      </div>
+                    ) : (
+                      filteredCategories.map((cat, idx) => {
+                        const isSelected = category === cat.name;
+                        const isActive = safeActiveIndex === idx;
+
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            role="option"
+                            aria-selected={isSelected}
+                            onMouseEnter={() => setActiveIndex(idx)}
+                            onClick={() => selectCategory(cat.name)}
+                            className={cn(
+                              "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors text-left",
+                              isActive
+                                ? isSelected
+                                  ? "bg-brand-500/20 text-brand-200 font-medium"
+                                  : "bg-white/10 text-white"
+                                : isSelected
+                                ? "bg-brand-500/10 text-brand-300 font-medium"
+                                : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                            )}
+                          >
+                            <span>{cat.name}</span>
+                            {isSelected && (
+                              <Check className="h-4 w-4 text-brand-400" />
+                            )}
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Publikasi Switch Box */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+            <Label htmlFor="status-publikasi" className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-brand-400" />
               <span>Status Publikasi</span>
             </Label>
-            <div
+            <button
+              id="status-publikasi"
+              type="button"
               onClick={() => setIsPublished(!isPublished)}
-              className={`flex h-10 cursor-pointer items-center justify-between rounded-lg border px-3.5 transition-colors ${
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "ArrowDown") {
+                  e.preventDefault();
+                  document.getElementById("cover-image")?.focus();
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  triggerButtonRef.current?.focus();
+                }
+              }}
+              className={cn(
+                "flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border px-3.5 text-left transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
                 isPublished
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                  ? "border-brand-500/30 bg-brand-500/10 text-brand-300"
                   : "border-white/10 bg-zinc-950/60 text-zinc-400"
-              }`}
+              )}
             >
               <span className="text-sm font-medium">
                 {isPublished ? "Langsung Terbitkan" : "Simpan Sebagai Draft"}
               </span>
               <div
-                className={`flex h-5 w-5 items-center justify-center rounded-full border transition-all ${
+                className={cn(
+                  "flex h-5 w-5 items-center justify-center rounded-full border transition-all",
                   isPublished
-                    ? "border-emerald-400 bg-emerald-500 text-black"
+                    ? "border-brand-400 bg-brand-500 text-black"
                     : "border-zinc-600 bg-zinc-800"
-                }`}
+                )}
               >
                 {isPublished && <Check className="h-3 w-3 stroke-[3]" />}
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
@@ -169,8 +376,11 @@ export function ArticleForm({ article }: { article?: Article }) {
           </Label>
 
           <div className="grid gap-4 sm:grid-cols-2 sm:items-center">
-            <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-950/40 p-6 text-center hover:border-brand-500/50 hover:bg-zinc-950/70 cursor-pointer transition-colors group">
-              <Upload className="h-7 w-7 text-zinc-400 group-hover:text-brand-400 transition-colors" />
+            <label
+              htmlFor="cover-image"
+              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-950/40 p-6 text-center hover:border-brand-500/50 hover:bg-zinc-950/70 cursor-pointer transition-colors group focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/40 focus-within:bg-zinc-950/70"
+            >
+              <Upload className="h-7 w-7 text-zinc-400 group-hover:text-brand-400 group-focus-within:text-brand-400 transition-colors" />
               <p className="mt-2 text-xs font-medium text-zinc-300">
                 Klik untuk unggah foto artikel
               </p>
@@ -178,9 +388,19 @@ export function ArticleForm({ article }: { article?: Article }) {
                 PNG, JPG, WebP (Maks. 2MB)
               </p>
               <input
+                id="cover-image"
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    document.getElementById("content")?.focus();
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    document.getElementById("status-publikasi")?.focus();
+                  }
+                }}
                 className="sr-only"
               />
             </label>
@@ -225,8 +445,14 @@ export function ArticleForm({ article }: { article?: Article }) {
             rows={10}
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit(e as unknown as React.FormEvent);
+              }
+            }}
             placeholder="Tuliskan berita, informasi kegiatan, atau sosialisasi obat dan perbekalan kesehatan di sini..."
-            className="border-white/10 bg-zinc-950/60 font-sans text-sm text-white placeholder-zinc-500 focus:border-brand-500/50 leading-relaxed"
+            className="border-white/10 bg-zinc-950/60 font-sans text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 leading-relaxed"
           />
         </div>
 
@@ -234,14 +460,14 @@ export function ArticleForm({ article }: { article?: Article }) {
         <div className="flex items-center gap-3 pt-4 border-t border-white/5">
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           >
             {article ? "Simpan Perubahan" : "Publikasikan Artikel"}
           </button>
           <button
             type="button"
             onClick={() => router.push("/admin/berita")}
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           >
             Batal
           </button>
