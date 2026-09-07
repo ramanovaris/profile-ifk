@@ -152,6 +152,17 @@ export function ArticleForm({ article }: { article?: Article }) {
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                setIsComboboxOpen(true);
+                const idx = filteredCategories.findIndex((c) => c.name === category);
+                setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+              } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                triggerButtonRef.current?.focus();
+              }
+            }}
             placeholder="Misal: Sosialisasi Pelayanan Kefarmasian Puskesmas Se-Kotabaru"
             className="border-white/10 bg-zinc-950/60 text-white placeholder-zinc-500 focus:border-brand-500/50"
           />
@@ -190,19 +201,22 @@ export function ArticleForm({ article }: { article?: Article }) {
                   }
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                  if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     if (!isComboboxOpen) {
                       setIsComboboxOpen(true);
                       const idx = filteredCategories.findIndex((cat) => cat.name === category);
                       setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
                     }
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    document.getElementById("title")?.focus();
                   }
                 }}
                 aria-expanded={isComboboxOpen}
                 aria-haspopup="listbox"
                 className={cn(
-                  "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors",
+                  "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50",
                   isComboboxOpen
                     ? "border-brand-500/50 ring-1 ring-brand-500/30"
                     : "border-white/10 hover:border-white/20"
@@ -323,6 +337,15 @@ export function ArticleForm({ article }: { article?: Article }) {
               id="status-publikasi"
               type="button"
               onClick={() => setIsPublished(!isPublished)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "ArrowDown") {
+                  e.preventDefault();
+                  document.getElementById("cover-image")?.focus();
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  triggerButtonRef.current?.focus();
+                }
+              }}
               className={cn(
                 "flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border px-3.5 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50",
                 isPublished
@@ -355,8 +378,11 @@ export function ArticleForm({ article }: { article?: Article }) {
           </Label>
 
           <div className="grid gap-4 sm:grid-cols-2 sm:items-center">
-            <label className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-950/40 p-6 text-center hover:border-brand-500/50 hover:bg-zinc-950/70 cursor-pointer transition-colors group">
-              <Upload className="h-7 w-7 text-zinc-400 group-hover:text-brand-400 transition-colors" />
+            <label
+              htmlFor="cover-image"
+              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-950/40 p-6 text-center hover:border-brand-500/50 hover:bg-zinc-950/70 cursor-pointer transition-colors group focus-within:border-brand-500/80 focus-within:ring-2 focus-within:ring-brand-500/40 focus-within:bg-zinc-950/70"
+            >
+              <Upload className="h-7 w-7 text-zinc-400 group-hover:text-brand-400 group-focus-within:text-brand-400 transition-colors" />
               <p className="mt-2 text-xs font-medium text-zinc-300">
                 Klik untuk unggah foto artikel
               </p>
@@ -364,9 +390,19 @@ export function ArticleForm({ article }: { article?: Article }) {
                 PNG, JPG, WebP (Maks. 2MB)
               </p>
               <input
+                id="cover-image"
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown") {
+                    e.preventDefault();
+                    document.getElementById("content")?.focus();
+                  } else if (e.key === "ArrowUp") {
+                    e.preventDefault();
+                    document.getElementById("status-publikasi")?.focus();
+                  }
+                }}
                 className="sr-only"
               />
             </label>
@@ -411,6 +447,12 @@ export function ArticleForm({ article }: { article?: Article }) {
             rows={10}
             value={content}
             onChange={(e) => setContent(e.target.value)}
+            onKeyDown={(e) => {
+              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit(e as unknown as React.FormEvent);
+              }
+            }}
             placeholder="Tuliskan berita, informasi kegiatan, atau sosialisasi obat dan perbekalan kesehatan di sini..."
             className="border-white/10 bg-zinc-950/60 font-sans text-sm text-white placeholder-zinc-500 focus:border-brand-500/50 leading-relaxed"
           />
@@ -420,14 +462,14 @@ export function ArticleForm({ article }: { article?: Article }) {
         <div className="flex items-center gap-3 pt-4 border-t border-white/5">
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-zinc-950"
           >
             {article ? "Simpan Perubahan" : "Publikasikan Artikel"}
           </button>
           <button
             type="button"
             onClick={() => router.push("/admin/berita")}
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors"
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-zinc-950"
           >
             Batal
           </button>
