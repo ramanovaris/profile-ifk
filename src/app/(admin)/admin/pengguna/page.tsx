@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Plus,
   Pencil,
@@ -74,26 +74,6 @@ export default function AdminPenggunaPage() {
 
   // Modal Hapus State
   const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  // Check URL query param ?tambah=true on mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("tambah") === "true") {
-        setEditUser(null);
-        setFormData({
-          name: "",
-          username: "",
-          password: "",
-          confirmPassword: "",
-          role: "STAFF",
-        });
-        setFormError(null);
-        setIsUserModalOpen(true);
-        window.history.replaceState({}, "", window.location.pathname);
-      }
-    }
-  }, []);
 
   // Filter Pengguna
   const filteredUsers = users.filter((user) => {

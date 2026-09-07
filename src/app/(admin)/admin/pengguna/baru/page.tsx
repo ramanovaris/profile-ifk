@@ -9,7 +9,7 @@ export default function AdminPenggunaBaruRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/admin/pengguna?tambah=true");
+    router.replace("/admin/pengguna");
   }, [router]);
 
   return (
