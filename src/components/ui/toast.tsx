@@ -98,6 +98,12 @@ function ToastCard({ item }: { item: ToastItem }) {
   const cfg = variantConfig[item.variant];
   const Icon = cfg.icon;
 
+  const handleDismiss = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setExiting(true);
+    setTimeout(() => dismissToast(item.id), 300);
+  };
+
   // mount animation
   useEffect(() => {
     const raf = requestAnimationFrame(() => setVisible(true));
@@ -110,13 +116,7 @@ function ToastCard({ item }: { item: ToastItem }) {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []);
-
-  const handleDismiss = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    setExiting(true);
-    setTimeout(() => dismissToast(item.id), 300);
-  };
+  }, [handleDismiss]);
 
   return (
     <div
