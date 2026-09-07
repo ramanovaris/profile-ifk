@@ -40,7 +40,9 @@ export function ArticleForm({ article }: { article?: Article }) {
   // Combobox State
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
   const [comboboxSearch, setComboboxSearch] = useState("");
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
   const comboboxRef = useRef<HTMLDivElement>(null);
+  const optionsRef = useRef<HTMLDivElement>(null);
 
   // Filter kategori yang hanya ACTIVE
   const activeCategories = initialCategories.filter(
@@ -63,11 +65,31 @@ export function ArticleForm({ article }: { article?: Article }) {
       ) {
         setIsComboboxOpen(false);
         setComboboxSearch("");
+        setActiveIndex(-1);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Sync scroll to active item
+  useEffect(() => {
+    if (activeIndex >= 0 && optionsRef.current) {
+      const activeEl = optionsRef.current.children[activeIndex] as HTMLElement | undefined;
+      activeEl?.scrollIntoView({ block: "nearest" });
+    }
+  }, [activeIndex]);
+
+  // Adjust activeIndex when filter changes
+  useEffect(() => {
+    if (isComboboxOpen) {
+      setActiveIndex((prev) => {
+        if (filteredCategories.length === 0) return -1;
+        if (prev >= filteredCategories.length) return 0;
+        return prev === -1 ? 0 : prev;
+      });
+    }
+  }, [comboboxSearch, isComboboxOpen, filteredCategories.length]);
 
   const generatedSlug = title
     .toLowerCase()
@@ -144,7 +166,29 @@ export function ArticleForm({ article }: { article?: Article }) {
             <div ref={comboboxRef} className="relative">
               <button
                 type="button"
-                onClick={() => setIsComboboxOpen(!isComboboxOpen)}
+                onClick={() => {
+                  if (isComboboxOpen) {
+                    setIsComboboxOpen(false);
+                    setComboboxSearch("");
+                    setActiveIndex(-1);
+                  } else {
+                    setIsComboboxOpen(true);
+                    const idx = filteredCategories.findIndex((cat) => cat.name === category);
+                    setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault();
+                    if (!isComboboxOpen) {
+                      setIsComboboxOpen(true);
+                      const idx = filteredCategories.findIndex((cat) => cat.name === category);
+                      setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+                    }
+                  }
+                }}
+                aria-expanded={isComboboxOpen}
+                aria-haspopup="listbox"
                 className={cn(
                   "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors",
                   isComboboxOpen
@@ -178,6 +222,32 @@ export function ArticleForm({ article }: { article?: Article }) {
                         placeholder="Cari kategori..."
                         value={comboboxSearch}
                         onChange={(e) => setComboboxSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            if (filteredCategories.length > 0) {
+                              setActiveIndex((prev) => (prev < filteredCategories.length - 1 ? prev + 1 : 0));
+                            }
+                          } else if (e.key === "ArrowUp") {
+                            e.preventDefault();
+                            if (filteredCategories.length > 0) {
+                              setActiveIndex((prev) => (prev > 0 ? prev - 1 : filteredCategories.length - 1));
+                            }
+                          } else if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (activeIndex >= 0 && activeIndex < filteredCategories.length) {
+                              setCategory(filteredCategories[activeIndex].name as ArticleCategory);
+                              setIsComboboxOpen(false);
+                              setComboboxSearch("");
+                              setActiveIndex(-1);
+                            }
+                          } else if (e.key === "Escape") {
+                            e.preventDefault();
+                            setIsComboboxOpen(false);
+                            setComboboxSearch("");
+                            setActiveIndex(-1);
+                          }
+                        }}
                         className="w-full rounded-lg border border-white/5 bg-white/[0.03] py-1.5 pl-8 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
                         autoFocus
                       />
@@ -185,34 +255,47 @@ export function ArticleForm({ article }: { article?: Article }) {
                   </div>
 
                   {/* Options List */}
-                  <div className="max-h-48 overflow-y-auto p-1.5">
+                  <div ref={optionsRef} role="listbox" className="max-h-48 overflow-y-auto p-1.5">
                     {filteredCategories.length === 0 ? (
                       <div className="py-4 text-center text-xs text-zinc-400">
                         Tidak ada kategori ditemukan.
                       </div>
                     ) : (
-                      filteredCategories.map((cat) => (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          onClick={() => {
-                            setCategory(cat.name as ArticleCategory);
-                            setIsComboboxOpen(false);
-                            setComboboxSearch("");
-                          }}
-                          className={cn(
-                            "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
-                            category === cat.name
-                              ? "bg-brand-500/15 text-brand-300"
-                              : "text-zinc-300 hover:bg-white/5 hover:text-white"
-                          )}
-                        >
-                          <span>{cat.name}</span>
-                          {category === cat.name && (
-                            <Check className="h-4 w-4 text-brand-400" />
-                          )}
-                        </button>
-                      ))
+                      filteredCategories.map((cat, idx) => {
+                        const isSelected = category === cat.name;
+                        const isActive = activeIndex === idx;
+
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            role="option"
+                            aria-selected={isSelected}
+                            onMouseEnter={() => setActiveIndex(idx)}
+                            onClick={() => {
+                              setCategory(cat.name as ArticleCategory);
+                              setIsComboboxOpen(false);
+                              setComboboxSearch("");
+                              setActiveIndex(-1);
+                            }}
+                            className={cn(
+                              "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors text-left",
+                              isActive
+                                ? isSelected
+                                  ? "bg-brand-500/20 text-brand-200 font-medium"
+                                  : "bg-white/10 text-white"
+                                : isSelected
+                                ? "bg-brand-500/10 text-brand-300 font-medium"
+                                : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                            )}
+                          >
+                            <span>{cat.name}</span>
+                            {isSelected && (
+                              <Check className="h-4 w-4 text-brand-400" />
+                            )}
+                          </button>
+                        );
+                      })
                     )}
                   </div>
                 </div>
