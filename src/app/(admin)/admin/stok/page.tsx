@@ -9,7 +9,6 @@ import {
   AlertTriangle, 
   CheckCircle, 
   XCircle,
-  MoreHorizontal,
   Pencil,
   Trash2
 } from "lucide-react";
