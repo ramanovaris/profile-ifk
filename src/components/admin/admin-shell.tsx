@@ -27,6 +27,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
+import { logoutAction } from "@/actions/auth";
 
 const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -110,14 +111,16 @@ function SidebarContent({ pathname }: { pathname: string }) {
       {/* Bottom section */}
       <div className="mt-auto px-3 pb-4">
         <Separator className="mb-4 bg-white/5" />
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-zinc-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
-          onClick={() => router.push("/")}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Keluar ke Web
-        </Button>
+        <form action={logoutAction}>
+          <Button
+            type="submit"
+            variant="ghost"
+            className="w-full justify-start text-zinc-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Keluar Sesi
+          </Button>
+        </form>
       </div>
     </div>
   );
@@ -178,6 +181,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </AvatarFallback>
               </Avatar>
             </div>
+            <form action={logoutAction}>
+              <Button
+                type="submit"
+                variant="ghost"
+                size="icon"
+                className="text-zinc-400 hover:bg-red-500/10 hover:text-red-400"
+                title="Keluar Sesi"
+                aria-label="Keluar Sesi"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </form>
           </div>
         </header>
 
