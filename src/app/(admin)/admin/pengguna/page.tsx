@@ -31,6 +31,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { toast } from "@/components/ui/toast";
 import { dummyUsers, type User } from "@/lib/dummy-data";
 
 type RoleFilter = "ALL" | "SUPER_ADMIN" | "STAFF";
@@ -134,11 +135,13 @@ export default function AdminPenggunaPage() {
 
     if (!trimmedName) {
       setFormError("Nama lengkap tidak boleh kosong.");
+      toast.error("Nama lengkap tidak boleh kosong.");
       return;
     }
 
     if (!trimmedUsername) {
       setFormError("Username tidak boleh kosong.");
+      toast.error("Username tidak boleh kosong.");
       return;
     }
 
@@ -146,6 +149,7 @@ export default function AdminPenggunaPage() {
       setFormError(
         "Username hanya boleh menggunakan huruf kecil, angka, underscore, atau tanda hubung."
       );
+      toast.error("Format username tidak valid.");
       return;
     }
 
@@ -158,6 +162,7 @@ export default function AdminPenggunaPage() {
 
     if (isDuplicate) {
       setFormError(`Username "${trimmedUsername}" sudah digunakan oleh akun lain.`);
+      toast.error(`Username "${trimmedUsername}" sudah digunakan.`);
       return;
     }
 
@@ -166,14 +171,17 @@ export default function AdminPenggunaPage() {
       // Mode Tambah: Password wajib
       if (!formData.password) {
         setFormError("Kata sandi wajib diisi untuk pengguna baru.");
+        toast.error("Kata sandi wajib diisi untuk pengguna baru.");
         return;
       }
       if (formData.password.length < 6) {
         setFormError("Kata sandi minimal 6 karakter.");
+        toast.error("Kata sandi minimal 6 karakter.");
         return;
       }
       if (formData.password !== formData.confirmPassword) {
         setFormError("Konfirmasi kata sandi tidak cocok.");
+        toast.error("Konfirmasi kata sandi tidak cocok.");
         return;
       }
 
@@ -187,15 +195,18 @@ export default function AdminPenggunaPage() {
       };
 
       setUsers([newUser, ...users]);
+      toast.success(`Pengguna "${trimmedName}" berhasil ditambahkan.`);
     } else {
       // Mode Edit: Password opsional
       if (formData.password) {
         if (formData.password.length < 6) {
           setFormError("Kata sandi baru minimal 6 karakter.");
+          toast.error("Kata sandi baru minimal 6 karakter.");
           return;
         }
         if (formData.password !== formData.confirmPassword) {
           setFormError("Konfirmasi kata sandi baru tidak cocok.");
+          toast.error("Konfirmasi kata sandi baru tidak cocok.");
           return;
         }
       }
@@ -213,6 +224,7 @@ export default function AdminPenggunaPage() {
             : u
         )
       );
+      toast.success(`Pengguna "${trimmedName}" berhasil diperbarui.`);
     }
 
     setIsUserModalOpen(false);
@@ -232,14 +244,17 @@ export default function AdminPenggunaPage() {
     e.preventDefault();
     if (!newPassword) {
       setResetError("Kata sandi baru tidak boleh kosong.");
+      toast.error("Kata sandi baru tidak boleh kosong.");
       return;
     }
     if (newPassword.length < 6) {
       setResetError("Kata sandi baru minimal 6 karakter.");
+      toast.error("Kata sandi baru minimal 6 karakter.");
       return;
     }
     if (newPassword !== confirmNewPassword) {
       setResetError("Konfirmasi kata sandi tidak cocok.");
+      toast.error("Konfirmasi kata sandi tidak cocok.");
       return;
     }
 
@@ -247,6 +262,7 @@ export default function AdminPenggunaPage() {
     setResetSuccessMessage(
       `Kata sandi untuk @${resetTarget?.username} berhasil diperbarui!`
     );
+    toast.success(`Kata sandi @${resetTarget?.username} berhasil diperbarui.`);
     setTimeout(() => {
       setIsResetPasswordOpen(false);
       setResetSuccessMessage(null);
@@ -258,8 +274,13 @@ export default function AdminPenggunaPage() {
   const isRootAdmin = userToDelete?.username.toLowerCase() === "admin";
 
   const handleConfirmDelete = () => {
-    if (!deleteId || isRootAdmin) return;
+    if (!deleteId || isRootAdmin) {
+      if (isRootAdmin) toast.error("Akun root admin tidak dapat dihapus.");
+      return;
+    }
+    const name = userToDelete?.name ?? "";
     setUsers(users.filter((u) => u.id !== deleteId));
+    toast.success(`Pengguna "${name}" berhasil dihapus.`);
     setDeleteId(null);
   };
 

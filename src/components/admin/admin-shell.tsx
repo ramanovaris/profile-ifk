@@ -25,6 +25,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/toast";
 
 const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -183,6 +184,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>
+      <Toaster />
     </div>
   );
 }
