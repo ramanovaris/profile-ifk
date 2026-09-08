@@ -1,26 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Eye, EyeOff, Lock, LogIn, User } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Lock, LogIn, User, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { siteConfig } from "@/lib/dummy-data";
+import { loginAction } from "@/actions/auth";
+import { Toaster, toast } from "@/components/ui/toast";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [state, formAction, isPending] = useActionState(loginAction, null);
   const [showPassword, setShowPassword] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    // Dummy login — redirect tanpa validasi
-    router.push("/admin/dashboard");
-  }
+  useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error, "Gagal Masuk");
+    }
+  }, [state?.error]);
 
   return (
     <div className="relative flex h-dvh w-full items-center justify-center overflow-hidden bg-zinc-950 p-4 sm:p-6">
@@ -73,8 +72,19 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
+          {/* Feedback error alert box */}
+          {state?.error && (
+            <div
+              role="alert"
+              className="mt-4 flex items-center gap-2.5 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-400"
+            >
+              <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
+              <span>{state.error}</span>
+            </div>
+          )}
+
           {/* Form login */}
-          <form onSubmit={handleSubmit} className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
+          <form action={formAction} className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
             <div className="space-y-1">
               <Label htmlFor="username" className="text-xs font-medium text-zinc-300">
                 Username
@@ -85,8 +95,9 @@ export default function AdminLoginPage() {
                 </div>
                 <Input
                   id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  name="username"
+                  required
+                  autoComplete="username"
                   placeholder="Masukkan username"
                   className="h-10 rounded-xl border-zinc-800 bg-zinc-950/70 pl-9.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500 focus-visible:ring-1 focus-visible:ring-brand-500"
                 />
@@ -103,9 +114,10 @@ export default function AdminLoginPage() {
                 </div>
                 <Input
                   id="password"
+                  name="password"
+                  required
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
                   placeholder="Masukkan password"
                   className="h-10 rounded-xl border-zinc-800 bg-zinc-950/70 pl-9.5 pr-10 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500 focus-visible:ring-1 focus-visible:ring-brand-500"
                 />
@@ -127,10 +139,20 @@ export default function AdminLoginPage() {
             <div className="pt-1.5">
               <Button
                 type="submit"
-                className="h-10 w-full rounded-xl bg-brand-600 font-semibold text-white shadow-lg shadow-brand-600/25 transition-all hover:bg-brand-500 active:scale-[0.99]"
+                disabled={isPending}
+                className="h-10 w-full rounded-xl bg-brand-600 font-semibold text-white shadow-lg shadow-brand-600/25 transition-all hover:bg-brand-500 active:scale-[0.99] disabled:opacity-70"
               >
-                <LogIn className="mr-2 h-4 w-4" />
-                Masuk
+                {isPending ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Memverifikasi...
+                  </span>
+                ) : (
+                  <>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Masuk
+                  </>
+                )}
               </Button>
             </div>
           </form>
@@ -141,6 +163,7 @@ export default function AdminLoginPage() {
           </p>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }
