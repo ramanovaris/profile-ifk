@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { toast } from "@/components/ui/toast";
+import { StockMultiSelectFilter } from "@/components/admin/stock-multi-select-filter";
 import { 
   initialMedicineStock, 
   getStockSummary, 
@@ -24,44 +25,73 @@ import {
 import { cn } from "@/lib/utils";
 import { StockForm } from "./stock-form";
 
-const filterCategories: (MedicineCategory | "Semua")[] = [
-  "Semua",
-  "Obat Generik",
-  "Obat Program",
-  "Obat Emergensi",
-  "BMHP / Alkes",
-  "Vaksin & Serum",
-];
-
-const filterStatuses = ["Semua", "Tersedia", "Menipis", "Kosong"] as const;
-
 export default function AdminStokPage() {
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("Semua");
-  const [activeStatus, setActiveStatus] = useState<string>("Semua");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const itemsPerPage = 10;
 
   const summary = useMemo(() => getStockSummary(initialMedicineStock), []);
 
+  const categoryOptions = useMemo(() => {
+    const cats: MedicineCategory[] = [
+      "Obat Generik",
+      "Obat Program",
+      "Obat Emergensi",
+      "BMHP / Alkes",
+      "Vaksin & Serum",
+    ];
+    return cats.map((cat) => ({
+      value: cat,
+      label: cat,
+      count: initialMedicineStock.filter((i) => i.category === cat).length,
+    }));
+  }, []);
+
+  const statusOptions = useMemo(() => [
+    {
+      value: "AVAILABLE",
+      label: "Tersedia",
+      indicatorColor: "bg-emerald-400",
+      count: summary.availableItems,
+    },
+    {
+      value: "LOW",
+      label: "Menipis",
+      indicatorColor: "bg-amber-400",
+      count: summary.lowItems,
+    },
+    {
+      value: "EMPTY",
+      label: "Kosong",
+      indicatorColor: "bg-rose-400",
+      count: summary.emptyItems,
+    },
+  ], [summary]);
+
   const filtered = useMemo(() => {
     return initialMedicineStock
-      .filter((item) => activeCategory === "Semua" || item.category === activeCategory)
-      .filter((item) => {
-        if (activeStatus === "Semua") return true;
-        if (activeStatus === "Tersedia") return item.status === "AVAILABLE";
-        if (activeStatus === "Menipis") return item.status === "LOW";
-        if (activeStatus === "Kosong") return item.status === "EMPTY";
-        return true;
-      })
       .filter(
         (item) =>
-          item.name.toLowerCase().includes(search.toLowerCase()) ||
-          item.code.toLowerCase().includes(search.toLowerCase()) ||
-          item.category.toLowerCase().includes(search.toLowerCase())
-      );
-  }, [search, activeCategory, activeStatus]);
+          selectedCategories.length === 0 ||
+          selectedCategories.includes(item.category)
+      )
+      .filter(
+        (item) =>
+          selectedStatuses.length === 0 ||
+          selectedStatuses.includes(item.status)
+      )
+      .filter((item) => {
+        const query = search.toLowerCase();
+        return (
+          item.name.toLowerCase().includes(query) ||
+          item.code.toLowerCase().includes(query) ||
+          item.category.toLowerCase().includes(query)
+        );
+      });
+  }, [search, selectedCategories, selectedStatuses]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginatedItems = filtered.slice(
@@ -133,73 +163,48 @@ export default function AdminStokPage() {
           </div>
         </div>
 
-        {/* ── Toolbar Pencarian & Filter ────────────────────────────────── */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 backdrop-blur-sm">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-            <Input
-              placeholder="Cari nama obat, kode, atau kategori..."
+        {/* ── Toolbar Pencarian & Filter Terpadu ────────────────────────── */}
+        <div className="relative z-20 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <input
+              type="text"
+              placeholder="Cari nama obat, kode barang, atau kategori..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
                 setCurrentPage(1);
               }}
-              className="border-zinc-800 bg-zinc-900 pl-9 focus-visible:ring-brand-500 text-zinc-100 placeholder:text-zinc-500"
+              className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
             />
           </div>
-          
-          <div className="mt-4 flex flex-col gap-3">
-            <div>
-              <p className="mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Kategori</p>
-              <div className="flex flex-wrap gap-2">
-                {filterCategories.map((cat) => {
-                  const isActive = activeCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        setActiveCategory(cat);
-                        setCurrentPage(1);
-                      }}
-                      className={cn(
-                        "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-                        isActive
-                          ? "bg-brand-500/20 text-brand-400 border border-brand-500/30"
-                          : "bg-zinc-800/50 text-zinc-400 border border-zinc-800 hover:text-zinc-200"
-                      )}
-                    >
-                      {cat}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            
-            <div>
-              <p className="mb-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Status Stok</p>
-              <div className="flex flex-wrap gap-2">
-                {filterStatuses.map((status) => {
-                  const isActive = activeStatus === status;
-                  return (
-                    <button
-                      key={status}
-                      onClick={() => {
-                        setActiveStatus(status);
-                        setCurrentPage(1);
-                      }}
-                      className={cn(
-                        "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-                        isActive
-                          ? "bg-brand-500/20 text-brand-400 border border-brand-500/30"
-                          : "bg-zinc-800/50 text-zinc-400 border border-zinc-800 hover:text-zinc-200"
-                      )}
-                    >
-                      {status}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+
+          {/* Filter Dropdowns (Kategori & Status) */}
+          <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+            <StockMultiSelectFilter
+              title="Kategori"
+              allLabel="Semua Kategori"
+              options={categoryOptions}
+              selectedValues={selectedCategories}
+              onChange={(vals) => {
+                setSelectedCategories(vals);
+                setCurrentPage(1);
+              }}
+              enableSearch={true}
+            />
+
+            <StockMultiSelectFilter
+              title="Status"
+              allLabel="Semua Status"
+              options={statusOptions}
+              selectedValues={selectedStatuses}
+              onChange={(vals) => {
+                setSelectedStatuses(vals);
+                setCurrentPage(1);
+              }}
+              enableSearch={false}
+            />
           </div>
         </div>
 

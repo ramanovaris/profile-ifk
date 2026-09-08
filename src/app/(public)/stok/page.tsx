@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
-import { Input } from "@/components/ui/input";
+import { PublicStockFilter } from "@/components/public/public-stock-filter";
 import {
   initialMedicineStock,
   getStockSummary,
@@ -21,36 +21,63 @@ import {
 } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
 
-const filterCategories: (MedicineCategory | "Semua")[] = [
-  "Semua",
-  "Obat Generik",
-  "Obat Program",
-  "Obat Emergensi",
-  "BMHP / Alkes",
-  "Vaksin & Serum",
-];
-
-const filterStatuses = ["Semua", "Tersedia", "Menipis", "Kosong"] as const;
-
 export default function StokPublikPage() {
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("Semua");
-  const [activeStatus, setActiveStatus] = useState<string>("Semua");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(15);
 
   const summary = useMemo(() => getStockSummary(initialMedicineStock), []);
 
+  const categoryOptions = useMemo(() => {
+    const cats: MedicineCategory[] = [
+      "Obat Generik",
+      "Obat Program",
+      "Obat Emergensi",
+      "BMHP / Alkes",
+      "Vaksin & Serum",
+    ];
+    return cats.map((cat) => ({
+      value: cat,
+      label: cat,
+      count: initialMedicineStock.filter((i) => i.category === cat).length,
+    }));
+  }, []);
+
+  const statusOptions = useMemo(() => [
+    {
+      value: "AVAILABLE",
+      label: "Tersedia",
+      indicatorColor: "bg-emerald-500",
+      count: summary.availableItems,
+    },
+    {
+      value: "LOW",
+      label: "Menipis",
+      indicatorColor: "bg-amber-500",
+      count: summary.lowItems,
+    },
+    {
+      value: "EMPTY",
+      label: "Kosong",
+      indicatorColor: "bg-rose-500",
+      count: summary.emptyItems,
+    },
+  ], [summary]);
+
   const filtered = useMemo(() => {
     return initialMedicineStock
-      .filter((item) => activeCategory === "Semua" || item.category === activeCategory)
-      .filter((item) => {
-        if (activeStatus === "Semua") return true;
-        if (activeStatus === "Tersedia") return item.status === "AVAILABLE";
-        if (activeStatus === "Menipis") return item.status === "LOW";
-        if (activeStatus === "Kosong") return item.status === "EMPTY";
-        return true;
-      })
+      .filter(
+        (item) =>
+          selectedCategories.length === 0 ||
+          selectedCategories.includes(item.category)
+      )
+      .filter(
+        (item) =>
+          selectedStatuses.length === 0 ||
+          selectedStatuses.includes(item.status)
+      )
       .filter((item) => {
         const query = search.toLowerCase();
         return (
@@ -59,7 +86,7 @@ export default function StokPublikPage() {
           item.category.toLowerCase().includes(query)
         );
       });
-  }, [search, activeCategory, activeStatus]);
+  }, [search, selectedCategories, selectedStatuses]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
   const paginatedItems = filtered.slice(
@@ -152,79 +179,50 @@ export default function StokPublikPage() {
 
           {/* ── Toolbar Pencarian & Filter ─────────────────────────── */}
           <Reveal delay={100}>
-            <div className="mt-10 rounded-2xl border border-border bg-surface-alt/60 p-5 backdrop-blur-md">
-              <div className="relative max-w-lg">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
+              {/* Search input */}
+              <div className="relative flex-1">
                 <Search
                   className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
                   strokeWidth={1.5}
                 />
-                <Input
+                <input
+                  type="text"
                   placeholder="Cari nama obat (contoh: Paracetamol, Amoxicillin, Infus)..."
                   value={search}
                   onChange={(e) => {
                     setSearch(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="border-border bg-surface pl-10 text-sm text-heading placeholder:text-muted focus:border-brand-600"
+                  className="w-full rounded-full border border-border bg-surface py-2 pl-10 pr-4 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
 
-              <div className="mt-5 space-y-3.5">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <span className="min-w-[80px] text-xs font-semibold uppercase tracking-wider text-muted">
-                    Kategori:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {filterCategories.map((cat) => {
-                      const isActive = activeCategory === cat;
-                      return (
-                        <button
-                          key={cat}
-                          onClick={() => {
-                            setActiveCategory(cat);
-                            setCurrentPage(1);
-                          }}
-                          className={cn(
-                            "cursor-pointer rounded-full px-3.5 py-1 text-xs font-medium transition-all duration-300",
-                            isActive
-                              ? "bg-zinc-950 text-white shadow-xs"
-                              : "bg-surface text-muted hover:bg-zinc-200/70 hover:text-heading"
-                          )}
-                        >
-                          {cat}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+              {/* Filter Dropdowns (Kategori & Status) */}
+              <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+                <PublicStockFilter
+                  title="Kategori"
+                  allLabel="Semua Kategori"
+                  options={categoryOptions}
+                  selectedValues={selectedCategories}
+                  onChange={(vals) => {
+                    setSelectedCategories(vals);
+                    setCurrentPage(1);
+                  }}
+                  enableSearch={true}
+                />
 
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <span className="min-w-[80px] text-xs font-semibold uppercase tracking-wider text-muted">
-                    Status:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {filterStatuses.map((status) => {
-                      const isActive = activeStatus === status;
-                      return (
-                        <button
-                          key={status}
-                          onClick={() => {
-                            setActiveStatus(status);
-                            setCurrentPage(1);
-                          }}
-                          className={cn(
-                            "cursor-pointer rounded-full px-3.5 py-1 text-xs font-medium transition-all duration-300",
-                            isActive
-                              ? "bg-zinc-950 text-white shadow-xs"
-                              : "bg-surface text-muted hover:bg-zinc-200/70 hover:text-heading"
-                          )}
-                        >
-                          {status}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                <PublicStockFilter
+                  title="Status"
+                  allLabel="Semua Status"
+                  options={statusOptions}
+                  selectedValues={selectedStatuses}
+                  onChange={(vals) => {
+                    setSelectedStatuses(vals);
+                    setCurrentPage(1);
+                  }}
+                  enableSearch={false}
+                />
               </div>
             </div>
           </Reveal>
