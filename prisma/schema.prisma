@@ -1,0 +1,127 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  STAFF
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum StockStatus {
+  AVAILABLE
+  LOW
+  EMPTY
+}
+
+model User {
+  id        String      @id @default(cuid())
+  username  String      @unique
+  password  String      // bcrypt hash
+  name      String
+  role      Role        @default(STAFF)
+  status    UserStatus  @default(ACTIVE)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  sessions  Session[]
+  articles  Article[]
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sessionToken])
+  @@map("sessions")
+}
+
+model Category {
+  id        String         @id @default(cuid())
+  name      String         @unique
+  slug      String         @unique
+  status    CategoryStatus @default(ACTIVE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  articles  Article[]
+
+  @@map("categories")
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  coverImage  String?
+  isPublished Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+
+  @@index([slug])
+  @@index([categoryId])
+  @@map("articles")
+}
+
+model MedicineStock {
+  id        String      @id @default(cuid())
+  code      String      @unique
+  name      String
+  category  String
+  unit      String
+  quantity  Int         @default(0)
+  status    StockStatus @default(AVAILABLE)
+  updatedAt DateTime    @updatedAt
+  createdAt DateTime    @default(now())
+
+  @@index([category])
+  @@index([status])
+  @@map("medicine_stocks")
+}
+
+model SiteSetting {
+  id                  String   @id @default("default")
+  name                String
+  shortName           String
+  address             String
+  phone               String
+  email               String
+  whatsappLink        String
+  googleMapsEmbedUrl  String   @db.Text
+  operationalHours    String   @db.Text
+  sp4nLaporUrl        String
+  motto               String
+  tagline             String
+  updatedAt           DateTime @updatedAt
+
+  @@map("site_settings")
+}
