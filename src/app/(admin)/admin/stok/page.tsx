@@ -12,7 +12,6 @@ import {
   Pencil,
   Trash2
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { toast } from "@/components/ui/toast";
