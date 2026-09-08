@@ -97,10 +97,6 @@ export default function AdminProfilPage() {
     <AdminShell>
       {/* Header Halaman */}
       <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-2 text-xs font-medium text-brand-400 mb-1">
-          <Shield className="h-3.5 w-3.5" />
-          <span>Pengaturan Akun</span>
-        </div>
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
           Profil Pengguna
         </h1>

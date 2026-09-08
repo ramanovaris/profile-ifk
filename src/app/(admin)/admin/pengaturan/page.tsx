@@ -3,7 +3,6 @@
 import { useState, useRef, type FormEvent, type ChangeEvent } from "react";
 import Image from "next/image";
 import {
-  Settings,
   Building2,
   FileText,
   Link2,
@@ -131,15 +130,9 @@ export default function AdminPengaturanPage() {
         {/* Header Halaman */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-                Pengaturan Website
-              </h1>
-              <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/20 bg-brand-500/10 px-2.5 py-0.5 text-xs font-medium text-brand-400">
-                <Settings className="h-3 w-3" />
-                System Config
-              </span>
-            </div>
+            <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+              Pengaturan Website
+            </h1>
             <p className="mt-1 text-xs text-zinc-400 sm:text-sm">
               Kelola identitas instansi, kontak pelayanan, konten profil lembaga, dan integrasi tautan publik.
             </p>
