@@ -211,6 +211,45 @@ export const dummyArticles: Article[] = [
   },
 ];
 
+// ── Types & Constants: Medicine Stock ──────────────────────────────────────────
+export type StockStatus = "AVAILABLE" | "LOW" | "EMPTY";
+
+export type MedicineCategory =
+  | "Obat Generik"
+  | "Obat Program"
+  | "Obat Emergensi"
+  | "BMHP / Alkes"
+  | "Vaksin & Serum";
+
+export type MedicineStockItem = {
+  id: string;
+  code: string;
+  name: string;
+  category: MedicineCategory;
+  unit: string;
+  quantity: number;
+  status: StockStatus;
+  updatedAt: string; // ISO date string
+};
+
+export type StockSummary = {
+  totalItems: number;
+  availableItems: number;
+  lowItems: number;
+  emptyItems: number;
+  lastUpdated: string;
+};
+
+export function getStockSummary(items: MedicineStockItem[]): StockSummary {
+  return {
+    totalItems: items.length,
+    availableItems: items.filter((i) => i.status === "AVAILABLE").length,
+    lowItems: items.filter((i) => i.status === "LOW").length,
+    emptyItems: items.filter((i) => i.status === "EMPTY").length,
+    lastUpdated: items.length > 0 ? items[0].updatedAt : "-",
+  };
+}
+
 // ── Dummy Stats ───────────────────────────────────────────────────────────────
 
 export const dummyStats = {
@@ -219,3 +258,25 @@ export const dummyStats = {
   draft: dummyArticles.filter((a) => !a.isPublished).length,
   totalUsers: dummyUsers.length,
 };
+
+// ── Mock Data: Medicine Stock (Representatif IFK Kotabaru) ────────────────────
+export const initialMedicineStock: MedicineStockItem[] = [
+  { id: "med-001", code: "OBG-001", name: "Paracetamol 500mg Tablet", category: "Obat Generik", unit: "Tablet", quantity: 15000, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-002", code: "OBG-002", name: "Amoxicillin 500mg Kaplet", category: "Obat Generik", unit: "Kaplet", quantity: 8500, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-003", code: "OBG-003", name: "Cotrimoxazole Tablet", category: "Obat Generik", unit: "Tablet", quantity: 12000, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-004", code: "OBG-004", name: "Metformin 500mg Tablet", category: "Obat Generik", unit: "Tablet", quantity: 9800, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-005", code: "OBG-005", name: "Amlodipine 10mg Tablet", category: "Obat Generik", unit: "Tablet", quantity: 11000, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-006", code: "OBG-006", name: "Salbutamol Nebules 2.5mg", category: "Obat Generik", unit: "Kantong", quantity: 450, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-007", code: "OBG-007", name: "Promethazine Sirup 60ml", category: "Obat Generik", unit: "Botol", quantity: 750, status: "LOW", updatedAt: "2026-08-31" },
+  { id: "med-008", code: "OBR-001", name: "Vitamin A 200.000 IU (Program Balita)", category: "Obat Program", unit: "Kapsul", quantity: 25000, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-009", code: "OBR-002", name: "Vitamin A 500.000 IU (Program Ibu Hamil)", category: "Obat Program", unit: "Kapsul", quantity: 12000, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-010", code: "OBR-003", name: "Fe (Zat Besi) Tablet Ibu Hamil", category: "Obat Program", unit: "Tablet", quantity: 1000, status: "LOW", updatedAt: "2026-08-31" },
+  { id: "med-011", code: "OBR-004", name: "Eisen Fumarate Tablet", category: "Obat Program", unit: "Tablet", quantity: 8500, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-012", code: "OBE-001", name: "Naloxone Injeksi 0.4mg", category: "Obat Emergensi", unit: "Ampul", quantity: 150, status: "EMPTY", updatedAt: "2026-08-31" },
+  { id: "med-013", code: "OBE-002", name: "Adrenalin Injeksi 1mg", category: "Obat Emergensi", unit: "Ampul", quantity: 280, status: "LOW", updatedAt: "2026-08-31" },
+  { id: "med-014", code: "BMH-001", name: "Spuit Suntik 3ml", category: "BMHP / Alkes", unit: "Pcs", quantity: 18000, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-015", code: "BMH-002", name: "Kasa Steril 10x10cm", category: "BMHP / Alkes", unit: "Bungkus", quantity: 4500, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-016", code: "VAK-001", name: "Vaksin DPT-HB-Hib", category: "Vaksin & Serum", unit: "Vial", quantity: 900, status: "AVAILABLE", updatedAt: "2026-08-31" },
+  { id: "med-017", code: "VAK-002", name: "Vaksin Campak MR", category: "Vaksin & Serum", unit: "Vial", quantity: 320, status: "LOW", updatedAt: "2026-08-31" },
+  { id: "med-018", code: "BMH-003", name: "Infus NaCl 0.9% 500ml", category: "BMHP / Alkes", unit: "Botol", quantity: 2400, status: "AVAILABLE", updatedAt: "2026-08-31" }
+];
