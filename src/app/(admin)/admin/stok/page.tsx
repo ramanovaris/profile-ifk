@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { toast } from "@/components/ui/toast";
 import { StockMultiSelectFilter } from "@/components/admin/stock-multi-select-filter";
@@ -192,31 +191,32 @@ export default function AdminStokPage() {
     <AdminShell>
       <div className="flex flex-col gap-6 p-4 md:p-8 max-w-7xl mx-auto w-full">
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-100 sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Kelola Stok Obat
             </h1>
             <p className="mt-1 text-sm text-zinc-400">
               Manajemen dan pembaruan data stok fisik IFK per akhir bulan
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              className="bg-transparent border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
+          <div className="flex flex-wrap items-center gap-2.5 sm:flex-nowrap">
+            <button 
+              type="button"
               onClick={() => toast.info("Fitur unduh template akan segera hadir")}
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3.5 text-sm font-medium text-zinc-300 shadow-sm transition-all hover:bg-white/10 hover:text-white active:scale-95"
             >
-              <Download className="mr-2 h-4 w-4" />
-              Unduh Template
-            </Button>
-            <Button 
-              className="bg-brand-600 hover:bg-brand-700 text-white"
+              <Download className="h-4 w-4 text-zinc-400" />
+              <span>Unduh Template</span>
+            </button>
+            <button 
+              type="button"
               onClick={() => setIsImportOpen(true)}
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Import Data Stok
-            </Button>
+              <Plus className="h-4 w-4" />
+              <span>Import Data Stok</span>
+            </button>
           </div>
         </div>
 
@@ -347,26 +347,24 @@ export default function AdminStokPage() {
                         {item.status === "EMPTY" && "Kosong"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-zinc-400 hover:text-zinc-100"
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1 justify-end">
+                        <button 
+                          type="button" 
                           onClick={() => handleOpenEdit(item)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-white/10 [@media(hover:hover)]:hover:bg-white/5 [@media(hover:hover)]:hover:text-white active:bg-white/10 active:text-white"
                           title="Edit Item"
                         >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10"
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button 
+                          type="button" 
                           onClick={() => setDeleteItem(item)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-400 active:bg-red-500/20 active:text-red-400"
                           title="Hapus Item"
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
