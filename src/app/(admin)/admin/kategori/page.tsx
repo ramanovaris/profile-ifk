@@ -214,7 +214,7 @@ export default function AdminKategoriPage() {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
           <input
             type="text"
-            placeholder="Cari nama kategori atau slug..."
+            placeholder="Cari nama kategori..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -235,7 +235,6 @@ export default function AdminKategoriPage() {
                   <span className="sm:hidden">Kategori</span>
                   <span className="hidden sm:inline">Nama Kategori</span>
                 </th>
-                <th className="hidden md:table-cell px-4 py-3 align-middle w-[140px]">Slug</th>
                 <th className="px-2 sm:px-4 py-3 text-center align-middle w-[90px] sm:w-[130px]">
                   <span className="sm:hidden">Artikel</span>
                   <span className="hidden sm:inline">Jumlah Artikel</span>
@@ -247,7 +246,7 @@ export default function AdminKategoriPage() {
             <tbody>
               {paginatedCategories.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-zinc-400">
+                  <td colSpan={4} className="py-12 text-center text-zinc-400">
                     <Tags className="mx-auto h-8 w-8 text-zinc-400/80 mb-2" />
                     <p className="text-sm">
                       {categories.length === 0
@@ -273,13 +272,6 @@ export default function AdminKategoriPage() {
                           <Tags className="hidden sm:inline-block h-4 w-4 text-brand-400 shrink-0" />
                           <span className="truncate max-w-[110px] sm:max-w-none">{cat.name}</span>
                         </div>
-                      </td>
-
-                      {/* Slug */}
-                      <td className="hidden md:table-cell px-4 py-3 align-middle">
-                        <code className="rounded bg-black/40 px-1.5 py-0.5 text-xs text-zinc-400 font-mono">
-                          /{cat.slug}
-                        </code>
                       </td>
 
                       {/* Jumlah Artikel */}
