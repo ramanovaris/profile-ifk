@@ -1,266 +1,266 @@
-1|import { placeholderImage } from "./placeholder";
-2|
-3|// ── Types & Constants ────────────────────────────────────────────────────────
-4|
-5|export const ARTICLE_CATEGORIES = ["Kegiatan", "Informasi", "Sosialisasi"] as const;
-6|export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
-7|
-8|// Simulasi data master kategori dengan status aktif/non-aktif
-9|export type CategoryStatus = "ACTIVE" | "INACTIVE";
-10|
-11|export type Category = {
-12|  id: string;
-13|  name: ArticleCategory;
-14|  slug: string;
-15|  status: CategoryStatus;
-16|};
-17|
-18|export const initialCategories: Category[] = [
-19|  { id: "cat-1", name: "Kegiatan", slug: "kegiatan", status: "ACTIVE" },
-20|  { id: "cat-2", name: "Informasi", slug: "informasi", status: "ACTIVE" },
-21|  { id: "cat-3", name: "Sosialisasi", slug: "sosialisasi", status: "ACTIVE" },
-22|];
-23|
-24|export function getArticleCountByCategory(categoryName: ArticleCategory, articles: Article[]): number {
-25|  return articles.filter((a) => a.category === categoryName).length;
-26|}
-27|
-28|export type Article = {
-29|  id: string;
-30|  title: string;
-31|  slug: string;
-32|  category: ArticleCategory;
-33|  content: string; // HTML string
-34|  coverImage: string;
-35|  isPublished: boolean;
-36|  authorId: string;
-37|  authorName: string;
-38|  publishedAt: string; // ISO date string
-39|};
-40|
-41|export type User = {
-42|  id: string;
-43|  username: string;
-44|  name: string;
-45|  role: "SUPER_ADMIN" | "STAFF";
-46|  status: "ACTIVE" | "INACTIVE";
-47|  createdAt: string;
-48|};
-49|
-50|export type SiteConfig = {
-51|  name: string;
-52|  shortName: string;
-53|  address: string;
-54|  phone: string;
-55|  email: string;
-56|  whatsappLink: string;
-57|  googleMapsEmbedUrl: string;
-58|  operationalHours: string;
-59|  sp4nLaporUrl: string;
-60|  motto: string;
-61|  tagline: string;
-62|};
-63|
-64|// ── Site Config ───────────────────────────────────────────────────────────────
-65|
-66|export const siteConfig: SiteConfig = {
-67|  name: "UPTD Instalasi Farmasi Kab. Kotabaru",
-68|  shortName: "IFK Kotabaru",
-69|  address:
-70|    "Jl. Kenanga Desa Dirgahayu, Kotabaru 72116. Telp/Fax (0518) 21603",
-71|  phone: "(0518) 21603",
-72|  email: "instalasifarmasi4@gmail.com",
-73|  whatsappLink: "https://wa.me/6281234567890",
-74|  googleMapsEmbedUrl:
-75|    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.402205111195!2d116.22363550000001!3d-3.2497904999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2def302cb3e8dcff%3A0xb7c86d7dc7737d8c!2sInstalasi%20Farmasi!5e0!3m2!1sen!2sid!4v1788250580948!5m2!1sen!2sid",
-76|  operationalHours:
-77|    "Senin - Kamis: 08.00 - 16.30 WITA\nJumat: 08.00 - 11.00 WITA",
-78|  sp4nLaporUrl: "https://www.lapor.go.id",
-79|  motto:
-80|    "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat",
-81|  tagline: "Stok Valid, Team Solid",
-82|};
-83|
-84|// ── Dummy Users ───────────────────────────────────────────────────────────────
-85|
-86|export const dummyUsers: User[] = [
-87|  {
-88|    id: "usr-1",
-89|    username: "admin",
-90|    name: "Administrator",
-91|    role: "SUPER_ADMIN",
-92|    status: "ACTIVE",
-93|    createdAt: "2024-01-15T08:00:00.000Z",
-94|  },
-95|  {
-96|    id: "usr-2",
-97|    username: "staff1",
-98|    name: "Siti Nurhaliza, S.Farm",
-99|    role: "STAFF",
-100|    status: "ACTIVE",
-101|    createdAt: "2024-03-10T08:00:00.000Z",
-102|  },
-103|  {
-104|    id: "usr-3",
-105|    username: "staff2",
-106|    name: "Ahmad Rizky, S.Farm",
-107|    role: "STAFF",
-108|    status: "ACTIVE",
-109|    createdAt: "2024-06-01T08:00:00.000Z",
-110|  },
-111|];
-112|
-113|// ── Dummy Articles ────────────────────────────────────────────────────────────
-114|
-115|export const dummyArticles: Article[] = [
-116|  {
-117|    id: "art-1",
-118|    title: "Sosialisasi Penggunaan Sistem Informasi Kefarmasian",
-119|    slug: "sosialisasi-sistem-informasi-kefarmasian",
-120|    category: "Kegiatan",
-121|    content: `
-122|      <p>UPTD Instalasi Farmasi Kab. Kotabaru mengadakan sosialisasi penggunaan sistem informasi kefarmasian kepada seluruh faskes binaan di wilayah Kabupaten Kotabaru.</p>
-123|      <p>Kegiatan ini bertujuan untuk memastikan setiap faskes dapat menggunakan sistem dengan baik dalam pengelolaan distribusi dan pemantauan stok obat. Para peserta mendapatkan penjelasan lengkap mulai dari cara login, input data stok, hingga laporan penggunaan obat.</p>
-124|      <p>Selain itu, sosialisasi ini juga menjadi wadah untuk menampung masukan dan kendala yang dihadapi oleh para apoteker faskes dalam penggunaan sistem informasi kefarmasian.</p>
-125|    `,
-126|    coverImage: placeholderImage(1200, 630, "Sosialisasi Sistem Informasi Kefarmasian", "Kegiatan"),
-127|    isPublished: true,
-128|    authorId: "usr-1",
-129|    authorName: "Administrator",
-130|    publishedAt: "2025-01-15T08:00:00.000Z",
-131|  },
-132|  {
-133|    id: "art-2",
-134|    title: "Evaluasi Kegiatan Distribusi Obat Triwulan IV 2024",
-135|    slug: "evaluasi-distribusi-obat-triwulan-iv-2024",
-136|    category: "Kegiatan",
-137|    content: `
-138|      <p>UPTD Instalasi Farmasi Kab. Kotabaru melaksanakan evaluasi kegiatan distribusi obat untuk triwulan IV tahun 2024.</p>
-139|      <p>Evaluasi ini mencakup analisis ketersediaan obat di seluruh faskes binaan, tingkat pemenuhan permintaan, serta efektivitas proses distribusi yang telah dilaksanakan selama periode tersebut.</p>
-140|      <p>Hasil evaluasi menunjukkan bahwa tingkat pemenuhan permintaan obat mencapai 95%, dengan beberapa catatan perbaikan untuk obat-obatan yang mengalami keterlambatan pengadaan dari pemasok.</p>
-141|    `,
-142|    coverImage: placeholderImage(1200, 630, "Evaluasi Distribusi Obat Triwulan IV", "Kegiatan"),
-143|    isPublished: true,
-144|    authorId: "usr-2",
-145|    authorName: "Siti Nurhaliza, S.Farm",
-146|    publishedAt: "2025-01-20T09:00:00.000Z",
-147|  },
-148|  {
-149|    id: "art-3",
-150|    title: "Pengumuman Jadwal Pelayanan Selama Libur Nasional",
-151|    slug: "pengumuman-jadwal-pelayanan-libur-nasional",
-152|    category: "Informasi",
-153|    content: `
-154|      <p>Berdasarkan surat edaran dari pimpinan, UPTD Instalasi Farmasi Kab. Kotabaru menginformasikan jadwal pelayanan selama masa libur nasional.</p>
-155|      <p>Selama libur nasional, pelayanan distribusi obat akan dititipkan pada jadwal pengajuan sebelum masa libur. Faskes binaan diimbau untuk mengajuan permintaan obat paling lambat H-7 sebelum hari libur nasional dimulai.</p>
-156|      <p>Pelayanan normal akan kembali beroperasi sesuai jam kerja yang berlaku setelah masa libur nasional berakhir.</p>
-157|    `,
-158|    coverImage: placeholderImage(1200, 630, "Jadwal Pelayanan Libur Nasional", "Informasi"),
-159|    isPublished: true,
-160|    authorId: "usr-1",
-161|    authorName: "Administrator",
-162|    publishedAt: "2025-02-01T08:00:00.000Z",
-163|  },
-164|  {
-165|    id: "art-4",
-166|    title: "Daftar Obat yang Diperbarui di Sistem e-Formularium",
-167|    slug: "daftar-obat-pembaruan-e-formularium",
-168|    category: "Informasi",
-169|    content: `
-170|      <p>Telah terjadi pembaruan daftar obat dalam sistem e-Formularium Nasional yang berlaku efektif bulan Februari 2025.</p>
-171|      <p>Beberapa obat yang mengalami perubahan meliputi penambahan obat generik baru, penghapusan obat yang sudah tidak diproduksi, serta penyesuaian harga obat berdasarkan keputusan terbaru dari Kementerian Kesehatan.</p>
-172|      <p>Faskes binaan diimbau untuk memperbarui referensi formularium di masing-masing institusi agar sesuai dengan daftar terbaru yang berlaku.</p>
-173|    `,
-174|    coverImage: placeholderImage(1200, 630, "Pembaruan e-Formularium Nasional", "Informasi"),
-175|    isPublished: true,
-176|    authorId: "usr-2",
-177|    authorName: "Siti Nurhaliza, S.Farm",
-178|    publishedAt: "2025-02-10T10:00:00.000Z",
-179|  },
-180|  {
-181|    id: "art-5",
-182|    title: "Pelibatan Masyarakat dalam Pengawasan Obat dan Makanan",
-183|    slug: "pelibatan-masyarakat-pengawasan-obat",
-184|    category: "Sosialisasi",
-185|    content: `
-186|      <p>UPTD Instalasi Farmasi Kab. Kotabaru mengadakan kegiatan sosialisasi pelibatan masyarakat dalam pengawasan obat dan makanan di wilayah Kabupaten Kotabaru.</p>
-187|      <p>Kegiatan ini bertujuan untuk meningkatkan kesadaran masyarakat tentang pentingnya menggunakan obat yang aman, berkhasiat, dan berkualitas. Masyarakat diedukasi untuk mengenali obat-obatan yang tidak memiliki izin edar dari BPOM.</p>
-188|      <p>Sosialisasi dilakukan melalui pertemuan langsung dengan warga di beberapa kecamatan, serta penyebaran brosur dan materi edukasi tentang penggunaan obat yang bijak.</p>
-189|    `,
-190|    coverImage: placeholderImage(1200, 630, "Pelibatan Masyarakat Pengawasan Obat", "Sosialisasi"),
-191|    isPublished: true,
-192|    authorId: "usr-3",
-193|    authorName: "Ahmad Rizky, S.Farm",
-194|    publishedAt: "2025-02-15T08:00:00.000Z",
-195|  },
-196|  {
-197|    id: "art-6",
-198|    title: "Kampanye Penggunaan Antibiotik yang Bijak",
-199|    slug: "kampanye-penggunaan-antibiotik-bijak",
-200|    category: "Sosialisasi",
-201|    content: `
-202|      <p>Dalam rangka meningkatkan pemahaman masyarakat tentang penggunaan antibiotik yang tepat, UPTD Instalasi Farmasi Kab. Kotabaru menggelar kampanye penggunaan antibiotik yang bijak.</p>
-203|      <p>Kampanye ini menekankan pentingnya tidak menggunakan antibiotik tanpa resep dokter, serta bahaya resistensi antibiotik yang dapat mengancam kesehatan masyarakat secara luas.</p>
-204|      <p>Pesan utama kampanye: "Gunakan Antibiotik Sesuai Resep Dokter, Selamatkan Masa Depan Kesehatan Kita." Kegiatan ini mendapat sambutan positif dari masyarakat dan tenaga kesehatan di Kabupaten Kotabaru.</p>
-205|    `,
-206|    coverImage: placeholderImage(1200, 630, "Kampanye Antibiotik Bijak", "Sosialisasi"),
-207|    isPublished: false,
-208|    authorId: "usr-1",
-209|    authorName: "Administrator",
-210|    publishedAt: "2025-02-20T08:00:00.000Z",
-211|  },
-212|];
-213|
-214|// ── Types & Constants: Medicine Stock ──────────────────────────────────────────
-215|export type StockStatus = "AVAILABLE" | "LOW" | "EMPTY";
-216|
-217|export type MedicineCategory =
-218|  | "Obat Generik"
-219|  | "Obat Program"
-220|  | "Obat Emergensi"
-221|  | "BMHP / Alkes"
-222|  | "Vaksin & Serum";
-223|
-224|export type MedicineStockItem = {
-225|  id: string;
-226|  code: string;
-227|  name: string;
-228|  category: MedicineCategory;
-229|  unit: string;
-230|  quantity: number;
-231|  status: StockStatus;
-232|  updatedAt: string; // ISO date string
-233|};
-234|
-235|export type StockSummary = {
-236|  totalItems: number;
-237|  availableItems: number;
-238|  lowItems: number;
-239|  emptyItems: number;
-240|  lastUpdated: string;
-241|};
-242|
-243|export function getStockSummary(items: MedicineStockItem[]): StockSummary {
-244|  return {
-245|    totalItems: items.length,
-246|    availableItems: items.filter((i) => i.status === "AVAILABLE").length,
-247|    lowItems: items.filter((i) => i.status === "LOW").length,
-248|    emptyItems: items.filter((i) => i.status === "EMPTY").length,
-249|    lastUpdated: items.length > 0 ? items[0].updatedAt : "-",
-250|  };
-251|}
-252|
-253|// ── Dummy Stats ───────────────────────────────────────────────────────────────
-254|
-255|export const dummyStats = {
-256|  totalArticles: dummyArticles.length,
-257|  published: dummyArticles.filter((a) => a.isPublished).length,
-258|  draft: dummyArticles.filter((a) => !a.isPublished).length,
-259|  totalUsers: dummyUsers.length,
-260|};
-261|
-262|// ── Mock Data: Medicine Stock (Representatif IFK Kotabaru) ────────────────────
-263|export const initialMedicineStock: MedicineStockItem[] = [
+import { placeholderImage } from "./placeholder";
+
+// ── Types & Constants ────────────────────────────────────────────────────────
+
+export const ARTICLE_CATEGORIES = ["Kegiatan", "Informasi", "Sosialisasi"] as const;
+export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
+
+// Simulasi data master kategori dengan status aktif/non-aktif
+export type CategoryStatus = "ACTIVE" | "INACTIVE";
+
+export type Category = {
+  id: string;
+  name: ArticleCategory;
+  slug: string;
+  status: CategoryStatus;
+};
+
+export const initialCategories: Category[] = [
+  { id: "cat-1", name: "Kegiatan", slug: "kegiatan", status: "ACTIVE" },
+  { id: "cat-2", name: "Informasi", slug: "informasi", status: "ACTIVE" },
+  { id: "cat-3", name: "Sosialisasi", slug: "sosialisasi", status: "ACTIVE" },
+];
+
+export function getArticleCountByCategory(categoryName: ArticleCategory, articles: Article[]): number {
+  return articles.filter((a) => a.category === categoryName).length;
+}
+
+export type Article = {
+  id: string;
+  title: string;
+  slug: string;
+  category: ArticleCategory;
+  content: string; // HTML string
+  coverImage: string;
+  isPublished: boolean;
+  authorId: string;
+  authorName: string;
+  publishedAt: string; // ISO date string
+};
+
+export type User = {
+  id: string;
+  username: string;
+  name: string;
+  role: "SUPER_ADMIN" | "STAFF";
+  status: "ACTIVE" | "INACTIVE";
+  createdAt: string;
+};
+
+export type SiteConfig = {
+  name: string;
+  shortName: string;
+  address: string;
+  phone: string;
+  email: string;
+  whatsappLink: string;
+  googleMapsEmbedUrl: string;
+  operationalHours: string;
+  sp4nLaporUrl: string;
+  motto: string;
+  tagline: string;
+};
+
+// ── Site Config ───────────────────────────────────────────────────────────────
+
+export const siteConfig: SiteConfig = {
+  name: "UPTD Instalasi Farmasi Kab. Kotabaru",
+  shortName: "IFK Kotabaru",
+  address:
+    "Jl. Kenanga Desa Dirgahayu, Kotabaru 72116. Telp/Fax (0518) 21603",
+  phone: "(0518) 21603",
+  email: "instalasifarmasi4@gmail.com",
+  whatsappLink: "https://wa.me/6281234567890",
+  googleMapsEmbedUrl:
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.402205111195!2d116.22363550000001!3d-3.2497904999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2def302cb3e8dcff%3A0xb7c86d7dc7737d8c!2sInstalasi%20Farmasi!5e0!3m2!1sen!2sid!4v1788250580948!5m2!1sen!2sid",
+  operationalHours:
+    "Senin - Kamis: 08.00 - 16.30 WITA\nJumat: 08.00 - 11.00 WITA",
+  sp4nLaporUrl: "https://www.lapor.go.id",
+  motto:
+    "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat",
+  tagline: "Stok Valid, Team Solid",
+};
+
+// ── Dummy Users ───────────────────────────────────────────────────────────────
+
+export const dummyUsers: User[] = [
+  {
+    id: "usr-1",
+    username: "admin",
+    name: "Administrator",
+    role: "SUPER_ADMIN",
+    status: "ACTIVE",
+    createdAt: "2024-01-15T08:00:00.000Z",
+  },
+  {
+    id: "usr-2",
+    username: "staff1",
+    name: "Siti Nurhaliza, S.Farm",
+    role: "STAFF",
+    status: "ACTIVE",
+    createdAt: "2024-03-10T08:00:00.000Z",
+  },
+  {
+    id: "usr-3",
+    username: "staff2",
+    name: "Ahmad Rizky, S.Farm",
+    role: "STAFF",
+    status: "ACTIVE",
+    createdAt: "2024-06-01T08:00:00.000Z",
+  },
+];
+
+// ── Dummy Articles ────────────────────────────────────────────────────────────
+
+export const dummyArticles: Article[] = [
+  {
+    id: "art-1",
+    title: "Sosialisasi Penggunaan Sistem Informasi Kefarmasian",
+    slug: "sosialisasi-sistem-informasi-kefarmasian",
+    category: "Kegiatan",
+    content: `
+      <p>UPTD Instalasi Farmasi Kab. Kotabaru mengadakan sosialisasi penggunaan sistem informasi kefarmasian kepada seluruh faskes binaan di wilayah Kabupaten Kotabaru.</p>
+      <p>Kegiatan ini bertujuan untuk memastikan setiap faskes dapat menggunakan sistem dengan baik dalam pengelolaan distribusi dan pemantauan stok obat. Para peserta mendapatkan penjelasan lengkap mulai dari cara login, input data stok, hingga laporan penggunaan obat.</p>
+      <p>Selain itu, sosialisasi ini juga menjadi wadah untuk menampung masukan dan kendala yang dihadapi oleh para apoteker faskes dalam penggunaan sistem informasi kefarmasian.</p>
+    `,
+    coverImage: placeholderImage(1200, 630, "Sosialisasi Sistem Informasi Kefarmasian", "Kegiatan"),
+    isPublished: true,
+    authorId: "usr-1",
+    authorName: "Administrator",
+    publishedAt: "2025-01-15T08:00:00.000Z",
+  },
+  {
+    id: "art-2",
+    title: "Evaluasi Kegiatan Distribusi Obat Triwulan IV 2024",
+    slug: "evaluasi-distribusi-obat-triwulan-iv-2024",
+    category: "Kegiatan",
+    content: `
+      <p>UPTD Instalasi Farmasi Kab. Kotabaru melaksanakan evaluasi kegiatan distribusi obat untuk triwulan IV tahun 2024.</p>
+      <p>Evaluasi ini mencakup analisis ketersediaan obat di seluruh faskes binaan, tingkat pemenuhan permintaan, serta efektivitas proses distribusi yang telah dilaksanakan selama periode tersebut.</p>
+      <p>Hasil evaluasi menunjukkan bahwa tingkat pemenuhan permintaan obat mencapai 95%, dengan beberapa catatan perbaikan untuk obat-obatan yang mengalami keterlambatan pengadaan dari pemasok.</p>
+    `,
+    coverImage: placeholderImage(1200, 630, "Evaluasi Distribusi Obat Triwulan IV", "Kegiatan"),
+    isPublished: true,
+    authorId: "usr-2",
+    authorName: "Siti Nurhaliza, S.Farm",
+    publishedAt: "2025-01-20T09:00:00.000Z",
+  },
+  {
+    id: "art-3",
+    title: "Pengumuman Jadwal Pelayanan Selama Libur Nasional",
+    slug: "pengumuman-jadwal-pelayanan-libur-nasional",
+    category: "Informasi",
+    content: `
+      <p>Berdasarkan surat edaran dari pimpinan, UPTD Instalasi Farmasi Kab. Kotabaru menginformasikan jadwal pelayanan selama masa libur nasional.</p>
+      <p>Selama libur nasional, pelayanan distribusi obat akan dititipkan pada jadwal pengajuan sebelum masa libur. Faskes binaan diimbau untuk mengajuan permintaan obat paling lambat H-7 sebelum hari libur nasional dimulai.</p>
+      <p>Pelayanan normal akan kembali beroperasi sesuai jam kerja yang berlaku setelah masa libur nasional berakhir.</p>
+    `,
+    coverImage: placeholderImage(1200, 630, "Jadwal Pelayanan Libur Nasional", "Informasi"),
+    isPublished: true,
+    authorId: "usr-1",
+    authorName: "Administrator",
+    publishedAt: "2025-02-01T08:00:00.000Z",
+  },
+  {
+    id: "art-4",
+    title: "Daftar Obat yang Diperbarui di Sistem e-Formularium",
+    slug: "daftar-obat-pembaruan-e-formularium",
+    category: "Informasi",
+    content: `
+      <p>Telah terjadi pembaruan daftar obat dalam sistem e-Formularium Nasional yang berlaku efektif bulan Februari 2025.</p>
+      <p>Beberapa obat yang mengalami perubahan meliputi penambahan obat generik baru, penghapusan obat yang sudah tidak diproduksi, serta penyesuaian harga obat berdasarkan keputusan terbaru dari Kementerian Kesehatan.</p>
+      <p>Faskes binaan diimbau untuk memperbarui referensi formularium di masing-masing institusi agar sesuai dengan daftar terbaru yang berlaku.</p>
+    `,
+    coverImage: placeholderImage(1200, 630, "Pembaruan e-Formularium Nasional", "Informasi"),
+    isPublished: true,
+    authorId: "usr-2",
+    authorName: "Siti Nurhaliza, S.Farm",
+    publishedAt: "2025-02-10T10:00:00.000Z",
+  },
+  {
+    id: "art-5",
+    title: "Pelibatan Masyarakat dalam Pengawasan Obat dan Makanan",
+    slug: "pelibatan-masyarakat-pengawasan-obat",
+    category: "Sosialisasi",
+    content: `
+      <p>UPTD Instalasi Farmasi Kab. Kotabaru mengadakan kegiatan sosialisasi pelibatan masyarakat dalam pengawasan obat dan makanan di wilayah Kabupaten Kotabaru.</p>
+      <p>Kegiatan ini bertujuan untuk meningkatkan kesadaran masyarakat tentang pentingnya menggunakan obat yang aman, berkhasiat, dan berkualitas. Masyarakat diedukasi untuk mengenali obat-obatan yang tidak memiliki izin edar dari BPOM.</p>
+      <p>Sosialisasi dilakukan melalui pertemuan langsung dengan warga di beberapa kecamatan, serta penyebaran brosur dan materi edukasi tentang penggunaan obat yang bijak.</p>
+    `,
+    coverImage: placeholderImage(1200, 630, "Pelibatan Masyarakat Pengawasan Obat", "Sosialisasi"),
+    isPublished: true,
+    authorId: "usr-3",
+    authorName: "Ahmad Rizky, S.Farm",
+    publishedAt: "2025-02-15T08:00:00.000Z",
+  },
+  {
+    id: "art-6",
+    title: "Kampanye Penggunaan Antibiotik yang Bijak",
+    slug: "kampanye-penggunaan-antibiotik-bijak",
+    category: "Sosialisasi",
+    content: `
+      <p>Dalam rangka meningkatkan pemahaman masyarakat tentang penggunaan antibiotik yang tepat, UPTD Instalasi Farmasi Kab. Kotabaru menggelar kampanye penggunaan antibiotik yang bijak.</p>
+      <p>Kampanye ini menekankan pentingnya tidak menggunakan antibiotik tanpa resep dokter, serta bahaya resistensi antibiotik yang dapat mengancam kesehatan masyarakat secara luas.</p>
+      <p>Pesan utama kampanye: "Gunakan Antibiotik Sesuai Resep Dokter, Selamatkan Masa Depan Kesehatan Kita." Kegiatan ini mendapat sambutan positif dari masyarakat dan tenaga kesehatan di Kabupaten Kotabaru.</p>
+    `,
+    coverImage: placeholderImage(1200, 630, "Kampanye Antibiotik Bijak", "Sosialisasi"),
+    isPublished: false,
+    authorId: "usr-1",
+    authorName: "Administrator",
+    publishedAt: "2025-02-20T08:00:00.000Z",
+  },
+];
+
+// ── Types & Constants: Medicine Stock ──────────────────────────────────────────
+export type StockStatus = "AVAILABLE" | "LOW" | "EMPTY";
+
+export type MedicineCategory =
+  | "Obat Generik"
+  | "Obat Program"
+  | "Obat Emergensi"
+  | "BMHP / Alkes"
+  | "Vaksin & Serum";
+
+export type MedicineStockItem = {
+  id: string;
+  code: string;
+  name: string;
+  category: MedicineCategory;
+  unit: string;
+  quantity: number;
+  status: StockStatus;
+  updatedAt: string; // ISO date string
+};
+
+export type StockSummary = {
+  totalItems: number;
+  availableItems: number;
+  lowItems: number;
+  emptyItems: number;
+  lastUpdated: string;
+};
+
+export function getStockSummary(items: MedicineStockItem[]): StockSummary {
+  return {
+    totalItems: items.length,
+    availableItems: items.filter((i) => i.status === "AVAILABLE").length,
+    lowItems: items.filter((i) => i.status === "LOW").length,
+    emptyItems: items.filter((i) => i.status === "EMPTY").length,
+    lastUpdated: items.length > 0 ? items[0].updatedAt : "-",
+  };
+}
+
+// ── Dummy Stats ───────────────────────────────────────────────────────────────
+
+export const dummyStats = {
+  totalArticles: dummyArticles.length,
+  published: dummyArticles.filter((a) => a.isPublished).length,
+  draft: dummyArticles.filter((a) => !a.isPublished).length,
+  totalUsers: dummyUsers.length,
+};
+
+// ── Mock Data: Medicine Stock (Representatif IFK Kotabaru) ────────────────────
+export const initialMedicineStock: MedicineStockItem[] = [
   { id: "stk-001", code: "OBG-001", name: "Paracetamol 500 mg", category: "Obat Generik", unit: "Tablet", quantity: 18500, status: "AVAILABLE", updatedAt: "2026-08-31" },
   { id: "stk-002", code: "OBG-002", name: "Paracetamol Sirup 120 mg/5 ml", category: "Obat Generik", unit: "Botol", quantity: 1240, status: "AVAILABLE", updatedAt: "2026-08-31" },
   { id: "stk-003", code: "OBG-003", name: "Paracetamol Drop 100 mg/ml", category: "Obat Generik", unit: "Botol", quantity: 450, status: "LOW", updatedAt: "2026-08-31" },
