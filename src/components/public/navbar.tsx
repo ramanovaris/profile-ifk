@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/", label: "Beranda" },
   { href: "/profil", label: "Profil" },
   { href: "/layanan", label: "Layanan" },
+  { href: "/stok", label: "Ketersediaan Obat" },
   { href: "/berita", label: "Berita" },
   { href: "/kontak", label: "Kontak" },
 ];
@@ -54,97 +55,62 @@ export function Navbar() {
                 </Link>
               );
             })}
-
-            {/* Desktop CTA Masuk */}
-            <Link
-              href="/admin/login"
-              className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-4 py-1.5 text-xs font-semibold tracking-wide text-white shadow-sm transition-all duration-300 ease-luxe hover:bg-brand-700 active:scale-95"
-            >
-              <LogIn className="h-3.5 w-3.5" strokeWidth={2} />
-              <span>Masuk</span>
-            </Link>
+            <div className="ml-2 flex items-center gap-1">
+              <Link
+                href="/admin/login"
+                className="flex items-center gap-1.5 rounded-full border border-black/5 bg-black/5 px-3.5 py-1.5 text-xs font-medium text-heading transition-colors hover:bg-black/10"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                Masuk Admin
+              </Link>
+            </div>
           </nav>
 
-          {/* Hamburger — dua garis morph ke X */}
+          {/* Mobile menu button */}
           <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Tutup menu" : "Buka menu"}
-            aria-expanded={open}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-black/5 transition-transform duration-300 ease-luxe active:scale-95 md:hidden"
+            onClick={() => setOpen(!open)}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-heading md:hidden"
           >
-              <span
-                className={cn(
-                  "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
-                  open ? "rotate-45" : "-translate-y-[3px]"
-                )}
-              />
-              <span
-                className={cn(
-                  "absolute h-px w-4 bg-heading transition-all duration-500 ease-luxe",
-                  open ? "-rotate-45" : "translate-y-[3px]"
-                )}
-              />
-            </button>
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={open ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
         </div>
       </header>
 
-      {/* ── Fullscreen glass overlay (mobile) + staggered reveal ─────── */}
-      <div
-        className={cn(
-          "fixed inset-0 z-40 flex flex-col justify-center bg-zinc-950/80 px-8 backdrop-blur-3xl transition-all duration-700 ease-luxe md:hidden",
-          open ? "visible opacity-100" : "invisible opacity-0"
-        )}
-      >
-        <nav className="flex flex-col gap-3">
-          {navLinks.map((link, i) => {
-            const isActive =
-              link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
-            return (
+      {/* Mobile drawer */}
+      {open && (
+        <div className="fixed inset-0 z-40 pt-20 bg-white/90 backdrop-blur-xl md:hidden">
+          <nav className="flex flex-col gap-2 p-4">
+            {navLinks.map((link) => {
+              const isActive = pathname.startsWith(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "rounded-xl px-4 py-3 text-sm font-medium",
+                    isActive ? "bg-black/5 text-heading" : "text-muted hover:bg-black/5 hover:text-heading"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+            <div className="mt-4 border-t border-black/5 pt-4">
               <Link
-                key={link.href}
-                href={link.href}
+                href="/admin/login"
                 onClick={() => setOpen(false)}
-                style={{ transitionDelay: open ? `${120 + i * 60}ms` : "0ms" }}
-                className={cn(
-                  "text-4xl font-bold tracking-tighter transition-all duration-700 ease-luxe",
-                  isActive ? "text-brand-400" : "text-white hover:text-brand-400",
-                  open ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-                )}
+                className="flex items-center gap-2 rounded-xl bg-black/5 px-4 py-3 text-sm font-medium text-heading hover:bg-black/10"
               >
-                {link.label}
+                <LogIn className="h-4 w-4" />
+                Masuk Admin
               </Link>
-            );
-          })}
-
-          {/* Fullscreen Mobile Menu Login Button */}
-          <div
-            style={{ transitionDelay: open ? `${120 + navLinks.length * 60}ms` : "0ms" }}
-            className={cn(
-              "mt-4 pt-2 transition-all duration-700 ease-luxe",
-              open ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-            )}
-          >
-            <Link
-              href="/admin/login"
-              onClick={() => setOpen(false)}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-3.5 text-base font-semibold text-white shadow-lg transition-transform duration-200 active:scale-98"
-            >
-              <LogIn className="h-4 w-4" strokeWidth={2} />
-              <span>Masuk Admin</span>
-            </Link>
-          </div>
-        </nav>
-        <p
-          style={{ transitionDelay: open ? "520ms" : "0ms" }}
-          className={cn(
-            "mt-10 text-xs uppercase tracking-[0.2em] text-zinc-500 transition-all duration-700 ease-luxe",
-            open ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
-          )}
-        >
-          {siteConfig.name}
-        </p>
-      </div>
+            </div>
+          </nav>
+        </div>
+      )}
     </>
   );
 }

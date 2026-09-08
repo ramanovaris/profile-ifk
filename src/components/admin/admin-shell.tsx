@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   Tags,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,7 @@ const sidebarLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/berita", label: "Berita", icon: Newspaper },
   { href: "/admin/kategori", label: "Kategori", icon: Tags },
+  { href: "/admin/stok", label: "Stok Obat", icon: Package },
   { href: "/admin/pengguna", label: "Pengguna", icon: Users },
   { href: "/admin/profil", label: "Profil", icon: UserCog },
   { href: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
