@@ -301,10 +301,10 @@ export default function AdminPenggunaPage() {
         {/* Header Section */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Kelola Pengguna
             </h1>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-sm text-zinc-400">
               Manajemen akun staf dan administrator sistem profil UPTD IFK Kotabaru.
             </p>
           </div>
