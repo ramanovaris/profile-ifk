@@ -178,8 +178,8 @@ export default function StokPublikPage() {
           </Reveal>
 
           {/* ── Toolbar Pencarian & Filter ─────────────────────────── */}
-          <Reveal delay={100}>
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
+          <Reveal delay={100} className="relative z-30">
+            <div className="relative z-30 mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
               {/* Search input */}
               <div className="relative flex-1">
                 <Search
@@ -228,7 +228,7 @@ export default function StokPublikPage() {
           </Reveal>
 
           {/* ── Tabel Ketersediaan Obat ────────────────────────────── */}
-          <Reveal delay={140}>
+          <Reveal delay={140} className="relative z-10">
             <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[768px] text-left text-sm">

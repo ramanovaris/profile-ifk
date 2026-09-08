@@ -167,7 +167,7 @@ export function StockMultiSelectFilter({
   return (
     <div
       ref={containerRef}
-      className={`relative inline-block w-full sm:w-auto ${className}`}
+      className={`relative inline-block w-full sm:w-auto ${isOpen ? "z-50" : ""} ${className}`}
       onKeyDown={handleKeyDown}
     >
       {/* Trigger Button */}

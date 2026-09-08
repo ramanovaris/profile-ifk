@@ -163,7 +163,7 @@ export default function AdminStokPage() {
         </div>
 
         {/* ── Toolbar Pencarian & Filter Terpadu ────────────────────────── */}
-        <div className="relative z-20 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+        <div className="relative z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
@@ -208,7 +208,7 @@ export default function AdminStokPage() {
         </div>
 
         {/* ── Tabel Stok ──────────────────────────────────────────────────── */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
+        <div className="relative z-10 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[800px] text-left text-sm text-zinc-300">
               <thead>

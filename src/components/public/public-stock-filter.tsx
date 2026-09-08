@@ -168,7 +168,7 @@ export function PublicStockFilter({
   return (
     <div
       ref={containerRef}
-      className={cn("relative inline-block w-full sm:w-auto", className)}
+      className={cn("relative inline-block w-full sm:w-auto", isOpen && "z-50", className)}
       onKeyDown={handleKeyDown}
     >
       {/* Trigger Button */}
