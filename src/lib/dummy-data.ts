@@ -43,6 +43,7 @@ export type User = {
   username: string;
   name: string;
   role: "SUPER_ADMIN" | "STAFF";
+  status: "ACTIVE" | "INACTIVE";
   createdAt: string;
 };
 
@@ -88,6 +89,7 @@ export const dummyUsers: User[] = [
     username: "admin",
     name: "Administrator",
     role: "SUPER_ADMIN",
+    status: "ACTIVE",
     createdAt: "2024-01-15T08:00:00.000Z",
   },
   {
@@ -95,6 +97,7 @@ export const dummyUsers: User[] = [
     username: "staff1",
     name: "Siti Nurhaliza, S.Farm",
     role: "STAFF",
+    status: "ACTIVE",
     createdAt: "2024-03-10T08:00:00.000Z",
   },
   {
@@ -102,6 +105,7 @@ export const dummyUsers: User[] = [
     username: "staff2",
     name: "Ahmad Rizky, S.Farm",
     role: "STAFF",
+    status: "ACTIVE",
     createdAt: "2024-06-01T08:00:00.000Z",
   },
 ];

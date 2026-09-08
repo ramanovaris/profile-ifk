@@ -20,6 +20,8 @@ import {
   ChevronRight,
   X,
   Lock,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import {
   Dialog,
@@ -42,6 +44,7 @@ type UserFormData = {
   password: string;
   confirmPassword: string;
   role: "SUPER_ADMIN" | "STAFF";
+  status: "ACTIVE" | "INACTIVE";
 };
 
 export default function AdminPenggunaPage() {
@@ -62,6 +65,7 @@ export default function AdminPenggunaPage() {
     password: "",
     confirmPassword: "",
     role: "STAFF",
+    status: "ACTIVE",
   });
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -108,6 +112,7 @@ export default function AdminPenggunaPage() {
       password: "",
       confirmPassword: "",
       role: "STAFF",
+      status: "ACTIVE",
     });
     setFormError(null);
     setIsUserModalOpen(true);
@@ -122,6 +127,7 @@ export default function AdminPenggunaPage() {
       password: "",
       confirmPassword: "",
       role: user.role,
+      status: user.status ?? "ACTIVE",
     });
     setFormError(null);
     setIsUserModalOpen(true);
@@ -191,6 +197,7 @@ export default function AdminPenggunaPage() {
         name: trimmedName,
         username: trimmedUsername,
         role: formData.role,
+        status: formData.status,
         createdAt: new Date().toISOString(),
       };
 
@@ -220,6 +227,7 @@ export default function AdminPenggunaPage() {
                 name: trimmedName,
                 username: trimmedUsername,
                 role: formData.role,
+                status: formData.status,
               }
             : u
         )
@@ -228,6 +236,29 @@ export default function AdminPenggunaPage() {
     }
 
     setIsUserModalOpen(false);
+  };
+
+  // Handler Toggle Status Akun
+  const toggleStatus = (userId: string) => {
+    const target = users.find((u) => u.id === userId);
+    if (!target) return;
+
+    if (target.username.toLowerCase() === "admin") {
+      toast.error("Akun Administrator Utama tidak dapat dinonaktifkan.");
+      return;
+    }
+
+    const nextStatus = target.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    setUsers(
+      users.map((u) =>
+        u.id === userId ? { ...u, status: nextStatus } : u
+      )
+    );
+    toast.info(
+      `Status akun "${target.name}" diubah ke ${
+        nextStatus === "ACTIVE" ? "Aktif" : "Non-Aktif"
+      }.`
+    );
   };
 
   // Handler Reset Sandi
@@ -404,6 +435,7 @@ export default function AdminPenggunaPage() {
                 <tr className="border-b border-white/5 bg-white/[0.02] text-zinc-400 font-medium tracking-wider uppercase">
                   <th className="px-4 py-3.5 align-middle">Pengguna</th>
                   <th className="px-4 py-3.5 align-middle w-[140px]">Peran</th>
+                  <th className="px-4 py-3.5 align-middle text-center w-[120px]">Status</th>
                   <th className="hidden md:table-cell px-4 py-3.5 align-middle w-[150px]">
                     Tanggal Dibuat
                   </th>
@@ -460,6 +492,36 @@ export default function AdminPenggunaPage() {
                           )}
                         </td>
 
+                        {/* Kolom Status Toggle */}
+                        <td className="px-4 py-3.5 align-middle text-center whitespace-nowrap">
+                          <button
+                            type="button"
+                            onClick={() => toggleStatus(user.id)}
+                            disabled={user.username.toLowerCase() === "admin"}
+                            title={
+                              user.username.toLowerCase() === "admin"
+                                ? "Status Administrator Utama selalu aktif"
+                                : "Klik untuk ubah status akun"
+                            }
+                            className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                              user.status === "ACTIVE"
+                                ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 [@media(hover:hover)]:hover:bg-emerald-500/20 active:bg-emerald-500/30"
+                                : "border-zinc-600 bg-zinc-800/50 text-zinc-400 [@media(hover:hover)]:hover:bg-zinc-800 active:bg-zinc-700"
+                            } ${
+                              user.username.toLowerCase() === "admin"
+                                ? "cursor-not-allowed opacity-80"
+                                : ""
+                            }`}
+                          >
+                            {user.status === "ACTIVE" ? (
+                              <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+                            ) : (
+                              <XCircle className="h-3.5 w-3.5 shrink-0" />
+                            )}
+                            <span>{user.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}</span>
+                          </button>
+                        </td>
+
                         {/* Kolom Tanggal Dibuat */}
                         <td className="hidden md:table-cell px-4 py-3.5 align-middle text-zinc-400">
                           <div className="flex items-center gap-1.5">
@@ -511,7 +573,7 @@ export default function AdminPenggunaPage() {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-4 py-12 text-center text-zinc-400">
+                    <td colSpan={5} className="px-4 py-12 text-center text-zinc-400">
                       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] text-zinc-500">
                         <Users className="h-6 w-6" />
                       </div>
@@ -712,6 +774,52 @@ export default function AdminPenggunaPage() {
                   </span>
                 </button>
               </div>
+            </div>
+
+            {/* Toggle Status Pengguna */}
+            <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-3">
+              <div>
+                <Label className="text-xs font-medium text-zinc-200">
+                  Status Akun
+                </Label>
+                <p className="text-[11px] text-zinc-400">
+                  {formData.status === "ACTIVE"
+                    ? "Akun aktif dan dapat masuk ke sistem"
+                    : "Akun non-aktif dan akses sistem ditangguhkan"}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                disabled={editUser?.username.toLowerCase() === "admin"}
+                aria-checked={formData.status === "ACTIVE"}
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: prev.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+                  }))
+                }
+                title={
+                  editUser?.username.toLowerCase() === "admin"
+                    ? "Status Administrator Utama selalu aktif"
+                    : "Ubah status akun"
+                }
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-opacity-75 ${
+                  formData.status === "ACTIVE" ? "bg-emerald-600" : "bg-zinc-700"
+                } ${
+                  editUser?.username.toLowerCase() === "admin"
+                    ? "cursor-not-allowed opacity-60"
+                    : ""
+                }`}
+              >
+                <span className="sr-only">Toggle Status</span>
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    formData.status === "ACTIVE" ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
             </div>
 
             {/* Field Password & Konfirmasi (Wajib di Add, Opsional di Edit) */}
