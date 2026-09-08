@@ -7,10 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\" && exit 0",
+    "postinstall": "prisma generate",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
+    "@prisma/client": "^6.19.3",
     "@tiptap/extension-link": "^3.31.3",
     "@tiptap/extension-placeholder": "^3.31.3",
     "@tiptap/pm": "^3.31.3",
@@ -32,6 +36,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
+    "prisma": "^6.19.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
