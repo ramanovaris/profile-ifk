@@ -480,13 +480,13 @@ export default function AdminPenggunaPage() {
                         {/* Kolom Peran */}
                         <td className="px-4 py-3.5 align-middle">
                           {isSuper ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400">
-                              <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                            <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-300">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)] shrink-0" />
                               <span>Super Admin</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-xs font-medium text-sky-400">
-                              <Shield className="h-3.5 w-3.5 shrink-0" />
+                            <span className="inline-flex items-center gap-1.5 rounded-md border border-sky-500/25 bg-sky-500/10 px-2.5 py-1 text-xs font-medium text-sky-300">
+                              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.6)] shrink-0" />
                               <span>Staff</span>
                             </span>
                           )}
