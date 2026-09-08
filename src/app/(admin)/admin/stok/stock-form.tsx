@@ -14,7 +14,6 @@ import {
   DialogTitle, 
   DialogDescription 
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 
 interface StockFormProps {
@@ -80,18 +79,22 @@ export function StockForm({ open, onOpenChange }: StockFormProps) {
           </div>
         </div>
 
-        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <Button 
-            variant="outline" 
+        <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
+          <button 
+            type="button"
             onClick={handleDownloadTemplate}
-            className="bg-transparent border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white active:scale-95"
           >
-            <Download className="mr-2 h-4 w-4" />
-            Unduh Template
-          </Button>
-          <Button onClick={handleFileInteraction} className="bg-brand-600 hover:bg-brand-700 text-white">
-            Proses File
-          </Button>
+            <Download className="h-4 w-4 text-zinc-400" />
+            <span>Unduh Template</span>
+          </button>
+          <button 
+            type="button"
+            onClick={handleFileInteraction} 
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95"
+          >
+            <span>Proses File</span>
+          </button>
         </div>
       </DialogContent>
     </Dialog>
