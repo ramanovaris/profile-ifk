@@ -70,7 +70,7 @@ export default function StokPublikPage() {
   return (
     <>
       <PageHero
-        breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Ketersediaan Obat" }]}
+        breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Stok Obat" }]}
         eyebrow="Transparansi Publik"
         title={<>Ketersediaan Stok Obat &amp; BMHP</>}
         subtitle="Informasi transparansi ketersediaan stok fisik perbekalan farmasi pada UPTD Instalasi Farmasi Kab. Kotabaru per akhir bulan."

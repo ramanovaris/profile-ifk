@@ -13,7 +13,7 @@ const navLinks = [
   { href: "/", label: "Beranda" },
   { href: "/profil", label: "Profil" },
   { href: "/layanan", label: "Layanan" },
-  { href: "/stok", label: "Ketersediaan Obat" },
+  { href: "/stok", label: "Stok Obat" },
   { href: "/berita", label: "Berita" },
   { href: "/kontak", label: "Kontak" },
 ];
@@ -26,13 +26,13 @@ export function Navbar() {
     <>
       {/* ── Floating glass pill, detached dari tepi atas ─────────────── */}
       <header className="fixed inset-x-0 top-4 z-50 px-4">
-        <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between rounded-full border border-black/5 bg-white/70 pl-5 pr-2 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+        <div className="mx-auto flex h-14 w-full max-w-4xl lg:max-w-5xl items-center justify-between rounded-full border border-black/5 bg-white/70 px-4 sm:px-5 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-xl">
           <Link
             href="/"
-            className="flex items-center gap-2 font-semibold tracking-tight text-heading"
+            className="flex shrink-0 items-center gap-2 font-semibold tracking-tight text-heading"
           >
-            <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 rounded-full" />
-            <span className="text-sm font-semibold tracking-tight">{siteConfig.shortName}</span>
+            <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 shrink-0 rounded-full" />
+            <span className="text-sm font-semibold tracking-tight whitespace-nowrap">{siteConfig.shortName}</span>
           </Link>
 
           {/* Desktop nav */}
@@ -45,7 +45,7 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "rounded-full px-4 py-1.5 text-sm transition-all duration-300 ease-luxe",
+                    "rounded-full px-3 py-1.5 text-sm transition-all duration-300 ease-luxe whitespace-nowrap",
                     isActive
                       ? "bg-black/5 font-medium text-heading"
                       : "text-muted hover:text-heading"
@@ -55,12 +55,12 @@ export function Navbar() {
                 </Link>
               );
             })}
-            <div className="ml-2 flex items-center gap-1">
+            <div className="ml-1.5 flex shrink-0 items-center gap-1">
               <Link
                 href="/admin/login"
-                className="flex items-center gap-1.5 rounded-full border border-black/5 bg-black/5 px-3.5 py-1.5 text-xs font-medium text-heading transition-colors hover:bg-black/10"
+                className="flex shrink-0 items-center gap-1.5 rounded-full border border-black/5 bg-black/5 px-3 py-1.5 text-xs font-medium text-heading transition-colors hover:bg-black/10 whitespace-nowrap"
               >
-                <LogIn className="h-3.5 w-3.5" />
+                <LogIn className="h-3.5 w-3.5 shrink-0" />
                 Masuk Admin
               </Link>
             </div>
