@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, EyeOff, Lock, LogIn, User, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,14 +13,23 @@ import { loginAction } from "@/actions/auth";
 import { Toaster, toast } from "@/components/ui/toast";
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(loginAction, null);
   const [showPassword, setShowPassword] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
-    if (state?.error) {
+    if (state?.success) {
+      setIsRedirecting(true);
+      toast.success("Berhasil masuk! Mengalihkan ke dashboard...", "Autentikasi Berhasil");
+      router.push("/admin/dashboard");
+      router.refresh();
+    } else if (state?.error) {
       toast.error(state.error, "Gagal Masuk");
     }
-  }, [state?.error]);
+  }, [state, router]);
+
+  const isLoading = isPending || isRedirecting;
 
   return (
     <div className="relative flex h-dvh w-full items-center justify-center overflow-hidden bg-zinc-950 p-4 sm:p-6">
@@ -139,13 +149,13 @@ export default function AdminLoginPage() {
             <div className="pt-1.5">
               <Button
                 type="submit"
-                disabled={isPending}
+                disabled={isLoading}
                 className="h-10 w-full rounded-xl bg-brand-600 font-semibold text-white shadow-lg shadow-brand-600/25 transition-all hover:bg-brand-500 active:scale-[0.99] disabled:opacity-70"
               >
-                {isPending ? (
+                {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Memverifikasi...
+                    {isRedirecting ? "Mengalihkan..." : "Memverifikasi..."}
                   </span>
                 ) : (
                   <>
