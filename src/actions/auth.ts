@@ -44,7 +44,7 @@ export async function loginAction(
   }
 
   await createSession(user.id);
-  redirect("/admin/dashboard");
+  return { success: true };
 }
 
 /**
