@@ -16,11 +16,9 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(loginAction, null);
   const [showPassword, setShowPassword] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     if (state?.success) {
-      setIsRedirecting(true);
       toast.success("Berhasil masuk! Mengalihkan ke dashboard...", "Autentikasi Berhasil");
       router.push("/admin/dashboard");
       router.refresh();
@@ -29,6 +27,7 @@ export default function AdminLoginPage() {
     }
   }, [state, router]);
 
+  const isRedirecting = Boolean(state?.success);
   const isLoading = isPending || isRedirecting;
 
   return (

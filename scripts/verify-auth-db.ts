@@ -1,6 +1,6 @@
 import { strict as assert } from "assert";
 import { db } from "../src/lib/db";
-import { verifyPassword, createSession, getCurrentSession, invalidateSession } from "../src/lib/auth";
+import { verifyPassword } from "../src/lib/auth";
 
 async function runTests() {
   console.log("Memulai pengujian modul autentikasi database...");

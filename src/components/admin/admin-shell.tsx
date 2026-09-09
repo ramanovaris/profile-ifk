@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard,
@@ -72,7 +72,6 @@ function SidebarLink({
 }
 
 function SidebarContent({ pathname }: { pathname: string }) {
-  const router = useRouter();
   return (
     <div className="flex h-full flex-col">
       {/* Brand Header */}
