@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useOptimistic } from "react";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -60,7 +60,16 @@ export function CategoryTable({
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const [categories, setCategories] = useState<CategoryWithCount[]>(initialCategories);
+  const [categories, setOptimisticCategories] = useOptimistic(
+    initialCategories,
+    (
+      state: CategoryWithCount[],
+      update: { id: string; status: "ACTIVE" | "INACTIVE" }
+    ) =>
+      state.map((c) =>
+        c.id === update.id ? { ...c, status: update.status } : c
+      )
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editCategory, setEditCategory] = useState<CategoryWithCount | null>(null);
@@ -78,11 +87,6 @@ export function CategoryTable({
     status: "ACTIVE",
   });
   const [error, setError] = useState<string | null>(null);
-
-  // Sinkronisasi data ketika server revalidate
-  useEffect(() => {
-    setCategories(initialCategories);
-  }, [initialCategories]);
 
   const filteredCategories = categories.filter((cat) => {
     const query = searchQuery.toLowerCase();
@@ -193,13 +197,10 @@ export function CategoryTable({
   const toggleStatus = (cat: CategoryWithCount) => {
     startTransition(async () => {
       // Optimistic update
-      setCategories((prev) =>
-        prev.map((c) =>
-          c.id === cat.id
-            ? { ...c, status: c.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" }
-            : c
-        )
-      );
+      setOptimisticCategories({
+        id: cat.id,
+        status: cat.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
+      });
 
       const res = await toggleCategoryStatusAction(cat.id);
       if (!res.success) {
