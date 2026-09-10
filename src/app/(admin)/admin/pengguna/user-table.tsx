@@ -23,6 +23,9 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  ArrowRight,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 import {
   Dialog,
@@ -103,6 +106,9 @@ export function UserTable({
 
   // Modal Hapus State
   const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  // Modal Konfirmasi Toggle Status State
+  const [toggleStatusTarget, setToggleStatusTarget] = useState<UserItem | null>(null);
 
   // Filter Pengguna
   const filteredUsers = users.filter((user) => {
@@ -255,23 +261,28 @@ export function UserTable({
   };
 
   // Handler Toggle Status Akun
-  const toggleStatus = (userId: string) => {
-    const target = users.find((u) => u.id === userId);
-    if (!target) return;
-
-    if (target.username.toLowerCase() === "admin") {
-      toast.error("Akun Administrator Utama tidak dapat dinonaktifkan.");
+  const handleOpenToggleStatus = (user: UserItem) => {
+    if (user.username.toLowerCase() === "admin") {
+      toast.error("Status Administrator Utama selalu aktif.");
       return;
     }
 
-    if (target.id === currentUserId) {
+    if (user.id === currentUserId) {
       toast.error("Anda tidak dapat menonaktifkan akun sendiri.");
       return;
     }
 
+    setToggleStatusTarget(user);
+  };
+
+  const handleConfirmToggleStatus = () => {
+    if (!toggleStatusTarget) return;
+    const target = toggleStatusTarget;
+    setToggleStatusTarget(null);
+
     startTransition(async () => {
       try {
-        const res = await toggleUserStatusAction(userId);
+        const res = await toggleUserStatusAction(target.id);
         if (!res.success || !res.data) {
           toast.error(res.error || "Gagal memperbarui status akun.");
           return;
@@ -279,7 +290,7 @@ export function UserTable({
 
         const nextStatus = res.data.status;
         setUsers((prev) =>
-          prev.map((u) => (u.id === userId ? { ...u, status: nextStatus } : u))
+          prev.map((u) => (u.id === target.id ? { ...u, status: nextStatus } : u))
         );
         toast.info(
           `Status akun "${target.name}" diubah ke ${
@@ -575,7 +586,7 @@ export function UserTable({
                       <td className="px-4 py-3.5 align-middle text-center whitespace-nowrap">
                         <button
                           type="button"
-                          onClick={() => toggleStatus(user.id)}
+                          onClick={() => handleOpenToggleStatus(user)}
                           disabled={
                             isPending ||
                             user.username.toLowerCase() === "admin" ||
@@ -1222,6 +1233,141 @@ export function UserTable({
                 </button>
               </>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Konfirmasi Toggle Status Pengguna */}
+      <Dialog
+        open={!!toggleStatusTarget}
+        onOpenChange={() => setToggleStatusTarget(null)}
+      >
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl w-[calc(100vw-2rem)] sm:w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-5 sm:p-6 overflow-hidden">
+          <DialogHeader className="space-y-2 pr-6">
+            <div className="flex items-start gap-3 min-w-0">
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+                  toggleStatusTarget?.status === "ACTIVE"
+                    ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
+                    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                }`}
+              >
+                {toggleStatusTarget?.status === "ACTIVE" ? (
+                  <UserX className="h-5 w-5" />
+                ) : (
+                  <UserCheck className="h-5 w-5" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                  {toggleStatusTarget?.status === "ACTIVE"
+                    ? "Nonaktifkan Akun Pengguna?"
+                    : "Aktifkan Akun Pengguna?"}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                  {toggleStatusTarget?.status === "ACTIVE"
+                    ? "Akses masuk akun ke sistem akan ditangguhkan sementara."
+                    : "Akun akan diaktifkan kembali dan dapat masuk ke sistem."}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          {toggleStatusTarget && (
+            <div className="space-y-3 mt-2 min-w-0 w-full">
+              {/* User Info Card */}
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
+                <div className="flex items-center gap-3 min-w-0 w-full">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-emerald-700 text-xs font-bold text-white ring-1 ring-white/10 shadow-sm">
+                    {getInitials(toggleStatusTarget.name)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-white truncate text-xs sm:text-sm">
+                      {toggleStatusTarget.name}
+                    </p>
+                    <p className="font-mono text-[11px] text-zinc-400 truncate">
+                      @{toggleStatusTarget.username} &bull;{" "}
+                      {toggleStatusTarget.role === "SUPER_ADMIN"
+                        ? "Super Admin"
+                        : "Staff"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Status Transition Indicator */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-2 text-xs w-full min-w-0">
+                  <span className="text-zinc-400 shrink-0">Perubahan Status:</span>
+                  <div className="flex items-center gap-1.5 font-medium shrink-0">
+                    <span
+                      className={
+                        toggleStatusTarget.status === "ACTIVE"
+                          ? "text-emerald-400"
+                          : "text-zinc-400"
+                      }
+                    >
+                      {toggleStatusTarget.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}
+                    </span>
+                    <ArrowRight className="h-3 w-3 text-zinc-500" />
+                    <span
+                      className={
+                        toggleStatusTarget.status === "ACTIVE"
+                          ? "text-amber-400 font-semibold"
+                          : "text-emerald-400 font-semibold"
+                      }
+                    >
+                      {toggleStatusTarget.status === "ACTIVE" ? "Non-Aktif" : "Aktif"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Explanatory Notice */}
+              <div
+                className={`rounded-lg border p-3 text-xs leading-relaxed break-words w-full ${
+                  toggleStatusTarget.status === "ACTIVE"
+                    ? "border-amber-500/20 bg-amber-500/5 text-amber-300/90"
+                    : "border-emerald-500/20 bg-emerald-500/5 text-emerald-300/90"
+                }`}
+              >
+                {toggleStatusTarget.status === "ACTIVE"
+                  ? "Akun ini tidak akan dapat login ke portal admin. Seluruh sesi login yang sedang aktif milik pengguna ini akan otomatis dicabut demi keamanan."
+                  : "Akun ini akan diaktifkan kembali dan pengguna dapat segera masuk ke portal admin menggunakan kredensial yang tersimpan."}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setToggleStatusTarget(null)}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={handleConfirmToggleStatus}
+              className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg active:scale-95 ${
+                toggleStatusTarget?.status === "ACTIVE"
+                  ? "border border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 shadow-amber-500/20 hover:brightness-110"
+                  : "border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 shadow-brand-500/20 hover:brightness-110"
+              }`}
+            >
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : toggleStatusTarget?.status === "ACTIVE" ? (
+                <UserX className="h-4 w-4" />
+              ) : (
+                <UserCheck className="h-4 w-4" />
+              )}
+              <span>
+                {toggleStatusTarget?.status === "ACTIVE"
+                  ? "Nonaktifkan Akun"
+                  : "Aktifkan Akun"}
+              </span>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
