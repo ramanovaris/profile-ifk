@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCurrentSession } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/admin-shell";
@@ -7,6 +8,10 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPenggunaPage() {
   const session = await getCurrentSession();
+
+  if (!session || session.user.role !== "SUPER_ADMIN") {
+    redirect("/admin/dashboard");
+  }
 
   const users = await db.user.findMany({
     select: {
@@ -36,10 +41,10 @@ export default async function AdminPenggunaPage() {
   }));
 
   return (
-    <AdminShell>
+    <AdminShell currentUser={session.user}>
       <UserTable
         initialUsers={initialUsers}
-        currentUserId={session?.user.id}
+        currentUserId={session.user.id}
       />
     </AdminShell>
   );

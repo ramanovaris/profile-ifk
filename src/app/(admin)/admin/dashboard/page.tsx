@@ -9,6 +9,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { getCurrentSession } from "@/lib/auth";
 import { dummyArticles, dummyUsers, dummyStats } from "@/lib/dummy-data";
 
 const statCards = [
@@ -42,9 +43,12 @@ const statCards = [
   },
 ];
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const session = await getCurrentSession();
+  const isSuperAdmin = session?.user.role === "SUPER_ADMIN";
+
   return (
-    <AdminShell>
+    <AdminShell currentUser={session?.user}>
       {/* Header section with quick action */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -183,13 +187,15 @@ export default function AdminDashboardPage() {
               Daftar pengelola akun admin portal
             </p>
           </div>
-          <Link
-            href="/admin/pengguna"
-            className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 hover:text-brand-300"
-          >
-            <span>Kelola Pengguna</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
-          </Link>
+          {isSuperAdmin && (
+            <Link
+              href="/admin/pengguna"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 hover:text-brand-300"
+            >
+              <span>Kelola Pengguna</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
