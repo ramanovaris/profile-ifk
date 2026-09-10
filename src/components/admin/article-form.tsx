@@ -537,7 +537,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
                 Klik untuk unggah foto artikel
               </p>
               <p className="mt-1 text-[11px] text-zinc-500">
-                PNG, JPG, WebP (Maks. 2MB)
+                PNG, JPG, WebP (Maks. 10MB)
               </p>
               <input
                 id="cover-image"
