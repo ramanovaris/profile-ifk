@@ -1,7 +1,23 @@
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ArticleForm } from "@/components/admin/article-form";
+import { db } from "@/lib/db";
 
-export default function AdminBeritaBaruPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AdminBeritaBaruPage() {
+  const categories = await db.category.findMany({
+    where: { status: "ACTIVE" },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      status: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
   return (
     <AdminShell>
       <div className="mx-auto max-w-4xl">
@@ -13,7 +29,7 @@ export default function AdminBeritaBaruPage() {
             Publikasikan pengumuman atau berita terbaru UPTD IFK Kotabaru.
           </p>
         </div>
-        <ArticleForm />
+        <ArticleForm categories={categories} />
       </div>
     </AdminShell>
   );
