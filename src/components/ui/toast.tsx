@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from "lucide-react";
 
 // ── Toast Types ──────────────────────────────────────────────────────────────
@@ -98,11 +98,11 @@ function ToastCard({ item }: { item: ToastItem }) {
   const cfg = variantConfig[item.variant];
   const Icon = cfg.icon;
 
-  const handleDismiss = () => {
+  const handleDismiss = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     setExiting(true);
     setTimeout(() => dismissToast(item.id), 300);
-  };
+  }, [item.id]);
 
   // mount animation
   useEffect(() => {

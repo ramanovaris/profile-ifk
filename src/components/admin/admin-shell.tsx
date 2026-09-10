@@ -156,28 +156,21 @@ export type AdminShellProps = {
 export function AdminShell({ children, currentUser }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [user, setUser] = useState<AuthUserInfo | null>(
-    currentUser
-      ? {
-          id: currentUser.id || "",
-          name: currentUser.name,
-          username: currentUser.username,
-          role: currentUser.role,
-        }
-      : null
-  );
+  const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
 
-  useEffect(() => {
-    if (!currentUser) {
-      getCurrentUserAction().then((u) => {
-        if (u) setUser(u);
-      });
-    } else {
-      setUser({
+  const user: AuthUserInfo | null = currentUser
+    ? {
         id: currentUser.id || "",
         name: currentUser.name,
         username: currentUser.username,
         role: currentUser.role,
+      }
+    : fetchedUser;
+
+  useEffect(() => {
+    if (!currentUser) {
+      getCurrentUserAction().then((u) => {
+        if (u) setFetchedUser(u);
       });
     }
   }, [currentUser]);
