@@ -79,11 +79,11 @@ export function StockForm({ open, onOpenChange }: StockFormProps) {
           </div>
         </div>
 
-        <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
+        <div className="mt-4 grid grid-cols-2 gap-3">
           <button 
             type="button"
             onClick={handleDownloadTemplate}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white active:scale-95"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer active:scale-95"
           >
             <Download className="h-4 w-4 text-zinc-400" />
             <span>Unduh Template</span>
@@ -91,7 +91,7 @@ export function StockForm({ open, onOpenChange }: StockFormProps) {
           <button 
             type="button"
             onClick={handleFileInteraction} 
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95"
           >
             <span>Proses File</span>
           </button>

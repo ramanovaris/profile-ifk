@@ -876,17 +876,17 @@ export default function AdminPenggunaPage() {
             )}
 
             {/* Tombol Aksi Modal */}
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setIsUserModalOpen(false)}
-                className="h-9 rounded-xl border border-white/10 bg-white/5 px-4 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-xs font-semibold text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95"
               >
                 <Save className="h-4 w-4" />
                 <span>Simpan Pengguna</span>
@@ -977,17 +977,17 @@ export default function AdminPenggunaPage() {
               </p>
             )}
 
-            <div className="flex items-center justify-center gap-3 pt-2">
+            <div className="mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setIsResetPasswordOpen(false)}
-                className="h-9 rounded-xl border border-white/10 bg-white/5 px-4 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 px-5 text-xs font-semibold text-white shadow-lg shadow-amber-500/20 transition-all hover:brightness-110 active:scale-95"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 px-4 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95"
               >
                 <Save className="h-4 w-4" />
                 <span>Simpan Kata Sandi</span>
@@ -1056,23 +1056,34 @@ export default function AdminPenggunaPage() {
             )}
           </div>
 
-          <div className="flex items-center justify-center gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => setDeleteId(null)}
-              className="h-9 rounded-xl border border-white/10 bg-white/5 px-4 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              Batal
-            </button>
-            <button
-              type="button"
-              disabled={isRootAdmin}
-              onClick={handleConfirmDelete}
-              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-500/30 bg-red-600 px-5 text-xs font-semibold text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-500 disabled:pointer-events-none disabled:opacity-40 active:scale-95"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span>Hapus Akun</span>
-            </button>
+          <div className={`mt-6 ${isRootAdmin ? "flex justify-end" : "grid grid-cols-2 gap-3"}`}>
+            {isRootAdmin ? (
+              <button
+                type="button"
+                onClick={() => setDeleteId(null)}
+                className="inline-flex h-10 w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              >
+                Tutup / Mengerti
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setDeleteId(null)}
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  <span>Hapus Akun</span>
+                </button>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
