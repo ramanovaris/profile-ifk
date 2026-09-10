@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,29 +10,53 @@ import {
   Check,
   Globe,
   FileText,
-  Sparkles,
   Tag,
   ImageIcon,
   Type,
   Search,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import type { Article, ArticleCategory } from "@/lib/dummy-data";
-import { initialCategories, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
+import { createArticleAction, updateArticleAction } from "@/actions/article";
 
-export function ArticleForm({ article }: { article?: Article }) {
+export interface FormCategoryOption {
+  id: string;
+  name: string;
+  slug?: string;
+  status?: string;
+}
+
+export interface FormArticleData {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  coverImage: string | null;
+  isPublished: boolean;
+  categoryId: string;
+}
+
+interface ArticleFormProps {
+  article?: FormArticleData;
+  categories: FormCategoryOption[];
+}
+
+export function ArticleForm({ article, categories }: ArticleFormProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const [title, setTitle] = useState(article?.title ?? "");
-  const [category, setCategory] = useState<Article["category"]>(
-    article?.category ?? ARTICLE_CATEGORIES[0]
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
+    article?.categoryId ?? categories[0]?.id ?? ""
   );
   const [content, setContent] = useState(article?.content ?? "");
-  const [isPublished, setIsPublished] = useState(article?.isPublished ?? false);
+  const [isPublished, setIsPublished] = useState(article?.isPublished ?? true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
   // Combobox State
@@ -43,9 +67,9 @@ export function ArticleForm({ article }: { article?: Article }) {
   const optionsRef = useRef<HTMLDivElement>(null);
   const triggerButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Filter kategori yang hanya ACTIVE
-  const activeCategories = initialCategories.filter(
-    (cat) => cat.status === "ACTIVE"
+  // Filter kategori aktif
+  const activeCategories = categories.filter(
+    (cat) => !cat.status || cat.status === "ACTIVE"
   );
 
   const filteredCategories = activeCategories.filter((cat) =>
@@ -53,7 +77,7 @@ export function ArticleForm({ article }: { article?: Article }) {
   );
 
   const selectedCategoryData = activeCategories.find(
-    (cat) => cat.name === category
+    (cat) => cat.id === selectedCategoryId
   );
 
   useEffect(() => {
@@ -81,13 +105,15 @@ export function ArticleForm({ article }: { article?: Article }) {
   // Sync scroll to active item
   useEffect(() => {
     if (safeActiveIndex >= 0 && optionsRef.current) {
-      const activeEl = optionsRef.current.children[safeActiveIndex] as HTMLElement | undefined;
+      const activeEl = optionsRef.current.children[safeActiveIndex] as
+        | HTMLElement
+        | undefined;
       activeEl?.scrollIntoView({ block: "nearest" });
     }
   }, [safeActiveIndex]);
 
-  const selectCategory = (catName: string) => {
-    setCategory(catName as ArticleCategory);
+  const selectCategory = (catId: string) => {
+    setSelectedCategoryId(catId);
     setIsComboboxOpen(false);
     setComboboxSearch("");
     setActiveIndex(-1);
@@ -101,27 +127,97 @@ export function ArticleForm({ article }: { article?: Article }) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!content || content.trim() === "" || content === "<p></p>") {
-      toast.error("Isi konten artikel wajib diisi.");
-      return;
-    }
-    toast.success(
-      article
-        ? "Artikel berhasil diperbarui."
-        : "Artikel berhasil disimpan."
-    );
-    router.push("/admin/berita");
-  }
-
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
+        toast.error("Format berkas harus berupa JPG, PNG, atau WebP.");
+        e.target.value = "";
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(
+          `Ukuran foto maksimal 10MB. Foto yang dipilih berukuran ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+        );
+        e.target.value = "";
+        return;
+      }
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (ev) => setPreview(ev.target?.result as string);
       reader.readAsDataURL(file);
     }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim() || title.trim().length < 3) {
+      toast.error("Judul artikel minimal 3 karakter.");
+      return;
+    }
+
+    if (!selectedCategoryId) {
+      toast.error("Kategori artikel wajib dipilih.");
+      return;
+    }
+
+    if (!content || content.trim() === "" || content === "<p></p>") {
+      toast.error("Isi konten artikel wajib diisi.");
+      return;
+    }
+
+    if (selectedFile && selectedFile.size > 10 * 1024 * 1024) {
+      toast.error("Ukuran foto maksimal 10MB.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", title.trim());
+    formData.append("categoryId", selectedCategoryId);
+    formData.append("content", content);
+    formData.append("isPublished", isPublished ? "true" : "false");
+
+    if (selectedFile) {
+      formData.append("coverImage", selectedFile);
+    } else if (article?.coverImage) {
+      formData.append("existingCoverImage", article.coverImage);
+    }
+
+    startTransition(async () => {
+      try {
+        const res = article
+          ? await updateArticleAction(article.id, formData)
+          : await createArticleAction(formData);
+
+        if (res.success) {
+          toast.success(
+            article
+              ? "Artikel berhasil diperbarui."
+              : "Artikel berhasil disimpan dan dipublikasikan."
+          );
+          router.push("/admin/berita/");
+        } else {
+          toast.error(res.error || "Gagal menyimpan artikel.");
+        }
+      } catch (err: unknown) {
+        console.error("[ArticleForm] Gagal menyimpan artikel:", err);
+        const errMsg = err instanceof Error ? err.message : "";
+        if (
+          errMsg.includes("Entity Too Large") ||
+          errMsg.includes("413") ||
+          errMsg.includes("bodySizeLimit") ||
+          errMsg.includes("exceeded")
+        ) {
+          toast.error(
+            "Ukuran berkas melebihi batas maksimal server. Silakan gunakan foto yang lebih kecil (maksimal 10MB)."
+          );
+        } else {
+          toast.error(
+            "Gagal menghubungi server. Pastikan koneksi stabil atau coba gunakan foto berukuran lebih kecil."
+          );
+        }
+      }
+    });
   }
 
   return (
@@ -129,7 +225,7 @@ export function ArticleForm({ article }: { article?: Article }) {
       {/* Top action / back link */}
       <div className="pb-2">
         <Link
-          href="/admin/berita"
+          href="/admin/berita/"
           className="inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-400 backdrop-blur-md transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -141,7 +237,10 @@ export function ArticleForm({ article }: { article?: Article }) {
       <div className="rounded-2xl border border-white/5 bg-zinc-900/60 p-6 backdrop-blur-xl shadow-xl sm:p-8 space-y-6">
         {/* Judul Artikel & Slug */}
         <div className="space-y-2">
-          <Label htmlFor="title" className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
+          <Label
+            htmlFor="title"
+            className="text-sm font-medium text-zinc-200 flex items-center gap-1.5"
+          >
             <Type className="h-3.5 w-3.5 text-brand-400" />
             <span>Judul Artikel</span> <span className="text-red-400">*</span>
           </Label>
@@ -154,8 +253,16 @@ export function ArticleForm({ article }: { article?: Article }) {
               if (e.key === "Enter") {
                 e.preventDefault();
                 setIsComboboxOpen(true);
-                const idx = filteredCategories.findIndex((c) => c.name === category);
-                setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+                const idx = filteredCategories.findIndex(
+                  (c) => c.id === selectedCategoryId
+                );
+                setActiveIndex(
+                  idx >= 0
+                    ? idx
+                    : filteredCategories.length > 0
+                    ? 0
+                    : -1
+                );
               } else if (e.key === "ArrowDown") {
                 e.preventDefault();
                 triggerButtonRef.current?.focus();
@@ -181,7 +288,7 @@ export function ArticleForm({ article }: { article?: Article }) {
           <div className="space-y-2">
             <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
               <Tag className="h-3.5 w-3.5 text-brand-400" />
-              <span>Kategori</span>
+              <span>Kategori</span> <span className="text-red-400">*</span>
             </Label>
             <div ref={comboboxRef} className="relative">
               <button
@@ -194,17 +301,37 @@ export function ArticleForm({ article }: { article?: Article }) {
                     setActiveIndex(-1);
                   } else {
                     setIsComboboxOpen(true);
-                    const idx = filteredCategories.findIndex((cat) => cat.name === category);
-                    setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+                    const idx = filteredCategories.findIndex(
+                      (cat) => cat.id === selectedCategoryId
+                    );
+                    setActiveIndex(
+                      idx >= 0
+                        ? idx
+                        : filteredCategories.length > 0
+                        ? 0
+                        : -1
+                    );
                   }
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+                  if (
+                    e.key === "ArrowDown" ||
+                    e.key === "Enter" ||
+                    e.key === " "
+                  ) {
                     e.preventDefault();
                     if (!isComboboxOpen) {
                       setIsComboboxOpen(true);
-                      const idx = filteredCategories.findIndex((cat) => cat.name === category);
-                      setActiveIndex(idx >= 0 ? idx : (filteredCategories.length > 0 ? 0 : -1));
+                      const idx = filteredCategories.findIndex(
+                        (cat) => cat.id === selectedCategoryId
+                      );
+                      setActiveIndex(
+                        idx >= 0
+                          ? idx
+                          : filteredCategories.length > 0
+                          ? 0
+                          : -1
+                      );
                     }
                   } else if (e.key === "ArrowUp") {
                     e.preventDefault();
@@ -222,7 +349,9 @@ export function ArticleForm({ article }: { article?: Article }) {
               >
                 <div className="flex items-center gap-2">
                   {selectedCategoryData ? (
-                    <span className="text-white">{selectedCategoryData.name}</span>
+                    <span className="text-white">
+                      {selectedCategoryData.name}
+                    </span>
                   ) : (
                     <span className="text-zinc-500">Pilih kategori...</span>
                   )}
@@ -253,72 +382,90 @@ export function ArticleForm({ article }: { article?: Article }) {
                           if (e.key === "ArrowDown") {
                             e.preventDefault();
                             if (filteredCategories.length > 0) {
-                              setActiveIndex((prev) => (prev < filteredCategories.length - 1 ? prev + 1 : 0));
+                              setActiveIndex((prev) =>
+                                prev < filteredCategories.length - 1
+                                  ? prev + 1
+                                  : 0
+                              );
                             }
                           } else if (e.key === "ArrowUp") {
                             e.preventDefault();
                             if (filteredCategories.length > 0) {
-                              setActiveIndex((prev) => (prev > 0 ? prev - 1 : filteredCategories.length - 1));
+                              setActiveIndex((prev) =>
+                                prev > 0
+                                  ? prev - 1
+                                  : filteredCategories.length - 1
+                              );
                             }
                           } else if (e.key === "Enter") {
                             e.preventDefault();
-                            if (safeActiveIndex >= 0 && safeActiveIndex < filteredCategories.length) {
-                              selectCategory(filteredCategories[safeActiveIndex].name);
+                            if (
+                              safeActiveIndex >= 0 &&
+                              safeActiveIndex < filteredCategories.length
+                            ) {
+                              selectCategory(
+                                filteredCategories[safeActiveIndex].id
+                              );
                             }
                           } else if (e.key === "Tab") {
-                            if (safeActiveIndex >= 0 && safeActiveIndex < filteredCategories.length) {
-                              e.preventDefault();
-                              selectCategory(filteredCategories[safeActiveIndex].name);
+                            if (
+                              safeActiveIndex >= 0 &&
+                              safeActiveIndex < filteredCategories.length
+                            ) {
+                              selectCategory(
+                                filteredCategories[safeActiveIndex].id
+                              );
+                            } else {
+                              setIsComboboxOpen(false);
                             }
                           } else if (e.key === "Escape") {
                             e.preventDefault();
                             setIsComboboxOpen(false);
-                            setComboboxSearch("");
-                            setActiveIndex(-1);
                             triggerButtonRef.current?.focus();
                           }
                         }}
-                        className="w-full rounded-lg border border-white/5 bg-white/[0.03] py-1.5 pl-8 pr-3 text-sm text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+                        className="w-full rounded-lg border border-white/10 bg-zinc-900/80 py-1.5 pl-8 pr-3 text-xs text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
                         autoFocus
                       />
                     </div>
                   </div>
 
                   {/* Options List */}
-                  <div ref={optionsRef} role="listbox" className="max-h-48 overflow-y-auto p-1.5">
+                  <div
+                    ref={optionsRef}
+                    role="listbox"
+                    className="max-h-48 overflow-y-auto p-1.5 focus:outline-none"
+                  >
                     {filteredCategories.length === 0 ? (
-                      <div className="py-4 text-center text-xs text-zinc-400">
-                        Tidak ada kategori ditemukan.
+                      <div className="p-3 text-center text-xs text-zinc-500">
+                        Tidak ada kategori yang cocok.
                       </div>
                     ) : (
                       filteredCategories.map((cat, idx) => {
-                        const isSelected = category === cat.name;
-                        const isActive = safeActiveIndex === idx;
+                        const isSelected = selectedCategoryId === cat.id;
+                        const isHighlighted = safeActiveIndex === idx;
 
                         return (
-                          <button
+                          <div
                             key={cat.id}
-                            type="button"
                             role="option"
                             aria-selected={isSelected}
+                            onClick={() => selectCategory(cat.id)}
                             onMouseEnter={() => setActiveIndex(idx)}
-                            onClick={() => selectCategory(cat.name)}
                             className={cn(
-                              "flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors text-left",
-                              isActive
-                                ? isSelected
-                                  ? "bg-brand-500/20 text-brand-200 font-medium"
-                                  : "bg-white/10 text-white"
+                              "flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors",
+                              isHighlighted
+                                ? "bg-brand-500/20 text-white"
                                 : isSelected
-                                ? "bg-brand-500/10 text-brand-300 font-medium"
-                                : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                                ? "bg-white/5 text-brand-300"
+                                : "text-zinc-300 hover:bg-white/5"
                             )}
                           >
-                            <span>{cat.name}</span>
+                            <span className="font-medium">{cat.name}</span>
                             {isSelected && (
-                              <Check className="h-4 w-4 text-brand-400" />
+                              <Check className="h-3.5 w-3.5 text-brand-400" />
                             )}
-                          </button>
+                          </div>
                         );
                       })
                     )}
@@ -328,20 +475,24 @@ export function ArticleForm({ article }: { article?: Article }) {
             </div>
           </div>
 
-          {/* Publikasi Switch Box */}
+          {/* Status Publikasi Switch Button */}
           <div className="space-y-2">
-            <Label htmlFor="status-publikasi" className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-brand-400" />
-              <span>Status Publikasi</span>
+            <Label
+              htmlFor="status-publikasi"
+              className="text-sm font-medium text-zinc-200"
+            >
+              Status Publikasi
             </Label>
             <button
               id="status-publikasi"
               type="button"
               onClick={() => setIsPublished(!isPublished)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === "ArrowDown") {
+                if (e.key === "ArrowDown") {
                   e.preventDefault();
-                  document.getElementById("cover-image")?.focus();
+                  const editorEl =
+                    document.querySelector<HTMLElement>(".ProseMirror");
+                  editorEl?.focus();
                 } else if (e.key === "ArrowUp") {
                   e.preventDefault();
                   triggerButtonRef.current?.focus();
@@ -388,17 +539,19 @@ export function ArticleForm({ article }: { article?: Article }) {
                 Klik untuk unggah foto artikel
               </p>
               <p className="mt-1 text-[11px] text-zinc-500">
-                PNG, JPG, WebP (Maks. 2MB)
+                PNG, JPG, WebP (Maks. 10MB)
               </p>
               <input
                 id="cover-image"
                 type="file"
                 accept="image/*"
+                tabIndex={-1}
                 onChange={handleFileChange}
                 onKeyDown={(e) => {
                   if (e.key === "ArrowDown") {
                     e.preventDefault();
-                    const editorEl = document.querySelector<HTMLElement>(".ProseMirror");
+                    const editorEl =
+                      document.querySelector<HTMLElement>(".ProseMirror");
                     editorEl?.focus();
                   } else if (e.key === "ArrowUp") {
                     e.preventDefault();
@@ -413,7 +566,7 @@ export function ArticleForm({ article }: { article?: Article }) {
             <div className="relative h-36 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950/80">
               {preview || article?.coverImage ? (
                 <Image
-                  src={preview ?? article?.coverImage ?? ""}
+                  src={preview ?? getAssetUrl(article?.coverImage)}
                   alt="Preview Sampul"
                   fill
                   unoptimized
@@ -460,14 +613,23 @@ export function ArticleForm({ article }: { article?: Article }) {
         <div className="flex items-center gap-3 pt-4 border-t border-white/5">
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+            disabled={isPending}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
           >
-            {article ? "Simpan Perubahan" : "Publikasikan Artikel"}
+            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+            <span>
+              {isPending
+                ? "Menyimpan..."
+                : article
+                ? "Simpan Perubahan"
+                : "Publikasikan Artikel"}
+            </span>
           </button>
           <button
             type="button"
-            onClick={() => router.push("/admin/berita")}
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+            disabled={isPending}
+            onClick={() => router.push("/admin/berita/")}
+            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
           >
             Batal
           </button>
