@@ -479,12 +479,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             </div>
           )}
 
-          <div className="mt-6 flex items-center justify-end gap-2.5">
+          <div className="mt-6 grid grid-cols-2 gap-3">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setToggleArticle(null)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
@@ -498,10 +498,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   handleTogglePublish(target);
                 }
               }}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg ${
+              className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg ${
                 toggleArticle?.isPublished
-                  ? "border border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 shadow-amber-500/20 hover:brightness-110"
-                  : "border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 shadow-brand-500/20 hover:brightness-110"
+                  ? "border border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 shadow-amber-500/20 hover:brightness-110 active:scale-95"
+                  : "border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 shadow-brand-500/20 hover:brightness-110 active:scale-95"
               }`}
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -568,12 +568,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             </div>
           )}
 
-          <div className="mt-6 flex items-center justify-end gap-2.5">
+          <div className="mt-6 grid grid-cols-2 gap-3">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setDeleteId(null)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
@@ -581,7 +581,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               type="button"
               disabled={isPending}
               onClick={handleDelete}
-              className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer active:scale-95"
             >
               {isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
