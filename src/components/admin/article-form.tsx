@@ -490,7 +490,9 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
               onKeyDown={(e) => {
                 if (e.key === "ArrowDown") {
                   e.preventDefault();
-                  document.getElementById("cover-image")?.focus();
+                  const editorEl =
+                    document.querySelector<HTMLElement>(".ProseMirror");
+                  editorEl?.focus();
                 } else if (e.key === "ArrowUp") {
                   e.preventDefault();
                   triggerButtonRef.current?.focus();
@@ -543,6 +545,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
                 id="cover-image"
                 type="file"
                 accept="image/*"
+                tabIndex={-1}
                 onChange={handleFileChange}
                 onKeyDown={(e) => {
                   if (e.key === "ArrowDown") {
