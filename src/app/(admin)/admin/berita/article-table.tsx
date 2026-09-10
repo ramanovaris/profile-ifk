@@ -23,7 +23,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
 import {
@@ -480,12 +479,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             </div>
           )}
 
-          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 w-full min-w-0">
+          <div className="mt-6 flex items-center justify-end gap-2.5">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setToggleArticle(null)}
-              className="w-full sm:w-auto rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 sm:py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer text-center"
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
@@ -499,10 +498,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   handleTogglePublish(target);
                 }
               }}
-              className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-lg border px-4 py-2.5 sm:py-2 text-sm font-medium text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg text-center ${
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg ${
                 toggleArticle?.isPublished
-                  ? "border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 shadow-amber-500/20 hover:brightness-110"
-                  : "border-emerald-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 shadow-brand-500/20 hover:brightness-110"
+                  ? "border border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 shadow-amber-500/20 hover:brightness-110"
+                  : "border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 shadow-brand-500/20 hover:brightness-110"
               }`}
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -510,7 +509,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 {toggleArticle?.isPublished ? "Ubah ke Draft" : "Terbitkan Artikel"}
               </span>
             </button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -537,36 +536,29 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             <div className="space-y-3 mt-2 min-w-0 w-full">
               <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
                 <div className="flex items-start gap-3 min-w-0 w-full">
-                  <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950 mt-0.5">
+                  <div className="relative h-12 w-16 shrink-0 rounded-lg overflow-hidden border border-white/10 bg-zinc-900">
                     {articleToDelete.coverImage ? (
                       <Image
                         src={getAssetUrl(articleToDelete.coverImage)}
                         alt={articleToDelete.title}
                         fill
-                        unoptimized
                         className="object-cover"
+                        unoptimized
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-[10px] text-zinc-500 font-mono">
-                        IFK
+                      <div className="h-full w-full flex items-center justify-center text-zinc-600">
+                        <Newspaper className="h-5 w-5" />
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-sm font-medium text-zinc-200 leading-snug break-words">
+                    <p className="text-xs font-semibold text-zinc-200 line-clamp-2 leading-tight break-words">
                       {articleToDelete.title}
                     </p>
-                    <p className="truncate text-xs text-zinc-400 mt-0.5 block">
+                    <p className="text-[11px] text-zinc-500 font-mono mt-1 truncate">
                       /{articleToDelete.slug}
                     </p>
                   </div>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-white/5 pt-2 text-xs text-zinc-400 w-full">
-                  <span>Kategori:</span>
-                  <span className="text-zinc-200 font-medium">
-                    {articleToDelete.category.name}
-                  </span>
                 </div>
               </div>
 
@@ -576,12 +568,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             </div>
           )}
 
-          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 w-full min-w-0">
+          <div className="mt-6 flex items-center justify-end gap-2.5">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setDeleteId(null)}
-              className="w-full sm:w-auto rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 sm:py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer text-center"
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
@@ -589,12 +581,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               type="button"
               disabled={isPending}
               onClick={handleDelete}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2.5 sm:py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer text-center"
+              className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
             >
-              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
               <span>Hapus Artikel</span>
             </button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </>
