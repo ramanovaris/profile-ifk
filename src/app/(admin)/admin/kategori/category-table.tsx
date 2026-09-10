@@ -556,19 +556,19 @@ export function CategoryTable({
               </button>
             </div>
 
-            <div className="mt-6 flex items-center justify-center gap-3">
+            <div className="mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
                 disabled={isSubmitting}
                 onClick={() => setIsModalOpen(false)}
-                className="rounded-lg border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 disabled:opacity-50"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer active:scale-95"
               >
                 {isSubmitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -663,12 +663,12 @@ export function CategoryTable({
             </div>
           )}
 
-          <div className="mt-6 flex items-center justify-center gap-3">
+          <div className={`mt-6 ${catArticleCount > 0 ? "flex justify-end" : "grid grid-cols-2 gap-3"}`}>
             {catArticleCount > 0 ? (
               <button
                 type="button"
                 onClick={() => setDeleteId(null)}
-                className="rounded-lg border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+                className="inline-flex h-10 w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
               >
                 Tutup / Mengerti
               </button>
@@ -678,7 +678,7 @@ export function CategoryTable({
                   type="button"
                   disabled={isDeleting}
                   onClick={() => setDeleteId(null)}
-                  className="rounded-lg border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
                 >
                   Batal
                 </button>
@@ -686,7 +686,7 @@ export function CategoryTable({
                   type="button"
                   disabled={isDeleting}
                   onClick={handleDelete}
-                  className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-600 px-5 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 transition-all hover:bg-red-500 disabled:opacity-50"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer active:scale-95"
                 >
                   {isDeleting ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
