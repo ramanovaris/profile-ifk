@@ -31,6 +31,45 @@ async function main() {
     console.log(`[Seed] Akun Super Admin '${username}' sudah ada.`);
   }
 
+  // 1b. Akun Staf Operasional Awal
+  const defaultStaff = [
+    {
+      username: "staff1",
+      password: "StaffIFK2026!",
+      name: "Siti Nurhaliza, S.Farm",
+      role: Role.STAFF,
+      status: UserStatus.ACTIVE,
+    },
+    {
+      username: "staff2",
+      password: "StaffIFK2026!",
+      name: "Ahmad Rizky, S.Farm",
+      role: Role.STAFF,
+      status: UserStatus.ACTIVE,
+    },
+  ];
+
+  for (const staff of defaultStaff) {
+    const existing = await prisma.user.findUnique({
+      where: { username: staff.username },
+    });
+    if (!existing) {
+      const hashedStaffPassword = await bcrypt.hash(staff.password, 10);
+      await prisma.user.create({
+        data: {
+          username: staff.username,
+          password: hashedStaffPassword,
+          name: staff.name,
+          role: staff.role,
+          status: staff.status,
+        },
+      });
+      console.log(`[Seed] Akun Staf '${staff.username}' berhasil dibuat.`);
+    } else {
+      console.log(`[Seed] Akun Staf '${staff.username}' sudah ada.`);
+    }
+  }
+
   // 2. Kategori Berita Default
   const defaultCategories = [
     { name: "Kegiatan", slug: "kegiatan" },
