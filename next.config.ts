@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   trailingSlash: !!basePath,
   output: "standalone",
   turbopack: undefined,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "15mb",
+    },
+  },
   allowedDevOrigins: ["43.129.57.214", "localhost", "127.0.0.1"],
   images: {
     unoptimized: !!basePath,

@@ -25,7 +25,7 @@ export type ArticleInput = {
 };
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 /**
  * Menyimpan file gambar sampul secara lokal di direktori public/uploads/articles/
@@ -36,7 +36,7 @@ async function saveUploadedCoverImage(file: File): Promise<string> {
   }
 
   if (file.size > MAX_IMAGE_SIZE) {
-    throw new Error("Ukuran gambar maksimal 2MB.");
+    throw new Error("Ukuran gambar maksimal 10MB.");
   }
 
   const uploadDir = path.join(process.cwd(), "public", "uploads", "articles");

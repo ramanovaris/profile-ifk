@@ -130,6 +130,18 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
+      if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
+        toast.error("Format berkas harus berupa JPG, PNG, atau WebP.");
+        e.target.value = "";
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(
+          `Ukuran foto maksimal 10MB. Foto yang dipilih berukuran ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+        );
+        e.target.value = "";
+        return;
+      }
       setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (ev) => setPreview(ev.target?.result as string);
@@ -151,6 +163,11 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
 
     if (!content || content.trim() === "" || content === "<p></p>") {
       toast.error("Isi konten artikel wajib diisi.");
+      return;
+    }
+
+    if (selectedFile && selectedFile.size > 10 * 1024 * 1024) {
+      toast.error("Ukuran foto maksimal 10MB.");
       return;
     }
 
