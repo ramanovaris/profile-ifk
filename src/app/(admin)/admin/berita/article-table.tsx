@@ -12,6 +12,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  AlertTriangle,
+  Globe,
+  EyeOff,
+  ArrowRight,
 } from "lucide-react";
 import {
   Dialog,
@@ -123,6 +127,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
       }
     });
   };
+
+  const articleToDelete = optimisticArticles.find((a) => a.id === deleteId);
 
   return (
     <>
@@ -373,23 +379,113 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
       {/* Dialog Konfirmasi Toggle Status Publikasi */}
       <Dialog open={!!toggleArticle} onOpenChange={() => setToggleArticle(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-white">
-              {toggleArticle?.isPublished ? "Jadikan Draft?" : "Terbitkan Artikel?"}
-            </DialogTitle>
-            <DialogDescription className="text-sm text-zinc-400">
-              {toggleArticle?.isPublished
-                ? `Artikel "${toggleArticle.title}" akan diubah statusnya menjadi draft dan tidak akan ditampilkan pada halaman publik.`
-                : `Artikel "${toggleArticle?.title}" akan segera dipublikasikan dan dapat dibaca oleh masyarakat umum.`}
-            </DialogDescription>
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
+                  toggleArticle?.isPublished
+                    ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
+                    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                }`}
+              >
+                {toggleArticle?.isPublished ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Globe className="h-5 w-5" />
+                )}
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                  {toggleArticle?.isPublished ? "Jadikan Draft?" : "Terbitkan Artikel?"}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                  {toggleArticle?.isPublished
+                    ? "Artikel akan disembunyikan dari akses publik."
+                    : "Artikel akan segera dapat diakses oleh masyarakat umum."}
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
+
+          {toggleArticle && (
+            <div className="space-y-3 mt-2">
+              {/* Article Preview Card */}
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-10 w-12 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+                    {toggleArticle.coverImage ? (
+                      <Image
+                        src={getAssetUrl(toggleArticle.coverImage)}
+                        alt={toggleArticle.title}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-zinc-500 font-mono">
+                        IFK
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-zinc-200">
+                      {toggleArticle.title}
+                    </p>
+                    <p className="truncate text-xs text-zinc-400">
+                      /{toggleArticle.slug}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Status Transition Indicator */}
+                <div className="flex items-center justify-between border-t border-white/5 pt-2 text-xs">
+                  <span className="text-zinc-400">Perubahan Status:</span>
+                  <div className="flex items-center gap-1.5 font-medium">
+                    <span
+                      className={
+                        toggleArticle.isPublished
+                          ? "text-emerald-400"
+                          : "text-amber-400"
+                      }
+                    >
+                      {toggleArticle.isPublished ? "Terbit" : "Draft"}
+                    </span>
+                    <ArrowRight className="h-3 w-3 text-zinc-500" />
+                    <span
+                      className={
+                        toggleArticle.isPublished
+                          ? "text-amber-400 font-semibold"
+                          : "text-emerald-400 font-semibold"
+                      }
+                    >
+                      {toggleArticle.isPublished ? "Draft" : "Terbit"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Change Explanatory Notice */}
+              <div
+                className={`rounded-lg border p-3 text-xs leading-relaxed ${
+                  toggleArticle.isPublished
+                    ? "border-amber-500/20 bg-amber-500/5 text-amber-300/90"
+                    : "border-emerald-500/20 bg-emerald-500/5 text-emerald-300/90"
+                }`}
+              >
+                {toggleArticle.isPublished
+                  ? "Artikel ini tidak akan tampil di portal publik, namun tetap aman tersimpan di basis data dan dapat diedit kapan saja."
+                  : "Artikel ini akan langsung dipublikasikan dan dapat dibaca oleh pengunjung portal resmi UPTD IFK Kotabaru."}
+              </div>
+            </div>
+          )}
+
           <DialogFooter className="mt-4 flex gap-2">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setToggleArticle(null)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
@@ -403,10 +499,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   handleTogglePublish(target);
                 }
               }}
-              className={`inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50 ${
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg ${
                 toggleArticle?.isPublished
-                  ? "border-amber-500/30 bg-amber-600/80 hover:bg-amber-600"
-                  : "border-emerald-500/30 bg-emerald-600/80 hover:bg-emerald-600"
+                  ? "border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 shadow-amber-500/20 hover:brightness-110"
+                  : "border-emerald-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 shadow-brand-500/20 hover:brightness-110"
               }`}
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -420,22 +516,72 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
       {/* Dialog Konfirmasi Hapus Dark Theme */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-white">
-              Hapus Artikel?
-            </DialogTitle>
-            <DialogDescription className="text-sm text-zinc-400">
-              Apakah Anda yakin ingin menghapus artikel ini? Data artikel akan
-              dihapus dari database beserta berkas gambar sampulnya, dan tindakan ini tidak dapat dibatalkan.
-            </DialogDescription>
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                  Hapus Artikel?
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                  Tindakan ini permanen dan tidak dapat dibatalkan.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
+
+          {articleToDelete && (
+            <div className="space-y-3 mt-2">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-10 w-12 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+                    {articleToDelete.coverImage ? (
+                      <Image
+                        src={getAssetUrl(articleToDelete.coverImage)}
+                        alt={articleToDelete.title}
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-zinc-500 font-mono">
+                        IFK
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-zinc-200">
+                      {articleToDelete.title}
+                    </p>
+                    <p className="truncate text-xs text-zinc-400">
+                      /{articleToDelete.slug}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-white/5 pt-2 text-xs text-zinc-400">
+                  <span>Kategori:</span>
+                  <span className="text-zinc-200 font-medium">
+                    {articleToDelete.category.name}
+                  </span>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs leading-relaxed text-red-300/90">
+                Record artikel ini di basis data dan berkas gambar sampul terkait pada penyimpanan server akan dihapus secara permanen.
+              </div>
+            </div>
+          )}
+
           <DialogFooter className="mt-4 flex gap-2">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setDeleteId(null)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
@@ -443,7 +589,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               type="button"
               disabled={isPending}
               onClick={handleDelete}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-600/80 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               <span>Hapus Artikel</span>
