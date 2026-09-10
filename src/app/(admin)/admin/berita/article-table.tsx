@@ -30,6 +30,7 @@ import {
   toggleArticlePublishAction,
   deleteArticleAction,
 } from "@/actions/article";
+import { getAssetUrl } from "@/lib/utils";
 
 export interface ArticleItem {
   id: string;
@@ -209,13 +210,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                         <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950">
                           {article.coverImage ? (
                             <Image
-                              src={article.coverImage}
+                              src={getAssetUrl(article.coverImage)}
                               alt={article.title}
                               fill
-                              unoptimized={
-                                article.coverImage.startsWith("http") ||
-                                article.coverImage.startsWith("/uploads/")
-                              }
+                              unoptimized
                               className="object-cover"
                             />
                           ) : (

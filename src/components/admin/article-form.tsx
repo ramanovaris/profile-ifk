@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { createArticleAction, updateArticleAction } from "@/actions/article";
 
@@ -527,7 +527,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
             <div className="relative h-36 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950/80">
               {preview || article?.coverImage ? (
                 <Image
-                  src={preview ?? article?.coverImage ?? ""}
+                  src={preview ?? getAssetUrl(article?.coverImage)}
                   alt="Preview Sampul"
                   fill
                   unoptimized
