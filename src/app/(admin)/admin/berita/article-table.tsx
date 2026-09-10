@@ -143,7 +143,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         </div>
         <div>
           <Link
-            href="/admin/berita/baru"
+            href="/admin/berita/baru/"
             className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
           >
             <Plus className="h-4 w-4" />
@@ -281,7 +281,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex items-center gap-1">
                         <Link
-                          href={`/admin/berita/${article.id}/edit`}
+                          href={`/admin/berita/${article.id}/edit/`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
                           title="Edit Artikel"
                         >

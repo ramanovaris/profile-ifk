@@ -57,7 +57,7 @@ export default function AdminDashboardPage() {
         </div>
         <div>
           <Link
-            href="/admin/berita/baru"
+            href="/admin/berita/baru/"
             className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
           >
             <Plus className="h-4 w-4" />

@@ -177,7 +177,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
             ? "Artikel berhasil diperbarui."
             : "Artikel berhasil disimpan dan dipublikasikan."
         );
-        router.push("/admin/berita");
+        router.push("/admin/berita/");
       } else {
         toast.error(res.error || "Gagal menyimpan artikel.");
       }
@@ -189,7 +189,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
       {/* Top action / back link */}
       <div className="pb-2">
         <Link
-          href="/admin/berita"
+          href="/admin/berita/"
           className="inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-400 backdrop-blur-md transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
@@ -589,7 +589,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
           <button
             type="button"
             disabled={isPending}
-            onClick={() => router.push("/admin/berita")}
+            onClick={() => router.push("/admin/berita/")}
             className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
           >
             Batal
