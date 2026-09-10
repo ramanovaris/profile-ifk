@@ -379,9 +379,9 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
       {/* Dialog Konfirmasi Toggle Status Publikasi */}
       <Dialog open={!!toggleArticle} onOpenChange={() => setToggleArticle(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-3">
-            <div className="flex items-center gap-3">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl w-[calc(100vw-2rem)] sm:w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-5 sm:p-6 overflow-hidden">
+          <DialogHeader className="space-y-2 pr-6">
+            <div className="flex items-start gap-3 min-w-0">
               <div
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
                   toggleArticle?.isPublished
@@ -395,11 +395,11 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   <Globe className="h-5 w-5" />
                 )}
               </div>
-              <div>
-                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
                   {toggleArticle?.isPublished ? "Jadikan Draft?" : "Terbitkan Artikel?"}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                <DialogDescription className="text-xs text-zinc-400 mt-1 leading-relaxed">
                   {toggleArticle?.isPublished
                     ? "Artikel akan disembunyikan dari akses publik."
                     : "Artikel akan segera dapat diakses oleh masyarakat umum."}
@@ -409,11 +409,11 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
           </DialogHeader>
 
           {toggleArticle && (
-            <div className="space-y-3 mt-2">
+            <div className="space-y-3 mt-2 min-w-0 w-full">
               {/* Article Preview Card */}
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-10 w-12 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
+                <div className="flex items-start gap-3 min-w-0 w-full">
+                  <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950 mt-0.5">
                     {toggleArticle.coverImage ? (
                       <Image
                         src={getAssetUrl(toggleArticle.coverImage)}
@@ -429,19 +429,19 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-zinc-200">
+                    <p className="line-clamp-2 text-sm font-medium text-zinc-200 leading-snug break-words">
                       {toggleArticle.title}
                     </p>
-                    <p className="truncate text-xs text-zinc-400">
+                    <p className="truncate text-xs text-zinc-400 mt-0.5 block">
                       /{toggleArticle.slug}
                     </p>
                   </div>
                 </div>
 
                 {/* Status Transition Indicator */}
-                <div className="flex items-center justify-between border-t border-white/5 pt-2 text-xs">
-                  <span className="text-zinc-400">Perubahan Status:</span>
-                  <div className="flex items-center gap-1.5 font-medium">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-2 text-xs w-full min-w-0">
+                  <span className="text-zinc-400 shrink-0">Perubahan Status:</span>
+                  <div className="flex items-center gap-1.5 font-medium shrink-0">
                     <span
                       className={
                         toggleArticle.isPublished
@@ -467,7 +467,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
               {/* Status Change Explanatory Notice */}
               <div
-                className={`rounded-lg border p-3 text-xs leading-relaxed ${
+                className={`rounded-lg border p-3 text-xs leading-relaxed break-words w-full ${
                   toggleArticle.isPublished
                     ? "border-amber-500/20 bg-amber-500/5 text-amber-300/90"
                     : "border-emerald-500/20 bg-emerald-500/5 text-emerald-300/90"
@@ -480,12 +480,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             </div>
           )}
 
-          <DialogFooter className="mt-4 flex gap-2">
+          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 w-full min-w-0">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setToggleArticle(null)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
+              className="w-full sm:w-auto rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 sm:py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer text-center"
             >
               Batal
             </button>
@@ -499,7 +499,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   handleTogglePublish(target);
                 }
               }}
-              className={`inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg ${
+              className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-lg border px-4 py-2.5 sm:py-2 text-sm font-medium text-white transition-all disabled:opacity-50 cursor-pointer shadow-lg text-center ${
                 toggleArticle?.isPublished
                   ? "border-amber-500/30 bg-gradient-to-r from-amber-600 to-amber-500 shadow-amber-500/20 hover:brightness-110"
                   : "border-emerald-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 shadow-brand-500/20 hover:brightness-110"
@@ -516,17 +516,17 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
       {/* Dialog Konfirmasi Hapus Dark Theme */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-3">
-            <div className="flex items-center gap-3">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl w-[calc(100vw-2rem)] sm:w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-5 sm:p-6 overflow-hidden">
+          <DialogHeader className="space-y-2 pr-6">
+            <div className="flex items-start gap-3 min-w-0">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
                 <AlertTriangle className="h-5 w-5" />
               </div>
-              <div>
-                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
                   Hapus Artikel?
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                <DialogDescription className="text-xs text-zinc-400 mt-1 leading-relaxed">
                   Tindakan ini permanen dan tidak dapat dibatalkan.
                 </DialogDescription>
               </div>
@@ -534,10 +534,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
           </DialogHeader>
 
           {articleToDelete && (
-            <div className="space-y-3 mt-2">
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-10 w-12 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+            <div className="space-y-3 mt-2 min-w-0 w-full">
+              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
+                <div className="flex items-start gap-3 min-w-0 w-full">
+                  <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950 mt-0.5">
                     {articleToDelete.coverImage ? (
                       <Image
                         src={getAssetUrl(articleToDelete.coverImage)}
@@ -553,16 +553,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-zinc-200">
+                    <p className="line-clamp-2 text-sm font-medium text-zinc-200 leading-snug break-words">
                       {articleToDelete.title}
                     </p>
-                    <p className="truncate text-xs text-zinc-400">
+                    <p className="truncate text-xs text-zinc-400 mt-0.5 block">
                       /{articleToDelete.slug}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between border-t border-white/5 pt-2 text-xs text-zinc-400">
+                <div className="flex items-center justify-between border-t border-white/5 pt-2 text-xs text-zinc-400 w-full">
                   <span>Kategori:</span>
                   <span className="text-zinc-200 font-medium">
                     {articleToDelete.category.name}
@@ -570,18 +570,18 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 </div>
               </div>
 
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs leading-relaxed text-red-300/90">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs leading-relaxed text-red-300/90 break-words w-full">
                 Record artikel ini di basis data dan berkas gambar sampul terkait pada penyimpanan server akan dihapus secara permanen.
               </div>
             </div>
           )}
 
-          <DialogFooter className="mt-4 flex gap-2">
+          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 w-full min-w-0">
             <button
               type="button"
               disabled={isPending}
               onClick={() => setDeleteId(null)}
-              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
+              className="w-full sm:w-auto rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 sm:py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50 cursor-pointer text-center"
             >
               Batal
             </button>
@@ -589,7 +589,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               type="button"
               disabled={isPending}
               onClick={handleDelete}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2.5 sm:py-2 text-sm font-medium text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer text-center"
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               <span>Hapus Artikel</span>
