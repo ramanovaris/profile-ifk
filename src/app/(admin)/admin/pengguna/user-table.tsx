@@ -1181,14 +1181,15 @@ export function UserTable({
               <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">
                 <p className="font-semibold flex items-center gap-1.5">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  Pengguna Memiliki Artikel Terkait
+                  Pengguna Memiliki Riwayat Penulisan Berita
                 </p>
                 <p className="mt-1 text-[11px] text-amber-400/90 leading-relaxed">
-                  Pengguna ini telah mempublikasikan{" "}
+                  Pengguna ini tercatat sebagai penulis pada{" "}
                   <strong className="text-white font-semibold">
                     {userToDelete?.articleCount} artikel berita
                   </strong>
-                  . Alihkan kepemilikan artikel atau hapus artikel terkait terlebih dahulu sebelum menghapus akun ini.
+                  . Demi menjaga keutuhan arsip publikasi instansi, akun ini tidak dapat dihapus. Anda dapat mengubah statusnya menjadi{" "}
+                  <strong className="text-white font-semibold">Non-Aktif</strong> jika staf yang bersangkutan sudah tidak bertugas.
                 </p>
               </div>
             ) : (

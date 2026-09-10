@@ -490,7 +490,7 @@ export async function deleteUserAction(
     if (targetUser._count.articles > 0) {
       return {
         success: false,
-        error: `Pengguna tidak dapat dihapus karena telah mempublikasikan ${targetUser._count.articles} artikel berita. Silakan alihkan atau hapus artikel terlebih dahulu.`,
+        error: `Pengguna tidak dapat dihapus karena tercatat sebagai penulis pada ${targetUser._count.articles} artikel berita. Silakan ubah status akun menjadi Non-Aktif jika staf sudah tidak bertugas.`,
       };
     }
 
