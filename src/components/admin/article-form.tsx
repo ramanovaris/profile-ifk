@@ -184,19 +184,38 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
     }
 
     startTransition(async () => {
-      const res = article
-        ? await updateArticleAction(article.id, formData)
-        : await createArticleAction(formData);
+      try {
+        const res = article
+          ? await updateArticleAction(article.id, formData)
+          : await createArticleAction(formData);
 
-      if (res.success) {
-        toast.success(
-          article
-            ? "Artikel berhasil diperbarui."
-            : "Artikel berhasil disimpan dan dipublikasikan."
-        );
-        router.push("/admin/berita/");
-      } else {
-        toast.error(res.error || "Gagal menyimpan artikel.");
+        if (res.success) {
+          toast.success(
+            article
+              ? "Artikel berhasil diperbarui."
+              : "Artikel berhasil disimpan dan dipublikasikan."
+          );
+          router.push("/admin/berita/");
+        } else {
+          toast.error(res.error || "Gagal menyimpan artikel.");
+        }
+      } catch (err: unknown) {
+        console.error("[ArticleForm] Gagal menyimpan artikel:", err);
+        const errMsg = err instanceof Error ? err.message : "";
+        if (
+          errMsg.includes("Entity Too Large") ||
+          errMsg.includes("413") ||
+          errMsg.includes("bodySizeLimit") ||
+          errMsg.includes("exceeded")
+        ) {
+          toast.error(
+            "Ukuran berkas melebihi batas maksimal server. Silakan gunakan foto yang lebih kecil (maksimal 10MB)."
+          );
+        } else {
+          toast.error(
+            "Gagal menghubungi server. Pastikan koneksi stabil atau coba gunakan foto berukuran lebih kecil."
+          );
+        }
       }
     });
   }

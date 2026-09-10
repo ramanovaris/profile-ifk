@@ -98,15 +98,20 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
   const handleTogglePublish = (article: ArticleItem) => {
     startTransition(async () => {
       setOptimisticArticles({ id: article.id, nextStatus: !article.isPublished });
-      const res = await toggleArticlePublishAction(article.id);
-      if (res.success) {
-        toast.success(
-          res.isPublished
-            ? `Artikel "${article.title}" berhasil diterbitkan.`
-            : `Artikel "${article.title}" diubah menjadi draft.`
-        );
-      } else {
-        toast.error(res.error || "Gagal mengubah status publikasi.");
+      try {
+        const res = await toggleArticlePublishAction(article.id);
+        if (res.success) {
+          toast.success(
+            res.isPublished
+              ? `Artikel "${article.title}" berhasil diterbitkan.`
+              : `Artikel "${article.title}" diubah menjadi draft.`
+          );
+        } else {
+          toast.error(res.error || "Gagal mengubah status publikasi.");
+        }
+      } catch (err: unknown) {
+        console.error("[handleTogglePublish] Error:", err);
+        toast.error("Gagal mengubah status publikasi. Periksa koneksi server Anda.");
       }
     });
   };
@@ -118,11 +123,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
     setDeleteId(null);
 
     startTransition(async () => {
-      const res = await deleteArticleAction(idToDelete);
-      if (res.success) {
-        toast.success("Artikel berhasil dihapus dari database.");
-      } else {
-        toast.error(res.error || "Gagal menghapus artikel.");
+      try {
+        const res = await deleteArticleAction(idToDelete);
+        if (res.success) {
+          toast.success("Artikel berhasil dihapus dari database.");
+        } else {
+          toast.error(res.error || "Gagal menghapus artikel.");
+        }
+      } catch (err: unknown) {
+        console.error("[handleDelete] Error:", err);
+        toast.error("Gagal menghapus artikel. Periksa koneksi server Anda.");
       }
     });
   };

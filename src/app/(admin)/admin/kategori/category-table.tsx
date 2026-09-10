@@ -136,40 +136,46 @@ export function CategoryTable({
       setIsSubmitting(true);
       setError(null);
 
-      if (editCategory) {
-        // Proses Edit Kategori
-        const res = await updateCategoryAction(editCategory.id, {
-          name: trimmedName,
-          status: formData.status,
-        });
+      try {
+        if (editCategory) {
+          // Proses Edit Kategori
+          const res = await updateCategoryAction(editCategory.id, {
+            name: trimmedName,
+            status: formData.status,
+          });
 
-        setIsSubmitting(false);
-        if (!res.success) {
-          setError(res.error || "Gagal memperbarui kategori.");
-          toast.error(res.error || "Gagal memperbarui kategori.");
-          return;
+          setIsSubmitting(false);
+          if (!res.success) {
+            setError(res.error || "Gagal memperbarui kategori.");
+            toast.error(res.error || "Gagal memperbarui kategori.");
+            return;
+          }
+
+          toast.success(`Kategori "${trimmedName}" berhasil diperbarui.`);
+          setIsModalOpen(false);
+          router.refresh();
+        } else {
+          // Proses Tambah Kategori
+          const res = await createCategoryAction({
+            name: trimmedName,
+            status: formData.status,
+          });
+
+          setIsSubmitting(false);
+          if (!res.success) {
+            setError(res.error || "Gagal menambahkan kategori.");
+            toast.error(res.error || "Gagal menambahkan kategori.");
+            return;
+          }
+
+          toast.success(`Kategori "${trimmedName}" berhasil ditambahkan.`);
+          setIsModalOpen(false);
+          router.refresh();
         }
-
-        toast.success(`Kategori "${trimmedName}" berhasil diperbarui.`);
-        setIsModalOpen(false);
-        router.refresh();
-      } else {
-        // Proses Tambah Kategori
-        const res = await createCategoryAction({
-          name: trimmedName,
-          status: formData.status,
-        });
-
+      } catch (err: unknown) {
         setIsSubmitting(false);
-        if (!res.success) {
-          setError(res.error || "Gagal menambahkan kategori.");
-          toast.error(res.error || "Gagal menambahkan kategori.");
-          return;
-        }
-
-        toast.success(`Kategori "${trimmedName}" berhasil ditambahkan.`);
-        setIsModalOpen(false);
-        router.refresh();
+        console.error("[category-table] Submit error:", err);
+        toast.error("Gagal menghubungi server. Periksa koneksi Anda.");
       }
     });
   };
@@ -179,18 +185,25 @@ export function CategoryTable({
 
     startTransition(async () => {
       setIsDeleting(true);
-      const res = await deleteCategoryAction(deleteId);
-      setIsDeleting(false);
+      try {
+        const res = await deleteCategoryAction(deleteId);
+        setIsDeleting(false);
 
-      if (!res.success) {
-        toast.error(res.error || "Gagal menghapus kategori.");
+        if (!res.success) {
+          toast.error(res.error || "Gagal menghapus kategori.");
+          setDeleteId(null);
+          return;
+        }
+
+        toast.success("Kategori berhasil dihapus.");
         setDeleteId(null);
-        return;
+        router.refresh();
+      } catch (err: unknown) {
+        setIsDeleting(false);
+        setDeleteId(null);
+        console.error("[deleteCategory] Error:", err);
+        toast.error("Gagal menghapus kategori. Periksa koneksi Anda.");
       }
-
-      toast.success("Kategori berhasil dihapus.");
-      setDeleteId(null);
-      router.refresh();
     });
   };
 
@@ -202,15 +215,21 @@ export function CategoryTable({
         status: cat.status === "ACTIVE" ? "INACTIVE" : "ACTIVE",
       });
 
-      const res = await toggleCategoryStatusAction(cat.id);
-      if (!res.success) {
-        toast.error(res.error || "Gagal memperbarui status kategori.");
-        router.refresh();
-        return;
-      }
+      try {
+        const res = await toggleCategoryStatusAction(cat.id);
+        if (!res.success) {
+          toast.error(res.error || "Gagal memperbarui status kategori.");
+          router.refresh();
+          return;
+        }
 
-      toast.info(`Status "${cat.name}" berhasil diubah.`);
-      router.refresh();
+        toast.info(`Status "${cat.name}" berhasil diubah.`);
+        router.refresh();
+      } catch (err: unknown) {
+        console.error("[toggleStatus] Error:", err);
+        toast.error("Gagal memperbarui status kategori. Periksa koneksi Anda.");
+        router.refresh();
+      }
     });
   };
 
