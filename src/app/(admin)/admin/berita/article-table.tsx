@@ -57,6 +57,7 @@ interface ArticleTableProps {
 
 export function ArticleTable({ initialArticles, categories }: ArticleTableProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [toggleArticle, setToggleArticle] = useState<ArticleItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -244,10 +245,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <td className="px-4 py-3">
                       <button
                         type="button"
-                        onClick={() => handleTogglePublish(article)}
+                        onClick={() => setToggleArticle(article)}
                         disabled={isPending}
                         title="Klik untuk mengubah status publikasi"
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all ${
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all cursor-pointer ${
                           article.isPublished
                             ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
                             : "border-amber-500/20 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
@@ -369,6 +370,53 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
           </div>
         )}
       </div>
+
+      {/* Dialog Konfirmasi Toggle Status Publikasi */}
+      <Dialog open={!!toggleArticle} onOpenChange={() => setToggleArticle(null)}>
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-white">
+              {toggleArticle?.isPublished ? "Jadikan Draft?" : "Terbitkan Artikel?"}
+            </DialogTitle>
+            <DialogDescription className="text-sm text-zinc-400">
+              {toggleArticle?.isPublished
+                ? `Artikel "${toggleArticle.title}" akan diubah statusnya menjadi draft dan tidak akan ditampilkan pada halaman publik.`
+                : `Artikel "${toggleArticle?.title}" akan segera dipublikasikan dan dapat dibaca oleh masyarakat umum.`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 flex gap-2">
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => setToggleArticle(null)}
+              className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-50"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => {
+                if (toggleArticle) {
+                  const target = toggleArticle;
+                  setToggleArticle(null);
+                  handleTogglePublish(target);
+                }
+              }}
+              className={`inline-flex items-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-medium text-white transition-colors disabled:opacity-50 ${
+                toggleArticle?.isPublished
+                  ? "border-amber-500/30 bg-amber-600/80 hover:bg-amber-600"
+                  : "border-emerald-500/30 bg-emerald-600/80 hover:bg-emerald-600"
+              }`}
+            >
+              {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              <span>
+                {toggleArticle?.isPublished ? "Ubah ke Draft" : "Terbitkan Artikel"}
+              </span>
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog Konfirmasi Hapus Dark Theme */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
