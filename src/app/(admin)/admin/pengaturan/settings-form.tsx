@@ -25,8 +25,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { placeholderImage } from "@/lib/placeholder";
-import { cn } from "@/lib/utils";
-import { updateSiteIdentityAction } from "@/actions/setting";
+import { cn, getAssetUrl } from "@/lib/utils";
+import { updateSiteIdentityAction, updateSiteProfileAction } from "@/actions/setting";
 
 type TabKey = "identitas" | "profil" | "tautan";
 
@@ -55,15 +55,20 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   // ── Tab 2: Konten Profil UPTD State ───────────────────────────────────────
   const initialProfile = {
-    headName: "apt. H. Muhammad Yusuf, S.Farm",
-    headRole: "Kepala UPTD Instalasi Farmasi Kab. Kotabaru",
-    headPhoto: placeholderImage(300, 400, "Kepala IFK", "Profil"),
-    greeting: `Assalamualaikum Warahmatullahi Wabarakatuh.\n\nPuji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa atas segala rahmat dan karunia-Nya sehingga UPTD Instalasi Farmasi Kabupaten Kotabaru dapat terus memberikan pelayanan terbaik di bidang kefarmasian bagi masyarakat Kabupaten Kotabaru.\n\nKami berkomitmen untuk terus meningkatkan kualitas distribusi obat dan farmasi, menjaga mutu pelayanan, serta memastikan ketersediaan obat yang aman, berkhasiat, dan berkualitas di seluruh fasilitas kesehatan binaan.\n\nSemoga website ini dapat menjadi sarana informasi yang bermanfaat bagi seluruh masyarakat.\n\nWassalamualaikum Warahmatullahi Wabarakatuh.`,
-    vision: `Terwujudnya Pelayanan Kefarmasian yang Bermutu, Merata, dan Terjangkau Menuju Masyarakat Kabupaten Kotabaru yang Sehat dan Mandiri.`,
-    mission: `1. Menjamin ketersediaan, pemerataan, dan keterjangkauan obat dan perbekalan kesehatan di seluruh fasilitas kesehatan binaan.\n2. Meningkatkan mutu pengelolaan dan pengawasan obat secara transparan dan akuntabel.\n3. Mengembangkan kapasitas sumber daya manusia dan pemanfaatan teknologi informasi dalam pengelolaan kefarmasian.\n4. Mendorong pemberdayaan masyarakat dalam penggunaan obat yang rasional dan bijak.`,
-    tupoksi: `UPTD Instalasi Farmasi mempunyai tugas melaksanakan kegiatan teknis operasional dinas dalam pengelolaan obat, alat kesehatan, dan perbekalan kesehatan lainnya yang meliputi perencanaan kebutuhan, penerimaan, penyimpanan, pemeliharaan, pendistribusian, pemantauan, serta evaluasi.`,
+    headName: initialSettings.headName || "apt. H. Muhammad Yusuf, S.Farm",
+    headRole:
+      initialSettings.headRole || "Kepala UPTD Instalasi Farmasi Kab. Kotabaru",
+    headPhoto: initialSettings.headPhoto || null,
+    greeting: initialSettings.greeting || "",
+    vision: initialSettings.vision || "",
+    mission: initialSettings.mission || "",
+    tupoksi: initialSettings.tupoksi || "",
   };
   const [profileForm, setProfileForm] = useState(initialProfile);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(
+    initialSettings.headPhoto ? getAssetUrl(initialSettings.headPhoto) : null
+  );
   const headPhotoInputRef = useRef<HTMLInputElement>(null);
 
   // ── Tab 3: Tautan & Layanan State ─────────────────────────────────────────
@@ -106,9 +111,18 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   const handleProfilePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Format berkas harus berupa gambar (PNG, JPG, WebP).");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Ukuran foto pimpinan tidak boleh melebihi 5MB.");
+        return;
+      }
       const url = URL.createObjectURL(file);
-      setProfileForm((prev) => ({ ...prev, headPhoto: url }));
-      toast.success("Foto pimpinan berhasil diperbarui.");
+      setPhotoFile(file);
+      setPhotoPreview(url);
+      toast.success("Foto pimpinan berhasil dipilih untuk disimpan.");
     }
   };
 
@@ -118,12 +132,40 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       toast.error("Nama Kepala UPTD tidak boleh kosong.");
       return;
     }
-    toast.success("Konten profil UPTD berhasil disimpan.");
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append("headName", profileForm.headName);
+      formData.append("headRole", profileForm.headRole);
+      formData.append("greeting", profileForm.greeting);
+      formData.append("vision", profileForm.vision);
+      formData.append("mission", profileForm.mission);
+      formData.append("tupoksi", profileForm.tupoksi);
+      if (photoFile) {
+        formData.append("headPhoto", photoFile);
+      }
+
+      const res = await updateSiteProfileAction(formData);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan konten profil UPTD.");
+        return;
+      }
+
+      toast.success("Konten profil UPTD berhasil disimpan ke basis data.");
+      setPhotoFile(null);
+      if (res.data?.headPhoto) {
+        setPhotoPreview(getAssetUrl(res.data.headPhoto));
+      }
+    });
   };
 
   const handleProfileReset = () => {
     setProfileForm(initialProfile);
-    toast.info("Form konten profil dikembalikan ke data default.");
+    setPhotoFile(null);
+    setPhotoPreview(
+      initialSettings.headPhoto ? getAssetUrl(initialSettings.headPhoto) : null
+    );
+    toast.info("Form konten profil dikembalikan ke data awal basis data.");
   };
 
   const handleLinksSave = (e: FormEvent) => {
@@ -448,7 +490,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               <div className="flex flex-col items-center gap-3">
                 <div className="group relative aspect-[3/4] w-full max-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-md">
                   <Image
-                    src={profileForm.headPhoto}
+                    src={photoPreview || placeholderImage(300, 400, "Kepala IFK", "Profil")}
                     alt="Kepala UPTD IFK"
                     fill
                     unoptimized
@@ -603,10 +645,11 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             </Button>
             <Button
               type="submit"
+              disabled={isPending}
               className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
             >
               <Save className="h-4 w-4" />
-              <span>Simpan Perubahan</span>
+              <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
             </Button>
           </div>
         </form>

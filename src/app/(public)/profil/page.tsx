@@ -3,15 +3,44 @@ import Image from "next/image";
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
 import { placeholderImage } from "@/lib/placeholder";
+import { getAssetUrl } from "@/lib/utils";
+import { getSiteSettings } from "@/actions/setting";
 
-export default function ProfilPage() {
+export default async function ProfilPage() {
+  const settings = await getSiteSettings();
+
+  const headPhotoSrc = settings.headPhoto
+    ? getAssetUrl(settings.headPhoto)
+    : placeholderImage(300, 400, "Kepala IFK", "Profil");
+
+  const greetingParagraphs = settings.greeting
+    ? settings.greeting
+        .split(/\n+/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+    : [];
+
+  const missionItems = settings.mission
+    ? settings.mission
+        .split(/\n+/)
+        .map((m) => m.replace(/^\d+[\.\)]\s*/, "").replace(/^[-*]\s*/, "").trim())
+        .filter(Boolean)
+    : [];
+
+  const tupoksiParagraphs = settings.tupoksi
+    ? settings.tupoksi
+        .split(/\n+/)
+        .map((t) => t.trim())
+        .filter(Boolean)
+    : [];
+
   return (
     <>
       <PageHero
         breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Profil" }]}
         eyebrow="Tentang Kami"
         title="Profil Instansi"
-        subtitle="UPTD Instalasi Farmasi Kab. Kotabaru — Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat."
+        subtitle={`${settings.name} — ${settings.motto}`}
       />
 
       {/* ── Sambutan Kepala ───────────────────────────────────────── */}
@@ -27,8 +56,8 @@ export default function ProfilPage() {
               <div className="bezel w-full">
                 <div className="bezel-inner relative aspect-[3/4]">
                   <Image
-                    src={placeholderImage(300, 400, "Kepala IFK", "Profil")}
-                    alt="Kepala UPTD Instalasi Farmasi"
+                    src={headPhotoSrc}
+                    alt={settings.headName}
                     fill
                     unoptimized
                     className="object-cover"
@@ -37,24 +66,13 @@ export default function ProfilPage() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-brand-700">
-                  apt. H. Muhammad Yusuf, S.Farm
+                  {settings.headName}
                 </p>
-                <p className="text-xs text-muted">Kepala UPTD Instalasi Farmasi Kab. Kotabaru</p>
+                <p className="text-xs text-muted">{settings.headRole}</p>
                 <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted">
-                  <p>Assalamualaikum Warahmatullahi Wabarakatuh.</p>
-                  <p>
-                    Puji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa atas segala rahmat
-                    dan karunia-Nya sehingga UPTD Instalasi Farmasi Kabupaten Kotabaru dapat terus
-                    memberikan pelayanan terbaik di bidang kefarmasian bagi masyarakat Kabupaten
-                    Kotabaru.
-                  </p>
-                  <p>
-                    Kami berkomitmen untuk terus meningkatkan kualitas distribusi obat dan farmasi,
-                    menjaga mutu pelayanan, serta memastikan ketersediaan obat yang aman, berkhasiat,
-                    dan berkualitas di seluruh fasilitas kesehatan binaan.
-                  </p>
-                  <p>Semoga website ini dapat menjadi sarana informasi yang bermanfaat bagi seluruh masyarakat.</p>
-                  <p>Wassalamualaikum Warahmatullahi Wabarakatuh.</p>
+                  {greetingParagraphs.map((p, idx) => (
+                    <p key={idx}>{p}</p>
+                  ))}
                 </div>
               </div>
             </div>
@@ -75,8 +93,7 @@ export default function ProfilPage() {
           <Reveal delay={80} className="mt-12 block">
             <h3 className="text-lg font-semibold text-muted">Visi</h3>
             <p className="mt-4 max-w-[65ch] text-base italic leading-relaxed text-heading">
-              Menjadi pengelola logistik kefarmasian yang profesional dan terpercaya dalam
-              mendukung ketersediaan obat bermutu bagi seluruh masyarakat Kabupaten Kotabaru.
+              {settings.vision}
             </p>
           </Reveal>
 
@@ -86,12 +103,7 @@ export default function ProfilPage() {
               <h3 className="text-lg font-semibold text-muted">Misi</h3>
             </Reveal>
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
-              {[
-                "Mengoptimalkan distribusi obat ke fasilitas kesehatan secara tepat waktu dan tepat jumlah.",
-                "Menjamin mutu dan keamanan obat melalui pengawasan sesuai standar farmakope.",
-                "Memberikan pelayanan kefarmasian yang profesional, cepat, dan akurat.",
-                "Meningkatkan kompetensi SDM melalui pelatihan dan pengembangan berkelanjutan.",
-              ].map((item, i) => (
+              {missionItems.map((item, i) => (
                 <Reveal key={i} delay={240 + i * 60} className="block">
                   <div className="flex items-start gap-4 border-t border-border pt-4">
                     <span
@@ -118,35 +130,13 @@ export default function ProfilPage() {
             </h2>
           </Reveal>
 
-          {/* Tugas Pokok */}
           <Reveal delay={80} className="mt-12 block">
-            <h3 className="text-lg font-semibold text-muted">Tugas Pokok</h3>
-            <ol className="mt-4 list-decimal list-inside space-y-2 text-sm text-muted">
-              <li>Melaksanakan pelayanan kefarmasian di bidang penyaluran obat dan bahan medis habis pakai.</li>
-              <li>Melaksanakan pengendalian mutu distribusi obat dan bahan medis habis pakai.</li>
-              <li>Melaksanakan pembinaan teknis kefarmasian terhadap fasilitas kesehatan binaan.</li>
-            </ol>
-          </Reveal>
-
-          {/* Fungsi */}
-          <div className="mt-12">
-            <Reveal delay={320} className="block">
-              <h3 className="text-lg font-semibold text-muted">Fungsi</h3>
-            </Reveal>
-            <ol className="mt-4 list-decimal list-inside space-y-2 text-sm text-muted">
-              {[
-                "Perencanaan kebutuhan dan pengadaan obat serta bahan medis habis pakai.",
-                "Penyimpanan dan pengelolaan stok obat sesuai standar farmakope.",
-                "Distribusi dan penyaluran obat ke faskes binaan secara tepat waktu.",
-                "Pengawasan mutu obat melalui pemeriksaan fisik dan dokumentasi.",
-                "Pembinaan dan sosialisasi tata cara pengelolaan obat di faskes.",
-              ].map((item, i) => (
-                <Reveal key={i} delay={400 + i * 60} className="block">
-                  <li>{item}</li>
-                </Reveal>
+            <div className="space-y-4 max-w-[75ch] text-sm leading-relaxed text-muted">
+              {tupoksiParagraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
               ))}
-            </ol>
-          </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
