@@ -121,6 +121,17 @@ model SiteSetting {
   sp4nLaporUrl        String
   motto               String
   tagline             String
+
+  // Profil UPTD
+  headName            String   @default("apt. H. Muhammad Yusuf, S.Farm")
+  headRole            String   @default("Kepala UPTD Instalasi Farmasi Kab. Kotabaru")
+  headPhoto           String?
+  orgStructurePhoto   String?
+  greeting            String   @default("Assalamualaikum Warahmatullahi Wabarakatuh.\n\nPuji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa atas segala rahmat dan karunia-Nya sehingga UPTD Instalasi Farmasi Kabupaten Kotabaru dapat terus memberikan pelayanan terbaik di bidang kefarmasian bagi masyarakat Kabupaten Kotabaru.\n\nKami berkomitmen untuk terus meningkatkan kualitas distribusi obat dan farmasi, menjaga mutu pelayanan, serta memastikan ketersediaan obat yang aman, berkhasiat, dan berkualitas di seluruh fasilitas kesehatan binaan.\n\nSemoga website ini dapat menjadi sarana informasi yang bermanfaat bagi seluruh masyarakat.\n\nWassalamualaikum Warahmatullahi Wabarakatuh.") @db.Text
+  vision              String   @default("Terwujudnya Pelayanan Kefarmasian yang Bermutu, Merata, dan Terjangkau Menuju Masyarakat Kabupaten Kotabaru yang Sehat dan Mandiri.") @db.Text
+  mission             String   @default("1. Menjamin ketersediaan, pemerataan, dan keterjangkauan obat dan perbekalan kesehatan di seluruh fasilitas kesehatan binaan.\n2. Meningkatkan mutu pengelolaan dan pengawasan obat secara transparan dan akuntabel.\n3. Mengembangkan kapasitas sumber daya manusia dan pemanfaatan teknologi informasi dalam pengelolaan kefarmasian.\n4. Mendorong pemberdayaan masyarakat dalam penggunaan obat yang rasional dan bijak.") @db.Text
+  tupoksi             String   @default("UPTD Instalasi Farmasi mempunyai tugas melaksanakan kegiatan teknis operasional dinas dalam pengelolaan obat, alat kesehatan, dan perbekalan kesehatan lainnya yang meliputi perencanaan kebutuhan, penerimaan, penyimpanan, pemeliharaan, pendistribusian, pemantauan, serta evaluasi.") @db.Text
+
   updatedAt           DateTime @updatedAt
 
   @@map("site_settings")

@@ -203,6 +203,18 @@ async function main() {
       sp4nLaporUrl: "https://www.lapor.go.id",
       motto: "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat",
       tagline: "Stok Valid, Team Solid",
+      headName: "apt. H. Muhammad Yusuf, S.Farm",
+      headRole: "Kepala UPTD Instalasi Farmasi Kab. Kotabaru",
+      headPhoto: null,
+      orgStructurePhoto: null,
+      greeting:
+        "Assalamualaikum Warahmatullahi Wabarakatuh.\n\nPuji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa atas segala rahmat dan karunia-Nya sehingga UPTD Instalasi Farmasi Kabupaten Kotabaru dapat terus memberikan pelayanan terbaik di bidang kefarmasian bagi masyarakat Kabupaten Kotabaru.\n\nKami berkomitmen untuk terus meningkatkan kualitas distribusi obat dan farmasi, menjaga mutu pelayanan, serta memastikan ketersediaan obat yang aman, berkhasiat, dan berkualitas di seluruh fasilitas kesehatan binaan.\n\nSemoga website ini dapat menjadi sarana informasi yang bermanfaat bagi seluruh masyarakat.\n\nWassalamualaikum Warahmatullahi Wabarakatuh.",
+      vision:
+        "Terwujudnya Pelayanan Kefarmasian yang Bermutu, Merata, dan Terjangkau Menuju Masyarakat Kabupaten Kotabaru yang Sehat dan Mandiri.",
+      mission:
+        "1. Menjamin ketersediaan, pemerataan, dan keterjangkauan obat dan perbekalan kesehatan di seluruh fasilitas kesehatan binaan.\n2. Meningkatkan mutu pengelolaan dan pengawasan obat secara transparan dan akuntabel.\n3. Mengembangkan kapasitas sumber daya manusia dan pemanfaatan teknologi informasi dalam pengelolaan kefarmasian.\n4. Mendorong pemberdayaan masyarakat dalam penggunaan obat yang rasional dan bijak.",
+      tupoksi:
+        "UPTD Instalasi Farmasi mempunyai tugas melaksanakan kegiatan teknis operasional dinas dalam pengelolaan obat, alat kesehatan, dan perbekalan kesehatan lainnya yang meliputi perencanaan kebutuhan, penerimaan, penyimpanan, pemeliharaan, pendistribusian, pemantauan, serta evaluasi.",
     },
   });
   console.log(`[Seed] Konfigurasi profil instansi default berhasil disinkronkan.`);
