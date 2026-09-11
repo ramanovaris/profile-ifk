@@ -7,6 +7,7 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
+  RotateCw,
   X,
   Maximize2,
   Download,
@@ -32,6 +33,7 @@ export function OrgStructureViewer({
   );
   const [isOpen, setIsOpen] = useState(false);
   const [scale, setScale] = useState(1);
+  const [rotation, setRotation] = useState(0);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -44,6 +46,8 @@ export function OrgStructureViewer({
     startY: number;
     posStartX: number;
     posStartY: number;
+    startAngle: number;
+    startRotation: number;
   }>({
     type: "none",
     startDist: 0,
@@ -52,11 +56,14 @@ export function OrgStructureViewer({
     startY: 0,
     posStartX: 0,
     posStartY: 0,
+    startAngle: 0,
+    startRotation: 0,
   });
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
     setScale(1);
+    setRotation(0);
     setPosition({ x: 0, y: 0 });
     setIsDragging(false);
     dragMovedRef.current = false;
@@ -76,7 +83,12 @@ export function OrgStructureViewer({
 
   const handleReset = () => {
     setScale(1);
+    setRotation(0);
     setPosition({ x: 0, y: 0 });
+  };
+
+  const handleRotate = () => {
+    setRotation((prev) => (prev + 90) % 360);
   };
 
   const handleWheel = (e: React.WheelEvent) => {
@@ -128,10 +140,11 @@ export function OrgStructureViewer({
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
-      // Dua jari: pinch-to-zoom
+      // Dua jari: pinch-to-zoom + gesture rotate
       const t1 = e.touches[0];
       const t2 = e.touches[1];
       const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const angle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
       touchStartRef.current = {
         type: "pinch",
         startDist: dist,
@@ -140,6 +153,8 @@ export function OrgStructureViewer({
         startY: (t1.clientY + t2.clientY) / 2,
         posStartX: position.x,
         posStartY: position.y,
+        startAngle: angle,
+        startRotation: rotation,
       };
       dragMovedRef.current = true;
     } else if (e.touches.length === 1) {
@@ -153,6 +168,8 @@ export function OrgStructureViewer({
         startY: t.clientY,
         posStartX: position.x,
         posStartY: position.y,
+        startAngle: 0,
+        startRotation: rotation,
       };
       dragMovedRef.current = false;
     }
@@ -164,18 +181,29 @@ export function OrgStructureViewer({
       const t1 = e.touches[0];
       const t2 = e.touches[1];
       const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
-      if (touchStartRef.current.startDist > 0) {
-        const factor = dist / touchStartRef.current.startDist;
+      const angle = Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX);
+      const ts = touchStartRef.current;
+
+      // Pinch-to-zoom
+      if (ts.startDist > 0) {
+        const factor = dist / ts.startDist;
         const newScale = Math.min(
-          Math.max(Number((touchStartRef.current.startScale * factor).toFixed(2)), 1),
+          Math.max(Number((ts.startScale * factor).toFixed(2)), 1),
           4
         );
         setScale(newScale);
         if (newScale === 1) {
           setPosition({ x: 0, y: 0 });
         }
-        dragMovedRef.current = true;
       }
+
+      // Gesture rotate (two-finger)
+      const angleDiff = angle - ts.startAngle;
+      const degDiff = (angleDiff * 180) / Math.PI;
+      const snapped = Math.round((ts.startRotation + degDiff) / 15) * 15;
+      setRotation(((snapped % 360) + 360) % 360);
+
+      dragMovedRef.current = true;
     } else if (e.touches.length === 1 && touchStartRef.current.type === "pan") {
       if (scale > 1) {
         if (e.cancelable) e.preventDefault();
@@ -206,6 +234,8 @@ export function OrgStructureViewer({
         startY: t.clientY,
         posStartX: position.x,
         posStartY: position.y,
+        startAngle: 0,
+        startRotation: rotation,
       };
     }
   };
@@ -227,7 +257,10 @@ export function OrgStructureViewer({
         });
       } else if (e.key === "0") {
         setScale(1);
+        setRotation(0);
         setPosition({ x: 0, y: 0 });
+      } else if (e.key === "r" || e.key === "R") {
+        setRotation((prev) => (prev + 90) % 360);
       }
     };
 
@@ -356,16 +389,27 @@ export function OrgStructureViewer({
                 </button>
               </div>
 
-              {/* Reset Zoom Button */}
+              {/* Reset Button */}
               <button
                 type="button"
                 onClick={handleReset}
-                disabled={scale === 1 && position.x === 0 && position.y === 0}
-                aria-label="Reset ukuran zoom"
-                title="Reset Zoom (0)"
+                disabled={scale === 1 && rotation === 0 && position.x === 0 && position.y === 0}
+                aria-label="Reset semua"
+                title="Reset (0)"
                 className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95 cursor-pointer"
               >
                 <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </button>
+
+              {/* Rotate Button */}
+              <button
+                type="button"
+                onClick={handleRotate}
+                aria-label="Putar gambar 90 derajat"
+                title="Putar (R)"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white active:scale-95 cursor-pointer"
+              >
+                <RotateCw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
 
               {/* Download Button */}
@@ -409,7 +453,7 @@ export function OrgStructureViewer({
             <div
               className="relative flex items-center justify-center transition-transform duration-75 select-none touch-none"
               style={{
-                transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
+                transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale}) rotate(${rotation}deg)`,
                 transformOrigin: "center center",
                 touchAction: "none",
               }}
