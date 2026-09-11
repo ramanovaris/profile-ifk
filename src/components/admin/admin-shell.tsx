@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Newspaper,
@@ -27,14 +27,22 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
-import { logoutAction } from "@/actions/auth";
+import { logoutAction, getCurrentUserAction, type AuthUserInfo } from "@/actions/auth";
+import type { Role } from "@prisma/client";
 
-const sidebarLinks = [
+type SidebarItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  superAdminOnly?: boolean;
+};
+
+const sidebarLinks: SidebarItem[] = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/berita", label: "Berita", icon: Newspaper },
   { href: "/admin/kategori", label: "Kategori", icon: Tags },
   { href: "/admin/stok", label: "Stok Obat", icon: Package },
-  { href: "/admin/pengguna", label: "Pengguna", icon: Users },
+  { href: "/admin/pengguna", label: "Pengguna", icon: Users, superAdminOnly: true },
   { href: "/admin/profil", label: "Profil", icon: UserCog },
   { href: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
 ];
@@ -71,7 +79,17 @@ function SidebarLink({
   );
 }
 
-function SidebarContent({ pathname }: { pathname: string }) {
+function SidebarContent({
+  pathname,
+  user,
+}: {
+  pathname: string;
+  user: AuthUserInfo | null;
+}) {
+  const visibleLinks = sidebarLinks.filter(
+    (link) => !link.superAdminOnly || user?.role === "SUPER_ADMIN"
+  );
+
   return (
     <div className="flex h-full flex-col">
       {/* Brand Header */}
@@ -98,7 +116,7 @@ function SidebarContent({ pathname }: { pathname: string }) {
 
       {/* Navigation */}
       <nav className="mt-4 flex flex-col gap-1 px-3">
-        {sidebarLinks.map((link) => (
+        {visibleLinks.map((link) => (
           <SidebarLink
             key={link.href}
             {...link}
@@ -125,9 +143,51 @@ function SidebarContent({ pathname }: { pathname: string }) {
   );
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export type AdminShellProps = {
+  children: React.ReactNode;
+  currentUser?: {
+    id?: string;
+    name: string;
+    username: string;
+    role: Role;
+  };
+};
+
+export function AdminShell({ children, currentUser }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
+
+  const user: AuthUserInfo | null = currentUser
+    ? {
+        id: currentUser.id || "",
+        name: currentUser.name,
+        username: currentUser.username,
+        role: currentUser.role,
+      }
+    : fetchedUser;
+
+  useEffect(() => {
+    if (!currentUser) {
+      getCurrentUserAction().then((u) => {
+        if (u) setFetchedUser(u);
+      });
+    }
+  }, [currentUser]);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
+  const displayName = user?.name || (user?.username ? `@${user.username}` : "Admin");
+  const initials = user?.name ? getInitials(user.name) : "AD";
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
   return (
     <div className="relative flex h-dvh min-h-dvh overflow-hidden bg-zinc-950 text-zinc-100 selection:bg-brand-500/30">
@@ -143,7 +203,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       {/* Desktop sidebar */}
       <aside className="relative z-10 hidden w-64 shrink-0 border-r border-white/5 bg-zinc-900/60 backdrop-blur-xl md:flex md:flex-col">
-        <SidebarContent pathname={pathname} />
+        <SidebarContent pathname={pathname} user={user} />
       </aside>
 
       <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
@@ -163,20 +223,31 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <SheetHeader>
                 <SheetTitle className="sr-only">Menu Admin</SheetTitle>
               </SheetHeader>
-              <SidebarContent pathname={pathname} />
+              <SidebarContent pathname={pathname} user={user} />
             </SheetContent>
           </Sheet>
 
           {/* Right Header Admin Info */}
           <div className="ml-auto flex items-center gap-3">
-            <span className="hidden items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-medium text-emerald-400 sm:inline-flex">
-              Super Admin
-            </span>
+            {user && (
+              <span
+                className={cn(
+                  "hidden items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium sm:inline-flex",
+                  isSuperAdmin
+                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                    : "border-sky-500/20 bg-sky-500/10 text-sky-400"
+                )}
+              >
+                {isSuperAdmin ? "Super Admin" : "Staff"}
+              </span>
+            )}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-zinc-200">Admin</span>
+              <span className="text-sm font-medium text-zinc-200 max-w-[150px] truncate sm:max-w-xs">
+                {displayName}
+              </span>
               <Avatar className="h-8 w-8 ring-1 ring-brand-500/30">
                 <AvatarFallback className="bg-brand-500/20 text-xs font-semibold text-brand-300">
-                  AD
+                  {initials}
                 </AvatarFallback>
               </Avatar>
             </div>
