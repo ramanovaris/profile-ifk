@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
@@ -18,22 +18,24 @@ interface OrgStructureViewerProps {
   alt?: string;
 }
 
+const emptySubscribe = () => () => {};
+
 // ponytail: Native fullscreen lightbox with zoom (1x-4x) and pan drag. Upgrade to multi-touch pinch gesture if needed.
 export function OrgStructureViewer({
   src,
   alt = "Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru",
 }: OrgStructureViewerProps) {
-  const [mounted, setMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const dragMovedRef = useRef(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -184,7 +186,7 @@ export function OrgStructureViewer({
       </p>
 
       {/* Google Drive Style Lightbox Preview (Portaled to document.body) */}
-      {isOpen && mounted && createPortal(
+      {isOpen && isClient && createPortal(
         <div
           role="dialog"
           aria-modal="true"

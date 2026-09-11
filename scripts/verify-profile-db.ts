@@ -10,7 +10,7 @@
  */
 
 import { db } from "../src/lib/db";
-import { updateSiteProfileAction, getSiteSettings } from "../src/actions/setting";
+import { updateSiteProfileAction } from "../src/actions/setting";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
