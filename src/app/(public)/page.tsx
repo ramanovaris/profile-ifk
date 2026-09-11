@@ -4,8 +4,9 @@ import { ArrowRight, Building2, ShieldCheck, Clock } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
-import { siteConfig, dummyArticles } from "@/lib/dummy-data";
+import { dummyArticles } from "@/lib/dummy-data";
 import { placeholderImage } from "@/lib/placeholder";
+import { getSiteSettings } from "@/actions/setting";
 
 const stats = [
   { icon: Building2, value: "28 Faskes", label: "Jaringan Kesehatan Binaan" },
@@ -13,7 +14,8 @@ const stats = [
   { icon: Clock, value: "Tepat Waktu", label: "Pengiriman Tepat Waktu" },
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getSiteSettings();
   const latestArticles = dummyArticles
     .filter((a) => a.isPublished)
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
@@ -149,7 +151,7 @@ export default function HomePage() {
                   <ShieldCheck className="h-5 w-5 text-sand" strokeWidth={1.5} />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-white">{siteConfig.tagline}</p>
+                  <p className="text-sm font-semibold text-white">{settings.tagline}</p>
                   <p className="text-xs text-zinc-400">Komitmen pelayanan kami</p>
                 </div>
               </div>

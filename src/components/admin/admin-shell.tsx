@@ -38,13 +38,13 @@ type SidebarItem = {
 };
 
 const sidebarLinks: SidebarItem[] = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/berita", label: "Berita", icon: Newspaper },
-  { href: "/admin/kategori", label: "Kategori", icon: Tags },
-  { href: "/admin/stok", label: "Stok Obat", icon: Package },
-  { href: "/admin/pengguna", label: "Pengguna", icon: Users, superAdminOnly: true },
-  { href: "/admin/profil", label: "Profil", icon: UserCog },
-  { href: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
+  { href: "/admin/dashboard/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/berita/", label: "Berita", icon: Newspaper },
+  { href: "/admin/kategori/", label: "Kategori", icon: Tags },
+  { href: "/admin/stok/", label: "Stok Obat", icon: Package },
+  { href: "/admin/pengguna/", label: "Pengguna", icon: Users, superAdminOnly: true },
+  { href: "/admin/profil/", label: "Profil", icon: UserCog },
+  { href: "/admin/pengaturan/", label: "Pengaturan", icon: Settings },
 ];
 
 function SidebarLink({

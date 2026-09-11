@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowUpRight, Mail, Phone, MapPin } from "lucide-react";
 
 import { siteConfig } from "@/lib/dummy-data";
+import type { SiteSetting } from "@prisma/client";
 
 const quickLinks = [
   { href: "/profil", label: "Profil" },
@@ -11,7 +12,18 @@ const quickLinks = [
   { href: "/kontak", label: "Kontak" },
 ];
 
-export function Footer() {
+interface FooterProps {
+  settings?: SiteSetting;
+}
+
+export function Footer({ settings }: FooterProps = {}) {
+  const shortName = settings?.shortName || siteConfig.shortName;
+  const name = settings?.name || siteConfig.name;
+  const address = settings?.address || siteConfig.address;
+  const motto = settings?.motto || siteConfig.motto;
+  const email = settings?.email || siteConfig.email;
+  const phone = settings?.phone || siteConfig.phone;
+
   return (
     <footer className="page-hero text-zinc-300">
       <div className="section-container py-24">
@@ -20,12 +32,12 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-2 font-semibold tracking-tight text-white">
             <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 rounded-full" />
-            <span className="font-semibold tracking-tight text-white">{siteConfig.shortName}</span>
+            <span className="font-semibold tracking-tight text-white">{shortName}</span>
             </div>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-zinc-400">
-              {siteConfig.address}
+              {address}
             </p>
-            <p className="mt-4 max-w-md text-sm italic text-zinc-500">{siteConfig.motto}</p>
+            <p className="mt-4 max-w-md text-sm italic text-zinc-500">{motto}</p>
           </div>
 
           {/* Kolom 2 — Quick Links */}
@@ -56,15 +68,15 @@ export function Footer() {
               <li className="flex items-center gap-2.5 text-sm">
                 <Mail className="h-4 w-4 shrink-0 text-brand-400" strokeWidth={1.5} />
                 <a
-                  href={`mailto:${siteConfig.email}`}
+                  href={`mailto:${email}`}
                   className="transition-colors duration-300 ease-luxe hover:text-brand-400"
                 >
-                  {siteConfig.email}
+                  {email}
                 </a>
               </li>
               <li className="flex items-center gap-2.5 text-sm">
                 <Phone className="h-4 w-4 shrink-0 text-brand-400" strokeWidth={1.5} />
-                <span>{siteConfig.phone}</span>
+                <span>{phone}</span>
               </li>
               <li className="flex items-center gap-2.5 text-sm">
                 <MapPin className="h-4 w-4 shrink-0 text-brand-400" strokeWidth={1.5} />
@@ -76,7 +88,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="mt-16 border-t border-white/10 pt-6 text-center text-xs text-zinc-600">
-          &copy; {new Date().getFullYear()} {siteConfig.name}. Hak cipta dilindungi.
+          &copy; {new Date().getFullYear()} {name}. Hak cipta dilindungi.
         </div>
       </div>
     </footer>

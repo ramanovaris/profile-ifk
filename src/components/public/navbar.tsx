@@ -7,7 +7,8 @@ import { useState } from "react";
 import { LogIn } from "lucide-react";
 
 import { siteConfig } from "@/lib/dummy-data";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
+import type { SiteSetting } from "@prisma/client";
 
 const navLinks = [
   { href: "/", label: "Beranda" },
@@ -18,9 +19,14 @@ const navLinks = [
   { href: "/kontak", label: "Kontak" },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  settings?: SiteSetting;
+}
+
+export function Navbar({ settings }: NavbarProps = {}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const shortName = settings?.shortName || siteConfig.shortName;
 
   return (
     <>
@@ -32,7 +38,7 @@ export function Navbar() {
             className="flex shrink-0 items-center gap-2 font-semibold tracking-tight text-heading"
           >
             <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 shrink-0 rounded-full" />
-            <span className="text-sm font-semibold tracking-tight whitespace-nowrap">{siteConfig.shortName}</span>
+            <span className="text-sm font-semibold tracking-tight whitespace-nowrap">{shortName}</span>
           </Link>
 
           {/* Desktop nav */}
@@ -56,13 +62,13 @@ export function Navbar() {
               );
             })}
             <div className="ml-1.5 flex shrink-0 items-center gap-1">
-              <Link
-                href="/admin/login"
+              <a
+                href={getAssetUrl("/admin/login/")}
                 className="flex shrink-0 items-center gap-1.5 rounded-full border border-black/5 bg-black/5 px-3 py-1.5 text-xs font-medium text-heading transition-colors hover:bg-black/10 whitespace-nowrap"
               >
                 <LogIn className="h-3.5 w-3.5 shrink-0" />
                 Masuk Admin
-              </Link>
+              </a>
             </div>
           </nav>
 
@@ -99,14 +105,14 @@ export function Navbar() {
               );
             })}
             <div className="mt-4 border-t border-black/5 pt-4">
-              <Link
-                href="/admin/login"
+              <a
+                href={getAssetUrl("/admin/login/")}
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 rounded-xl bg-black/5 px-4 py-3 text-sm font-medium text-heading hover:bg-black/10"
               >
                 <LogIn className="h-4 w-4" />
                 Masuk Admin
-              </Link>
+              </a>
             </div>
           </nav>
         </div>
