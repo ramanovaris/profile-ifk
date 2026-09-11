@@ -5,6 +5,7 @@ import { Reveal } from "@/components/public/reveal";
 import { placeholderImage } from "@/lib/placeholder";
 import { getAssetUrl } from "@/lib/utils";
 import { getSiteSettings } from "@/actions/setting";
+import { OrgStructureViewer } from "@/components/public/org-structure-viewer";
 
 export default async function ProfilPage() {
   const settings = await getSiteSettings();
@@ -153,21 +154,10 @@ export default async function ProfilPage() {
             </h2>
           </Reveal>
           <Reveal delay={80} className="mt-12 block">
-            <div className="bezel mx-auto max-w-3xl">
-              <div className="bezel-inner">
-                <Image
-                  src={orgStructureSrc}
-                  alt="Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru"
-                  width={800}
-                  height={500}
-                  unoptimized
-                  className="h-auto w-full"
-                />
-              </div>
-            </div>
-            <p className="mt-4 text-sm text-muted">
-              Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru
-            </p>
+            <OrgStructureViewer
+              src={orgStructureSrc}
+              alt="Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru"
+            />
           </Reveal>
         </div>
       </section>
