@@ -1,8 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
-import { ZoomIn, ZoomOut, RotateCcw, X, Maximize2 } from "lucide-react";
+import {
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  X,
+  Maximize2,
+  Download,
+  ImageIcon,
+} from "lucide-react";
 
 interface OrgStructureViewerProps {
   src: string;
@@ -19,12 +27,14 @@ export function OrgStructureViewer({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const dragMovedRef = useRef(false);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
     setScale(1);
     setPosition({ x: 0, y: 0 });
     setIsDragging(false);
+    dragMovedRef.current = false;
   }, []);
 
   const handleZoomIn = () => {
@@ -55,6 +65,7 @@ export function OrgStructureViewer({
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    dragMovedRef.current = false;
     if (scale <= 1) return;
     setIsDragging(true);
     setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
@@ -63,6 +74,7 @@ export function OrgStructureViewer({
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDragging || scale <= 1) return;
+    dragMovedRef.current = true;
     setPosition({
       x: e.clientX - dragStart.x,
       y: e.clientY - dragStart.y,
@@ -165,118 +177,127 @@ export function OrgStructureViewer({
         </button>
       </p>
 
-      {/* Modal Dialog Lightbox (Centered in Viewport) */}
+      {/* Google Drive Style Lightbox Preview (Photo Centered in Viewport) */}
       {isOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Modal Bagan Struktur Organisasi"
-          onClick={handleClose}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in-0 duration-200"
+          aria-label="Pratinjau Bagan Struktur Organisasi"
+          className="fixed inset-0 z-50 flex flex-col bg-zinc-950/90 backdrop-blur-sm animate-in fade-in-0 duration-150"
         >
-          {/* Modal Container Centered */}
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative flex flex-col w-full max-w-5xl max-h-[90vh] rounded-2xl border border-white/15 bg-zinc-950/95 shadow-2xl backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-200"
-          >
-            {/* Modal Header */}
-            <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-4 sm:px-6 bg-white/[0.02]">
-              <div className="min-w-0 pr-3">
-                <h3 className="truncate text-sm sm:text-base font-semibold text-white">
-                  Bagan Struktur Organisasi
-                </h3>
-              </div>
-
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                {/* Zoom Controls */}
-                <div className="flex items-center rounded-xl border border-white/10 bg-white/5 p-0.5 sm:p-1 backdrop-blur-md">
-                  <button
-                    type="button"
-                    onClick={handleZoomOut}
-                    disabled={scale <= 1}
-                    aria-label="Perkecil zoom"
-                    title="Perkecil (-)"
-                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95 cursor-pointer"
-                  >
-                    <ZoomOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </button>
-                  <span className="w-12 sm:w-14 text-center text-xs font-mono font-medium text-zinc-300">
-                    {Math.round(scale * 100)}%
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleZoomIn}
-                    disabled={scale >= 4}
-                    aria-label="Perbesar zoom"
-                    title="Perbesar (+)"
-                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95 cursor-pointer"
-                  >
-                    <ZoomIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  </button>
-                </div>
-
-                {/* Reset Zoom Button */}
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  disabled={scale === 1 && position.x === 0 && position.y === 0}
-                  aria-label="Reset ukuran zoom"
-                  title="Reset Zoom (0)"
-                  className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95 cursor-pointer"
-                >
-                  <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                </button>
-
-                {/* Close Button */}
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  aria-label="Tutup modal"
-                  title="Tutup (Esc)"
-                  className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-white transition-colors hover:bg-rose-500/20 hover:border-rose-500/40 hover:text-rose-300 active:scale-95 cursor-pointer ml-1"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Centered Image Viewport Stage */}
-            <div
-              className="relative flex-1 min-h-[45vh] max-h-[72vh] overflow-hidden flex items-center justify-center p-2 sm:p-4 bg-zinc-900/30"
-              onWheel={handleWheel}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={handlePointerUp}
-              onPointerCancel={handlePointerUp}
-              onDoubleClick={handleDoubleClick}
-              style={{
-                cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
-                touchAction: scale > 1 ? "none" : "auto",
-              }}
-            >
-              <div
-                className="relative flex items-center justify-center transition-transform duration-75 select-none"
-                style={{
-                  transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
-                  transformOrigin: "center center",
-                }}
+          {/* Top Header Bar (Google Drive Style) */}
+          <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-3 sm:px-5 bg-black/40 backdrop-blur-md z-20">
+            {/* Left: Close button (X) + File icon + Title */}
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
+              <button
+                type="button"
+                onClick={handleClose}
+                aria-label="Tutup pratinjau"
+                title="Tutup (Esc)"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-95"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={src}
-                  alt={alt}
-                  draggable={false}
-                  className="max-h-[68vh] w-auto max-w-full object-contain rounded-lg shadow-xl pointer-events-none select-none"
-                />
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-rose-600 text-white shadow-sm">
+                <ImageIcon className="h-4 w-4" />
               </div>
+
+              <span className="truncate text-xs sm:text-sm font-medium text-white max-w-[150px] sm:max-w-xs md:max-w-md">
+                Struktur-Organisasi-IFK.jpg
+              </span>
             </div>
 
-            {/* Modal Footer Info */}
-            <div className="flex items-center justify-between border-t border-white/5 px-4 py-2 text-[11px] text-zinc-400 bg-white/[0.01]">
-              <span className="truncate max-w-[240px] sm:max-w-md">{alt}</span>
-              <span className="hidden sm:inline text-zinc-500">
-                Klik ganda / roda mouse untuk zoom • Geser saat di-zoom • Esc untuk tutup
-              </span>
+            {/* Right: Zoom Controls, Reset, and Download */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {/* Zoom In / Out Controls */}
+              <div className="flex items-center rounded-xl border border-white/10 bg-white/5 p-0.5 sm:p-1 backdrop-blur-md">
+                <button
+                  type="button"
+                  onClick={handleZoomOut}
+                  disabled={scale <= 1}
+                  aria-label="Perkecil zoom"
+                  title="Perkecil (-)"
+                  className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95 cursor-pointer"
+                >
+                  <ZoomOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </button>
+                <span className="w-11 sm:w-13 text-center text-xs font-mono font-medium text-zinc-300">
+                  {Math.round(scale * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={handleZoomIn}
+                  disabled={scale >= 4}
+                  aria-label="Perbesar zoom"
+                  title="Perbesar (+)"
+                  className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95 cursor-pointer"
+                >
+                  <ZoomIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </button>
+              </div>
+
+              {/* Reset Zoom Button */}
+              <button
+                type="button"
+                onClick={handleReset}
+                disabled={scale === 1 && position.x === 0 && position.y === 0}
+                aria-label="Reset ukuran zoom"
+                title="Reset Zoom (0)"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95 cursor-pointer"
+              >
+                <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </button>
+
+              {/* Download Button */}
+              <a
+                href={src}
+                download="Struktur-Organisasi-IFK.jpg"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Unduh berkas gambar struktur organisasi"
+                title="Unduh berkas gambar"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white active:scale-95 cursor-pointer"
+              >
+                <Download className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+
+          {/* Center Stage: Photo directly centered in viewport */}
+          <div
+            className="relative flex-1 w-full overflow-hidden flex items-center justify-center p-3 sm:p-6"
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !dragMovedRef.current) {
+                handleClose();
+              }
+            }}
+            onWheel={handleWheel}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onDoubleClick={handleDoubleClick}
+            style={{
+              cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
+              touchAction: scale > 1 ? "none" : "auto",
+            }}
+          >
+            <div
+              className="relative flex items-center justify-center transition-transform duration-75 select-none"
+              style={{
+                transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
+                transformOrigin: "center center",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt={alt}
+                draggable={false}
+                className="max-h-[85vh] max-w-[92vw] w-auto h-auto object-contain shadow-[0_20px_60px_rgba(0,0,0,0.85)] pointer-events-none select-none"
+              />
             </div>
           </div>
         </div>
