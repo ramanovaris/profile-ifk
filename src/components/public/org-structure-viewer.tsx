@@ -133,7 +133,7 @@ export function OrgStructureViewer({
           }
         }}
         className="bezel mx-auto max-w-3xl group relative cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded-2xl transition-all"
-        aria-label="Lihat bagan struktur organisasi dalam ukuran penuh"
+        aria-label="Lihat bagan struktur organisasi"
       >
         <div className="bezel-inner relative overflow-hidden">
           <Image
@@ -147,7 +147,7 @@ export function OrgStructureViewer({
           <div className="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-200 group-hover:opacity-100 flex items-center justify-center p-4">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-zinc-900/90 px-4 py-2 text-xs font-medium text-white shadow-xl backdrop-blur-md transition-transform duration-200 group-hover:scale-105">
               <Maximize2 className="h-3.5 w-3.5 text-brand-400" />
-              Klik untuk Layar Penuh &amp; Zoom
+              Klik untuk Perbesar &amp; Zoom
             </span>
           </div>
         </div>
@@ -161,116 +161,123 @@ export function OrgStructureViewer({
           className="text-brand-600 font-medium hover:underline inline-flex items-center gap-1 cursor-pointer"
         >
           <Maximize2 className="h-3 w-3" />
-          Buka Layar Penuh
+          Lihat Bagan Penuh
         </button>
       </p>
 
-      {/* Fullscreen Lightbox Modal */}
+      {/* Modal Dialog Lightbox (Centered in Viewport) */}
       {isOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Tampilan Penuh Bagan Struktur Organisasi"
-          className="fixed inset-0 z-50 flex flex-col bg-zinc-950/95 backdrop-blur-xl animate-in fade-in-0 duration-200"
+          aria-label="Modal Bagan Struktur Organisasi"
+          onClick={handleClose}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-black/80 backdrop-blur-md animate-in fade-in-0 duration-200"
         >
-          {/* Header Bar */}
-          <div className="flex h-16 shrink-0 items-center justify-between border-b border-white/10 px-4 sm:px-6">
-            <div className="min-w-0 pr-4">
-              <h3 className="truncate text-sm font-semibold text-white sm:text-base">
-                Struktur Organisasi UPTD Instalasi Farmasi
-              </h3>
-              <p className="hidden text-xs text-zinc-400 sm:block">
-                Gunakan tombol zoom (+/-), roda scroll mouse, atau geser (drag) untuk melihat detail.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              {/* Zoom Controls */}
-              <div className="flex items-center rounded-xl border border-white/10 bg-white/5 p-1 backdrop-blur-md">
-                <button
-                  type="button"
-                  onClick={handleZoomOut}
-                  disabled={scale <= 1}
-                  aria-label="Perkecil zoom"
-                  title="Perkecil (-)"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95"
-                >
-                  <ZoomOut className="h-4 w-4" />
-                </button>
-                <span className="w-14 text-center text-xs font-mono font-medium text-zinc-300">
-                  {Math.round(scale * 100)}%
-                </span>
-                <button
-                  type="button"
-                  onClick={handleZoomIn}
-                  disabled={scale >= 4}
-                  aria-label="Perbesar zoom"
-                  title="Perbesar (+)"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95"
-                >
-                  <ZoomIn className="h-4 w-4" />
-                </button>
+          {/* Modal Container Centered */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex flex-col w-full max-w-5xl max-h-[90vh] rounded-2xl border border-white/15 bg-zinc-950/95 shadow-2xl backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+          >
+            {/* Modal Header */}
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-4 sm:px-6 bg-white/[0.02]">
+              <div className="min-w-0 pr-3">
+                <h3 className="truncate text-sm sm:text-base font-semibold text-white">
+                  Bagan Struktur Organisasi
+                </h3>
               </div>
 
-              {/* Reset Zoom Button */}
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={scale === 1 && position.x === 0 && position.y === 0}
-                aria-label="Reset ukuran zoom"
-                title="Reset Zoom (0)"
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95"
-              >
-                <RotateCcw className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* Zoom Controls */}
+                <div className="flex items-center rounded-xl border border-white/10 bg-white/5 p-0.5 sm:p-1 backdrop-blur-md">
+                  <button
+                    type="button"
+                    onClick={handleZoomOut}
+                    disabled={scale <= 1}
+                    aria-label="Perkecil zoom"
+                    title="Perkecil (-)"
+                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95 cursor-pointer"
+                  >
+                    <ZoomOut className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </button>
+                  <span className="w-12 sm:w-14 text-center text-xs font-mono font-medium text-zinc-300">
+                    {Math.round(scale * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleZoomIn}
+                    disabled={scale >= 4}
+                    aria-label="Perbesar zoom"
+                    title="Perbesar (+)"
+                    className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95 cursor-pointer"
+                  >
+                    <ZoomIn className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </button>
+                </div>
 
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={handleClose}
-                aria-label="Tutup tampilan penuh"
-                title="Tutup (Esc)"
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-white transition-colors hover:bg-rose-500/20 hover:border-rose-500/40 hover:text-rose-300 active:scale-95 ml-1"
-              >
-                <X className="h-4 w-4" />
-              </button>
+                {/* Reset Zoom Button */}
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  disabled={scale === 1 && position.x === 0 && position.y === 0}
+                  aria-label="Reset ukuran zoom"
+                  title="Reset Zoom (0)"
+                  className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:pointer-events-none active:scale-95 cursor-pointer"
+                >
+                  <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </button>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  aria-label="Tutup modal"
+                  title="Tutup (Esc)"
+                  className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-white transition-colors hover:bg-rose-500/20 hover:border-rose-500/40 hover:text-rose-300 active:scale-95 cursor-pointer ml-1"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Interactive Zoom & Pan Stage */}
-          <div
-            className="relative flex-1 overflow-hidden flex items-center justify-center p-2 sm:p-6"
-            onWheel={handleWheel}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            onDoubleClick={handleDoubleClick}
-            style={{
-              cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
-              touchAction: scale > 1 ? "none" : "auto",
-            }}
-          >
+            {/* Centered Image Viewport Stage */}
             <div
-              className="relative max-h-full max-w-full transition-transform duration-75 select-none"
+              className="relative flex-1 min-h-[45vh] max-h-[72vh] overflow-hidden flex items-center justify-center p-2 sm:p-4 bg-zinc-900/30"
+              onWheel={handleWheel}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              onDoubleClick={handleDoubleClick}
               style={{
-                transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
-                transformOrigin: "center center",
+                cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
+                touchAction: scale > 1 ? "none" : "auto",
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={src}
-                alt={alt}
-                draggable={false}
-                className="max-h-[82vh] max-w-[95vw] object-contain rounded-lg shadow-2xl pointer-events-none select-none"
-              />
+              <div
+                className="relative flex items-center justify-center transition-transform duration-75 select-none"
+                style={{
+                  transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
+                  transformOrigin: "center center",
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt={alt}
+                  draggable={false}
+                  className="max-h-[68vh] w-auto max-w-full object-contain rounded-lg shadow-xl pointer-events-none select-none"
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Touchscreen Hint Footer */}
-          <div className="border-t border-white/5 px-4 py-2.5 text-center text-[11px] text-zinc-500 sm:hidden">
-            Ketuk 2x untuk memperbesar • Geser layar saat gambar diperbesar
+            {/* Modal Footer Info */}
+            <div className="flex items-center justify-between border-t border-white/5 px-4 py-2 text-[11px] text-zinc-400 bg-white/[0.01]">
+              <span className="truncate max-w-[240px] sm:max-w-md">{alt}</span>
+              <span className="hidden sm:inline text-zinc-500">
+                Klik ganda / roda mouse untuk zoom • Geser saat di-zoom • Esc untuk tutup
+              </span>
+            </div>
           </div>
         </div>
       )}
