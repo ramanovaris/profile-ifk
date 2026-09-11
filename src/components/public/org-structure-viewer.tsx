@@ -36,6 +36,23 @@ export function OrgStructureViewer({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const dragMovedRef = useRef(false);
+  const touchStartRef = useRef<{
+    type: "none" | "pan" | "pinch";
+    startDist: number;
+    startScale: number;
+    startX: number;
+    startY: number;
+    posStartX: number;
+    posStartY: number;
+  }>({
+    type: "none",
+    startDist: 0,
+    startScale: 1,
+    startX: 0,
+    startY: 0,
+    posStartX: 0,
+    posStartY: 0,
+  });
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -109,7 +126,91 @@ export function OrgStructureViewer({
     }
   };
 
-  // Keyboard navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      // Dua jari: pinch-to-zoom
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      touchStartRef.current = {
+        type: "pinch",
+        startDist: dist,
+        startScale: scale,
+        startX: (t1.clientX + t2.clientX) / 2,
+        startY: (t1.clientY + t2.clientY) / 2,
+        posStartX: position.x,
+        posStartY: position.y,
+      };
+      dragMovedRef.current = true;
+    } else if (e.touches.length === 1) {
+      // Satu jari: drag saat diperbesar
+      const t = e.touches[0];
+      touchStartRef.current = {
+        type: "pan",
+        startDist: 0,
+        startScale: scale,
+        startX: t.clientX,
+        startY: t.clientY,
+        posStartX: position.x,
+        posStartY: position.y,
+      };
+      dragMovedRef.current = false;
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && touchStartRef.current.type === "pinch") {
+      if (e.cancelable) e.preventDefault();
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      if (touchStartRef.current.startDist > 0) {
+        const factor = dist / touchStartRef.current.startDist;
+        const newScale = Math.min(
+          Math.max(Number((touchStartRef.current.startScale * factor).toFixed(2)), 1),
+          4
+        );
+        setScale(newScale);
+        if (newScale === 1) {
+          setPosition({ x: 0, y: 0 });
+        }
+        dragMovedRef.current = true;
+      }
+    } else if (e.touches.length === 1 && touchStartRef.current.type === "pan") {
+      if (scale > 1) {
+        if (e.cancelable) e.preventDefault();
+        const t = e.touches[0];
+        const dx = t.clientX - touchStartRef.current.startX;
+        const dy = t.clientY - touchStartRef.current.startY;
+        if (Math.hypot(dx, dy) > 4) {
+          dragMovedRef.current = true;
+        }
+        setPosition({
+          x: touchStartRef.current.posStartX + dx,
+          y: touchStartRef.current.posStartY + dy,
+        });
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length === 0) {
+      touchStartRef.current.type = "none";
+    } else if (e.touches.length === 1) {
+      const t = e.touches[0];
+      touchStartRef.current = {
+        type: "pan",
+        startDist: 0,
+        startScale: scale,
+        startX: t.clientX,
+        startY: t.clientY,
+        posStartX: position.x,
+        posStartY: position.y,
+      };
+    }
+  };
+
+  // Keyboard navigation & lock body zoom/scroll
   useEffect(() => {
     if (!isOpen) return;
 
@@ -130,12 +231,21 @@ export function OrgStructureViewer({
       }
     };
 
+    // Cegah gesture pinch browser memperbesar halaman web saat viewer terbuka
+    const preventMultiTouch = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("touchmove", preventMultiTouch, { passive: false });
 
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchmove", preventMultiTouch);
     };
   }, [isOpen, handleClose]);
 
@@ -191,7 +301,8 @@ export function OrgStructureViewer({
           role="dialog"
           aria-modal="true"
           aria-label="Pratinjau Bagan Struktur Organisasi"
-          className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-md animate-in fade-in-0 duration-150 select-none"
+          className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-md animate-in fade-in-0 duration-150 select-none touch-none"
+          style={{ touchAction: "none" }}
         >
           {/* Top Header Bar (Google Drive Style) */}
           <div className="flex h-14 sm:h-16 shrink-0 items-center justify-between border-b border-white/10 px-3 sm:px-6 bg-zinc-950/80 backdrop-blur-md z-20">
@@ -272,9 +383,9 @@ export function OrgStructureViewer({
             </div>
           </div>
 
-          {/* Center Stage: Photo directly centered in viewport */}
+          {/* Center Stage: Photo directly centered in viewport with touch-none */}
           <div
-            className="relative flex-1 w-full overflow-hidden flex items-center justify-center p-3 sm:p-8"
+            className="relative flex-1 w-full overflow-hidden flex items-center justify-center p-3 sm:p-8 touch-none"
             onClick={(e) => {
               if (e.target === e.currentTarget && !dragMovedRef.current) {
                 handleClose();
@@ -285,17 +396,22 @@ export function OrgStructureViewer({
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
             onDoubleClick={handleDoubleClick}
             style={{
               cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "default",
-              touchAction: scale > 1 ? "none" : "auto",
+              touchAction: "none",
             }}
           >
             <div
-              className="relative flex items-center justify-center transition-transform duration-75 select-none"
+              className="relative flex items-center justify-center transition-transform duration-75 select-none touch-none"
               style={{
                 transform: `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale})`,
                 transformOrigin: "center center",
+                touchAction: "none",
               }}
               onClick={(e) => e.stopPropagation()}
             >
