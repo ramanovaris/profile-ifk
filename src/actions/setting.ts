@@ -22,6 +22,17 @@ export interface UpdateIdentityInput {
   googleMapsEmbedUrl: string;
 }
 
+export interface UpdateLinksInput {
+  sp4nLaporUrl: string;
+  dinkesUrl: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  youtubeUrl: string;
+  announcementEnabled: boolean;
+  announcementType: "info" | "warning" | "important";
+  announcementText: string;
+}
+
 export type SettingActionResult<T = SiteSetting> = {
   success: boolean;
   data?: T;
@@ -76,6 +87,13 @@ export const getSiteSettings = cache(async (): Promise<SiteSetting> => {
     googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
     operationalHours: siteConfig.operationalHours,
     sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+    dinkesUrl: "",
+    instagramUrl: "",
+    facebookUrl: "",
+    youtubeUrl: "",
+    announcementEnabled: false,
+    announcementType: "info",
+    announcementText: "",
     motto: siteConfig.motto,
     tagline: siteConfig.tagline,
     headName: "apt. H. Muhammad Yusuf, S.Farm",
@@ -381,6 +399,111 @@ export async function updateSiteProfileAction(
     return {
       success: false,
       error: msg,
+    };
+  }
+}
+
+/**
+ * Memperbarui data tautan media sosial & banner pengumuman di PostgreSQL.
+ * Memerlukan otentikasi sesi aktif dengan peran SUPER_ADMIN.
+ */
+export async function updateSiteLinksAction(
+  data: UpdateLinksInput
+): Promise<SettingActionResult> {
+  const auth = await getCurrentSession();
+  if (!auth) {
+    return {
+      success: false,
+      error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
+    };
+  }
+
+  if (auth.user.role !== "SUPER_ADMIN") {
+    return {
+      success: false,
+      error: "Hanya Super Admin yang berwenang mengubah pengaturan tautan.",
+    };
+  }
+
+  const sp4nLaporUrl = data.sp4nLaporUrl?.trim() || "";
+  const dinkesUrl = data.dinkesUrl?.trim() || "";
+  const instagramUrl = data.instagramUrl?.trim() || "";
+  const facebookUrl = data.facebookUrl?.trim() || "";
+  const youtubeUrl = data.youtubeUrl?.trim() || "";
+  const announcementEnabled = Boolean(data.announcementEnabled);
+  const announcementType = ["info", "warning", "important"].includes(data.announcementType)
+    ? data.announcementType
+    : "info";
+  const announcementText = data.announcementText?.trim() || "";
+
+  // Validasi URL format jika diisi
+  const urlPattern = /^(https?:\/\/).+/;
+  const urls = [
+    { name: "SP4N LAPOR!", value: sp4nLaporUrl },
+    { name: "Portal Dinkes", value: dinkesUrl },
+    { name: "Instagram", value: instagramUrl },
+    { name: "Facebook", value: facebookUrl },
+    { name: "YouTube", value: youtubeUrl },
+  ];
+
+  for (const { name, value } of urls) {
+    if (value && !urlPattern.test(value)) {
+      return {
+        success: false,
+        error: `Format URL ${name} tidak valid. Gunakan format https://...`,
+      };
+    }
+  }
+
+  try {
+    const updated = await db.siteSetting.upsert({
+      where: { id: "default" },
+      update: {
+        sp4nLaporUrl,
+        dinkesUrl,
+        instagramUrl,
+        facebookUrl,
+        youtubeUrl,
+        announcementEnabled,
+        announcementType,
+        announcementText,
+      },
+      create: {
+        id: "default",
+        name: siteConfig.name,
+        shortName: siteConfig.shortName,
+        tagline: siteConfig.tagline,
+        motto: siteConfig.motto,
+        address: siteConfig.address,
+        operationalHours: siteConfig.operationalHours,
+        phone: siteConfig.phone,
+        whatsappLink: siteConfig.whatsappLink,
+        email: siteConfig.email,
+        googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
+        sp4nLaporUrl,
+        dinkesUrl,
+        instagramUrl,
+        facebookUrl,
+        youtubeUrl,
+        announcementEnabled,
+        announcementType,
+        announcementText,
+      },
+    });
+
+    // Revalidasi cache halaman publik dan admin
+    revalidatePath("/", "layout");
+    revalidatePath("/admin/pengaturan");
+
+    return {
+      success: true,
+      data: updated,
+    };
+  } catch (err) {
+    console.error("[Settings] Gagal menyimpan tautan & pengumuman:", err);
+    return {
+      success: false,
+      error: "Terjadi kesalahan sistem saat menyimpan ke basis data.",
     };
   }
 }
