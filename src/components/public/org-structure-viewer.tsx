@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
   ZoomIn,
@@ -22,12 +23,17 @@ export function OrgStructureViewer({
   src,
   alt = "Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru",
 }: OrgStructureViewerProps) {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const dragMovedRef = useRef(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -177,33 +183,33 @@ export function OrgStructureViewer({
         </button>
       </p>
 
-      {/* Google Drive Style Lightbox Preview (Photo Centered in Viewport) */}
-      {isOpen && (
+      {/* Google Drive Style Lightbox Preview (Portaled to document.body) */}
+      {isOpen && mounted && createPortal(
         <div
           role="dialog"
           aria-modal="true"
           aria-label="Pratinjau Bagan Struktur Organisasi"
-          className="fixed inset-0 z-50 flex flex-col bg-zinc-950/90 backdrop-blur-sm animate-in fade-in-0 duration-150"
+          className="fixed inset-0 z-[9999] flex flex-col bg-black/95 backdrop-blur-md animate-in fade-in-0 duration-150 select-none"
         >
           {/* Top Header Bar (Google Drive Style) */}
-          <div className="flex h-14 shrink-0 items-center justify-between border-b border-white/10 px-3 sm:px-5 bg-black/40 backdrop-blur-md z-20">
+          <div className="flex h-14 sm:h-16 shrink-0 items-center justify-between border-b border-white/10 px-3 sm:px-6 bg-zinc-950/80 backdrop-blur-md z-20">
             {/* Left: Close button (X) + File icon + Title */}
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
+            <div className="flex items-center gap-2 sm:gap-3.5 min-w-0 pr-2">
               <button
                 type="button"
                 onClick={handleClose}
                 aria-label="Tutup pratinjau"
                 title="Tutup (Esc)"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-95"
+                className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full text-zinc-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer active:scale-95"
               >
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-rose-600 text-white shadow-sm">
-                <ImageIcon className="h-4 w-4" />
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded bg-rose-600 text-white shadow-sm">
+                <ImageIcon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
               </div>
 
-              <span className="truncate text-xs sm:text-sm font-medium text-white max-w-[150px] sm:max-w-xs md:max-w-md">
+              <span className="truncate text-xs sm:text-base font-medium text-white max-w-[140px] sm:max-w-sm md:max-w-md">
                 Struktur-Organisasi-IFK.jpg
               </span>
             </div>
@@ -266,7 +272,7 @@ export function OrgStructureViewer({
 
           {/* Center Stage: Photo directly centered in viewport */}
           <div
-            className="relative flex-1 w-full overflow-hidden flex items-center justify-center p-3 sm:p-6"
+            className="relative flex-1 w-full overflow-hidden flex items-center justify-center p-3 sm:p-8"
             onClick={(e) => {
               if (e.target === e.currentTarget && !dragMovedRef.current) {
                 handleClose();
@@ -296,11 +302,12 @@ export function OrgStructureViewer({
                 src={src}
                 alt={alt}
                 draggable={false}
-                className="max-h-[85vh] max-w-[92vw] w-auto h-auto object-contain shadow-[0_20px_60px_rgba(0,0,0,0.85)] pointer-events-none select-none"
+                className="max-h-[85vh] max-w-[92vw] w-auto h-auto object-contain shadow-[0_25px_70px_rgba(0,0,0,0.9)] pointer-events-none select-none"
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
