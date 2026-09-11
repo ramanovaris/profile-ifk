@@ -8,6 +8,7 @@ import { LogIn } from "lucide-react";
 
 import { siteConfig } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
+import type { SiteSetting } from "@prisma/client";
 
 const navLinks = [
   { href: "/", label: "Beranda" },
@@ -18,9 +19,14 @@ const navLinks = [
   { href: "/kontak", label: "Kontak" },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  settings?: SiteSetting;
+}
+
+export function Navbar({ settings }: NavbarProps = {}) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const shortName = settings?.shortName || siteConfig.shortName;
 
   return (
     <>
@@ -32,7 +38,7 @@ export function Navbar() {
             className="flex shrink-0 items-center gap-2 font-semibold tracking-tight text-heading"
           >
             <Image src="/images/logo-ifk.jpg" alt="Logo IFK Kotabaru" width={28} height={28} unoptimized className="h-7 w-7 shrink-0 rounded-full" />
-            <span className="text-sm font-semibold tracking-tight whitespace-nowrap">{siteConfig.shortName}</span>
+            <span className="text-sm font-semibold tracking-tight whitespace-nowrap">{shortName}</span>
           </Link>
 
           {/* Desktop nav */}
