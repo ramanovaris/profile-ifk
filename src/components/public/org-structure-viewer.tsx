@@ -197,10 +197,11 @@ export function OrgStructureViewer({
         }
       }
 
-      // Gesture rotate (two-finger)
+      // Gesture rotate — snap ke 90° terdekat
       const angleDiff = angle - ts.startAngle;
       const degDiff = (angleDiff * 180) / Math.PI;
-      const snapped = Math.round((ts.startRotation + degDiff) / 15) * 15;
+      const raw = ts.startRotation + degDiff;
+      const snapped = Math.round(raw / 90) * 90;
       setRotation(((snapped % 360) + 360) % 360);
 
       dragMovedRef.current = true;
