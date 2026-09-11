@@ -69,9 +69,15 @@ async function runTests() {
     typeof initialDbSetting.tupoksi === "string" && initialDbSetting.tupoksi.length > 0,
     `Field tupoksi terbaca: "${initialDbSetting.tupoksi.substring(0, 30)}..."`
   );
+  assert(
+    "orgStructurePhoto" in initialDbSetting,
+    "Field orgStructurePhoto tersedia pada model SiteSetting"
+  );
 
   const originalHeadName = initialDbSetting.headName;
+  const originalOrgPhoto = initialDbSetting.orgStructurePhoto;
   const testHeadName = `${originalHeadName} [TEST]`;
+  const testOrgPhoto = `/uploads/profile/org-test.png`;
 
   // 3. Pengujian mutasi update data profil di PostgreSQL
   console.log("3. Pengujian mutasi update data profil di PostgreSQL...");
@@ -79,11 +85,16 @@ async function runTests() {
     where: { id: "default" },
     data: {
       headName: testHeadName,
+      orgStructurePhoto: testOrgPhoto,
     },
   });
   assert(
     updatedDbSetting.headName === testHeadName,
     "Mutasi pembaruan headName berhasil dieksekusi di database"
+  );
+  assert(
+    updatedDbSetting.orgStructurePhoto === testOrgPhoto,
+    "Mutasi pembaruan orgStructurePhoto berhasil dieksekusi di database"
   );
 
   // 4. Pengujian pembacaan ulang via getSiteSettings
@@ -95,6 +106,10 @@ async function runTests() {
     reReadDbSetting?.headName === testHeadName,
     "Data headName yang dibaca ulang konsisten dengan nilai yang diperbarui"
   );
+  assert(
+    reReadDbSetting?.orgStructurePhoto === testOrgPhoto,
+    "Data orgStructurePhoto yang dibaca ulang konsisten dengan nilai yang diperbarui"
+  );
 
   // 5. Rollback data ke kondisi awal
   console.log("5. Mengembalikan (rollback) data ke kondisi semula...");
@@ -102,6 +117,7 @@ async function runTests() {
     where: { id: "default" },
     data: {
       headName: originalHeadName,
+      orgStructurePhoto: originalOrgPhoto,
     },
   });
 

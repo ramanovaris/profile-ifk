@@ -13,6 +13,10 @@ export default async function ProfilPage() {
     ? getAssetUrl(settings.headPhoto)
     : placeholderImage(300, 400, "Kepala IFK", "Profil");
 
+  const orgStructureSrc = settings.orgStructurePhoto
+    ? getAssetUrl(settings.orgStructurePhoto)
+    : placeholderImage(800, 500, "Struktur Organisasi", "Profil");
+
   const greetingParagraphs = settings.greeting
     ? settings.greeting
         .split(/\n+/)
@@ -152,7 +156,7 @@ export default async function ProfilPage() {
             <div className="bezel mx-auto max-w-3xl">
               <div className="bezel-inner">
                 <Image
-                  src={placeholderImage(800, 500, "Struktur Organisasi", "Profil")}
+                  src={orgStructureSrc}
                   alt="Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru"
                   width={800}
                   height={500}

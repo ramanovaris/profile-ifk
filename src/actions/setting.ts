@@ -81,6 +81,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSetting> => {
     headName: "apt. H. Muhammad Yusuf, S.Farm",
     headRole: "Kepala UPTD Instalasi Farmasi Kab. Kotabaru",
     headPhoto: null,
+    orgStructurePhoto: null,
     greeting: DEFAULT_GREETING,
     vision: DEFAULT_VISION,
     mission: DEFAULT_MISSION,
@@ -220,6 +221,33 @@ async function saveProfilePhotoFile(file: File): Promise<string> {
 }
 
 /**
+ * Menyimpan file bagan struktur organisasi secara lokal di direktori public/uploads/profile/
+ */
+async function saveOrgStructurePhotoFile(file: File): Promise<string> {
+  const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+  if (!allowedMimeTypes.includes(file.type)) {
+    throw new Error("Format bagan tidak didukung. Gunakan file bertipe PNG, JPG, atau WebP.");
+  }
+
+  // Batas maksimal 5MB
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("Ukuran berkas bagan struktur organisasi melebihi batas maksimal 5MB.");
+  }
+
+  const uploadDir = path.join(process.cwd(), "public", "uploads", "profile");
+  await fs.mkdir(uploadDir, { recursive: true });
+
+  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+  const filename = `org-structure-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+  const filePath = path.join(uploadDir, filename);
+
+  const arrayBuffer = await file.arrayBuffer();
+  await fs.writeFile(filePath, Buffer.from(arrayBuffer));
+
+  return `/uploads/profile/${filename}`;
+}
+
+/**
  * Menghapus file foto pimpinan lama jika berada di direktori lokal
  */
 async function deleteOldProfilePhoto(photoUrl?: string | null) {
@@ -235,7 +263,7 @@ async function deleteOldProfilePhoto(photoUrl?: string | null) {
 }
 
 /**
- * Memperbarui data konten profil UPTD (Pimpinan, Sambutan, Visi, Misi, Tupoksi) di PostgreSQL.
+ * Memperbarui data konten profil UPTD (Pimpinan, Sambutan, Visi, Misi, Tupoksi, Bagan Struktur) di PostgreSQL.
  * Memerlukan otentikasi sesi aktif dengan peran SUPER_ADMIN.
  */
 export async function updateSiteProfileAction(
@@ -263,6 +291,7 @@ export async function updateSiteProfileAction(
   const mission = formData.get("mission")?.toString().trim() || "";
   const tupoksi = formData.get("tupoksi")?.toString().trim() || "";
   const photoFile = formData.get("headPhoto") as File | null;
+  const orgStructureFile = formData.get("orgStructurePhoto") as File | null;
 
   if (!headName || headName.length < 3) {
     return {
@@ -277,6 +306,7 @@ export async function updateSiteProfileAction(
     });
 
     let headPhoto = currentSetting?.headPhoto || null;
+    let orgStructurePhoto = currentSetting?.orgStructurePhoto || null;
 
     if (photoFile && photoFile.size > 0 && photoFile.name && photoFile.name !== "undefined") {
       const newPhotoUrl = await saveProfilePhotoFile(photoFile);
@@ -286,12 +316,26 @@ export async function updateSiteProfileAction(
       headPhoto = newPhotoUrl;
     }
 
+    if (
+      orgStructureFile &&
+      orgStructureFile.size > 0 &&
+      orgStructureFile.name &&
+      orgStructureFile.name !== "undefined"
+    ) {
+      const newOrgPhotoUrl = await saveOrgStructurePhotoFile(orgStructureFile);
+      if (currentSetting?.orgStructurePhoto) {
+        await deleteOldProfilePhoto(currentSetting.orgStructurePhoto);
+      }
+      orgStructurePhoto = newOrgPhotoUrl;
+    }
+
     const updated = await db.siteSetting.upsert({
       where: { id: "default" },
       update: {
         headName,
         headRole,
         headPhoto,
+        orgStructurePhoto,
         greeting,
         vision,
         mission,
@@ -313,6 +357,7 @@ export async function updateSiteProfileAction(
         headName,
         headRole,
         headPhoto,
+        orgStructurePhoto,
         greeting,
         vision,
         mission,

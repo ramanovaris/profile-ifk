@@ -206,6 +206,7 @@ async function main() {
       headName: "apt. H. Muhammad Yusuf, S.Farm",
       headRole: "Kepala UPTD Instalasi Farmasi Kab. Kotabaru",
       headPhoto: null,
+      orgStructurePhoto: null,
       greeting:
         "Assalamualaikum Warahmatullahi Wabarakatuh.\n\nPuji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa atas segala rahmat dan karunia-Nya sehingga UPTD Instalasi Farmasi Kabupaten Kotabaru dapat terus memberikan pelayanan terbaik di bidang kefarmasian bagi masyarakat Kabupaten Kotabaru.\n\nKami berkomitmen untuk terus meningkatkan kualitas distribusi obat dan farmasi, menjaga mutu pelayanan, serta memastikan ketersediaan obat yang aman, berkhasiat, dan berkualitas di seluruh fasilitas kesehatan binaan.\n\nSemoga website ini dapat menjadi sarana informasi yang bermanfaat bagi seluruh masyarakat.\n\nWassalamualaikum Warahmatullahi Wabarakatuh.",
       vision:

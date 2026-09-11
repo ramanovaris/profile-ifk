@@ -6,7 +6,7 @@ Rencana kerja terinci untuk menyelesaikan **Issue #53** (`feat(pengaturan): inte
 
 ## Task 1: Perluasan Skema Prisma & Sinkronisasi Database
 - [ ] Edit `prisma/schema.prisma`:
-  - Tambahkan 7 field baru pada model `SiteSetting`: `headName`, `headRole`, `headPhoto`, `greeting`, `vision`, `mission`, `tupoksi`.
+  - Tambahkan field baru pada model `SiteSetting`: `headName`, `headRole`, `headPhoto`, `orgStructurePhoto`, `greeting`, `vision`, `mission`, `tupoksi`.
 - [ ] Jalankan `npx prisma db push` untuk menerapkan perubahan skema ke database PostgreSQL VPS tanpa data loss.
 - [ ] Perbarui seeder `prisma/seed.ts` agar idempoten dan menyertakan nilai awal profil instansi.
 

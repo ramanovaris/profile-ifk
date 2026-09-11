@@ -18,6 +18,7 @@ import {
   Radio,
   Share2,
   Megaphone,
+  Network,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     headRole:
       initialSettings.headRole || "Kepala UPTD Instalasi Farmasi Kab. Kotabaru",
     headPhoto: initialSettings.headPhoto || null,
+    orgStructurePhoto: initialSettings.orgStructurePhoto || null,
     greeting: initialSettings.greeting || "",
     vision: initialSettings.vision || "",
     mission: initialSettings.mission || "",
@@ -70,6 +72,14 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     initialSettings.headPhoto ? getAssetUrl(initialSettings.headPhoto) : null
   );
   const headPhotoInputRef = useRef<HTMLInputElement>(null);
+
+  const [orgPhotoFile, setOrgPhotoFile] = useState<File | null>(null);
+  const [orgPhotoPreview, setOrgPhotoPreview] = useState<string | null>(
+    initialSettings.orgStructurePhoto
+      ? getAssetUrl(initialSettings.orgStructurePhoto)
+      : null
+  );
+  const orgPhotoInputRef = useRef<HTMLInputElement>(null);
 
   // ── Tab 3: Tautan & Layanan State ─────────────────────────────────────────
   const initialLinks = {
@@ -126,6 +136,24 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     }
   };
 
+  const handleOrgPhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Format berkas harus berupa gambar (PNG, JPG, WebP).");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Ukuran berkas bagan struktur tidak boleh melebihi 5MB.");
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      setOrgPhotoFile(file);
+      setOrgPhotoPreview(url);
+      toast.success("Gambar bagan struktur organisasi berhasil dipilih.");
+    }
+  };
+
   const handleProfileSave = (e: FormEvent) => {
     e.preventDefault();
     if (!profileForm.headName.trim()) {
@@ -144,6 +172,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       if (photoFile) {
         formData.append("headPhoto", photoFile);
       }
+      if (orgPhotoFile) {
+        formData.append("orgStructurePhoto", orgPhotoFile);
+      }
 
       const res = await updateSiteProfileAction(formData);
       if (!res.success) {
@@ -153,8 +184,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
       toast.success("Konten profil UPTD berhasil disimpan ke basis data.");
       setPhotoFile(null);
+      setOrgPhotoFile(null);
       if (res.data?.headPhoto) {
         setPhotoPreview(getAssetUrl(res.data.headPhoto));
+      }
+      if (res.data?.orgStructurePhoto) {
+        setOrgPhotoPreview(getAssetUrl(res.data.orgStructurePhoto));
       }
     });
   };
@@ -164,6 +199,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     setPhotoFile(null);
     setPhotoPreview(
       initialSettings.headPhoto ? getAssetUrl(initialSettings.headPhoto) : null
+    );
+    setOrgPhotoFile(null);
+    setOrgPhotoPreview(
+      initialSettings.orgStructurePhoto
+        ? getAssetUrl(initialSettings.orgStructurePhoto)
+        : null
     );
     toast.info("Form konten profil dikembalikan ke data awal basis data.");
   };
@@ -629,6 +670,68 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   className="border-white/10 bg-zinc-950/60 text-sm leading-relaxed text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Kartu Bagan Struktur Organisasi */}
+          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+                  <Network className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-white">Bagan Struktur Organisasi</h2>
+                  <p className="text-xs text-zinc-400">
+                    Bagan hierarki struktur organisasi UPTD Instalasi Farmasi untuk halaman profil.
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => orgPhotoInputRef.current?.click()}
+                className="gap-2 border-white/10 bg-zinc-800/60 text-xs text-zinc-300 [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                <span>Upload Bagan Baru</span>
+              </Button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              <div className="group relative aspect-[16/9] w-full max-h-[380px] overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-md">
+                <Image
+                  src={
+                    orgPhotoPreview ||
+                    placeholderImage(800, 500, "Struktur Organisasi", "Profil")
+                  }
+                  alt="Struktur Organisasi UPTD IFK"
+                  fill
+                  unoptimized
+                  className="object-contain transition-transform duration-300 group-hover:scale-[1.01]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100 flex items-end justify-center pb-4">
+                  <button
+                    type="button"
+                    onClick={() => orgPhotoInputRef.current?.click()}
+                    className="rounded-full border border-white/20 bg-zinc-900/90 px-4 py-2 text-xs font-medium text-white shadow-lg backdrop-blur-sm transition-transform active:scale-95 flex items-center gap-2"
+                  >
+                    <Camera className="h-4 w-4" />
+                    Ganti Gambar Bagan
+                  </button>
+                </div>
+              </div>
+              <input
+                type="file"
+                ref={orgPhotoInputRef}
+                onChange={handleOrgPhotoChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <p className="text-[11px] text-zinc-500">
+                Format yang didukung: PNG, JPG, WebP. Disarankan diagram berorientasi landscape dengan ukuran file maksimal 5MB.
+              </p>
             </div>
           </div>
 
