@@ -325,7 +325,7 @@ export function OrgStructureViewer({
           className="text-brand-600 font-medium hover:underline inline-flex items-center gap-1 cursor-pointer"
         >
           <Maximize2 className="h-3 w-3" />
-          Lihat Bagan Penuh
+          Lihat Diagram Struktur
         </button>
       </p>
 
