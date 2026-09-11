@@ -63,7 +63,8 @@ export function Navbar({ settings }: NavbarProps = {}) {
             })}
             <div className="ml-1.5 flex shrink-0 items-center gap-1">
               <Link
-                href="/admin/login"
+                href="/admin/login/"
+                prefetch={false}
                 className="flex shrink-0 items-center gap-1.5 rounded-full border border-black/5 bg-black/5 px-3 py-1.5 text-xs font-medium text-heading transition-colors hover:bg-black/10 whitespace-nowrap"
               >
                 <LogIn className="h-3.5 w-3.5 shrink-0" />
@@ -106,7 +107,8 @@ export function Navbar({ settings }: NavbarProps = {}) {
             })}
             <div className="mt-4 border-t border-black/5 pt-4">
               <Link
-                href="/admin/login"
+                href="/admin/login/"
+                prefetch={false}
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 rounded-xl bg-black/5 px-4 py-3 text-sm font-medium text-heading hover:bg-black/10"
               >

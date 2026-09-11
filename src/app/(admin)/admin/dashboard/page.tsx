@@ -109,7 +109,7 @@ export default async function AdminDashboardPage() {
             </p>
           </div>
           <Link
-            href="/admin/berita"
+            href="/admin/berita/"
             className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 hover:text-brand-300"
           >
             <span>Semua Berita</span>
@@ -162,7 +162,7 @@ export default async function AdminDashboardPage() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Link
-                      href={`/admin/berita/${article.id}/edit`}
+                      href={`/admin/berita/${article.id}/edit/`}
                       className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 transition-colors hover:text-white"
                     >
                       <span>Edit</span>
@@ -189,7 +189,7 @@ export default async function AdminDashboardPage() {
           </div>
           {isSuperAdmin && (
             <Link
-              href="/admin/pengguna"
+              href="/admin/pengguna/"
               className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 hover:text-brand-300"
             >
               <span>Kelola Pengguna</span>

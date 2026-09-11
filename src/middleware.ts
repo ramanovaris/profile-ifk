@@ -14,13 +14,13 @@ export function middleware(request: NextRequest) {
   // ponytail: cookie existence check at edge (no DB query); full revocation & role checks run in server actions and data layer
   if (!sessionToken && !isLoginPage) {
     const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/admin/login";
+    loginUrl.pathname = "/admin/login/";
     return NextResponse.redirect(loginUrl);
   }
 
   if (sessionToken && (isLoginPage || cleanPath === "/admin")) {
     const dashboardUrl = request.nextUrl.clone();
-    dashboardUrl.pathname = "/admin/dashboard";
+    dashboardUrl.pathname = "/admin/dashboard/";
     return NextResponse.redirect(dashboardUrl);
   }
 
