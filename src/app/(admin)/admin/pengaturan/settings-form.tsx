@@ -27,7 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { placeholderImage } from "@/lib/placeholder";
 import { cn, getAssetUrl } from "@/lib/utils";
-import { updateSiteIdentityAction, updateSiteProfileAction } from "@/actions/setting";
+import { updateSiteIdentityAction, updateSiteProfileAction, updateSiteLinksAction } from "@/actions/setting";
 
 type TabKey = "identitas" | "profil" | "tautan";
 
@@ -84,14 +84,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   // ── Tab 3: Tautan & Layanan State ─────────────────────────────────────────
   const initialLinks = {
     sp4nLaporUrl: initialSettings.sp4nLaporUrl,
-    dinkesUrl: "https://dinkes.kotabarukab.go.id",
-    instagramUrl: "https://instagram.com/ifk_kotabaru",
-    facebookUrl: "https://facebook.com/ifk.kotabaru",
-    youtubeUrl: "https://youtube.com/@ifkkotabaru",
-    announcementEnabled: false,
-    announcementType: "info" as "info" | "warning" | "important",
-    announcementText:
-      "Layanan penerimaan dan distribusi obat libur nasional. Layanan darurat kefarmasian tetap disiagakan.",
+    dinkesUrl: initialSettings.dinkesUrl || "",
+    instagramUrl: initialSettings.instagramUrl || "",
+    facebookUrl: initialSettings.facebookUrl || "",
+    youtubeUrl: initialSettings.youtubeUrl || "",
+    announcementEnabled: initialSettings.announcementEnabled || false,
+    announcementType: (initialSettings.announcementType || "info") as "info" | "warning" | "important",
+    announcementText: initialSettings.announcementText || "",
   };
   const [linksForm, setLinksForm] = useState(initialLinks);
 
@@ -211,7 +210,14 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   const handleLinksSave = (e: FormEvent) => {
     e.preventDefault();
-    toast.success("Tautan layanan eksternal berhasil disimpan.");
+    startTransition(async () => {
+      const res = await updateSiteLinksAction(linksForm);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan tautan layanan.");
+        return;
+      }
+      toast.success("Tautan layanan & pengumuman berhasil disimpan ke basis data.");
+    });
   };
 
   const handleLinksReset = () => {
@@ -957,10 +963,11 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             </Button>
             <Button
               type="submit"
+              disabled={isPending}
               className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
             >
               <Save className="h-4 w-4" />
-              <span>Simpan Perubahan</span>
+              <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
             </Button>
           </div>
         </form>
