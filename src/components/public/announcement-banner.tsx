@@ -1,11 +1,13 @@
-import { getSiteSettings } from "@/actions/setting";
 import { Megaphone, AlertTriangle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { SiteSetting } from "@prisma/client";
 
-export async function AnnouncementBanner() {
-  const settings = await getSiteSettings();
+interface AnnouncementBannerProps {
+  settings?: SiteSetting | null;
+}
 
-  if (!settings.announcementEnabled || !settings.announcementText) {
+export function AnnouncementBanner({ settings }: AnnouncementBannerProps) {
+  if (!settings?.announcementEnabled || !settings?.announcementText?.trim()) {
     return null;
   }
 
@@ -14,15 +16,15 @@ export async function AnnouncementBanner() {
   return (
     <div
       className={cn(
-        "relative border-b px-4 py-2.5 text-xs font-medium backdrop-blur-xl",
+        "w-full border-b px-4 py-2 text-xs font-medium shadow-sm backdrop-blur-xl",
         type === "important"
-          ? "border-rose-500/20 bg-rose-500/10 text-rose-200"
+          ? "border-rose-500/25 bg-rose-950/85 text-rose-200"
           : type === "warning"
-          ? "border-amber-500/20 bg-amber-500/10 text-amber-200"
-          : "border-sky-500/20 bg-sky-500/10 text-sky-200"
+          ? "border-amber-500/25 bg-amber-950/85 text-amber-200"
+          : "border-sky-500/25 bg-sky-950/85 text-sky-200"
       )}
     >
-      <div className="section-container flex items-center justify-center gap-2.5">
+      <div className="section-container flex items-center justify-center gap-2">
         <span
           className={cn(
             "inline-flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider",

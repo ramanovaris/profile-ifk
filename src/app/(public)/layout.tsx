@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
-import { AnnouncementBanner } from "@/components/public/announcement-banner";
 import { getSiteSettings } from "@/actions/setting";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -8,7 +7,6 @@ export default async function PublicLayout({ children }: { children: React.React
 
   return (
     <>
-      <AnnouncementBanner />
       <Navbar settings={settings} />
       <main className="flex-1">{children}</main>
       <Footer settings={settings} />
