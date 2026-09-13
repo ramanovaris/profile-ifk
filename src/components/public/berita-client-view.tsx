@@ -1,10 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, Loader2, ArrowDown } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import {
+  Search,
+  SlidersHorizontal,
+  ChevronDown,
+  Check,
+  X,
+  Loader2,
+  ArrowDown,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
 import { cn } from "@/lib/utils";
@@ -31,32 +39,106 @@ export function BeritaClientView({
   categories,
   initialHasMore,
 }: BeritaClientViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Inisialisasi state dari query parameter URL jika ada
+  const initialQ = searchParams.get("q") || "";
+  const initialCategoryParam = searchParams.get("kategori") || "semua";
+
   const [articles, setArticles] = useState<PublicArticleItem[]>(initialArticles);
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("semua");
+  const [search, setSearch] = useState(initialQ);
+  const [activeCategory, setActiveCategory] = useState<string>(initialCategoryParam);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
 
-  // Kategori filter: 'Semua' + kategori aktif dinamis
+  // Kategori filter: 'Semua Kategori' + kategori aktif dinamis
   const filterCategories = [
-    { name: "Semua", slug: "semua" },
+    { id: "semua", name: "Semua Kategori", slug: "semua" },
     ...categories,
   ];
 
-  // Debounced search & filter kategori
+  // Helper untuk memperbarui URL query parameter tanpa lonjakan scroll
+  const updateUrlParams = useCallback(
+    (newSearch: string, newCategory: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (newSearch.trim()) {
+        params.set("q", newSearch.trim());
+      } else {
+        params.delete("q");
+      }
+
+      if (newCategory && newCategory !== "semua") {
+        params.set("kategori", newCategory);
+      } else {
+        params.delete("kategori");
+      }
+
+      const queryString = params.toString();
+      const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.replace(targetUrl, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  // Tutup dropdown saat klik di luar
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsCategoryOpen(false);
+      }
+    }
+    if (isCategoryOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isCategoryOpen]);
+
+  // Debounced search & filter kategori (350ms)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
+      // Jika saat pertama kali load terdapat param URL non-default, lakukan fetch sinkron
+      if (initialQ || (initialCategoryParam && initialCategoryParam !== "semua")) {
+        const fetchInitialFiltered = async () => {
+          setIsLoading(true);
+          const res = await getPublicArticlesAction({
+            page: 1,
+            limit: 12,
+            categorySlug:
+              initialCategoryParam === "semua" ? undefined : initialCategoryParam,
+            search: initialQ.trim() || undefined,
+          });
+          if (res.success) {
+            setArticles(res.articles);
+            setHasMore(res.hasMore);
+          }
+          setIsLoading(false);
+        };
+        fetchInitialFiltered();
+      }
       return;
     }
 
     const timer = setTimeout(async () => {
       setIsLoading(true);
       setPage(1);
+
+      // Sinkronkan ke URL
+      updateUrlParams(search, activeCategory);
 
       const res = await getPublicArticlesAction({
         page: 1,
@@ -70,10 +152,24 @@ export function BeritaClientView({
         setHasMore(res.hasMore);
       }
       setIsLoading(false);
-    }, 300);
+    }, 350);
 
     return () => clearTimeout(timer);
-  }, [search, activeCategory]);
+  }, [search, activeCategory, updateUrlParams, initialQ, initialCategoryParam]);
+
+  // Hapus pencarian seketika (0ms)
+  const handleClearSearch = () => {
+    setSearch("");
+    setPage(1);
+    updateUrlParams("", activeCategory);
+  };
+
+  const handleSelectCategory = (catSlug: string) => {
+    setActiveCategory(catSlug);
+    setIsCategoryOpen(false);
+    setPage(1);
+    updateUrlParams(search, catSlug);
+  };
 
   const handleLoadMore = async () => {
     if (isLoadingMore || !hasMore) return;
@@ -95,47 +191,110 @@ export function BeritaClientView({
     setIsLoadingMore(false);
   };
 
+  const activeCategoryObj = filterCategories.find(
+    (c) => c.slug === activeCategory
+  );
+  const activeCategoryLabel = activeCategoryObj
+    ? activeCategoryObj.name
+    : "Semua Kategori";
+
   return (
     <div className="section-container">
-      {/* Search bar & Category Filter */}
-      <Reveal>
-        <div className="relative max-w-md">
-          <Search
-            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
-            strokeWidth={1.5}
-          />
-          <Input
-            placeholder="Cari berita atau pengumuman..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border-border pl-9 focus:border-brand-600"
-          />
-        </div>
-
-        {/* Category filter pills */}
-        <div className="mt-6 flex flex-wrap gap-2">
-          {filterCategories.map((cat) => {
-            const isActive = activeCategory === cat.slug;
-            return (
+      {/* ── Toolbar Pencarian & Filter Terpadu (Serasi Halaman Stok) ─ */}
+      <Reveal className="relative z-30">
+        <div className="relative z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
+          {/* Kolom Pencarian dengan Tombol Clear 'X' */}
+          <div className="relative flex-1">
+            <Search
+              className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+              strokeWidth={1.5}
+            />
+            <input
+              type="text"
+              placeholder="Cari judul berita, artikel, atau pengumuman..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-full border border-border bg-surface py-2.5 pl-10 pr-10 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
+            />
+            {search && (
               <button
-                key={cat.slug}
                 type="button"
-                onClick={() => setActiveCategory(cat.slug)}
-                className={cn(
-                  "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-500 ease-luxe",
-                  isActive
-                    ? "bg-zinc-950 text-white shadow-xs"
-                    : "bg-surface-alt text-muted hover:bg-zinc-200 hover:text-heading"
-                )}
+                onClick={handleClearSearch}
+                aria-label="Bersihkan pencarian"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-muted transition-colors hover:bg-zinc-200 hover:text-heading cursor-pointer"
               >
-                {cat.name}
+                <X className="h-3.5 w-3.5" />
               </button>
-            );
-          })}
+            )}
+          </div>
+
+          {/* Dropdown Filter Kategori */}
+          <div ref={dropdownRef} className="relative inline-block w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setIsCategoryOpen((prev) => !prev)}
+              aria-expanded={isCategoryOpen}
+              aria-haspopup="listbox"
+              className={cn(
+                "inline-flex h-10 w-full items-center justify-between gap-2.5 rounded-full border px-4 text-xs font-medium transition-all duration-300 sm:w-auto sm:min-w-[180px] cursor-pointer",
+                activeCategory !== "semua"
+                  ? "border-brand-600/30 bg-brand-500/10 text-brand-700 shadow-xs"
+                  : "border-border bg-surface text-muted hover:border-zinc-300 hover:text-heading hover:bg-surface-alt/80"
+              )}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <SlidersHorizontal
+                  className={cn(
+                    "h-3.5 w-3.5 shrink-0 transition-colors",
+                    activeCategory !== "semua" ? "text-brand-600" : "text-muted"
+                  )}
+                />
+                <span className="truncate">{activeCategoryLabel}</span>
+              </div>
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 text-muted transition-transform duration-200 shrink-0",
+                  isCategoryOpen && "rotate-180"
+                )}
+              />
+            </button>
+
+            {/* Popover Menu Dropdown */}
+            {isCategoryOpen && (
+              <div
+                role="listbox"
+                className="absolute right-0 top-full z-50 mt-2 w-56 max-w-[calc(100vw-2rem)] origin-top-right rounded-2xl border border-border bg-surface/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+              >
+                <div className="max-h-64 overflow-y-auto py-1 space-y-0.5">
+                  {filterCategories.map((cat) => {
+                    const isSelected = activeCategory === cat.slug;
+                    return (
+                      <button
+                        key={cat.slug}
+                        type="button"
+                        onClick={() => handleSelectCategory(cat.slug)}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-colors cursor-pointer text-left",
+                          isSelected
+                            ? "bg-brand-500/10 text-brand-700"
+                            : "text-zinc-700 hover:bg-surface-alt hover:text-heading"
+                        )}
+                      >
+                        <span className="truncate">{cat.name}</span>
+                        {isSelected && (
+                          <Check className="h-3.5 w-3.5 text-brand-600 shrink-0 ml-2" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Reveal>
 
-      {/* Article grid */}
+      {/* ── Grid Daftar Artikel ────────────────────────────────────── */}
       <Reveal delay={100}>
         <div
           className={cn(
@@ -179,7 +338,7 @@ export function BeritaClientView({
               <h3 className="mt-4 text-lg font-semibold text-heading line-clamp-2 transition-colors duration-300 group-hover:text-brand-800">
                 {article.title}
               </h3>
-              <p className="mt-1 font-mono text-xs text-muted">
+              <p className="mt-2 font-mono text-xs text-muted">
                 {new Date(article.publishedAt).toLocaleDateString("id-ID", {
                   day: "numeric",
                   month: "long",
@@ -189,45 +348,56 @@ export function BeritaClientView({
             </Link>
           ))}
         </div>
-      </Reveal>
 
-      {/* Empty State */}
-      {articles.length === 0 && !isLoading && (
-        <div className="mt-12 rounded-2xl border border-dashed border-border bg-surface-alt/40 p-12 text-center">
-          <p className="text-base font-semibold text-heading">
-            Tidak ada berita yang cocok
-          </p>
-          <p className="mt-1 text-sm text-muted">
-            {search.trim()
-              ? `Tidak ditemukan berita dengan kata kunci "${search.trim()}".`
-              : "Belum ada berita pada kategori ini."}
-          </p>
-        </div>
-      )}
-
-      {/* Load More Button */}
-      {hasMore && (
-        <div className="mt-14 flex justify-center">
-          <button
-            type="button"
-            onClick={handleLoadMore}
-            disabled={isLoadingMore}
-            className="group inline-flex items-center gap-2.5 rounded-full border border-border bg-white px-8 py-3 text-sm font-medium text-heading shadow-xs transition-all duration-500 ease-luxe hover:border-brand-300 hover:bg-zinc-50 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98]"
-          >
-            {isLoadingMore ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin text-brand-600" />
-                <span>Memuat Berita...</span>
-              </>
-            ) : (
-              <>
-                <span>Muat Berita Lainnya</span>
-                <ArrowDown className="h-4 w-4 text-muted transition-transform duration-300 group-hover:translate-y-0.5 group-hover:text-brand-700" />
-              </>
+        {articles.length === 0 && !isLoading && (
+          <div className="mt-16 flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-16 text-center">
+            <Search className="h-8 w-8 text-muted/60" />
+            <p className="mt-3 text-sm font-medium text-heading">
+              Tidak ada berita yang sesuai
+            </p>
+            <p className="mt-1 text-xs text-muted">
+              Coba sesuaikan kata kunci pencarian atau pilih kategori lain.
+            </p>
+            {(search || activeCategory !== "semua") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setActiveCategory("semua");
+                  updateUrlParams("", "semua");
+                }}
+                className="mt-4 rounded-full bg-surface-alt px-4 py-1.5 text-xs font-medium text-brand-700 hover:bg-zinc-200 transition-colors cursor-pointer"
+              >
+                Reset Filter
+              </button>
             )}
-          </button>
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {hasMore && (
+          <div className="mt-12 flex justify-center">
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-6 py-3 text-sm font-medium text-heading transition-all duration-300 hover:border-brand-600 hover:bg-surface-alt disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLoadingMore ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-brand-600" />
+                  <span>Memuat...</span>
+                </>
+              ) : (
+                <>
+                  <span>Muat Berita Lainnya</span>
+                  <ArrowDown className="h-4 w-4 text-muted" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
+      </Reveal>
     </div>
   );
 }
