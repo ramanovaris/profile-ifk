@@ -29,7 +29,7 @@ export function PageHero({
         aria-hidden
         className="pointer-events-none absolute top-0 bottom-0 left-1/2 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block"
       />
-      <div className="section-container relative z-10 py-24">
+      <div className="section-container relative z-10 pt-36 pb-20 sm:pt-40 sm:pb-24 md:pt-44">
         <div className="max-w-2xl">
           <Breadcrumb items={breadcrumb} variant="dark" />
           <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">

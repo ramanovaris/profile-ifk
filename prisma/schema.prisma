@@ -119,6 +119,13 @@ model SiteSetting {
   googleMapsEmbedUrl  String   @db.Text
   operationalHours    String   @db.Text
   sp4nLaporUrl        String
+  dinkesUrl           String   @default("")
+  instagramUrl        String   @default("")
+  facebookUrl         String   @default("")
+  youtubeUrl          String   @default("")
+  announcementEnabled Boolean  @default(false)
+  announcementType    String   @default("info")
+  announcementText    String   @default("") @db.Text
   motto               String
   tagline             String
 
