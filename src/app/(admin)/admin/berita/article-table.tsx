@@ -3,6 +3,7 @@
 import { useState, useTransition, useOptimistic } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   Plus,
   Pencil,
@@ -17,6 +18,9 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import {
   Dialog,
@@ -35,6 +39,11 @@ import {
   deleteArticleAction,
 } from "@/actions/article";
 import { getAssetUrl } from "@/lib/utils";
+import {
+  sortArticles,
+  type SortKey,
+  type SortOrder,
+} from "@/lib/article-sorting";
 
 export interface ArticleItem {
   id: string;
@@ -60,6 +69,10 @@ interface ArticleTableProps {
 }
 
 export function ArticleTable({ initialArticles, categories }: ArticleTableProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [toggleArticle, setToggleArticle] = useState<ArticleItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,6 +80,37 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isPending, startTransition] = useTransition();
+
+  // Sorting state diinisialisasi dari URL query parameters
+  const [sortKey, setSortKey] = useState<SortKey>(() => {
+    const p = searchParams.get("sort") as SortKey | null;
+    return p && ["title", "category", "isPublished", "publishedAt"].includes(p)
+      ? p
+      : "publishedAt";
+  });
+
+  const [sortOrder, setSortOrder] = useState<SortOrder>(() => {
+    const o = searchParams.get("order") as SortOrder | null;
+    return o === "asc" ? "asc" : "desc";
+  });
+
+  const handleSort = (key: SortKey) => {
+    let nextOrder: SortOrder;
+    if (sortKey === key) {
+      nextOrder = sortOrder === "asc" ? "desc" : "asc";
+    } else {
+      nextOrder = key === "publishedAt" ? "desc" : "asc";
+    }
+
+    setSortKey(key);
+    setSortOrder(nextOrder);
+    setCurrentPage(1);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("sort", key);
+    params.set("order", nextOrder);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   // Optimistic UI untuk pergantian status publikasi instan
   const [optimisticArticles, setOptimisticArticles] = useOptimistic(
@@ -87,10 +131,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
     return matchesSearch && matchesCategory;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredArticles.length / itemsPerPage));
+  const sortedArticles = sortArticles(filteredArticles, sortKey, sortOrder);
+
+  const totalPages = Math.max(1, Math.ceil(sortedArticles.length / itemsPerPage));
   const validPage = Math.min(currentPage, totalPages);
   const startIndex = (validPage - 1) * itemsPerPage;
-  const paginatedArticles = filteredArticles.slice(
+  const paginatedArticles = sortedArticles.slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -200,11 +246,181 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02] text-xs font-medium uppercase tracking-wider text-zinc-400">
-                <th className="px-4 py-3">Artikel</th>
-                <th className="px-4 py-3">Kategori</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Tanggal Terbit</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
+                {/* Artikel / Judul */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "title"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("title")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Judul Artikel (${
+                      sortKey === "title" && sortOrder === "asc"
+                        ? "Z ke A"
+                        : "A ke Z"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "title"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Artikel
+                    </span>
+                    {sortKey === "title" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                {/* Kategori */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "category"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("category")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Kategori (${
+                      sortKey === "category" && sortOrder === "asc"
+                        ? "Z ke A"
+                        : "A ke Z"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "category"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Kategori
+                    </span>
+                    {sortKey === "category" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                {/* Status */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "isPublished"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("isPublished")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Status Publikasi (${
+                      sortKey === "isPublished" && sortOrder === "asc"
+                        ? "Draft dahulu"
+                        : "Terbit dahulu"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "isPublished"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Status
+                    </span>
+                    {sortKey === "isPublished" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                {/* Tanggal Terbit */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "publishedAt"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("publishedAt")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Tanggal Terbit (${
+                      sortKey === "publishedAt" && sortOrder === "desc"
+                        ? "Terlama dahulu"
+                        : "Terbaru dahulu"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "publishedAt"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Tanggal Terbit
+                    </span>
+                    {sortKey === "publishedAt" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                <th scope="col" className="px-4 py-3 text-right">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -325,15 +541,15 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         </div>
 
         {/* Pagination Bar */}
-        {filteredArticles.length > 0 && (
+        {sortedArticles.length > 0 && (
           <div className="flex flex-col gap-3 border-t border-white/5 bg-white/[0.01] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
               <p>
                 Menampilkan{" "}
                 <span className="font-medium text-white">
-                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredArticles.length)}
+                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, sortedArticles.length)}
                 </span>{" "}
-                dari <span className="font-medium text-white">{filteredArticles.length}</span> artikel
+                dari <span className="font-medium text-white">{sortedArticles.length}</span> artikel
               </p>
 
               {/* Selector Baris Per Halaman */}
