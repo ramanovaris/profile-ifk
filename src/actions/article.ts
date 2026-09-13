@@ -6,7 +6,7 @@ import * as fs from "fs/promises";
 import { db } from "../lib/db";
 import { getCurrentSession } from "../lib/auth";
 import { slugify } from "../lib/utils";
-import type { Article } from "@prisma/client";
+import type { Article, Prisma } from "@prisma/client";
 
 export type ArticleActionResult<T = unknown> = {
   success: boolean;
@@ -445,3 +445,108 @@ export async function deleteArticleAction(
     };
   }
 }
+
+export type GetPublicArticlesParams = {
+  page?: number;
+  limit?: number;
+  categorySlug?: string;
+  search?: string;
+};
+
+export type PublicArticleItem = {
+  id: string;
+  title: string;
+  slug: string;
+  coverImage: string | null;
+  categoryName: string;
+  categorySlug: string;
+  publishedAt: string;
+};
+
+export type GetPublicArticlesResult = {
+  success: boolean;
+  articles: PublicArticleItem[];
+  total: number;
+  hasMore: boolean;
+  error?: string;
+};
+
+/**
+ * Mengambil daftar artikel terbit untuk konsumsi publik dengan paginasi dan filter
+ */
+export async function getPublicArticlesAction(
+  params: GetPublicArticlesParams = {}
+): Promise<GetPublicArticlesResult> {
+  try {
+    const page = Math.max(1, Number(params.page) || 1);
+    const limit = Math.max(1, Math.min(50, Number(params.limit) || 12));
+    const skip = (page - 1) * limit;
+
+    const trimmedSearch = typeof params.search === "string" ? params.search.trim().slice(0, 100) : "";
+    const categorySlug = typeof params.categorySlug === "string" ? params.categorySlug.trim().toLowerCase() : "";
+
+    const whereClause: Prisma.ArticleWhereInput = {
+      isPublished: true,
+    };
+
+    if (categorySlug && categorySlug !== "semua") {
+      whereClause.category = {
+        slug: categorySlug,
+        status: "ACTIVE",
+      };
+    }
+
+    if (trimmedSearch) {
+      whereClause.OR = [
+        { title: { contains: trimmedSearch, mode: "insensitive" } },
+        { content: { contains: trimmedSearch, mode: "insensitive" } },
+      ];
+    }
+
+    const [total, dbArticles] = await Promise.all([
+      db.article.count({ where: whereClause }),
+      db.article.findMany({
+        where: whereClause,
+        include: {
+          category: {
+            select: { name: true, slug: true },
+          },
+        },
+        orderBy: {
+          publishedAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    const articles: PublicArticleItem[] = dbArticles.map((art) => ({
+      id: art.id,
+      title: art.title,
+      slug: art.slug,
+      coverImage: art.coverImage,
+      categoryName: art.category?.name || "Umum",
+      categorySlug: art.category?.slug || "umum",
+      publishedAt: art.publishedAt.toISOString(),
+    }));
+
+    const hasMore = skip + articles.length < total;
+
+    return {
+      success: true,
+      articles,
+      total,
+      hasMore,
+    };
+  } catch (err: unknown) {
+    console.error("[getPublicArticlesAction] Error:", err);
+    return {
+      success: false,
+      articles: [],
+      total: 0,
+      hasMore: false,
+      error: "Gagal memuat artikel berita.",
+    };
+  }
+}
+

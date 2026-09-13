@@ -5,6 +5,7 @@ import { ArrowRight, Building2, ShieldCheck, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
 import { dummyArticles } from "@/lib/dummy-data";
+import { db } from "@/lib/db";
 import { placeholderImage } from "@/lib/placeholder";
 import { getSiteSettings } from "@/actions/setting";
 
@@ -16,10 +17,57 @@ const stats = [
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
-  const latestArticles = dummyArticles
-    .filter((a) => a.isPublished)
-    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-    .slice(0, 3);
+
+  let latestArticles: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    coverImage: string | null;
+    category: string;
+    publishedAt: Date | string;
+  }> = [];
+
+  try {
+    const dbArticles = await db.article.findMany({
+      where: { isPublished: true },
+      include: {
+        category: {
+          select: { name: true },
+        },
+      },
+      orderBy: {
+        publishedAt: "desc",
+      },
+      take: 3,
+    });
+
+    latestArticles = dbArticles.map((a) => ({
+      id: a.id,
+      title: a.title,
+      slug: a.slug,
+      coverImage: a.coverImage,
+      category: a.category?.name || "Umum",
+      publishedAt: a.publishedAt,
+    }));
+  } catch (err) {
+    console.error("[HomePage] Gagal mengambil artikel dari basis data:", err);
+  }
+
+  if (latestArticles.length === 0) {
+    latestArticles = dummyArticles
+      .filter((a) => a.isPublished)
+      .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+      .slice(0, 3)
+      .map((a) => ({
+        id: a.id,
+        title: a.title,
+        slug: a.slug,
+        coverImage: a.coverImage,
+        category: a.category,
+        publishedAt: a.publishedAt,
+      }));
+  }
+
   const featuredArticle = latestArticles[0];
   const otherArticles = latestArticles.slice(1);
 
@@ -264,14 +312,25 @@ export default async function HomePage() {
               {featuredArticle && (
                 <Link href={`/berita/${featuredArticle.slug}`} className="group block">
                   <div className="bezel">
-                    <div className="bezel-inner relative aspect-[16/9]">
-                      <Image
-                        src={featuredArticle.coverImage}
-                        alt={featuredArticle.title}
-                        fill
-                        sizes="(min-width: 768px) 60vw, 100vw"
-                        className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-[1.03]"
-                      />
+                    <div className="bezel-inner relative aspect-[16/9] overflow-hidden rounded-2xl bg-zinc-100">
+                      {featuredArticle.coverImage ? (
+                        <Image
+                          src={featuredArticle.coverImage}
+                          alt={featuredArticle.title}
+                          fill
+                          sizes="(min-width: 768px) 60vw, 100vw"
+                          unoptimized={
+                            featuredArticle.coverImage.startsWith("https://picsum.photos/") ||
+                            featuredArticle.coverImage.startsWith("http://") ||
+                            featuredArticle.coverImage.startsWith("https://")
+                          }
+                          className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-sm text-muted">
+                          IFK Kotabaru
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="mt-6">
