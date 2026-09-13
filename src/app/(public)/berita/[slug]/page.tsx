@@ -105,7 +105,12 @@ export default async function BeritaDetailPage(props: {
     isPreview = true;
   }
 
-  // 3. Ambil Berita Terkait (Hanya yang sudah terbit)
+  // 3. Estimasi Waktu Baca (Reading Time: rata-rata 200 kata/menit)
+  const plainText = content.replace(/<[^>]*>/g, " ").trim();
+  const wordCount = plainText ? plainText.split(/\s+/).filter(Boolean).length : 0;
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+  // 4. Ambil Berita Terkait (Hanya yang sudah terbit)
   let otherArticles: Array<{
     id: string;
     slug: string;
@@ -152,35 +157,16 @@ export default async function BeritaDetailPage(props: {
   }
 
   return (
-    <>
-      {/* ── Cover Image ────────────────────────────────────────────── */}
-      <div className="relative aspect-[21/9] w-full overflow-hidden rounded-b-3xl bg-zinc-900">
-        {coverImage ? (
-          <Image
-            src={coverImage}
-            alt={title}
-            fill
-            unoptimized={
-              coverImage.startsWith("https://picsum.photos/") ||
-              coverImage.startsWith("http://") ||
-              coverImage.startsWith("https://")
-            }
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-zinc-600">
-            <span className="text-sm font-medium">UPTD Instalasi Farmasi Kabupaten Kotabaru</span>
-          </div>
-        )}
-      </div>
-
-      {/* ── Article Content ────────────────────────────────────────── */}
-      <section className="border-t border-border bg-surface py-24">
+    <article className="min-h-screen bg-surface text-foreground">
+      {/* ── 1. Header Artikel: Breadcrumb, Badge, Judul, Metadata ───── */}
+      <header className="pt-10 sm:pt-14 pb-4 sm:pb-6">
         <div className="section-container">
-          <div className="mx-auto max-w-3xl">
-            {isPreview && <ArticlePreviewBanner articleId={articleId} />}
+          <div className="mx-auto max-w-4xl">
+            {isPreview && (
+              <div className="mb-6">
+                <ArticlePreviewBanner articleId={articleId} />
+              </div>
+            )}
 
             <Breadcrumb
               items={[
@@ -189,41 +175,104 @@ export default async function BeritaDetailPage(props: {
                 { label: categoryName },
               ]}
             />
-            <Badge variant="default" className="mt-4 bg-brand-50 text-brand-700">
+
+            <Badge
+              variant="default"
+              className="mt-5 inline-flex bg-brand-500/10 text-brand-400 border border-brand-500/20 font-medium px-3 py-1 rounded-full text-xs"
+            >
               {categoryName}
             </Badge>
-            <h1 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl">
+
+            <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-heading sm:text-3xl md:text-4xl lg:text-5xl leading-tight sm:leading-tight md:leading-tight">
               {title}
             </h1>
-            <p className="mt-2 text-sm font-mono text-muted">
-              {new Date(publishedAt).toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}{" "}
-              &middot; {authorName}
-            </p>
+
+            <div className="mt-5 flex flex-wrap items-center gap-y-2 text-sm text-muted">
+              <div className="flex items-center gap-2 font-medium text-zinc-300">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 border border-border/40 text-[11px] font-semibold text-brand-400">
+                  {authorName.charAt(0).toUpperCase()}
+                </span>
+                <span>{authorName}</span>
+              </div>
+              <span className="mx-2.5 text-zinc-600">&middot;</span>
+              <time
+                dateTime={new Date(publishedAt).toISOString()}
+                className="font-mono text-xs sm:text-sm text-zinc-400"
+              >
+                {new Date(publishedAt).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </time>
+              <span className="mx-2.5 text-zinc-600">&middot;</span>
+              <span className="font-mono text-xs sm:text-sm text-zinc-400">
+                {readingMinutes} menit baca
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* ── 2. Foto Sampul Ekspansif (Full-Width Container, 16:9) ───── */}
+      <section className="my-4 sm:my-8">
+        <div className="section-container">
+          <div className="mx-auto max-w-5xl">
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-zinc-900 shadow-2xl backdrop-blur-sm">
+              {coverImage ? (
+                <Image
+                  src={coverImage}
+                  alt={title}
+                  fill
+                  unoptimized={
+                    coverImage.startsWith("https://picsum.photos/") ||
+                    coverImage.startsWith("http://") ||
+                    coverImage.startsWith("https://")
+                  }
+                  sizes="(min-width: 1280px) 1024px, 100vw"
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900 p-6 text-center text-zinc-600">
+                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full border border-border/40 bg-zinc-800/80 text-brand-400">
+                    <span className="text-sm font-bold">IFK</span>
+                  </div>
+                  <span className="text-sm font-medium text-zinc-400">
+                    UPTD Instalasi Farmasi Kabupaten Kotabaru
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 3. Tubuh Naskah Artikel (Prose Terpusat & Nyaman) ───────── */}
+      <section className="pb-16 sm:pb-24 pt-2 sm:pt-4">
+        <div className="section-container">
+          <div className="mx-auto max-w-3xl">
             <div
-              className="prose prose-zinc mt-6 max-w-none text-sm leading-relaxed"
+              className="prose prose-zinc prose-invert max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-300/95"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>
         </div>
       </section>
 
-      {/* ── Related Articles ─────────────────────────────────────── */}
+      {/* ── 4. Rekomendasi Berita Terkait ──────────────────────────── */}
       {otherArticles.length > 0 && (
-        <section className="border-t border-border bg-surface py-24">
+        <section className="border-t border-border/40 bg-surface/40 py-16 sm:py-20">
           <div className="section-container">
-            <div className="mx-auto max-w-3xl">
-              <h2 className="text-xl font-bold tracking-tight text-heading">
+            <div className="mx-auto max-w-5xl">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-heading">
                 Berita Lainnya
               </h2>
-              <div className="mt-10 grid gap-8 sm:grid-cols-2">
+              <div className="mt-8 grid gap-6 sm:grid-cols-2">
                 {otherArticles.map((a) => (
                   <Link key={a.id} href={`/berita/${a.slug}`} className="group block">
-                    <Card className="h-full overflow-hidden border-border transition-colors hover:border-brand-300">
-                      <div className="relative h-36 w-full overflow-hidden bg-zinc-900">
+                    <Card className="h-full overflow-hidden border-border/50 bg-zinc-900/40 transition-all duration-300 hover:border-brand-500/40 hover:shadow-lg hover:shadow-brand-500/5">
+                      <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
                         {a.coverImage ? (
                           <Image
                             src={a.coverImage}
@@ -234,7 +283,7 @@ export default async function BeritaDetailPage(props: {
                               a.coverImage.startsWith("http://") ||
                               a.coverImage.startsWith("https://")
                             }
-                            sizes="(min-width: 768px) 33vw, 100vw"
+                            sizes="(min-width: 768px) 50vw, 100vw"
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         ) : (
@@ -243,14 +292,17 @@ export default async function BeritaDetailPage(props: {
                           </div>
                         )}
                       </div>
-                      <CardContent className="pt-4">
-                        <Badge variant="default" className="mb-2 bg-brand-50 text-brand-700">
+                      <CardContent className="p-5">
+                        <Badge
+                          variant="default"
+                          className="mb-2.5 inline-flex bg-brand-500/10 text-brand-400 border border-brand-500/20 font-medium text-xs"
+                        >
                           {a.category}
                         </Badge>
-                        <h3 className="mt-2 line-clamp-2 font-semibold text-heading group-hover:text-brand-800">
+                        <h3 className="line-clamp-2 text-base font-semibold text-heading group-hover:text-brand-300 transition-colors">
                           {a.title}
                         </h3>
-                        <p className="mt-1 font-mono text-xs text-muted">
+                        <p className="mt-2 font-mono text-xs text-muted">
                           {new Date(a.publishedAt).toLocaleDateString("id-ID", {
                             day: "numeric",
                             month: "long",
@@ -266,6 +318,6 @@ export default async function BeritaDetailPage(props: {
           </div>
         </section>
       )}
-    </>
+    </article>
   );
 }
