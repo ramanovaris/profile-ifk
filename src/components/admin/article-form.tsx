@@ -16,10 +16,12 @@ import {
   Search,
   ChevronDown,
   Loader2,
+  Eye,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
+import { ArticlePreviewModal } from "@/components/admin/article-preview-modal";
 import { cn, getAssetUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { createArticleAction, updateArticleAction } from "@/actions/article";
@@ -44,9 +46,10 @@ export interface FormArticleData {
 interface ArticleFormProps {
   article?: FormArticleData;
   categories: FormCategoryOption[];
+  authorName?: string;
 }
 
-export function ArticleForm({ article, categories }: ArticleFormProps) {
+export function ArticleForm({ article, categories, authorName }: ArticleFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -58,6 +61,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
   const [isPublished, setIsPublished] = useState(article?.isPublished ?? true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Combobox State
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
@@ -610,7 +614,7 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3 pt-4 border-t border-white/5">
+        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/5">
           <button
             type="submit"
             disabled={isPending}
@@ -627,6 +631,15 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
           </button>
           <button
             type="button"
+            onClick={() => setIsPreviewOpen(true)}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 text-sm font-medium text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-colors outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/40"
+            title="Lihat Pratinjau Tampilan Artikel"
+          >
+            <Eye className="h-4 w-4" />
+            <span>Pratinjau</span>
+          </button>
+          <button
+            type="button"
             disabled={isPending}
             onClick={() => router.push("/admin/berita/")}
             className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
@@ -635,6 +648,20 @@ export function ArticleForm({ article, categories }: ArticleFormProps) {
           </button>
         </div>
       </div>
+
+      <ArticlePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        data={{
+          title,
+          categoryName:
+            categories.find((c) => c.id === selectedCategoryId)?.name || "Umum",
+          content,
+          coverPreviewUrl: preview || getAssetUrl(article?.coverImage) || null,
+          authorName: authorName || "Administrator",
+          isPublished,
+        }}
+      />
     </form>
   );
 }
