@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import {
@@ -30,19 +30,21 @@ interface ArticlePreviewModalProps {
   data: ArticlePreviewData;
 }
 
+const emptySubscribe = () => () => {};
+
 export function ArticlePreviewModal({
   isOpen,
   onClose,
   data,
 }: ArticlePreviewModalProps) {
-  const [mounted, setMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const [viewportMode, setViewportMode] = useState<"desktop" | "mobile">(
     "desktop"
   );
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Kunci scroll body saat modal terbuka & pasang handler Escape
   useEffect(() => {
@@ -64,7 +66,7 @@ export function ArticlePreviewModal({
     };
   }, [isOpen, onClose]);
 
-  if (!mounted || !isOpen) return null;
+  if (!isClient || !isOpen) return null;
 
   const displayTitle = data.title.trim() || "Judul Artikel Belum Diisi";
   const displayCategory = data.categoryName.trim() || "Umum";
