@@ -75,7 +75,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [toggleArticle, setToggleArticle] = useState<ArticleItem | null>(null);
-  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
+  const urlQ = searchParams.get("q") || "";
+  const [searchQuery, setSearchQuery] = useState(urlQ);
+  const [prevUrlQ, setPrevUrlQ] = useState(urlQ);
+
+  // Sesuaikan state lokal jika URL query berubah (misal saat navigasi tombol Back/Forward)
+  if (urlQ !== prevUrlQ) {
+    setPrevUrlQ(urlQ);
+    setSearchQuery(urlQ);
+  }
+
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isPending, startTransition] = useTransition();
 
@@ -121,21 +130,15 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
   // Debounce sinkronisasi search query ke URL (350ms)
   useEffect(() => {
     const timer = setTimeout(() => {
-      const urlQ = searchParams.get("q") || "";
+      const currentQ = searchParams.get("q") || "";
       const trimmed = searchQuery.trim();
-      if (urlQ !== trimmed) {
+      if (currentQ !== trimmed) {
         updateUrl({ q: trimmed || null, page: null });
       }
     }, 350);
 
     return () => clearTimeout(timer);
   }, [searchQuery, searchParams, updateUrl]);
-
-  // Sinkronisasi input teks pencarian saat navigasi browser (misal tombol Back/Forward)
-  useEffect(() => {
-    const urlQ = searchParams.get("q") || "";
-    setSearchQuery(urlQ);
-  }, [searchParams]);
 
   const handleSort = (key: SortKey) => {
     let nextOrder: SortOrder;
