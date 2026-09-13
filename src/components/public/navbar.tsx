@@ -32,6 +32,9 @@ export function Navbar({ settings }: NavbarProps = {}) {
     settings?.announcementEnabled && settings?.announcementText?.trim()
   );
 
+  const isLinkActive = (href: string) =>
+    href === "/" ? pathname === "/" || pathname === "" : pathname.startsWith(href);
+
   return (
     <>
       {/* ── Floating glass pill, detached dari tepi atas ─────────────── */}
@@ -59,8 +62,7 @@ export function Navbar({ settings }: NavbarProps = {}) {
             {/* Desktop nav */}
             <nav className="hidden items-center gap-1 md:flex">
               {navLinks.map((link) => {
-                const isActive =
-                  link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+                const isActive = isLinkActive(link.href);
                 return (
                   <Link
                     key={link.href}
@@ -110,7 +112,7 @@ export function Navbar({ settings }: NavbarProps = {}) {
         >
           <nav className="flex flex-col gap-2 p-4">
             {navLinks.map((link) => {
-              const isActive = pathname.startsWith(link.href);
+              const isActive = isLinkActive(link.href);
               return (
                 <Link
                   key={link.href}
