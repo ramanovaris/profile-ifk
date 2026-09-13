@@ -158,6 +158,9 @@ async function runTests() {
     "http://localhost:3003/profile-ifk/admin/berita?sort=category&order=desc",
     "http://localhost:3003/profile-ifk/admin/berita?sort=isPublished&order=asc",
     "http://localhost:3003/profile-ifk/admin/berita?sort=publishedAt&order=desc",
+    "http://localhost:3003/profile-ifk/admin/berita?q=vaksin",
+    "http://localhost:3003/profile-ifk/admin/berita?kategori=Kegiatan",
+    "http://localhost:3003/profile-ifk/admin/berita?q=vaksin&kategori=Kegiatan&sort=title&order=asc&page=1",
   ];
 
   for (const url of testUrls) {

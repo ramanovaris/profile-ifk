@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useOptimistic } from "react";
+import { useState, useEffect, useTransition, useOptimistic } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -75,9 +75,15 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [toggleArticle, setToggleArticle] = useState<ArticleItem | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+    const raw = searchParams.get("kategori");
+    return raw ? raw.split(",").map((s) => s.trim()).filter(Boolean) : [];
+  });
+  const [currentPage, setCurrentPage] = useState(() => {
+    const p = Number(searchParams.get("page"));
+    return Number.isInteger(p) && p > 0 ? p : 1;
+  });
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isPending, startTransition] = useTransition();
 
@@ -94,6 +100,74 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
     return o === "asc" ? "asc" : "desc";
   });
 
+  // Helper untuk memperbarui URL query parameter secara terpusat & konsisten
+  const updateUrl = (updates: Record<string, string | null>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    for (const [key, value] of Object.entries(updates)) {
+      if (value === null || value === "" || (key === "page" && value === "1")) {
+        params.delete(key);
+      } else {
+        params.set(key, value);
+      }
+    }
+    const queryString = params.toString();
+    const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
+    router.replace(targetUrl, { scroll: false });
+  };
+
+  // Debounce sinkronisasi search query ke URL (350ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const urlQ = searchParams.get("q") || "";
+      const trimmed = searchQuery.trim();
+      if (urlQ !== trimmed) {
+        updateUrl({ q: trimmed || null, page: null });
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, pathname, router, searchParams]);
+
+  // Sinkronisasi state lokal saat pengguna menekan tombol Back/Forward browser
+  useEffect(() => {
+    const urlQ = searchParams.get("q") || "";
+    if (urlQ !== searchQuery) {
+      setSearchQuery(urlQ);
+    }
+
+    const rawCat = searchParams.get("kategori");
+    const urlCats = rawCat
+      ? rawCat
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+    if (JSON.stringify(urlCats) !== JSON.stringify(selectedCategories)) {
+      setSelectedCategories(urlCats);
+    }
+
+    const p = Number(searchParams.get("page"));
+    const urlPage = Number.isInteger(p) && p > 0 ? p : 1;
+    if (urlPage !== currentPage) {
+      setCurrentPage(urlPage);
+    }
+
+    const pSort = searchParams.get("sort") as SortKey | null;
+    const urlSort =
+      pSort && ["title", "category", "isPublished", "publishedAt"].includes(pSort)
+        ? pSort
+        : "publishedAt";
+    if (urlSort !== sortKey) {
+      setSortKey(urlSort);
+    }
+
+    const pOrder = searchParams.get("order") as SortOrder | null;
+    const urlOrder = pOrder === "asc" ? "asc" : "desc";
+    if (urlOrder !== sortOrder) {
+      setSortOrder(urlOrder);
+    }
+  }, [searchParams]);
+
   const handleSort = (key: SortKey) => {
     let nextOrder: SortOrder;
     if (sortKey === key) {
@@ -106,10 +180,21 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
     setSortOrder(nextOrder);
     setCurrentPage(1);
 
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("sort", key);
-    params.set("order", nextOrder);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    updateUrl({ sort: key, order: nextOrder, page: null });
+  };
+
+  const handleCategoryChange = (cats: string[]) => {
+    setSelectedCategories(cats);
+    setCurrentPage(1);
+    updateUrl({
+      kategori: cats.length > 0 ? cats.join(",") : null,
+      page: null,
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    updateUrl({ page: newPage > 1 ? String(newPage) : null });
   };
 
   // Optimistic UI untuk pergantian status publikasi instan
@@ -230,10 +315,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         <CategoryMultiSelectFilter
           categories={categories}
           selectedCategories={selectedCategories}
-          onChange={(cats) => {
-            setSelectedCategories(cats);
-            setCurrentPage(1);
-          }}
+          onChange={handleCategoryChange}
           getArticleCount={(catName) =>
             optimisticArticles.filter((a) => a.category.name === catName).length
           }
@@ -559,7 +641,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   value={itemsPerPage}
                   onChange={(e) => {
                     setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
+                    handlePageChange(1);
                   }}
                   className="rounded-md border border-white/10 bg-zinc-950 px-2 py-1 text-xs text-zinc-300 outline-none transition-colors hover:border-white/20 focus:border-brand-500/50"
                 >
@@ -574,7 +656,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               <button
                 type="button"
                 disabled={validPage <= 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                onClick={() => handlePageChange(Math.max(1, validPage - 1))}
                 className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
@@ -586,7 +668,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   <button
                     key={page}
                     type="button"
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => handlePageChange(page)}
                     className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
                       validPage === page
                         ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 font-semibold shadow-sm shadow-brand-500/10"
@@ -601,7 +683,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               <button
                 type="button"
                 disabled={validPage >= totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages, validPage + 1))}
                 className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
               >
                 <span>Selanjutnya</span>
