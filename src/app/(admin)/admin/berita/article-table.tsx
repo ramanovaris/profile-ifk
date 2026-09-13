@@ -14,6 +14,7 @@ import {
   Loader2,
   AlertTriangle,
   Globe,
+  Eye,
   EyeOff,
   ArrowRight,
 } from "lucide-react";
@@ -290,6 +291,15 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     {/* Aksi */}
                     <td className="px-4 py-3 text-right">
                       <div className="inline-flex items-center gap-1">
+                        <Link
+                          href={`/berita/${article.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400"
+                          title="Pratinjau Artikel di Tab Baru"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                        </Link>
                         <Link
                           href={`/admin/berita/${article.id}/edit/`}
                           className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
