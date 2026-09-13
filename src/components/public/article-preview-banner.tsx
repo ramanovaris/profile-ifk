@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Eye, ShieldAlert, ArrowLeft, Pencil } from "lucide-react";
+import { Eye, ArrowLeft, Pencil } from "lucide-react";
 
 interface ArticlePreviewBannerProps {
   articleId?: string;
@@ -7,44 +7,45 @@ interface ArticlePreviewBannerProps {
 
 export function ArticlePreviewBanner({ articleId }: ArticlePreviewBannerProps) {
   return (
-    <div className="relative mb-6 overflow-hidden rounded-xl border border-amber-300 bg-amber-50/95 p-4 text-amber-950 shadow-sm backdrop-blur-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="relative mb-6 overflow-hidden rounded-2xl border border-amber-300 bg-amber-50/95 p-4 sm:p-5 text-amber-950 shadow-sm">
+      <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
+        {/* Header & Pesan */}
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-300 bg-amber-200/60 text-amber-800">
-            <ShieldAlert className="h-4 w-4" />
+          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-300/80 bg-amber-200/70 text-amber-800">
+            <Eye className="h-4.5 w-4.5" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-md border border-amber-300/80 bg-amber-200/80 px-2 py-0.5 text-xs font-bold tracking-wider text-amber-900">
-                <Eye className="h-3 w-3" />
-                MODE PRATINJAU DRAF
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center rounded-md border border-amber-300/80 bg-amber-200/90 px-2 py-0.5 text-xs font-bold text-amber-900">
+                Pratinjau Draf
               </span>
-              <span className="text-xs font-medium text-amber-800 sm:inline">
-                &middot; Khusus Administrator
+              <span className="text-xs font-medium text-amber-800/90">
+                &middot; Belum Diterbitkan
               </span>
             </div>
-            <p className="mt-1 text-xs text-amber-900/90 sm:text-sm leading-relaxed">
-              Artikel ini berstatus <strong className="font-bold text-amber-950 underline decoration-amber-400">DRAFT</strong> dan belum dipublikasikan ke masyarakat luas. Pengunjung umum tanpa sesi login admin tidak dapat mengakses halaman ini (404 Not Found).
+            <p className="mt-1.5 text-xs text-amber-900/90 sm:text-sm leading-relaxed">
+              Artikel ini masih disimpan sebagai draf. Masyarakat umum belum dapat melihat berita ini sampai Anda mempublikasikannya.
             </p>
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 pt-1 sm:pt-0">
+        {/* Tombol Aksi (Simetris 50/50 di mobile, rapi di kanan saat desktop) */}
+        <div className="flex items-center gap-2 border-t border-amber-200/80 pt-3 sm:border-t-0 sm:pt-0 sm:shrink-0 sm:justify-end">
           {articleId ? (
             <Link
               href={`/admin/berita/${articleId}/edit/`}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-amber-600 bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-amber-700"
+              className="flex flex-1 sm:flex-initial items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-amber-700"
             >
               <Pencil className="h-3.5 w-3.5" />
-              Edit Draf
+              <span>Edit Artikel</span>
             </Link>
           ) : null}
           <Link
             href="/admin/berita/"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 hover:text-zinc-950"
+            className="flex flex-1 sm:flex-initial items-center justify-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3.5 py-2 text-xs font-medium text-amber-950 shadow-sm transition-colors hover:bg-amber-100/50 hover:text-zinc-950"
           >
-            <ArrowLeft className="h-3.5 w-3.5 text-zinc-500" />
-            Panel Admin
+            <ArrowLeft className="h-3.5 w-3.5 text-amber-800" />
+            <span>Kelola Berita</span>
           </Link>
         </div>
       </div>
