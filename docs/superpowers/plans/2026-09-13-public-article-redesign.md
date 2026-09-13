@@ -45,28 +45,46 @@
   4. Isi Naskah Artikel: `max-w-3xl mx-auto`, `prose prose-zinc prose-invert`
   5. Seksi Berita Terkait: `max-w-5xl mx-auto`, 2 kolom grid kartu
 
-- [ ] **Step 1: Terapkan perubahan layout pada `src/app/(public)/berita/[slug]/page.tsx`**
-- [ ] **Step 2: Jalankan skrip verifikasi otomatis `npx tsx scripts/verify-public-article-redesign.ts`** — Harapkan PASS
-- [ ] **Step 3: Commit perubahan komponen** — `git add src/app/(public)/berita/[slug]/page.tsx && git commit -m "feat(berita): redesign layout halaman detail artikel berita publik"`
+- [x] **Step 1: Terapkan perubahan layout pada `src/app/(public)/berita/[slug]/page.tsx`**
+- [x] **Step 2: Jalankan skrip verifikasi otomatis `npx tsx scripts/verify-public-article-redesign.ts`** — Harapkan PASS
+- [x] **Step 3: Commit perubahan komponen** — `git add src/app/(public)/berita/[slug]/page.tsx && git commit -m "feat(berita): redesign layout halaman detail artikel berita publik"`
 
 ---
 
 ### Task 3: Verifikasi Endpoint Dev Server Lokal (Port 3003)
 
 **Files:**
-- Test endpoint: `http://localhost:3003/profile-ifk/berita/edukasi-vaksinasi-polio`
+- Test endpoint: `http://localhost:3003/profile-ifk/berita/sosialisasi-sistem-informasi-kefarmasian`
 
-- [ ] **Step 1: Uji akses HTTP GET menggunakan curl ke dev server Next.js port 3003** — Harapkan status `200 OK`
-- [ ] **Step 2: Verifikasi kemunculan elemen judul dan foto sampul pada output HTML**
+- [x] **Step 1: Uji akses HTTP GET menggunakan curl ke dev server Next.js port 3003** — Harapkan status `200 OK`
+- [x] **Step 2: Verifikasi kemunculan elemen judul dan foto sampul pada output HTML**
 
 ---
 
-### Task 4: Pembuatan Pull Request & Penyiapan Redaksi e-Kinerja
+### Task 4: Redesign Toolbar Pencarian & Dropdown Kategori Berita Publik (`/berita`)
+
+**Files:**
+- Modify: `src/components/public/berita-client-view.tsx`
+- Modify: `src/app/(public)/berita/page.tsx`
+- Test: `scripts/verify-public-berita-search.ts`
+
+**Interfaces:**
+- Consumes: `categories`, `initialArticles`, `useSearchParams()`, `useRouter()`, `getPublicArticlesAction`.
+- Produces: Toolbar melengkung (`bg-surface-alt/60 border rounded-2xl p-4`) dengan input pencarian `rounded-full` berikon `Search` & tombol `X`, dropdown filter kategori ber-ikon `SlidersHorizontal` & `ChevronDown`, serta sinkronisasi URL parameter `?q=` dan `?kategori=` dengan `{ scroll: false }`.
+
+- [ ] **Step 1: Buat skrip verifikasi otomatis `scripts/verify-public-berita-search.ts`**
+- [ ] **Step 2: Implementasikan toolbar search & category dropdown pada `src/components/public/berita-client-view.tsx` dan pembungkus `<Suspense>` pada `src/app/(public)/berita/page.tsx`**
+- [ ] **Step 3: Jalankan verifikasi otomatis dan curl endpoint `/profile-ifk/berita?q=...`** — Harapkan PASS
+- [ ] **Step 4: Commit perubahan**
+
+---
+
+### Task 5: Pembaruan Pull Request & Penyiapan Redaksi e-Kinerja
 
 **Files:**
 - Remote branch: `feat/62-redesign-berita-publik`
 
-- [ ] **Step 1: Push branch ke GitHub `origin/feat/62-redesign-berita-publik`**
-- [ ] **Step 2: Buat Pull Request menargetkan `develop` via `gh pr create`**
+- [ ] **Step 1: Push perubahan ke branch GitHub `origin/feat/62-redesign-berita-publik`**
+- [ ] **Step 2: Perbarui naskah PR #63 via `gh pr edit`**
 - [ ] **Step 3: Pantau GitHub Actions CI hingga 100% PASS (Green)**
-- [ ] **Step 4: Sajikan panduan pengujian visual manual untuk Mas Rama di HP Android mode Desktop site**
+- [ ] **Step 4: Sajikan panduan pengujian visual manual untuk Mas Rama**

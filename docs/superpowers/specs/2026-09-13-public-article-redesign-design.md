@@ -72,7 +72,36 @@ Tata letak tersebut memiliki keterbatasan pengalaman pengguna (UX):
 
 ---
 
-## 3. Kompatibilitas Perangkat & Mode Desktop HP (md+ ≥768px)
+## 3. Redesign Toolbar Pencarian & Filter Kategori Berita Publik (Halaman `/berita`)
+
+### A. Konsep & Desain Visual Toolbar Terpadu
+Mengadopsi tata letak dan estetika toolbar dari halaman stok obat (`/stok`):
+1. **Wadah Toolbar (`Reveal`):**
+   - Menggunakan card melengkung elegan: `rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`.
+2. **Kolom Pencarian (`Search` & Tombol `X`):**
+   - Kolom pencarian melengkung penuh: `rounded-full border border-border bg-surface py-2.5 pl-10 pr-10 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20`.
+   - Ikon pencarian `Search` di sebelah kiri (`left-3.5 text-muted`).
+   - Tombol hapus instan `X` di sebelah kanan: hanya muncul saat kolom memiliki teks ketikan; mengeklik tombol akan mengosongkan input dan parameter URL `q` secara seketika (0ms).
+3. **Dropdown Filter Kategori (`PublicCategoryFilter`):**
+   - Tombol pemicu (*trigger button*) melengkung penuh: `rounded-full border px-4 h-10 text-xs font-medium` berikon `SlidersHorizontal` dan `ChevronDown`.
+   - Popover panel melengkung dengan backdrop blur tinggi (`rounded-2xl border border-border bg-surface/95 shadow-2xl backdrop-blur-xl p-2.5`).
+   - Menampilkan opsi "Semua Kategori" dan seluruh kategori aktif, lengkap dengan indikator aktif (`Check` icon) dan jumlah artikel per kategori.
+
+### B. Sinkronisasi State & Parameter URL (`useSearchParams` + `router.replace`)
+1. **Parameter `q` (Pencarian Teks):**
+   - Menulis ke URL peramban dengan debounce 350ms agar input ketikan responsif dan URL browser tidak berkedip.
+   - Jika teks kosong, parameter `q` dihapus dari URL.
+2. **Parameter `kategori` (Penyaringan Kategori):**
+   - Menulis slug kategori terpilih ke URL seketika (0ms).
+   - Jika kategori adalah `"semua"` atau dikembalikan ke awal, parameter `kategori` dihapus dari URL.
+3. **Pencegahan Lonjakan Gulir (*Zero-Jump Scroll*):**
+   - Menggunakan `router.replace(url, { scroll: false })` sehingga URL dapat dibagikan atau disimpan (*bookmark*) tanpa memindahkan posisi gulir layar.
+4. **Pembungkus Suspense:**
+   - Komponen `BeritaClientView` dibungkus dalam `<Suspense fallback={null}>` di `src/app/(public)/berita/page.tsx` sesuai aturan Next.js App Router.
+
+---
+
+## 4. Kompatibilitas Perangkat & Mode Desktop HP (md+ ≥768px)
 
 1. **Pengujian Responsif Khusus HP Android**:
    - Pengguna mereview antarmuka melalui peramban Google Chrome Android dengan mode *"Desktop site"* aktif (simulasi lebar layar `1024px` hingga `1280px`).
