@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { db } from "@/lib/db";
 import { ArticleTable } from "./article-table";
@@ -40,7 +41,9 @@ export default async function AdminBeritaPage() {
 
   return (
     <AdminShell>
-      <ArticleTable initialArticles={articles} categories={categories} />
+      <Suspense fallback={null}>
+        <ArticleTable initialArticles={articles} categories={categories} />
+      </Suspense>
     </AdminShell>
   );
 }

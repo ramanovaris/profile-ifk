@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition, useOptimistic } from "react";
+import { useState, useEffect, useCallback, useTransition, useOptimistic } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   Plus,
   Pencil,
@@ -17,6 +18,10 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  X,
 } from "lucide-react";
 import {
   Dialog,
@@ -35,6 +40,11 @@ import {
   deleteArticleAction,
 } from "@/actions/article";
 import { getAssetUrl } from "@/lib/utils";
+import {
+  sortArticles,
+  type SortKey,
+  type SortOrder,
+} from "@/lib/article-sorting";
 
 export interface ArticleItem {
   id: string;
@@ -60,13 +70,98 @@ interface ArticleTableProps {
 }
 
 export function ArticleTable({ initialArticles, categories }: ArticleTableProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [toggleArticle, setToggleArticle] = useState<ArticleItem | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const urlQ = searchParams.get("q") || "";
+  const [searchQuery, setSearchQuery] = useState(urlQ);
+  const [prevUrlQ, setPrevUrlQ] = useState(urlQ);
+
+  // Sesuaikan state lokal jika URL query berubah (misal saat navigasi tombol Back/Forward)
+  if (urlQ !== prevUrlQ) {
+    setPrevUrlQ(urlQ);
+    setSearchQuery(urlQ);
+  }
+
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isPending, startTransition] = useTransition();
+
+  // Single Source of Truth dari URL query parameter
+  const paramSort = searchParams.get("sort") as SortKey | null;
+  const sortKey: SortKey =
+    paramSort && ["title", "category", "isPublished", "publishedAt"].includes(paramSort)
+      ? paramSort
+      : "publishedAt";
+
+  const paramOrder = searchParams.get("order") as SortOrder | null;
+  const sortOrder: SortOrder = paramOrder === "asc" ? "asc" : "desc";
+
+  const rawKategori = searchParams.get("kategori");
+  const selectedCategories = rawKategori
+    ? rawKategori
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+
+  const rawPage = Number(searchParams.get("page"));
+  const currentPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+
+  // Helper untuk memperbarui URL query parameter secara terpusat & konsisten
+  const updateUrl = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === "" || (key === "page" && value === "1")) {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      const queryString = params.toString();
+      const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.replace(targetUrl, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  // Debounce sinkronisasi search query ke URL (350ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentQ = searchParams.get("q") || "";
+      const trimmed = searchQuery.trim();
+      if (currentQ !== trimmed) {
+        updateUrl({ q: trimmed || null, page: null });
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchParams, updateUrl]);
+
+  const handleSort = (key: SortKey) => {
+    let nextOrder: SortOrder;
+    if (sortKey === key) {
+      nextOrder = sortOrder === "asc" ? "desc" : "asc";
+    } else {
+      nextOrder = key === "publishedAt" ? "desc" : "asc";
+    }
+
+    updateUrl({ sort: key, order: nextOrder, page: null });
+  };
+
+  const handleCategoryChange = (cats: string[]) => {
+    updateUrl({
+      kategori: cats.length > 0 ? cats.join(",") : null,
+      page: null,
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    updateUrl({ page: newPage > 1 ? String(newPage) : null });
+  };
 
   // Optimistic UI untuk pergantian status publikasi instan
   const [optimisticArticles, setOptimisticArticles] = useOptimistic(
@@ -87,10 +182,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
     return matchesSearch && matchesCategory;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filteredArticles.length / itemsPerPage));
+  const sortedArticles = sortArticles(filteredArticles, sortKey, sortOrder);
+
+  const totalPages = Math.max(1, Math.ceil(sortedArticles.length / itemsPerPage));
   const validPage = Math.min(currentPage, totalPages);
   const startIndex = (validPage - 1) * itemsPerPage;
-  const paginatedArticles = filteredArticles.slice(
+  const paginatedArticles = sortedArticles.slice(
     startIndex,
     startIndex + itemsPerPage
   );
@@ -172,22 +269,30 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             type="text"
             placeholder="Cari judul atau topik artikel..."
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-9 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                updateUrl({ q: null, page: null });
+              }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-zinc-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+              title="Hapus pencarian"
+              aria-label="Hapus kata kunci pencarian"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Category Multi-Select Filter */}
         <CategoryMultiSelectFilter
           categories={categories}
           selectedCategories={selectedCategories}
-          onChange={(cats) => {
-            setSelectedCategories(cats);
-            setCurrentPage(1);
-          }}
+          onChange={handleCategoryChange}
           getArticleCount={(catName) =>
             optimisticArticles.filter((a) => a.category.name === catName).length
           }
@@ -200,11 +305,181 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-white/5 bg-white/[0.02] text-xs font-medium uppercase tracking-wider text-zinc-400">
-                <th className="px-4 py-3">Artikel</th>
-                <th className="px-4 py-3">Kategori</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Tanggal Terbit</th>
-                <th className="px-4 py-3 text-right">Aksi</th>
+                {/* Artikel / Judul */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "title"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("title")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Judul Artikel (${
+                      sortKey === "title" && sortOrder === "asc"
+                        ? "Z ke A"
+                        : "A ke Z"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "title"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Artikel
+                    </span>
+                    {sortKey === "title" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                {/* Kategori */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "category"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("category")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Kategori (${
+                      sortKey === "category" && sortOrder === "asc"
+                        ? "Z ke A"
+                        : "A ke Z"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "category"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Kategori
+                    </span>
+                    {sortKey === "category" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                {/* Status */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "isPublished"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("isPublished")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Status Publikasi (${
+                      sortKey === "isPublished" && sortOrder === "asc"
+                        ? "Draft dahulu"
+                        : "Terbit dahulu"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "isPublished"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Status
+                    </span>
+                    {sortKey === "isPublished" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                {/* Tanggal Terbit */}
+                <th
+                  scope="col"
+                  className="px-4 py-3"
+                  aria-sort={
+                    sortKey === "publishedAt"
+                      ? sortOrder === "asc"
+                        ? "ascending"
+                        : "descending"
+                      : "none"
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleSort("publishedAt")}
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Tanggal Terbit (${
+                      sortKey === "publishedAt" && sortOrder === "desc"
+                        ? "Terlama dahulu"
+                        : "Terbaru dahulu"
+                    })`}
+                  >
+                    <span
+                      className={
+                        sortKey === "publishedAt"
+                          ? "text-brand-400 font-semibold"
+                          : ""
+                      }
+                    >
+                      Tanggal Terbit
+                    </span>
+                    {sortKey === "publishedAt" ? (
+                      sortOrder === "asc" ? (
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                      ) : (
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                      )
+                    ) : (
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    )}
+                  </button>
+                </th>
+
+                <th scope="col" className="px-4 py-3 text-right">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -325,15 +600,15 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         </div>
 
         {/* Pagination Bar */}
-        {filteredArticles.length > 0 && (
+        {sortedArticles.length > 0 && (
           <div className="flex flex-col gap-3 border-t border-white/5 bg-white/[0.01] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
               <p>
                 Menampilkan{" "}
                 <span className="font-medium text-white">
-                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredArticles.length)}
+                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, sortedArticles.length)}
                 </span>{" "}
-                dari <span className="font-medium text-white">{filteredArticles.length}</span> artikel
+                dari <span className="font-medium text-white">{sortedArticles.length}</span> artikel
               </p>
 
               {/* Selector Baris Per Halaman */}
@@ -343,7 +618,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   value={itemsPerPage}
                   onChange={(e) => {
                     setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
+                    handlePageChange(1);
                   }}
                   className="rounded-md border border-white/10 bg-zinc-950 px-2 py-1 text-xs text-zinc-300 outline-none transition-colors hover:border-white/20 focus:border-brand-500/50"
                 >
@@ -358,7 +633,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               <button
                 type="button"
                 disabled={validPage <= 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                onClick={() => handlePageChange(Math.max(1, validPage - 1))}
                 className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
@@ -370,7 +645,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   <button
                     key={page}
                     type="button"
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => handlePageChange(page)}
                     className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
                       validPage === page
                         ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 font-semibold shadow-sm shadow-brand-500/10"
@@ -385,7 +660,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               <button
                 type="button"
                 disabled={validPage >= totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages, validPage + 1))}
                 className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
               >
                 <span>Selanjutnya</span>
