@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition, useOptimistic } from "react";
+import { useState, useEffect, useCallback, useTransition, useOptimistic } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -76,44 +76,47 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [toggleArticle, setToggleArticle] = useState<ArticleItem | null>(null);
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") || "");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
-    const raw = searchParams.get("kategori");
-    return raw ? raw.split(",").map((s) => s.trim()).filter(Boolean) : [];
-  });
-  const [currentPage, setCurrentPage] = useState(() => {
-    const p = Number(searchParams.get("page"));
-    return Number.isInteger(p) && p > 0 ? p : 1;
-  });
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [isPending, startTransition] = useTransition();
 
-  // Sorting state diinisialisasi dari URL query parameters
-  const [sortKey, setSortKey] = useState<SortKey>(() => {
-    const p = searchParams.get("sort") as SortKey | null;
-    return p && ["title", "category", "isPublished", "publishedAt"].includes(p)
-      ? p
+  // Single Source of Truth dari URL query parameter
+  const paramSort = searchParams.get("sort") as SortKey | null;
+  const sortKey: SortKey =
+    paramSort && ["title", "category", "isPublished", "publishedAt"].includes(paramSort)
+      ? paramSort
       : "publishedAt";
-  });
 
-  const [sortOrder, setSortOrder] = useState<SortOrder>(() => {
-    const o = searchParams.get("order") as SortOrder | null;
-    return o === "asc" ? "asc" : "desc";
-  });
+  const paramOrder = searchParams.get("order") as SortOrder | null;
+  const sortOrder: SortOrder = paramOrder === "asc" ? "asc" : "desc";
+
+  const rawKategori = searchParams.get("kategori");
+  const selectedCategories = rawKategori
+    ? rawKategori
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+
+  const rawPage = Number(searchParams.get("page"));
+  const currentPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
 
   // Helper untuk memperbarui URL query parameter secara terpusat & konsisten
-  const updateUrl = (updates: Record<string, string | null>) => {
-    const params = new URLSearchParams(searchParams.toString());
-    for (const [key, value] of Object.entries(updates)) {
-      if (value === null || value === "" || (key === "page" && value === "1")) {
-        params.delete(key);
-      } else {
-        params.set(key, value);
+  const updateUrl = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === "" || (key === "page" && value === "1")) {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
       }
-    }
-    const queryString = params.toString();
-    const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
-    router.replace(targetUrl, { scroll: false });
-  };
+      const queryString = params.toString();
+      const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.replace(targetUrl, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
 
   // Debounce sinkronisasi search query ke URL (350ms)
   useEffect(() => {
@@ -126,46 +129,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [searchQuery, pathname, router, searchParams]);
+  }, [searchQuery, searchParams, updateUrl]);
 
-  // Sinkronisasi state lokal saat pengguna menekan tombol Back/Forward browser
+  // Sinkronisasi input teks pencarian saat navigasi browser (misal tombol Back/Forward)
   useEffect(() => {
     const urlQ = searchParams.get("q") || "";
-    if (urlQ !== searchQuery) {
-      setSearchQuery(urlQ);
-    }
-
-    const rawCat = searchParams.get("kategori");
-    const urlCats = rawCat
-      ? rawCat
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [];
-    if (JSON.stringify(urlCats) !== JSON.stringify(selectedCategories)) {
-      setSelectedCategories(urlCats);
-    }
-
-    const p = Number(searchParams.get("page"));
-    const urlPage = Number.isInteger(p) && p > 0 ? p : 1;
-    if (urlPage !== currentPage) {
-      setCurrentPage(urlPage);
-    }
-
-    const pSort = searchParams.get("sort") as SortKey | null;
-    const urlSort =
-      pSort && ["title", "category", "isPublished", "publishedAt"].includes(pSort)
-        ? pSort
-        : "publishedAt";
-    if (urlSort !== sortKey) {
-      setSortKey(urlSort);
-    }
-
-    const pOrder = searchParams.get("order") as SortOrder | null;
-    const urlOrder = pOrder === "asc" ? "asc" : "desc";
-    if (urlOrder !== sortOrder) {
-      setSortOrder(urlOrder);
-    }
+    setSearchQuery(urlQ);
   }, [searchParams]);
 
   const handleSort = (key: SortKey) => {
@@ -176,16 +145,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
       nextOrder = key === "publishedAt" ? "desc" : "asc";
     }
 
-    setSortKey(key);
-    setSortOrder(nextOrder);
-    setCurrentPage(1);
-
     updateUrl({ sort: key, order: nextOrder, page: null });
   };
 
   const handleCategoryChange = (cats: string[]) => {
-    setSelectedCategories(cats);
-    setCurrentPage(1);
     updateUrl({
       kategori: cats.length > 0 ? cats.join(",") : null,
       page: null,
@@ -193,7 +156,6 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
   };
 
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
     updateUrl({ page: newPage > 1 ? String(newPage) : null });
   };
 
