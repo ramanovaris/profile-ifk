@@ -178,7 +178,7 @@ export default async function BeritaDetailPage(props: {
 
             <Badge
               variant="default"
-              className="mt-5 inline-flex bg-brand-500/10 text-brand-400 border border-brand-500/20 font-medium px-3 py-1 rounded-full text-xs"
+              className="mt-5 inline-flex bg-brand-50 text-brand-700 border border-brand-200/60 font-medium px-3 py-1 rounded-full text-xs"
             >
               {categoryName}
             </Badge>
@@ -188,16 +188,16 @@ export default async function BeritaDetailPage(props: {
             </h1>
 
             <div className="mt-5 flex flex-wrap items-center gap-y-2 text-sm text-muted">
-              <div className="flex items-center gap-2 font-medium text-zinc-300">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 border border-border/40 text-[11px] font-semibold text-brand-400">
+              <div className="flex items-center gap-2 font-medium text-zinc-800">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-50 border border-brand-200 text-[11px] font-semibold text-brand-700">
                   {authorName.charAt(0).toUpperCase()}
                 </span>
                 <span>{authorName}</span>
               </div>
-              <span className="mx-2.5 text-zinc-600">&middot;</span>
+              <span className="mx-2.5 text-zinc-400">&middot;</span>
               <time
                 dateTime={new Date(publishedAt).toISOString()}
-                className="font-mono text-xs sm:text-sm text-zinc-400"
+                className="font-mono text-xs sm:text-sm text-zinc-600"
               >
                 {new Date(publishedAt).toLocaleDateString("id-ID", {
                   day: "numeric",
@@ -205,8 +205,8 @@ export default async function BeritaDetailPage(props: {
                   year: "numeric",
                 })}
               </time>
-              <span className="mx-2.5 text-zinc-600">&middot;</span>
-              <span className="font-mono text-xs sm:text-sm text-zinc-400">
+              <span className="mx-2.5 text-zinc-400">&middot;</span>
+              <span className="font-mono text-xs sm:text-sm text-zinc-600">
                 {readingMinutes} menit baca
               </span>
             </div>
@@ -218,7 +218,7 @@ export default async function BeritaDetailPage(props: {
       <section className="my-4 sm:my-8">
         <div className="section-container">
           <div className="mx-auto max-w-5xl">
-            <div className="relative aspect-video w-full overflow-hidden rounded-2xl md:rounded-3xl border border-border/50 bg-zinc-900 shadow-2xl backdrop-blur-sm">
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl md:rounded-3xl border border-border/80 bg-zinc-100 shadow-xl">
               {coverImage ? (
                 <Image
                   src={coverImage}
@@ -234,11 +234,11 @@ export default async function BeritaDetailPage(props: {
                   priority
                 />
               ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900 p-6 text-center text-zinc-600">
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full border border-border/40 bg-zinc-800/80 text-brand-400">
+                <div className="flex h-full w-full flex-col items-center justify-center bg-zinc-100 p-6 text-center text-zinc-600">
+                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white text-brand-700 shadow-xs">
                     <span className="text-sm font-bold">IFK</span>
                   </div>
-                  <span className="text-sm font-medium text-zinc-400">
+                  <span className="text-sm font-medium text-zinc-600">
                     UPTD Instalasi Farmasi Kabupaten Kotabaru
                   </span>
                 </div>
@@ -253,7 +253,7 @@ export default async function BeritaDetailPage(props: {
         <div className="section-container">
           <div className="mx-auto max-w-3xl">
             <div
-              className="prose prose-zinc prose-invert max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-300/95"
+              className="prose prose-zinc max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-800"
               dangerouslySetInnerHTML={{ __html: content }}
             />
           </div>
@@ -262,7 +262,7 @@ export default async function BeritaDetailPage(props: {
 
       {/* ── 4. Rekomendasi Berita Terkait ──────────────────────────── */}
       {otherArticles.length > 0 && (
-        <section className="border-t border-border/40 bg-surface/40 py-16 sm:py-20">
+        <section className="border-t border-border bg-surface-alt/50 py-16 sm:py-20">
           <div className="section-container">
             <div className="mx-auto max-w-5xl">
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-heading">
@@ -271,8 +271,8 @@ export default async function BeritaDetailPage(props: {
               <div className="mt-8 grid gap-6 sm:grid-cols-2">
                 {otherArticles.map((a) => (
                   <Link key={a.id} href={`/berita/${a.slug}`} className="group block">
-                    <Card className="h-full overflow-hidden border-border/50 bg-zinc-900/40 transition-all duration-300 hover:border-brand-500/40 hover:shadow-lg hover:shadow-brand-500/5">
-                      <div className="relative aspect-video w-full overflow-hidden bg-zinc-900">
+                    <Card className="h-full overflow-hidden border-border bg-white transition-all duration-300 hover:border-brand-300 hover:shadow-md">
+                      <div className="relative aspect-video w-full overflow-hidden bg-zinc-100">
                         {a.coverImage ? (
                           <Image
                             src={a.coverImage}
@@ -287,7 +287,7 @@ export default async function BeritaDetailPage(props: {
                             className="object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-zinc-600">
+                          <div className="flex h-full w-full items-center justify-center text-zinc-400">
                             <span className="text-xs">UPTD IFK</span>
                           </div>
                         )}
@@ -295,11 +295,11 @@ export default async function BeritaDetailPage(props: {
                       <CardContent className="p-5">
                         <Badge
                           variant="default"
-                          className="mb-2.5 inline-flex bg-brand-500/10 text-brand-400 border border-brand-500/20 font-medium text-xs"
+                          className="mb-2.5 inline-flex bg-brand-50 text-brand-700 border border-brand-200/60 font-medium text-xs"
                         >
                           {a.category}
                         </Badge>
-                        <h3 className="line-clamp-2 text-base font-semibold text-heading group-hover:text-brand-300 transition-colors">
+                        <h3 className="line-clamp-2 text-base font-semibold text-heading group-hover:text-brand-800 transition-colors">
                           {a.title}
                         </h3>
                         <p className="mt-2 font-mono text-xs text-muted">
