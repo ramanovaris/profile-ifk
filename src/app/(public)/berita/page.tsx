@@ -1,32 +1,89 @@
-"use client";
-
-import { useState, useMemo } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import type { Metadata } from "next";
 import { PageHero } from "@/components/public/page-hero";
-import { Reveal } from "@/components/public/reveal";
-import { dummyArticles, ARTICLE_CATEGORIES } from "@/lib/dummy-data";
-import { cn } from "@/lib/utils";
+import { BeritaClientView } from "@/components/public/berita-client-view";
+import { db } from "@/lib/db";
+import { dummyArticles } from "@/lib/dummy-data";
+import type { PublicArticleItem } from "@/actions/article";
 
-const filterCategories = ["Semua", ...ARTICLE_CATEGORIES] as const;
+export const dynamic = "force-dynamic";
 
-export default function BeritaPage() {
-  const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string>("Semua");
+export const metadata: Metadata = {
+  title: "Berita & Informasi | UPTD Instalasi Farmasi Kab. Kotabaru",
+  description:
+    "Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian di Kabupaten Kotabaru.",
+};
 
-  const filtered = useMemo(() => {
-    return dummyArticles
-      .filter((a) => a.isPublished)
-      .filter((a) => activeCategory === "Semua" || a.category === activeCategory)
-      .filter(
-        (a) =>
-          a.title.toLowerCase().includes(search.toLowerCase()) ||
-          a.category.toLowerCase().includes(search.toLowerCase())
+export default async function BeritaPage() {
+  let initialArticles: PublicArticleItem[] = [];
+  let categories: Array<{ id: string; name: string; slug: string }> = [];
+  let initialTotal = 0;
+
+  try {
+    const [totalCount, dbArticles, dbCategories] = await Promise.all([
+      db.article.count({
+        where: { isPublished: true },
+      }),
+      db.article.findMany({
+        where: { isPublished: true },
+        include: {
+          category: {
+            select: { name: true, slug: true },
+          },
+        },
+        orderBy: {
+          publishedAt: "desc",
+        },
+        take: 12,
+      }),
+      db.category.findMany({
+        where: { status: "ACTIVE" },
+        select: { id: true, name: true, slug: true },
+        orderBy: { name: "asc" },
+      }),
+    ]);
+
+    initialTotal = totalCount;
+    categories = dbCategories;
+
+    initialArticles = dbArticles.map((art) => ({
+      id: art.id,
+      title: art.title,
+      slug: art.slug,
+      coverImage: art.coverImage,
+      categoryName: art.category?.name || "Umum",
+      categorySlug: art.category?.slug || "umum",
+      publishedAt: art.publishedAt.toISOString(),
+    }));
+  } catch (err) {
+    console.error("[BeritaPage] Gagal mengambil data dari basis data:", err);
+  }
+
+  // Graceful fallback ke dummy data jika basis data kosong
+  if (initialArticles.length === 0) {
+    const publishedDummy = dummyArticles.filter((a) => a.isPublished);
+    initialTotal = publishedDummy.length;
+    initialArticles = publishedDummy.slice(0, 12).map((a) => ({
+      id: a.id,
+      title: a.title,
+      slug: a.slug,
+      coverImage: a.coverImage,
+      categoryName: a.category,
+      categorySlug: a.category.toLowerCase().replace(/\s+/g, "-"),
+      publishedAt: a.publishedAt,
+    }));
+    if (categories.length === 0) {
+      const dummyCategoryNames = Array.from(
+        new Set(dummyArticles.map((a) => a.category))
       );
-  }, [search, activeCategory]);
+      categories = dummyCategoryNames.map((name) => ({
+        id: name,
+        name,
+        slug: name.toLowerCase().replace(/\s+/g, "-"),
+      }));
+    }
+  }
+
+  const initialHasMore = initialArticles.length < initialTotal;
 
   return (
     <>
@@ -38,83 +95,12 @@ export default function BeritaPage() {
       />
 
       <section className="border-t border-border bg-surface py-24">
-        <div className="section-container">
-          {/* Search bar */}
-          <Reveal>
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.5} />
-            <Input
-              placeholder="Cari berita..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border-border pl-9 focus:border-brand-600"
-            />
-          </div>
-
-          {/* Category filter */}
-          <div className="mt-6 flex flex-wrap gap-2">
-            {filterCategories.map((cat) => {
-              const isActive = activeCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={cn(
-                    "cursor-pointer rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-500 ease-luxe",
-                    isActive
-                      ? "bg-zinc-950 text-white"
-                      : "bg-surface-alt text-muted hover:bg-zinc-200",
-                  )}
-                >
-                  {cat}
-                </button>
-              );
-            })}
-          </div>
-          </Reveal>
-
-          {/* Article grid */}
-          <Reveal delay={100}>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2">
-            {filtered.map((article) => (
-              <Link key={article.id} href={`/berita/${article.slug}`} className="group block">
-                <div className="bezel">
-                  <div className="bezel-inner relative aspect-[16/10]">
-                    <Image
-                      src={article.coverImage}
-                      alt={article.title}
-                      fill
-                      sizes="(min-width: 640px) 50vw, 100vw"
-                      unoptimized={article.coverImage.startsWith("https://picsum.photos/")}
-                      className="object-cover transition-transform duration-700 ease-luxe group-hover:scale-[1.03]"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <Badge variant="default" className="bg-white/90 text-brand-700">
-                        {article.category}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <h3 className="mt-4 text-lg font-semibold text-heading line-clamp-2 group-hover:text-brand-800">
-                  {article.title}
-                </h3>
-                <p className="mt-1 font-mono text-xs text-muted">
-                  {new Date(article.publishedAt).toLocaleDateString("id-ID", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-              </Link>
-            ))}
-          </div>
-          </Reveal>
-          {filtered.length === 0 && (
-            <p className="mt-12 text-center text-sm text-muted">
-              Tidak ada berita yang cocok dengan pencarian Anda.
-            </p>
-          )}
-        </div>
+        <BeritaClientView
+          initialArticles={initialArticles}
+          categories={categories}
+          initialTotal={initialTotal}
+          initialHasMore={initialHasMore}
+        />
       </section>
     </>
   );
