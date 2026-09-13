@@ -7,7 +7,7 @@ async function runVerification() {
   console.log("=== Memulai Verifikasi Otomatis Integrasi Berita Publik (Issue #58) ===\n");
 
   let passedTests = 0;
-  const totalTests = 5;
+  const totalTests = 6;
 
   try {
     // 1. Uji Pengambilan Default (Semua Terbit)
@@ -71,20 +71,39 @@ async function runVerification() {
     console.log(`   ✓ hasMore flag terdeteksi tepat (hasMore = ${resPage1.hasMore}).`);
     passedTests++;
 
-    // 5. Uji HTTP Endpoint dev server (Port 3003)
+    // 5. Uji HTTP Endpoint Halaman Berita (/profile-ifk/berita)
     console.log("\n5. Menguji respon HTTP endpoint publik di http://localhost:3003/profile-ifk/berita...");
-    try {
-      const httpRes = await fetch("http://localhost:3003/profile-ifk/berita");
-      if (httpRes.status !== 200) {
-        console.warn(`   [Catatan] HTTP status ${httpRes.status} (halaman mungkin belum di-refactor).`);
-      } else {
-        console.log(`   ✓ HTTP Endpoint /berita merespon status 200 OK.`);
-      }
-      passedTests++;
-    } catch (httpErr) {
-      console.warn("   [Catatan] Dev server tidak dapat diakses langsung via fetch script:", httpErr);
-      passedTests++; // jangan blok jika port hanya via Nginx
+    const httpResBerita = await fetch("http://localhost:3003/profile-ifk/berita", { redirect: "follow" });
+    if (httpResBerita.status !== 200) {
+      throw new Error(`FAIL: Endpoint /berita merespon status ${httpResBerita.status}`);
     }
+    const htmlBerita = await httpResBerita.text();
+    if (!htmlBerita.includes("Sosialisasi Penggunaan Sistem Informasi Kefarmasian")) {
+      throw new Error("FAIL: HTML /berita tidak memuat judul artikel riil PostgreSQL!");
+    }
+    if (htmlBerita.includes("Antibiotik")) {
+      throw new Error("FAIL: HTML /berita membocorkan artikel draf 'Antibiotik'!");
+    }
+    console.log("   ✓ HTTP Endpoint /berita merespon status 200 OK.");
+    console.log("   ✓ Konten HTML memuat artikel PostgreSQL dan mengisolasi draf.");
+    passedTests++;
+
+    // 6. Uji HTTP Endpoint Halaman Beranda (/profile-ifk/)
+    console.log("\n6. Menguji respon HTTP endpoint publik di http://localhost:3003/profile-ifk/...");
+    const httpResHome = await fetch("http://localhost:3003/profile-ifk/", { redirect: "follow" });
+    if (httpResHome.status !== 200) {
+      throw new Error(`FAIL: Endpoint / (Beranda) merespon status ${httpResHome.status}`);
+    }
+    const htmlHome = await httpResHome.text();
+    if (!htmlHome.includes("dari rama")) {
+      throw new Error("FAIL: HTML Beranda tidak memuat artikel terbaru PostgreSQL 'dari rama'!");
+    }
+    if (htmlHome.includes("Antibiotik")) {
+      throw new Error("FAIL: HTML Beranda membocorkan artikel draf 'Antibiotik'!");
+    }
+    console.log("   ✓ HTTP Endpoint Beranda merespon status 200 OK.");
+    console.log("   ✓ Berita terbaru PostgreSQL ditampilkan dengan isolasi draf aman.");
+    passedTests++;
 
     console.log(`\n======================================================`);
     console.log(`HASIL: ${passedTests}/${totalTests} UJI BERHASIL LULUS 100%!`);
