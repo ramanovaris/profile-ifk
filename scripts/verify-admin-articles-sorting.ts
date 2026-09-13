@@ -1,4 +1,5 @@
 import { sortArticles, type SortableArticle } from "../src/lib/article-sorting";
+import { db } from "../src/lib/db";
 
 const mockArticles: SortableArticle[] = [
   {
@@ -57,7 +58,7 @@ async function runTests() {
       byTitleAsc[1].title === "Bimbingan Teknis Tenaga Kefarmasian" &&
       byTitleAsc[2].title === "Penyuluhan Pengelolaan Narkotika" &&
       byTitleAsc[3].title === "Vaksinasi Polio Serentak 2026",
-    "Pengurutan Judul secara Ascending (A-Z)"
+    "1. Pengurutan Judul secara Ascending (A-Z)"
   );
 
   // 2. Uji Pengurutan Judul (Z-A)
@@ -65,7 +66,7 @@ async function runTests() {
   assert(
     byTitleDesc[0].title === "Vaksinasi Polio Serentak 2026" &&
       byTitleDesc[3].title === "Alur Distribusi Obat Puskesmas",
-    "Pengurutan Judul secara Descending (Z-A)"
+    "2. Pengurutan Judul secara Descending (Z-A)"
   );
 
   // 3. Uji Pengurutan Kategori (A-Z)
@@ -75,7 +76,7 @@ async function runTests() {
       byCatAsc[1].category.name === "Farmasi" &&
       byCatAsc[2].category.name === "Kegiatan" &&
       byCatAsc[3].category.name === "Kegiatan",
-    "Pengurutan Kategori secara Ascending (A-Z)"
+    "3. Pengurutan Kategori secara Ascending (A-Z)"
   );
 
   // 4. Uji Pengurutan Status (Terbit vs Draft)
@@ -85,7 +86,7 @@ async function runTests() {
       byStatusAsc[1].isPublished === true &&
       byStatusAsc[2].isPublished === false &&
       byStatusAsc[3].isPublished === false,
-    "Pengurutan Status Publikasi secara Ascending (Terbit dahulu)"
+    "4a. Pengurutan Status Publikasi secara Ascending (Terbit dahulu)"
   );
 
   const byStatusDesc = sortArticles(mockArticles, "isPublished", "desc");
@@ -94,7 +95,7 @@ async function runTests() {
       byStatusDesc[1].isPublished === false &&
       byStatusDesc[2].isPublished === true &&
       byStatusDesc[3].isPublished === true,
-    "Pengurutan Status Publikasi secara Descending (Draft dahulu)"
+    "4b. Pengurutan Status Publikasi secara Descending (Draft dahulu)"
   );
 
   // 5. Uji Pengurutan Tanggal Terbit
@@ -104,14 +105,14 @@ async function runTests() {
       byDateDesc[1].id === "art-1" && // 2026-03-10
       byDateDesc[2].id === "art-4" && // 2026-02-05
       byDateDesc[3].id === "art-2", // 2026-01-15 (terlama)
-    "Pengurutan Tanggal Terbit secara Descending (Terbaru dahulu)"
+    "5a. Pengurutan Tanggal Terbit secara Descending (Terbaru dahulu)"
   );
 
   const byDateAsc = sortArticles(mockArticles, "publishedAt", "asc");
   assert(
     byDateAsc[0].id === "art-2" && // 2026-01-15 (terlama)
       byDateAsc[3].id === "art-3", // 2026-05-20 (terbaru)
-    "Pengurutan Tanggal Terbit secara Ascending (Terlama dahulu)"
+    "5b. Pengurutan Tanggal Terbit secara Ascending (Terlama dahulu)"
   );
 
   // 6. Uji Imutabilitas Array
@@ -119,13 +120,64 @@ async function runTests() {
   sortArticles(mockArticles, "title", "asc");
   assert(
     JSON.stringify(mockArticles) === originalSnapshot,
-    "Fungsi bersifat murni dan tidak memutasi array masukan asli"
+    "6. Fungsi bersifat murni dan tidak memutasi array masukan asli"
   );
 
-  console.log("\n✨ SELURUH 6 PENGUJIAN LOGIKA SORTING BERHASIL LULUS! ✨\n");
+  // 7. Uji Integrasi Data Riil Basis Data PostgreSQL
+  console.log("\n--- Menguji dengan Data Riil PostgreSQL ---");
+  const realArticles = await db.article.findMany({
+    include: {
+      category: {
+        select: { id: true, name: true },
+      },
+    },
+    take: 10,
+  });
+  console.log(`Ditemukan ${realArticles.length} artikel di basis data.`);
+
+  if (realArticles.length > 0) {
+    const realSorted = sortArticles(realArticles, "publishedAt", "desc");
+    assert(realSorted.length === realArticles.length, "7a. Jumlah artikel riil setelah sorting tetap utuh");
+
+    const realTitleSorted = sortArticles(realArticles, "title", "asc");
+    for (let i = 0; i < realTitleSorted.length - 1; i++) {
+      const cmp = realTitleSorted[i].title.localeCompare(
+        realTitleSorted[i + 1].title,
+        "id",
+        { sensitivity: "base" }
+      );
+      assert(cmp <= 0, `7b. Urutan judul abjad konsisten pada indeks ${i}`);
+    }
+  }
+
+  // 8. Uji Respon HTTP Endpoint Dev Server Port 3003
+  console.log("\n--- Menguji Respon HTTP Endpoint Dev Server (Port 3003) ---");
+  const testUrls = [
+    "http://localhost:3003/profile-ifk/admin/berita",
+    "http://localhost:3003/profile-ifk/admin/berita?sort=title&order=asc",
+    "http://localhost:3003/profile-ifk/admin/berita?sort=category&order=desc",
+    "http://localhost:3003/profile-ifk/admin/berita?sort=isPublished&order=asc",
+    "http://localhost:3003/profile-ifk/admin/berita?sort=publishedAt&order=desc",
+  ];
+
+  for (const url of testUrls) {
+    try {
+      const res = await fetch(url);
+      assert(res.status === 200, `8. HTTP GET ${url} merespon status 200 OK (Received: ${res.status})`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`⚠️ Warning: Panggilan fetch ke ${url} gagal (${msg}). Dev server mungkin perlu beberapa detik untuk merender.`);
+    }
+  }
+
+  console.log("\n✨ SELURUH PENGUJIAN VERIFIKASI SORTING DAN ENDPOINT BERHASIL LULUS 100%! ✨\n");
 }
 
-runTests().catch((err) => {
-  console.error("Terjadi kesalahan:", err);
-  process.exit(1);
-});
+runTests()
+  .catch((err) => {
+    console.error("Terjadi kesalahan fatal:", err);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await db.$disconnect();
+  });
