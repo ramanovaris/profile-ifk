@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/public/page-hero";
 import { BeritaClientView } from "@/components/public/berita-client-view";
@@ -95,12 +96,14 @@ export default async function BeritaPage() {
       />
 
       <section className="border-t border-border bg-surface py-24">
-        <BeritaClientView
-          initialArticles={initialArticles}
-          categories={categories}
-          initialTotal={initialTotal}
-          initialHasMore={initialHasMore}
-        />
+        <Suspense fallback={null}>
+          <BeritaClientView
+            initialArticles={initialArticles}
+            categories={categories}
+            initialTotal={initialTotal}
+            initialHasMore={initialHasMore}
+          />
+        </Suspense>
       </section>
     </>
   );
