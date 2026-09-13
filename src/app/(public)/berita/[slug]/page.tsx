@@ -159,7 +159,7 @@ export default async function BeritaDetailPage(props: {
   return (
     <article className="min-h-screen bg-surface text-foreground">
       {/* ── 1. Header Artikel: Breadcrumb, Badge, Judul, Metadata ───── */}
-      <header className="pt-10 sm:pt-14 pb-4 sm:pb-6">
+      <header className="pt-28 sm:pt-32 pb-4 sm:pb-6">
         <div className="section-container">
           <div className="mx-auto max-w-4xl">
             {isPreview && (
