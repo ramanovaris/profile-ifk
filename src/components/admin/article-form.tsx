@@ -17,6 +17,8 @@ import {
   ChevronDown,
   Loader2,
   Eye,
+  Users,
+  Lock,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +27,13 @@ import { ArticlePreviewModal } from "@/components/admin/article-preview-modal";
 import { cn, getAssetUrl } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { createArticleAction, updateArticleAction } from "@/actions/article";
+
+export interface FormAuthorOption {
+  id: string;
+  name: string;
+  username: string;
+  role: "SUPER_ADMIN" | "STAFF";
+}
 
 export interface FormCategoryOption {
   id: string;
@@ -41,15 +50,30 @@ export interface FormArticleData {
   coverImage: string | null;
   isPublished: boolean;
   categoryId: string;
+  authorId?: string;
 }
 
 interface ArticleFormProps {
   article?: FormArticleData;
   categories: FormCategoryOption[];
   authorName?: string;
+  currentUserRole?: "SUPER_ADMIN" | "STAFF";
+  currentUserId?: string;
+  currentAuthorId?: string;
+  currentAuthorName?: string;
+  availableAuthors?: FormAuthorOption[];
 }
 
-export function ArticleForm({ article, categories, authorName }: ArticleFormProps) {
+export function ArticleForm({
+  article,
+  categories,
+  authorName,
+  currentUserRole,
+  currentUserId,
+  currentAuthorId,
+  currentAuthorName,
+  availableAuthors,
+}: ArticleFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -71,6 +95,17 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
   const optionsRef = useRef<HTMLDivElement>(null);
   const triggerButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Author State
+  const [selectedAuthorId, setSelectedAuthorId] = useState<string>(
+    currentAuthorId ?? currentUserId ?? availableAuthors?.[0]?.id ?? ""
+  );
+  const [isAuthorComboboxOpen, setIsAuthorComboboxOpen] = useState(false);
+  const [authorSearch, setAuthorSearch] = useState("");
+  const [authorActiveIndex, setAuthorActiveIndex] = useState<number>(-1);
+  const authorComboboxRef = useRef<HTMLDivElement>(null);
+  const authorOptionsRef = useRef<HTMLDivElement>(null);
+  const authorTriggerButtonRef = useRef<HTMLButtonElement>(null);
+
   // Filter kategori aktif
   const activeCategories = categories.filter(
     (cat) => !cat.status || cat.status === "ACTIVE"
@@ -84,6 +119,30 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
     (cat) => cat.id === selectedCategoryId
   );
 
+  // Filter penulis aktif
+  const filteredAuthors = (availableAuthors || []).filter(
+    (author) =>
+      author.name.toLowerCase().includes(authorSearch.toLowerCase()) ||
+      author.username.toLowerCase().includes(authorSearch.toLowerCase())
+  );
+
+  const selectedAuthorData = (availableAuthors || []).find(
+    (author) => author.id === selectedAuthorId
+  );
+
+  const displayAuthorName =
+    selectedAuthorData?.name || currentAuthorName || authorName || "Admin IFK";
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -93,6 +152,14 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
         setIsComboboxOpen(false);
         setComboboxSearch("");
         setActiveIndex(-1);
+      }
+      if (
+        authorComboboxRef.current &&
+        !authorComboboxRef.current.contains(event.target as Node)
+      ) {
+        setIsAuthorComboboxOpen(false);
+        setAuthorSearch("");
+        setAuthorActiveIndex(-1);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -106,6 +173,13 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
       ? 0
       : activeIndex;
 
+  const safeAuthorActiveIndex =
+    filteredAuthors.length === 0
+      ? -1
+      : authorActiveIndex >= filteredAuthors.length
+      ? 0
+      : authorActiveIndex;
+
   // Sync scroll to active item
   useEffect(() => {
     if (safeActiveIndex >= 0 && optionsRef.current) {
@@ -115,6 +189,15 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
       activeEl?.scrollIntoView({ block: "nearest" });
     }
   }, [safeActiveIndex]);
+
+  useEffect(() => {
+    if (safeAuthorActiveIndex >= 0 && authorOptionsRef.current) {
+      const activeEl = authorOptionsRef.current.children[safeAuthorActiveIndex] as
+        | HTMLElement
+        | undefined;
+      activeEl?.scrollIntoView({ block: "nearest" });
+    }
+  }, [safeAuthorActiveIndex]);
 
   const selectCategory = (catId: string) => {
     setSelectedCategoryId(catId);
@@ -180,6 +263,10 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
     formData.append("categoryId", selectedCategoryId);
     formData.append("content", content);
     formData.append("isPublished", isPublished ? "true" : "false");
+
+    if (selectedAuthorId && currentUserRole === "SUPER_ADMIN") {
+      formData.append("authorId", selectedAuthorId);
+    }
 
     if (selectedFile) {
       formData.append("coverImage", selectedFile);
@@ -524,6 +611,242 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
               </div>
             </button>
           </div>
+
+          {/* Penulis Naskah (Author Selector) */}
+          {currentUserRole === "SUPER_ADMIN" ? (
+            <div className="sm:col-span-2 space-y-2">
+              <Label className="text-sm font-medium text-zinc-200 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-3.5 w-3.5 text-brand-400" />
+                  <span>Penulis Naskah (Author)</span>
+                </span>
+                <span className="text-[11px] text-zinc-400 font-normal">
+                  Khusus Super Admin
+                </span>
+              </Label>
+              <div ref={authorComboboxRef} className="relative">
+                <button
+                  ref={authorTriggerButtonRef}
+                  type="button"
+                  onClick={() => {
+                    if (isAuthorComboboxOpen) {
+                      setIsAuthorComboboxOpen(false);
+                      setAuthorSearch("");
+                      setAuthorActiveIndex(-1);
+                    } else {
+                      setIsAuthorComboboxOpen(true);
+                      const idx = filteredAuthors.findIndex(
+                        (a) => a.id === selectedAuthorId
+                      );
+                      setAuthorActiveIndex(
+                        idx >= 0
+                          ? idx
+                          : filteredAuthors.length > 0
+                          ? 0
+                          : -1
+                      );
+                    }
+                  }}
+                  aria-expanded={isAuthorComboboxOpen}
+                  aria-haspopup="listbox"
+                  className={cn(
+                    "flex h-12 w-full items-center justify-between rounded-xl border bg-zinc-950/60 px-3.5 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
+                    isAuthorComboboxOpen
+                      ? "border-brand-500/60 ring-2 ring-brand-500/40"
+                      : "border-white/10 hover:border-white/20"
+                  )}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300 ring-1 ring-brand-500/30">
+                      {getInitials(displayAuthorName)}
+                    </div>
+                    <div className="flex items-center gap-2 min-w-0 truncate">
+                      <span className="font-medium text-white truncate">
+                        {displayAuthorName}
+                      </span>
+                      {selectedAuthorData && (
+                        <span className="font-mono text-xs text-zinc-400 truncate">
+                          @{selectedAuthorData.username}
+                        </span>
+                      )}
+                      {selectedAuthorData && (
+                        <span
+                          className={cn(
+                            "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                            selectedAuthorData.role === "SUPER_ADMIN"
+                              ? "border border-amber-500/30 bg-amber-500/10 text-amber-300"
+                              : "border border-brand-500/30 bg-brand-500/10 text-brand-300"
+                          )}
+                        >
+                          {selectedAuthorData.role === "SUPER_ADMIN"
+                            ? "Super Admin"
+                            : "Staf"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 text-zinc-400 transition-transform ml-2",
+                      isAuthorComboboxOpen && "rotate-180"
+                    )}
+                  />
+                </button>
+
+                {isAuthorComboboxOpen && (
+                  <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-2xl backdrop-blur-2xl">
+                    {/* Search Input inside Dropdown */}
+                    <div className="border-b border-white/5 p-2">
+                      <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+                        <input
+                          type="text"
+                          placeholder="Cari nama atau username staf..."
+                          value={authorSearch}
+                          onChange={(e) => {
+                            setAuthorSearch(e.target.value);
+                            setAuthorActiveIndex(0);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "ArrowDown") {
+                              e.preventDefault();
+                              if (filteredAuthors.length > 0) {
+                                setAuthorActiveIndex((prev) =>
+                                  prev < filteredAuthors.length - 1
+                                    ? prev + 1
+                                    : 0
+                                );
+                              }
+                            } else if (e.key === "ArrowUp") {
+                              e.preventDefault();
+                              if (filteredAuthors.length > 0) {
+                                setAuthorActiveIndex((prev) =>
+                                  prev > 0
+                                    ? prev - 1
+                                    : filteredAuthors.length - 1
+                                );
+                              }
+                            } else if (e.key === "Enter") {
+                              e.preventDefault();
+                              if (
+                                safeAuthorActiveIndex >= 0 &&
+                                safeAuthorActiveIndex < filteredAuthors.length
+                              ) {
+                                setSelectedAuthorId(
+                                  filteredAuthors[safeAuthorActiveIndex].id
+                                );
+                                setIsAuthorComboboxOpen(false);
+                                setAuthorSearch("");
+                              }
+                            } else if (e.key === "Escape") {
+                              e.preventDefault();
+                              setIsAuthorComboboxOpen(false);
+                              authorTriggerButtonRef.current?.focus();
+                            }
+                          }}
+                          className="w-full rounded-lg border border-white/10 bg-zinc-900/80 py-1.5 pl-8 pr-3 text-xs text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+
+                    {/* Authors List */}
+                    <div
+                      ref={authorOptionsRef}
+                      role="listbox"
+                      className="max-h-48 overflow-y-auto p-1.5 focus:outline-none"
+                    >
+                      {filteredAuthors.length === 0 ? (
+                        <div className="p-3 text-center text-xs text-zinc-500">
+                          Tidak ada staf aktif yang cocok.
+                        </div>
+                      ) : (
+                        filteredAuthors.map((author, idx) => {
+                          const isSelected = selectedAuthorId === author.id;
+                          const isHighlighted = safeAuthorActiveIndex === idx;
+
+                          return (
+                            <div
+                              key={author.id}
+                              role="option"
+                              aria-selected={isSelected}
+                              onClick={() => {
+                                setSelectedAuthorId(author.id);
+                                setIsAuthorComboboxOpen(false);
+                                setAuthorSearch("");
+                              }}
+                              onMouseEnter={() => setAuthorActiveIndex(idx)}
+                              className={cn(
+                                "flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors",
+                                isHighlighted
+                                  ? "bg-brand-500/20 text-white"
+                                  : isSelected
+                                  ? "bg-white/5 text-brand-300"
+                                  : "text-zinc-300 hover:bg-white/5"
+                              )}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-bold text-white ring-1 ring-white/10">
+                                  {getInitials(author.name)}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-medium text-white truncate">
+                                    {author.name}
+                                  </p>
+                                  <p className="text-[11px] text-zinc-400 font-mono truncate">
+                                    @{author.username} &bull;{" "}
+                                    <span
+                                      className={
+                                        author.role === "SUPER_ADMIN"
+                                          ? "text-amber-400"
+                                          : "text-zinc-400"
+                                      }
+                                    >
+                                      {author.role === "SUPER_ADMIN"
+                                        ? "Super Admin"
+                                        : "Staf"}
+                                    </span>
+                                  </p>
+                                </div>
+                              </div>
+                              {isSelected && (
+                                <Check className="h-4 w-4 shrink-0 text-brand-400 ml-2" />
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="sm:col-span-2 space-y-2">
+              <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5 text-brand-400" />
+                <span>Penulis Naskah (Author)</span>
+              </Label>
+              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-950/40 p-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[11px] font-bold text-white ring-1 ring-white/10">
+                    {getInitials(displayAuthorName)}
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-white">
+                      {displayAuthorName}
+                    </p>
+                    <p className="text-[11px] text-zinc-400 flex items-center gap-1 mt-0.5">
+                      <Lock className="h-3 w-3 text-zinc-500" />
+                      <span>
+                        Penulis naskah hanya dapat dialihkan oleh Super Admin.
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Cover Image Upload Area */}
@@ -658,7 +981,7 @@ export function ArticleForm({ article, categories, authorName }: ArticleFormProp
             categories.find((c) => c.id === selectedCategoryId)?.name || "Umum",
           content,
           coverPreviewUrl: preview || getAssetUrl(article?.coverImage) || null,
-          authorName: authorName || "Administrator",
+          authorName: displayAuthorName,
           isPublished,
         }}
       />

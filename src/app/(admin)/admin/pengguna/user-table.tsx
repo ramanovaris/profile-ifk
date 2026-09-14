@@ -106,6 +106,7 @@ export function UserTable({
 
   // Modal Hapus State
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [reassignTargetUserId, setReassignTargetUserId] = useState<string>("");
 
   // Modal Konfirmasi Toggle Status State
   const [toggleStatusTarget, setToggleStatusTarget] = useState<UserItem | null>(null);
@@ -368,31 +369,58 @@ export function UserTable({
   const isRootAdmin = userToDelete?.username.toLowerCase() === "admin";
   const isSelf = userToDelete?.id === currentUserId;
   const hasArticles = (userToDelete?.articleCount ?? 0) > 0;
-  const isProtectedFromDelete = isRootAdmin || isSelf || hasArticles;
+  const isProtectedFromDelete = isRootAdmin || isSelf;
+
+  const eligibleReassignRecipients = users.filter(
+    (u) => u.status === "ACTIVE" && u.id !== deleteId
+  );
 
   const handleConfirmDelete = () => {
     if (!deleteId || isProtectedFromDelete) {
       if (isRootAdmin) toast.error("Akun Administrator Utama tidak dapat dihapus.");
       if (isSelf) toast.error("Anda tidak dapat menghapus akun Anda sendiri.");
-      if (hasArticles)
-        toast.error(
-          "Pengguna memiliki riwayat artikel dan tidak dapat dihapus."
-        );
+      return;
+    }
+
+    if (hasArticles && !reassignTargetUserId) {
+      toast.error("Silakan pilih akun penerima untuk mengalihkan artikel.");
       return;
     }
 
     const name = userToDelete?.name ?? "";
+    const articleCount = userToDelete?.articleCount ?? 0;
     startTransition(async () => {
       try {
-        const res = await deleteUserAction(deleteId);
+        const res = await deleteUserAction(
+          deleteId,
+          hasArticles ? reassignTargetUserId : undefined
+        );
         if (!res.success) {
           toast.error(res.error || "Gagal menghapus pengguna.");
           return;
         }
 
-        setUsers((prev) => prev.filter((u) => u.id !== deleteId));
-        toast.success(`Pengguna "${name}" berhasil dihapus.`);
+        setUsers((prev) =>
+          prev
+            .filter((u) => u.id !== deleteId)
+            .map((u) =>
+              hasArticles && u.id === reassignTargetUserId
+                ? { ...u, articleCount: (u.articleCount ?? 0) + articleCount }
+                : u
+            )
+        );
+
+        if (hasArticles) {
+          const recipientName =
+            users.find((u) => u.id === reassignTargetUserId)?.name ?? "staf terpilih";
+          toast.success(
+            `Pengguna "${name}" berhasil dihapus. ${articleCount} artikel dialihkan ke ${recipientName}.`
+          );
+        } else {
+          toast.success(`Pengguna "${name}" berhasil dihapus.`);
+        }
         setDeleteId(null);
+        setReassignTargetUserId("");
       } catch (err: unknown) {
         toast.error(
           err instanceof Error ? err.message : "Gagal menghapus pengguna."
@@ -1117,7 +1145,15 @@ export function UserTable({
       </Dialog>
 
       {/* Dialog Konfirmasi Hapus Pengguna */}
-      <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+      <Dialog
+        open={!!deleteId}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteId(null);
+            setReassignTargetUserId("");
+          }
+        }}
+      >
         <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
           <DialogHeader className="space-y-3">
             <div className="flex items-center gap-3">
@@ -1178,19 +1214,51 @@ export function UserTable({
                 </p>
               </div>
             ) : hasArticles ? (
-              <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">
-                <p className="font-semibold flex items-center gap-1.5">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  Pengguna Memiliki Riwayat Penulisan Berita
-                </p>
-                <p className="mt-1 text-[11px] text-amber-400/90 leading-relaxed">
-                  Pengguna ini tercatat sebagai penulis pada{" "}
-                  <strong className="text-white font-semibold">
-                    {userToDelete?.articleCount} artikel berita
-                  </strong>
-                  . Demi menjaga keutuhan arsip publikasi instansi, akun ini tidak dapat dihapus. Anda dapat mengubah statusnya menjadi{" "}
-                  <strong className="text-white font-semibold">Non-Aktif</strong> jika staf yang bersangkutan sudah tidak bertugas.
-                </p>
+              <div className="space-y-3">
+                <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-300">
+                  <p className="font-semibold flex items-center gap-1.5">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    Pengguna Memiliki Riwayat Penulisan Berita
+                  </p>
+                  <p className="mt-1 text-[11px] text-amber-400/90 leading-relaxed">
+                    Pengguna ini tercatat sebagai penulis pada{" "}
+                    <strong className="text-white font-semibold">
+                      {userToDelete?.articleCount} artikel berita
+                    </strong>
+                    . Sebelum akun dihapus, seluruh artikel wajib dialihkan ke staf
+                    atau admin aktif lain agar arsip publikasi instansi tetap terjaga.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <Label
+                    htmlFor="reassign-recipient"
+                    className="text-xs font-medium text-zinc-300 flex items-center justify-between"
+                  >
+                    <span>Alihkan Kepemilikan Seluruh Artikel Ke:</span>
+                    <span className="text-red-400 text-[10px]">* Wajib dipilih</span>
+                  </Label>
+                  <select
+                    id="reassign-recipient"
+                    value={reassignTargetUserId}
+                    onChange={(e) => setReassignTargetUserId(e.target.value)}
+                    className="flex h-10 w-full rounded-xl border border-white/10 bg-zinc-900/90 px-3 py-2 text-xs text-white outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                  >
+                    <option value="" className="bg-zinc-950 text-zinc-400">
+                      -- Pilih Staf / Admin Penerima Artikel --
+                    </option>
+                    {eligibleReassignRecipients.map((recipient) => (
+                      <option
+                        key={recipient.id}
+                        value={recipient.id}
+                        className="bg-zinc-950 text-white"
+                      >
+                        {recipient.name} (@{recipient.username}) &bull;{" "}
+                        {recipient.role === "SUPER_ADMIN" ? "Super Admin" : "Staf"}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             ) : (
               <p className="text-xs text-zinc-400 leading-relaxed">
@@ -1204,7 +1272,10 @@ export function UserTable({
             {isProtectedFromDelete ? (
               <button
                 type="button"
-                onClick={() => setDeleteId(null)}
+                onClick={() => {
+                  setDeleteId(null);
+                  setReassignTargetUserId("");
+                }}
                 className="inline-flex h-10 w-full items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
               >
                 Tutup / Mengerti
@@ -1213,7 +1284,10 @@ export function UserTable({
               <>
                 <button
                   type="button"
-                  onClick={() => setDeleteId(null)}
+                  onClick={() => {
+                    setDeleteId(null);
+                    setReassignTargetUserId("");
+                  }}
                   disabled={isPending}
                   className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:opacity-50"
                 >
@@ -1222,15 +1296,21 @@ export function UserTable({
                 <button
                   type="button"
                   onClick={handleConfirmDelete}
-                  disabled={isPending}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                  disabled={isPending || (hasArticles && !reassignTargetUserId)}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <Trash2 className="h-4 w-4" />
                   )}
-                  <span>{isPending ? "Menghapus..." : "Hapus Akun"}</span>
+                  <span>
+                    {isPending
+                      ? "Memproses..."
+                      : hasArticles
+                      ? `Alihkan & Hapus`
+                      : "Hapus Akun"}
+                  </span>
                 </button>
               </>
             )}

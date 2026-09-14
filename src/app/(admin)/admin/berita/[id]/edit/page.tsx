@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ArticleForm } from "@/components/admin/article-form";
 import { db } from "@/lib/db";
+import { getCurrentSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,8 @@ export default async function AdminBeritaEditPage(props: {
 }) {
   const { id } = await props.params;
 
-  const [categories, article] = await Promise.all([
+  const [session, categories, article, activeUsers] = await Promise.all([
+    getCurrentSession(),
     db.category.findMany({
       where: { status: "ACTIVE" },
       select: {
@@ -34,7 +36,28 @@ export default async function AdminBeritaEditPage(props: {
         coverImage: true,
         isPublished: true,
         categoryId: true,
+        authorId: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+          },
+        },
       },
+    }),
+    db.user.findMany({
+      where: { status: "ACTIVE" },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        role: true,
+      },
+      orderBy: [
+        { role: "asc" },
+        { name: "asc" },
+      ],
     }),
   ]);
 
@@ -66,7 +89,15 @@ export default async function AdminBeritaEditPage(props: {
             Perbarui informasi artikel atau ubah status publikasinya.
           </p>
         </div>
-        <ArticleForm article={article} categories={categories} />
+        <ArticleForm
+          article={article}
+          categories={categories}
+          currentUserRole={session?.user.role}
+          currentUserId={session?.user.id}
+          currentAuthorId={article.authorId}
+          currentAuthorName={article.author?.name}
+          availableAuthors={activeUsers}
+        />
       </div>
     </AdminShell>
   );
