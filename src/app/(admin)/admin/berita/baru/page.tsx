@@ -37,7 +37,7 @@ export default async function AdminBeritaBaruPage() {
 
   return (
     <AdminShell>
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-4xl w-full min-w-0">
         <div className="mb-6">
           <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
             Tambah Artikel Baru

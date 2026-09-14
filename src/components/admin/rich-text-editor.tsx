@@ -309,14 +309,14 @@ export function RichTextEditor({
     <div
       onKeyDown={onKeyDown}
       className={cn(
-        "group relative flex flex-col rounded-xl border border-white/10 bg-zinc-950/60 backdrop-blur-md transition-all",
+        "group relative flex flex-col rounded-xl border border-white/10 bg-zinc-950/60 backdrop-blur-md transition-all w-full max-w-full min-w-0 overflow-hidden",
         "focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/40",
         disabled && "opacity-60 cursor-not-allowed",
         className
       )}
     >
       {/* Sticky Toolbar */}
-      <div className="sticky top-0 z-10 flex items-center gap-1 border-b border-white/10 bg-zinc-900/90 p-1.5 rounded-t-xl backdrop-blur-md overflow-x-auto sm:flex-wrap">
+      <div className="sticky top-0 z-10 flex w-full max-w-full min-w-0 items-center gap-1 border-b border-white/10 bg-zinc-900/90 p-1.5 rounded-t-xl backdrop-blur-md overflow-x-auto sm:flex-wrap">
         {/* Grup 1: Text Style */}
         <ToolbarButton
           icon={Bold}
@@ -445,8 +445,8 @@ export function RichTextEditor({
       </div>
 
       {/* Editor Content Area */}
-      <div className="relative flex-1">
-        <EditorContent editor={editor} />
+      <div className="relative flex-1 w-full max-w-full min-w-0 overflow-hidden">
+        <EditorContent editor={editor} className="w-full max-w-full min-w-0" />
       </div>
 
       {/* Global CSS tipografi placeholder untuk Tiptap */}

@@ -312,7 +312,7 @@ export function ArticleForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 w-full min-w-0">
       {/* Top action / back link */}
       <div className="pb-2">
         <Link
@@ -325,7 +325,7 @@ export function ArticleForm({
       </div>
 
       {/* Main Form Container Card */}
-      <div className="rounded-2xl border border-white/5 bg-zinc-900/60 p-6 backdrop-blur-xl shadow-xl sm:p-8 space-y-6">
+      <div className="rounded-2xl border border-white/5 bg-zinc-900/60 p-4 sm:p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6 w-full min-w-0 max-w-full overflow-hidden">
         {/* Judul Artikel & Slug */}
         <div className="space-y-2">
           <Label
@@ -363,10 +363,10 @@ export function ArticleForm({
             className="border-white/10 bg-zinc-950/60 text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           />
           {title && (
-            <div className="flex items-center gap-1.5 text-xs text-zinc-400 pt-1">
-              <Globe className="h-3.5 w-3.5 text-brand-400" />
-              <span>Preview URL:</span>
-              <code className="rounded bg-black/40 px-1.5 py-0.5 text-brand-300 font-mono">
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-400 pt-1 min-w-0 max-w-full">
+              <Globe className="h-3.5 w-3.5 text-brand-400 shrink-0" />
+              <span className="shrink-0">Preview URL:</span>
+              <code className="rounded bg-black/40 px-1.5 py-0.5 text-brand-300 font-mono break-all">
                 /berita/{generatedSlug}
               </code>
             </div>
@@ -374,7 +374,7 @@ export function ArticleForm({
         </div>
 
         {/* Kategori & Status Grid */}
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 w-full min-w-0">
           {/* Combobox Kategori */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
@@ -614,8 +614,8 @@ export function ArticleForm({
 
           {/* Penulis Naskah (Author Selector) */}
           {currentUserRole === "SUPER_ADMIN" ? (
-            <div className="sm:col-span-2 space-y-2">
-              <Label className="text-sm font-medium text-zinc-200 flex items-center justify-between">
+            <div className="sm:col-span-2 space-y-2 min-w-0">
+              <Label className="text-sm font-medium text-zinc-200 flex flex-wrap items-center justify-between gap-1">
                 <span className="flex items-center gap-1.5">
                   <Users className="h-3.5 w-3.5 text-brand-400" />
                   <span>Penulis Naskah (Author)</span>
@@ -624,7 +624,7 @@ export function ArticleForm({
                   Khusus Super Admin
                 </span>
               </Label>
-              <div ref={authorComboboxRef} className="relative">
+              <div ref={authorComboboxRef} className="relative w-full min-w-0">
                 <button
                   ref={authorTriggerButtonRef}
                   type="button"
@@ -650,38 +650,38 @@ export function ArticleForm({
                   aria-expanded={isAuthorComboboxOpen}
                   aria-haspopup="listbox"
                   className={cn(
-                    "flex h-12 w-full items-center justify-between rounded-xl border bg-zinc-950/60 px-3.5 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
+                    "flex min-h-12 w-full items-center justify-between rounded-xl border bg-zinc-950/60 px-3.5 py-2 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
                     isAuthorComboboxOpen
                       ? "border-brand-500/60 ring-2 ring-brand-500/40"
                       : "border-white/10 hover:border-white/20"
                   )}
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300 ring-1 ring-brand-500/30">
                       {getInitials(displayAuthorName)}
                     </div>
-                    <div className="flex items-center gap-2 min-w-0 truncate">
-                      <span className="font-medium text-white truncate">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0 flex-1 overflow-hidden text-left">
+                      <span className="font-medium text-white text-xs sm:text-sm truncate block">
                         {displayAuthorName}
                       </span>
                       {selectedAuthorData && (
-                        <span className="font-mono text-xs text-zinc-400 truncate">
-                          @{selectedAuthorData.username}
-                        </span>
-                      )}
-                      {selectedAuthorData && (
-                        <span
-                          className={cn(
-                            "rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                            selectedAuthorData.role === "SUPER_ADMIN"
-                              ? "border border-amber-500/30 bg-amber-500/10 text-amber-300"
-                              : "border border-brand-500/30 bg-brand-500/10 text-brand-300"
-                          )}
-                        >
-                          {selectedAuthorData.role === "SUPER_ADMIN"
-                            ? "Super Admin"
-                            : "Staf"}
-                        </span>
+                        <div className="flex items-center gap-1.5 min-w-0 shrink-0">
+                          <span className="font-mono text-[11px] text-zinc-400 truncate max-w-[110px] sm:max-w-[150px]">
+                            @{selectedAuthorData.username}
+                          </span>
+                          <span
+                            className={cn(
+                              "rounded-full px-1.5 py-0.2 text-[9px] sm:text-[10px] font-semibold shrink-0",
+                              selectedAuthorData.role === "SUPER_ADMIN"
+                                ? "border border-amber-500/30 bg-amber-500/10 text-amber-300"
+                                : "border border-brand-500/30 bg-brand-500/10 text-brand-300"
+                            )}
+                          >
+                            {selectedAuthorData.role === "SUPER_ADMIN"
+                              ? "Super Admin"
+                              : "Staf"}
+                          </span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -822,23 +822,23 @@ export function ArticleForm({
               </div>
             </div>
           ) : (
-            <div className="sm:col-span-2 space-y-2">
+            <div className="sm:col-span-2 space-y-2 min-w-0">
               <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
                 <Users className="h-3.5 w-3.5 text-brand-400" />
                 <span>Penulis Naskah (Author)</span>
               </Label>
-              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-950/40 p-3">
-                <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-950/40 p-3 w-full min-w-0 overflow-hidden">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[11px] font-bold text-white ring-1 ring-white/10">
                     {getInitials(displayAuthorName)}
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-white">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold text-white truncate">
                       {displayAuthorName}
                     </p>
-                    <p className="text-[11px] text-zinc-400 flex items-center gap-1 mt-0.5">
-                      <Lock className="h-3 w-3 text-zinc-500" />
-                      <span>
+                    <p className="text-[11px] text-zinc-400 flex items-center gap-1 mt-0.5 truncate">
+                      <Lock className="h-3 w-3 text-zinc-500 shrink-0" />
+                      <span className="truncate">
                         Penulis naskah hanya dapat dialihkan oleh Super Admin.
                       </span>
                     </p>
