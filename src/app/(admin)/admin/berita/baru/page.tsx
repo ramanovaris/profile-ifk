@@ -1,22 +1,39 @@
 import { AdminShell } from "@/components/admin/admin-shell";
 import { ArticleForm } from "@/components/admin/article-form";
 import { db } from "@/lib/db";
+import { getCurrentSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBeritaBaruPage() {
-  const categories = await db.category.findMany({
-    where: { status: "ACTIVE" },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      status: true,
-    },
-    orderBy: {
-      name: "asc",
-    },
-  });
+  const [session, categories, activeUsers] = await Promise.all([
+    getCurrentSession(),
+    db.category.findMany({
+      where: { status: "ACTIVE" },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        status: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    }),
+    db.user.findMany({
+      where: { status: "ACTIVE" },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        role: true,
+      },
+      orderBy: [
+        { role: "asc" },
+        { name: "asc" },
+      ],
+    }),
+  ]);
 
   return (
     <AdminShell>
@@ -29,7 +46,12 @@ export default async function AdminBeritaBaruPage() {
             Publikasikan pengumuman atau berita terbaru UPTD IFK Kotabaru.
           </p>
         </div>
-        <ArticleForm categories={categories} />
+        <ArticleForm
+          categories={categories}
+          currentUserRole={session?.user.role}
+          currentUserId={session?.user.id}
+          availableAuthors={activeUsers}
+        />
       </div>
     </AdminShell>
   );
