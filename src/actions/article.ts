@@ -21,7 +21,9 @@ export type ArticleInput = {
   content: string;
   isPublished?: boolean;
   coverImage?: File | string | null;
+  authorId?: string;
   _testUserId?: string;
+  _testUserRole?: "SUPER_ADMIN" | "STAFF";
 };
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
@@ -103,6 +105,7 @@ function parseArticlePayload(input: FormData | ArticleInput): ArticleInput {
   if (input instanceof FormData) {
     const isPublishedRaw = input.get("isPublished");
     const coverFile = input.get("coverImage");
+    const authorIdRaw = input.get("authorId");
 
     return {
       title: (input.get("title") as string) || "",
@@ -114,7 +117,9 @@ function parseArticlePayload(input: FormData | ArticleInput): ArticleInput {
         coverFile instanceof File && coverFile.size > 0
           ? coverFile
           : (input.get("existingCoverImage") as string) || null,
+      authorId: (authorIdRaw as string) || undefined,
       _testUserId: (input.get("_testUserId") as string) || undefined,
+      _testUserRole: (input.get("_testUserRole") as "SUPER_ADMIN" | "STAFF") || undefined,
     };
   }
   return input;
@@ -129,8 +134,9 @@ export async function createArticleAction(
   const payload = parseArticlePayload(input);
 
   // Verifikasi sesi
-  let authorId = payload._testUserId;
-  if (!authorId) {
+  let currentUserId = payload._testUserId;
+  let currentUserRole: "SUPER_ADMIN" | "STAFF" = payload._testUserRole ?? "SUPER_ADMIN";
+  if (!currentUserId) {
     const auth = await getCurrentSession();
     if (!auth || auth.user.status === "INACTIVE") {
       return {
@@ -138,7 +144,23 @@ export async function createArticleAction(
         error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
       };
     }
-    authorId = auth.user.id;
+    currentUserId = auth.user.id;
+    currentUserRole = auth.user.role;
+  }
+
+  let finalAuthorId = currentUserId;
+  if (currentUserRole === "SUPER_ADMIN" && payload.authorId) {
+    const authorExists = await db.user.findFirst({
+      where: { id: payload.authorId, status: "ACTIVE" },
+      select: { id: true },
+    });
+    if (!authorExists) {
+      return {
+        success: false,
+        error: "Penulis yang dipilih tidak ditemukan atau tidak berstatus aktif.",
+      };
+    }
+    finalAuthorId = payload.authorId;
   }
 
   const title = payload.title?.trim();
@@ -201,7 +223,7 @@ export async function createArticleAction(
         isPublished: payload.isPublished ?? true,
         publishedAt: payload.isPublished ? new Date() : new Date(),
         categoryId: payload.categoryId,
-        authorId,
+        authorId: finalAuthorId,
       },
     });
 
@@ -236,6 +258,7 @@ export async function updateArticleAction(
   const payload = parseArticlePayload(input);
 
   // Verifikasi sesi
+  let currentUserRole: "SUPER_ADMIN" | "STAFF" = payload._testUserRole ?? "SUPER_ADMIN";
   if (!payload._testUserId) {
     const auth = await getCurrentSession();
     if (!auth || auth.user.status === "INACTIVE") {
@@ -244,6 +267,7 @@ export async function updateArticleAction(
         error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
       };
     }
+    currentUserRole = auth.user.role;
   }
 
   const existingArticle = await db.article.findUnique({
@@ -291,6 +315,25 @@ export async function updateArticleAction(
       slug = await generateUniqueArticleSlug(title, id);
     }
 
+    let nextAuthorId = existingArticle.authorId;
+    if (
+      currentUserRole === "SUPER_ADMIN" &&
+      payload.authorId &&
+      payload.authorId !== existingArticle.authorId
+    ) {
+      const authorExists = await db.user.findFirst({
+        where: { id: payload.authorId, status: "ACTIVE" },
+        select: { id: true },
+      });
+      if (!authorExists) {
+        return {
+          success: false,
+          error: "Penulis yang dipilih tidak ditemukan atau tidak berstatus aktif.",
+        };
+      }
+      nextAuthorId = payload.authorId;
+    }
+
     const updated = await db.article.update({
       where: { id },
       data: {
@@ -300,6 +343,7 @@ export async function updateArticleAction(
         coverImage: coverImagePath,
         isPublished: payload.isPublished ?? existingArticle.isPublished,
         categoryId: payload.categoryId || existingArticle.categoryId,
+        authorId: nextAuthorId,
       },
     });
 
@@ -549,4 +593,79 @@ export async function getPublicArticlesAction(
     };
   }
 }
+
+/**
+ * Server Action: Mengalihkan seluruh artikel milik sourceUserId ke targetUserId (Super Admin only).
+ */
+export async function bulkReassignArticlesAction(
+  sourceUserId: string,
+  targetUserId: string,
+  options?: { _testUserRole?: "SUPER_ADMIN" | "STAFF" }
+): Promise<ArticleActionResult<{ count: number }>> {
+  let role = options?._testUserRole;
+  if (!role) {
+    const auth = await getCurrentSession();
+    if (!auth || auth.user.status === "INACTIVE") {
+      return {
+        success: false,
+        error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
+      };
+    }
+    role = auth.user.role;
+  }
+
+  if (role !== "SUPER_ADMIN") {
+    return {
+      success: false,
+      error: "Hanya Super Admin yang berwenang mengalihkan kepemilikan artikel secara massal.",
+    };
+  }
+
+  if (sourceUserId === targetUserId) {
+    return {
+      success: false,
+      error: "Pengguna asal dan pengguna tujuan alih kepemilikan tidak boleh sama.",
+    };
+  }
+
+  try {
+    const targetUser = await db.user.findFirst({
+      where: { id: targetUserId, status: "ACTIVE" },
+      select: { id: true, name: true },
+    });
+
+    if (!targetUser) {
+      return {
+        success: false,
+        error: "Pengguna tujuan tidak ditemukan atau tidak berstatus aktif.",
+      };
+    }
+
+    const result = await db.article.updateMany({
+      where: { authorId: sourceUserId },
+      data: { authorId: targetUserId },
+    });
+
+    try {
+      revalidatePath("/admin/berita");
+      revalidatePath("/admin/pengguna");
+      revalidatePath("/berita");
+      revalidatePath("/");
+    } catch {
+      // Safe fallback
+    }
+
+    return {
+      success: true,
+      data: { count: result.count },
+    };
+  } catch (err: unknown) {
+    console.error("[bulkReassignArticlesAction] Error:", err);
+    return {
+      success: false,
+      error: "Terjadi kesalahan saat mengalihkan kepemilikan artikel.",
+    };
+  }
+}
+
 
