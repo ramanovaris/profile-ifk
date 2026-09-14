@@ -55,7 +55,7 @@ async function runTests() {
 
   console.log(`✓ Data uji berhasil disiapkan: User A (${userA.username}), User B (${userB.username})`);
 
-  let createdArticleIds: string[] = [];
+  const createdArticleIds: string[] = [];
 
   try {
     // 1. Uji Pembuatan Artikel oleh Super Admin dengan Atribusi ke User A
