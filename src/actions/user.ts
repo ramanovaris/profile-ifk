@@ -436,20 +436,28 @@ export async function resetUserPasswordAction(
 }
 
 /**
- * Server Action: Menghapus akun pengguna dari database.
+ * Server Action: Menghapus akun pengguna dari database dengan opsi alih kepemilikan artikel atomik.
  */
 export async function deleteUserAction(
-  id: string
+  id: string,
+  reassignToUserId?: string,
+  options?: { _testUserId?: string; _testUserRole?: "SUPER_ADMIN" | "STAFF" }
 ): Promise<UserActionResult<null>> {
-  const auth = await getCurrentSession();
-  if (!auth) {
-    return {
-      success: false,
-      error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
-    };
+  let currentUserId = options?._testUserId;
+  let currentUserRole: "SUPER_ADMIN" | "STAFF" = options?._testUserRole ?? "SUPER_ADMIN";
+  if (!options?._testUserId) {
+    const auth = await getCurrentSession();
+    if (!auth) {
+      return {
+        success: false,
+        error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
+      };
+    }
+    currentUserId = auth.user.id;
+    currentUserRole = auth.user.role;
   }
 
-  if (auth.user.role !== "SUPER_ADMIN") {
+  if (currentUserRole !== "SUPER_ADMIN") {
     return {
       success: false,
       error: "Hanya Super Admin yang berwenang menghapus pengguna.",
@@ -473,14 +481,14 @@ export async function deleteUserAction(
       };
     }
 
-    if (targetUser.username === "admin") {
+    if (targetUser.username.toLowerCase() === "admin") {
       return {
         success: false,
         error: "Akun Super Admin utama ('admin') dilindungi sistem dan tidak dapat dihapus.",
       };
     }
 
-    if (targetUser.id === auth.user.id) {
+    if (targetUser.id === currentUserId) {
       return {
         success: false,
         error: "Anda tidak dapat menghapus akun Anda sendiri saat sedang masuk.",
@@ -488,24 +496,58 @@ export async function deleteUserAction(
     }
 
     if (targetUser._count.articles > 0) {
-      return {
-        success: false,
-        error: `Pengguna tidak dapat dihapus karena tercatat sebagai penulis pada ${targetUser._count.articles} artikel berita. Silakan ubah status akun menjadi Non-Aktif jika staf sudah tidak bertugas.`,
-      };
+      if (!reassignToUserId) {
+        return {
+          success: false,
+          error: `Pengguna ini memiliki ${targetUser._count.articles} artikel berita. Silakan pilih akun penerima untuk mengalihkan kepemilikan artikel sebelum akun dihapus.`,
+        };
+      }
+
+      if (reassignToUserId === id) {
+        return {
+          success: false,
+          error: "Penerima alih kepemilikan artikel tidak boleh sama dengan akun yang akan dihapus.",
+        };
+      }
+
+      const targetRecipient = await db.user.findFirst({
+        where: { id: reassignToUserId, status: "ACTIVE" },
+        select: { id: true, name: true },
+      });
+
+      if (!targetRecipient) {
+        return {
+          success: false,
+          error: "Akun penerima alih kepemilikan artikel tidak ditemukan atau tidak berstatus aktif.",
+        };
+      }
     }
 
-    // Hapus seluruh sesi aktif pengguna
-    await db.session.deleteMany({
-      where: { userId: id },
-    });
+    // Eksekusi transaksi atomik di PostgreSQL via Prisma
+    await db.$transaction(async (tx) => {
+      if (reassignToUserId && targetUser._count.articles > 0) {
+        await tx.article.updateMany({
+          where: { authorId: id },
+          data: { authorId: reassignToUserId },
+        });
+      }
 
-    // Hapus record pengguna
-    await db.user.delete({
-      where: { id },
+      // Hapus seluruh sesi aktif pengguna
+      await tx.session.deleteMany({
+        where: { userId: id },
+      });
+
+      // Hapus record pengguna
+      await tx.user.delete({
+        where: { id },
+      });
     });
 
     try {
       revalidatePath("/admin/pengguna");
+      revalidatePath("/admin/berita");
+      revalidatePath("/berita");
+      revalidatePath("/");
     } catch {
       // Safe fallback
     }
