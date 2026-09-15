@@ -250,6 +250,19 @@ export function getStockSummary(items: MedicineStockItem[]): StockSummary {
   };
 }
 
+/**
+ * Kalkulasi otomatis status stok berdasarkan jumlah fisik:
+ * - quantity <= 0 => EMPTY
+ * - quantity < 500 => LOW (jika tidak ditentukan manual)
+ * - lainnya => AVAILABLE
+ */
+export function calculateStockStatus(quantity: number, manualStatus?: StockStatus): StockStatus {
+  if (quantity <= 0) return "EMPTY";
+  if (manualStatus && manualStatus !== "EMPTY") return manualStatus;
+  if (quantity < 500) return "LOW";
+  return "AVAILABLE";
+}
+
 // ── Dummy Stats ───────────────────────────────────────────────────────────────
 
 export const dummyStats = {

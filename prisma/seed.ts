@@ -1,5 +1,6 @@
-import { PrismaClient, Role, UserStatus, CategoryStatus } from "@prisma/client";
+import { PrismaClient, Role, UserStatus, CategoryStatus, StockStatus } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
+import { initialMedicineStock } from "../src/lib/dummy-data";
 
 const prisma = new PrismaClient();
 
@@ -225,6 +226,30 @@ async function main() {
     },
   });
   console.log(`[Seed] Konfigurasi profil instansi default berhasil disinkronkan.`);
+
+  // 5. Data Awal Stok Obat (MedicineStock)
+  console.log(`[Seed] Menyinkronkan data stok obat (${initialMedicineStock.length} item)...`);
+  for (const item of initialMedicineStock) {
+    await prisma.medicineStock.upsert({
+      where: { code: item.code },
+      update: {
+        name: item.name,
+        category: item.category,
+        unit: item.unit,
+        quantity: item.quantity,
+        status: item.status as StockStatus,
+      },
+      create: {
+        code: item.code,
+        name: item.name,
+        category: item.category,
+        unit: item.unit,
+        quantity: item.quantity,
+        status: item.status as StockStatus,
+      },
+    });
+  }
+  console.log(`[Seed] Data awal ${initialMedicineStock.length} stok obat berhasil disinkronkan.`);
 }
 
 main()

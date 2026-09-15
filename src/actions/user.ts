@@ -126,7 +126,7 @@ export async function createUserAction(data: {
     console.error("[createUserAction] Error:", err);
     return {
       success: false,
-      error: "Terjadi kesalahan saat menambahkan pengguna ke database.",
+      error: "Terjadi kesalahan saat menambahkan pengguna.",
     };
   }
 }
@@ -188,7 +188,7 @@ export async function updateUserAction(
     if (!targetUser) {
       return {
         success: false,
-        error: "Pengguna tidak ditemukan di database.",
+        error: "Pengguna tidak ditemukan.",
       };
     }
 

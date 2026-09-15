@@ -224,7 +224,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
       try {
         const res = await deleteArticleAction(idToDelete);
         if (res.success) {
-          toast.success("Artikel berhasil dihapus dari database.");
+          toast.success("Artikel berhasil dihapus.");
         } else {
           toast.error(res.error || "Gagal menghapus artikel.");
         }
@@ -768,7 +768,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 }`}
               >
                 {toggleArticle.isPublished
-                  ? "Artikel ini tidak akan tampil di portal publik, namun tetap aman tersimpan di basis data dan dapat diedit kapan saja."
+                  ? "Artikel ini tidak akan tampil di portal publik, namun tetap tersimpan dan dapat diedit kapan saja."
                   : "Artikel ini akan langsung dipublikasikan dan dapat dibaca oleh pengunjung portal resmi UPTD IFK Kotabaru."}
               </div>
             </div>
@@ -858,7 +858,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               </div>
 
               <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs leading-relaxed text-red-300/90 break-words w-full">
-                Record artikel ini di basis data dan berkas gambar sampul terkait pada penyimpanan server akan dihapus secara permanen.
+                Artikel ini beserta berkas gambar sampul terkait akan dihapus secara permanen dari sistem.
               </div>
             </div>
           )}
