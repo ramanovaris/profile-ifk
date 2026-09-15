@@ -64,14 +64,14 @@ export function StockTable({ initialItems }: StockTableProps) {
     name: string;
     category: MedicineCategory;
     unit: string;
-    quantity: number;
+    quantity: number | string;
     status: StockStatus;
   }>({
     code: "",
     name: "",
     category: "Obat Generik",
     unit: "Tablet",
-    quantity: 0,
+    quantity: "",
     status: "AVAILABLE",
   });
 
@@ -81,7 +81,7 @@ export function StockTable({ initialItems }: StockTableProps) {
     name: string;
     category: MedicineCategory;
     unit: string;
-    quantity: number;
+    quantity: number | string;
     status: StockStatus;
   }>({
     code: "",
@@ -166,7 +166,7 @@ export function StockTable({ initialItems }: StockTableProps) {
       name: "",
       category: "Obat Generik",
       unit: "Tablet",
-      quantity: 0,
+      quantity: "",
       status: "AVAILABLE",
     });
     setIsAddOpen(true);
@@ -636,13 +636,18 @@ export function StockTable({ initialItems }: StockTableProps) {
                   id="add-quantity"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={addForm.quantity}
+                  onFocus={(e) => {
+                    if (e.target.value === "0") e.target.select();
+                  }}
                   onChange={(e) => {
-                    const qty = parseInt(e.target.value, 10) || 0;
+                    const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                    const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
                     setAddForm((f) => ({
                       ...f,
-                      quantity: qty,
-                      status: qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
+                      quantity: cleaned,
+                      status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
                     }));
                   }}
                   className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
@@ -790,13 +795,18 @@ export function StockTable({ initialItems }: StockTableProps) {
                   id="edit-quantity"
                   type="number"
                   min="0"
+                  placeholder="0"
                   value={editForm.quantity}
+                  onFocus={(e) => {
+                    if (e.target.value === "0") e.target.select();
+                  }}
                   onChange={(e) => {
-                    const qty = parseInt(e.target.value, 10) || 0;
+                    const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                    const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
                     setEditForm((f) => ({
                       ...f,
-                      quantity: qty,
-                      status: qty === 0 ? "EMPTY" : f.status === "EMPTY" ? "AVAILABLE" : f.status,
+                      quantity: cleaned,
+                      status: qty === 0 ? "EMPTY" : f.status === "EMPTY" ? (qty < 500 ? "LOW" : "AVAILABLE") : f.status,
                     }));
                   }}
                   className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
