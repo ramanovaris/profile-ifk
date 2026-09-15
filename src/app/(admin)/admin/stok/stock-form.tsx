@@ -50,7 +50,7 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.name.endsWith(".csv")) {
+      if (!file.name.toLowerCase().endsWith(".csv")) {
         toast.error("Format file saat ini hanya mendukung .csv.");
         return;
       }
@@ -133,7 +133,7 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
         <input
           type="file"
           ref={fileInputRef}
-          accept=".csv"
+          accept=".csv,text/csv,application/vnd.ms-excel,text/comma-separated-values,text/plain"
           onChange={handleFileChange}
           className="hidden"
         />
