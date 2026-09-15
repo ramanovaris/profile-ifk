@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from "lucide-react";
 
@@ -152,17 +152,18 @@ function ToastCard({ item }: { item: ToastItem }) {
   );
 }
 
+const emptySubscribe = () => () => {};
+
 // ── Viewport (install once in AdminShell) ────────────────────────────────────
 export function Toaster() {
-  const [items, setItems] = useState<ToastItem[]>(() => getSnapshot());
-  const [mounted, setMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+  const items = useSyncExternalStore(subscribe, getSnapshot, () => []);
 
-  useEffect(() => {
-    setMounted(true);
-    return subscribe(() => setItems(getSnapshot()));
-  }, []);
-
-  if (!mounted || items.length === 0) return null;
+  if (!isClient || items.length === 0) return null;
 
   return createPortal(
     <div
