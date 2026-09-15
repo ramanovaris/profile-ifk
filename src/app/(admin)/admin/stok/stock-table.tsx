@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { 
   Search, 
   Package, 
@@ -44,7 +45,13 @@ interface StockTableProps {
 }
 
 export function StockTable({ initialItems }: StockTableProps) {
+  const router = useRouter();
   const [items, setItems] = useState<MedicineStockItem[]>(initialItems);
+
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
+
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
@@ -931,8 +938,7 @@ export function StockTable({ initialItems }: StockTableProps) {
         open={isImportOpen} 
         onOpenChange={setIsImportOpen} 
         onImportSuccess={() => {
-          // Re-trigger reload or update
-          window.location.reload();
+          router.refresh();
         }}
       />
     </div>
