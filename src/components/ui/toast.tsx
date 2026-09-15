@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from "lucide-react";
 
 // ── Toast Types ──────────────────────────────────────────────────────────────
@@ -154,18 +155,20 @@ function ToastCard({ item }: { item: ToastItem }) {
 // ── Viewport (install once in AdminShell) ────────────────────────────────────
 export function Toaster() {
   const [items, setItems] = useState<ToastItem[]>(() => getSnapshot());
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     return subscribe(() => setItems(getSnapshot()));
   }, []);
 
-  if (items.length === 0) return null;
+  if (!mounted || items.length === 0) return null;
 
-  return (
+  return createPortal(
     <div
       aria-label="Notifikasi"
       className="
-        fixed z-50 flex flex-col gap-2.5
+        fixed z-[9999] flex flex-col gap-2.5
         pointer-events-none
         bottom-4 inset-x-4
         sm:bottom-6 sm:right-6 sm:left-auto sm:max-w-sm sm:w-full
@@ -174,6 +177,7 @@ export function Toaster() {
       {items.map((item) => (
         <ToastCard key={item.id} item={item} />
       ))}
-    </div>
+    </div>,
+    document.body
   );
 }
