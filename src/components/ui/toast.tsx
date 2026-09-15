@@ -153,6 +153,8 @@ function ToastCard({ item }: { item: ToastItem }) {
 }
 
 const emptySubscribe = () => () => {};
+const SERVER_SNAPSHOT: ToastItem[] = [];
+const getServerSnapshot = () => SERVER_SNAPSHOT;
 
 // ── Viewport (install once in AdminShell) ────────────────────────────────────
 export function Toaster() {
@@ -161,7 +163,7 @@ export function Toaster() {
     () => true,
     () => false
   );
-  const items = useSyncExternalStore(subscribe, getSnapshot, () => []);
+  const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   if (!isClient || items.length === 0) return null;
 
