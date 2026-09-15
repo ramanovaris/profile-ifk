@@ -51,8 +51,6 @@ export function StockTable({ initialItems }: StockTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [addError, setAddError] = useState<string | null>(null);
-  const [editError, setEditError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const itemsPerPage = 10;
 
@@ -163,7 +161,6 @@ export function StockTable({ initialItems }: StockTableProps) {
   // ── Handlers ─────────────────────────────────────────────────────────────
 
   const handleOpenAdd = () => {
-    setAddError(null);
     setAddForm({
       code: "",
       name: "",
@@ -177,18 +174,13 @@ export function StockTable({ initialItems }: StockTableProps) {
 
   const handleSaveAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    setAddError(null);
 
     if (!addForm.name.trim()) {
-      const msg = "Nama obat tidak boleh kosong";
-      setAddError(msg);
-      toast.error(msg);
+      toast.error("Nama obat tidak boleh kosong");
       return;
     }
     if (!addForm.code.trim()) {
-      const msg = "Kode obat tidak boleh kosong";
-      setAddError(msg);
-      toast.error(msg);
+      toast.error("Kode obat tidak boleh kosong");
       return;
     }
 
@@ -203,9 +195,7 @@ export function StockTable({ initialItems }: StockTableProps) {
       });
 
       if (!res.success || !res.data) {
-        const errorMsg = res.error || "Gagal menambahkan data obat";
-        setAddError(errorMsg);
-        toast.error(errorMsg);
+        toast.error(res.error || "Gagal menambahkan data obat");
         return;
       }
 
@@ -222,13 +212,11 @@ export function StockTable({ initialItems }: StockTableProps) {
 
       setItems((prev) => [newItem, ...prev]);
       toast.success(`Obat ${newItem.name} berhasil ditambahkan ke database`);
-      setAddError(null);
       setIsAddOpen(false);
     });
   };
 
   const handleOpenEdit = (item: MedicineStockItem) => {
-    setEditError(null);
     setEditItem(item);
     setEditForm({
       code: item.code,
@@ -243,18 +231,13 @@ export function StockTable({ initialItems }: StockTableProps) {
   const handleSaveEdit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editItem) return;
-    setEditError(null);
 
     if (!editForm.name.trim()) {
-      const msg = "Nama obat tidak boleh kosong";
-      setEditError(msg);
-      toast.error(msg);
+      toast.error("Nama obat tidak boleh kosong");
       return;
     }
     if (!editForm.code.trim()) {
-      const msg = "Kode obat tidak boleh kosong";
-      setEditError(msg);
-      toast.error(msg);
+      toast.error("Kode obat tidak boleh kosong");
       return;
     }
 
@@ -269,9 +252,7 @@ export function StockTable({ initialItems }: StockTableProps) {
       });
 
       if (!res.success || !res.data) {
-        const errorMsg = res.error || "Gagal memperbarui data obat";
-        setEditError(errorMsg);
-        toast.error(errorMsg);
+        toast.error(res.error || "Gagal memperbarui data obat");
         return;
       }
 
@@ -293,7 +274,6 @@ export function StockTable({ initialItems }: StockTableProps) {
       );
 
       toast.success(`Data ${editForm.name} berhasil diperbarui di database`);
-      setEditError(null);
       setEditItem(null);
     });
   };
@@ -585,13 +565,6 @@ export function StockTable({ initialItems }: StockTableProps) {
           </DialogHeader>
 
           <form onSubmit={handleSaveAdd} className="space-y-4 pt-2">
-            {addError && (
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-300">
-                <AlertTriangle className="h-4 w-4 shrink-0 text-rose-400 mt-0.5" />
-                <span className="leading-relaxed">{addError}</span>
-              </div>
-            )}
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
@@ -600,10 +573,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                 <Input
                   id="add-name"
                   value={addForm.name}
-                  onChange={(e) => {
-                    setAddForm((f) => ({ ...f, name: e.target.value }));
-                    if (addError) setAddError(null);
-                  }}
+                  onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))}
                   className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                   placeholder="Contoh: Paracetamol 500mg Tablet"
                   required
@@ -617,10 +587,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                 <Input
                   id="add-code"
                   value={addForm.code}
-                  onChange={(e) => {
-                    setAddForm((f) => ({ ...f, code: e.target.value }));
-                    if (addError) setAddError(null);
-                  }}
+                  onChange={(e) => setAddForm((f) => ({ ...f, code: e.target.value }))}
                   className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                   placeholder="Contoh: OBG-999"
                   required
@@ -752,13 +719,6 @@ export function StockTable({ initialItems }: StockTableProps) {
           </DialogHeader>
 
           <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
-            {editError && (
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-xs text-rose-300">
-                <AlertTriangle className="h-4 w-4 shrink-0 text-rose-400 mt-0.5" />
-                <span className="leading-relaxed">{editError}</span>
-              </div>
-            )}
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="edit-name" className="text-xs font-medium text-zinc-300">
@@ -767,10 +727,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                 <Input
                   id="edit-name"
                   value={editForm.name}
-                  onChange={(e) => {
-                    setEditForm((f) => ({ ...f, name: e.target.value }));
-                    if (editError) setEditError(null);
-                  }}
+                  onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
                   className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                   placeholder="Contoh: Paracetamol 500mg Tablet"
                   required
@@ -784,10 +741,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                 <Input
                   id="edit-code"
                   value={editForm.code}
-                  onChange={(e) => {
-                    setEditForm((f) => ({ ...f, code: e.target.value }));
-                    if (editError) setEditError(null);
-                  }}
+                  onChange={(e) => setEditForm((f) => ({ ...f, code: e.target.value }))}
                   className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                   placeholder="Contoh: OBT-001"
                   required
