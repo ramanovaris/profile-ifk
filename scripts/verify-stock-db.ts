@@ -17,9 +17,9 @@ import {
   createStockAction, 
   updateStockAction, 
   deleteStockAction, 
-  batchImportStockAction,
-  calculateStockStatus 
+  batchImportStockAction
 } from "../src/actions/stock";
+import { calculateStockStatus } from "../src/lib/dummy-data";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {

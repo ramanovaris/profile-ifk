@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "../lib/db";
 import { getCurrentSession } from "../lib/auth";
+import { calculateStockStatus } from "../lib/dummy-data";
 import type { MedicineStock, StockStatus } from "@prisma/client";
 
 export type StockActionResult<T = unknown> = {
@@ -21,19 +22,6 @@ export type StockItemInput = {
   status?: StockStatus;
   _testUserId?: string;
 };
-
-/**
- * Kalkulasi otomatis status stok berdasarkan jumlah fisik:
- * - quantity <= 0 => EMPTY
- * - quantity < 500 => LOW (jika tidak ditentukan manual)
- * - lainnya => AVAILABLE
- */
-export function calculateStockStatus(quantity: number, manualStatus?: StockStatus): StockStatus {
-  if (quantity <= 0) return "EMPTY";
-  if (manualStatus && manualStatus !== "EMPTY") return manualStatus;
-  if (quantity < 500) return "LOW";
-  return "AVAILABLE";
-}
 
 /**
  * Server Action: Menambahkan data obat baru ke basis data PostgreSQL.
