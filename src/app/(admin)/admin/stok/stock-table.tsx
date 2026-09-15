@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useTransition, useEffect } from "react";
+import { useState, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Search, 
@@ -47,10 +47,12 @@ interface StockTableProps {
 export function StockTable({ initialItems }: StockTableProps) {
   const router = useRouter();
   const [items, setItems] = useState<MedicineStockItem[]>(initialItems);
+  const [prevInitialItems, setPrevInitialItems] = useState(initialItems);
 
-  useEffect(() => {
+  if (initialItems !== prevInitialItems) {
+    setPrevInitialItems(initialItems);
     setItems(initialItems);
-  }, [initialItems]);
+  }
 
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
