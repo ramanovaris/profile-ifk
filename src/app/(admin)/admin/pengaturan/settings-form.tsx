@@ -108,13 +108,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         toast.error(res.error || "Gagal menyimpan identitas instansi.");
         return;
       }
-      toast.success("Identitas dan kontak lembaga berhasil disimpan ke basis data.");
+      toast.success("Identitas dan kontak lembaga berhasil disimpan.");
     });
   };
 
   const handleIdentityReset = () => {
     setIdentityForm(initialIdentity);
-    toast.info("Form identitas dikembalikan ke data awal basis data.");
+    toast.info("Form identitas dikembalikan ke data awal.");
   };
 
   const handleProfilePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -181,7 +181,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         return;
       }
 
-      toast.success("Konten profil UPTD berhasil disimpan ke basis data.");
+      toast.success("Konten profil UPTD berhasil disimpan.");
       setPhotoFile(null);
       setOrgPhotoFile(null);
       if (res.data?.headPhoto) {
@@ -205,7 +205,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         ? getAssetUrl(initialSettings.orgStructurePhoto)
         : null
     );
-    toast.info("Form konten profil dikembalikan ke data awal basis data.");
+    toast.info("Form konten profil dikembalikan ke data awal.");
   };
 
   const handleLinksSave = (e: FormEvent) => {
@@ -216,7 +216,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         toast.error(res.error || "Gagal menyimpan tautan layanan.");
         return;
       }
-      toast.success("Tautan layanan & pengumuman berhasil disimpan ke basis data.");
+      toast.success("Tautan layanan & pengumuman berhasil disimpan.");
     });
   };
 

@@ -211,7 +211,7 @@ export function StockTable({ initialItems }: StockTableProps) {
       };
 
       setItems((prev) => [newItem, ...prev]);
-      toast.success(`Obat ${newItem.name} berhasil ditambahkan ke database`);
+      toast.success(`Obat ${newItem.name} berhasil ditambahkan`);
       setIsAddOpen(false);
     });
   };
@@ -273,7 +273,7 @@ export function StockTable({ initialItems }: StockTableProps) {
         )
       );
 
-      toast.success(`Data ${editForm.name} berhasil diperbarui di database`);
+      toast.success(`Data ${editForm.name} berhasil diperbarui`);
       setEditItem(null);
     });
   };
@@ -285,12 +285,12 @@ export function StockTable({ initialItems }: StockTableProps) {
     startTransition(async () => {
       const res = await deleteStockAction(deleteItem.id);
       if (!res.success) {
-        toast.error(res.error || "Gagal menghapus item dari database");
+        toast.error(res.error || "Gagal menghapus item");
         return;
       }
 
       setItems((prev) => prev.filter((item) => item.id !== deleteItem.id));
-      toast.success(`Item "${targetName}" berhasil dihapus dari database`);
+      toast.success(`Item "${targetName}" berhasil dihapus`);
       setDeleteItem(null);
     });
   };
@@ -320,7 +320,7 @@ export function StockTable({ initialItems }: StockTableProps) {
             Kelola Stok Obat
           </h1>
           <p className="mt-1 text-sm text-zinc-400">
-            Manajemen dan pembaruan data stok fisik IFK per akhir bulan terhubung PostgreSQL
+            Manajemen dan pembaruan data stok fisik IFK per akhir bulan
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 sm:flex-nowrap">
@@ -558,7 +558,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                   Tambah Data Obat Baru
                 </DialogTitle>
                 <DialogDescription className="text-xs text-zinc-400">
-                  Input data master dan stok fisik obat/perbekalan farmasi baru ke database
+                  Input data master dan stok fisik obat/perbekalan farmasi baru
                 </DialogDescription>
               </div>
             </div>
@@ -717,7 +717,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                   Edit Data Stok
                 </DialogTitle>
                 <DialogDescription className="text-xs text-zinc-400">
-                  Sesuaikan informasi dan kuantitas fisik obat atau BMHP di database
+                  Sesuaikan informasi dan kuantitas fisik obat atau BMHP
                 </DialogDescription>
               </div>
             </div>
@@ -876,7 +876,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                   Hapus Item Stok?
                 </DialogTitle>
                 <DialogDescription className="text-xs text-zinc-400 mt-0.5">
-                  Tindakan ini permanen dan akan menghapus item dari database PostgreSQL.
+                  Tindakan ini permanen dan data obat akan dihapus dari sistem.
                 </DialogDescription>
               </div>
             </div>

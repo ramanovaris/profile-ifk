@@ -206,7 +206,7 @@ export async function updateSiteIdentityAction(
     console.error("[Settings] Gagal menyimpan pengaturan:", err);
     return {
       success: false,
-      error: "Terjadi kesalahan sistem saat menyimpan ke basis data.",
+      error: "Terjadi kesalahan saat menyimpan pengaturan.",
     };
   }
 }
@@ -503,7 +503,7 @@ export async function updateSiteLinksAction(
     console.error("[Settings] Gagal menyimpan tautan & pengumuman:", err);
     return {
       success: false,
-      error: "Terjadi kesalahan sistem saat menyimpan ke basis data.",
+      error: "Terjadi kesalahan saat menyimpan pengaturan.",
     };
   }
 }

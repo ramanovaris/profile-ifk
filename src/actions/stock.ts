@@ -90,7 +90,7 @@ export async function createStockAction(data: StockItemInput): Promise<StockActi
     console.error("[createStockAction] Error:", err);
     return {
       success: false,
-      error: "Gagal menyimpan data obat ke basis data.",
+      error: "Gagal menyimpan data obat.",
     };
   }
 }
@@ -122,7 +122,7 @@ export async function updateStockAction(
     });
 
     if (!existing) {
-      return { success: false, error: "Data obat tidak ditemukan di basis data." };
+      return { success: false, error: "Data obat tidak ditemukan." };
     }
 
     const trimmedCode = data.code !== undefined ? data.code.trim() : existing.code;
@@ -182,7 +182,7 @@ export async function updateStockAction(
     console.error("[updateStockAction] Error:", err);
     return {
       success: false,
-      error: "Gagal memperbarui data obat di basis data.",
+      error: "Gagal memperbarui data obat.",
     };
   }
 }
@@ -228,7 +228,7 @@ export async function deleteStockAction(
     console.error("[deleteStockAction] Error:", err);
     return {
       success: false,
-      error: "Gagal menghapus data obat dari basis data.",
+      error: "Gagal menghapus data obat.",
     };
   }
 }

@@ -1263,7 +1263,7 @@ export function UserTable({
             ) : (
               <p className="text-xs text-zinc-400 leading-relaxed">
                 Apakah Anda yakin ingin menghapus akun ini? Seluruh data sesi dan akses
-                pengguna akan dihapus secara permanen dari basis data.
+                pengguna akan dihapus secara permanen dari sistem.
               </p>
             )}
           </div>
