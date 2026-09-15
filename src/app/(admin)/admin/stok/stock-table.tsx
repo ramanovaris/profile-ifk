@@ -806,7 +806,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                     setEditForm((f) => ({
                       ...f,
                       quantity: cleaned,
-                      status: qty === 0 ? "EMPTY" : f.status === "EMPTY" ? (qty < 500 ? "LOW" : "AVAILABLE") : f.status,
+                      status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
                     }));
                   }}
                   className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
