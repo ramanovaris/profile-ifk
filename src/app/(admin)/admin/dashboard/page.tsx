@@ -92,6 +92,7 @@ export default async function AdminDashboardPage() {
       value: totalArticles,
       icon: FileText,
       glow: "bg-brand-500/15 text-brand-400 border-brand-500/30",
+      watermark: "text-brand-500/[0.05] group-hover:text-brand-500/[0.10]",
       borderHover: "hover:border-brand-500/30",
     },
     {
@@ -99,6 +100,7 @@ export default async function AdminDashboardPage() {
       value: publishedArticles,
       icon: CheckCircle,
       glow: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+      watermark: "text-emerald-500/[0.05] group-hover:text-emerald-500/[0.10]",
       borderHover: "hover:border-emerald-500/30",
     },
     {
@@ -106,6 +108,7 @@ export default async function AdminDashboardPage() {
       value: draftArticles,
       icon: FilePen,
       glow: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+      watermark: "text-amber-500/[0.05] group-hover:text-amber-500/[0.10]",
       borderHover: "hover:border-amber-500/30",
     },
     {
@@ -113,6 +116,7 @@ export default async function AdminDashboardPage() {
       value: totalStock,
       icon: Package,
       glow: "bg-sky-500/15 text-sky-400 border-sky-500/30",
+      watermark: "text-sky-500/[0.05] group-hover:text-sky-500/[0.10]",
       borderHover: "hover:border-sky-500/30",
     },
     ...(isSuperAdmin
@@ -122,6 +126,7 @@ export default async function AdminDashboardPage() {
             value: superAdminUsers.length,
             icon: Users,
             glow: "bg-purple-500/15 text-purple-400 border-purple-500/30",
+            watermark: "text-purple-500/[0.05] group-hover:text-purple-500/[0.10]",
             borderHover: "hover:border-purple-500/30",
           },
         ]
@@ -151,29 +156,42 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Responsive Stat KPI cards (5 untuk Super Admin, 4 untuk Staf) */}
+      {/* Responsive Stat KPI cards (Grid 2 Kolom Mobile, 5 untuk Super Admin, 4 untuk Staf) */}
       <div
-        className={`mt-6 grid gap-4 sm:grid-cols-2 ${
+        className={`mt-6 grid grid-cols-2 gap-3 sm:gap-4 ${
           isSuperAdmin ? "lg:grid-cols-3 xl:grid-cols-5" : "lg:grid-cols-4"
         }`}
       >
-        {statCards.map((stat) => (
+        {statCards.map((stat, idx) => (
           <div
             key={stat.label}
-            className={`group relative overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 p-5 backdrop-blur-xl transition-all duration-200 ${stat.borderHover}`}
+            className={`group relative overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 p-4 sm:p-5 backdrop-blur-xl transition-all duration-200 ${
+              stat.borderHover
+            } ${
+              isSuperAdmin && idx === 4 ? "col-span-2 sm:col-span-1" : ""
+            }`}
           >
+            {/* Ornamen Watermark Icon Samar (Dark Ethereal Depth) */}
             <div
-              className={`flex h-12 w-12 items-center justify-center rounded-xl border ${stat.glow}`}
+              className={`pointer-events-none absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 ${stat.watermark}`}
             >
-              <stat.icon className="h-6 w-6" />
+              <stat.icon className="h-20 w-20 sm:h-24 sm:w-24 -rotate-12" />
             </div>
-            <div className="mt-4">
-              <p className="text-3xl font-bold tracking-tight text-white">
-                {stat.value}
-              </p>
-              <p className="mt-1 text-xs font-medium text-zinc-400">
-                {stat.label}
-              </p>
+
+            <div className="relative z-10 flex h-full flex-col justify-between">
+              <div
+                className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl border ${stat.glow}`}
+              >
+                <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+              </div>
+              <div className="mt-3 sm:mt-4">
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-[11px] sm:text-xs font-medium text-zinc-400">
+                  {stat.label}
+                </p>
+              </div>
             </div>
           </div>
         ))}
