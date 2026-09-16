@@ -39,7 +39,7 @@ import {
   toggleArticlePublishAction,
   deleteArticleAction,
 } from "@/actions/article";
-import { getAssetUrl } from "@/lib/utils";
+import { getAssetUrl, cn } from "@/lib/utils";
 import {
   sortArticles,
   type SortKey,
@@ -106,6 +106,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         .map((s) => s.trim())
         .filter(Boolean)
     : [];
+
+  const rawStatus = searchParams.get("status"); // "terbit" | "draft" | null
 
   const rawPage = Number(searchParams.get("page"));
   const currentPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
@@ -179,7 +181,11 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
     const matchesCategory =
       selectedCategories.length === 0 ||
       selectedCategories.includes(article.category.name);
-    return matchesSearch && matchesCategory;
+    const matchesStatus =
+      !rawStatus ||
+      ((rawStatus === "terbit" || rawStatus === "published") && article.isPublished) ||
+      (rawStatus === "draft" && !article.isPublished);
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
   const sortedArticles = sortArticles(filteredArticles, sortKey, sortOrder);
@@ -258,6 +264,56 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             <span>Tambah Artikel</span>
           </Link>
         </div>
+      </div>
+
+      {/* Status Filter Tabs (Semua / Terbit / Draft) */}
+      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1">
+        {[
+          { key: null, label: "Semua", count: optimisticArticles.length },
+          {
+            key: "terbit",
+            label: "Terbit",
+            count: optimisticArticles.filter((a) => a.isPublished).length,
+            activeColor: "border-emerald-500/30 bg-emerald-500/15 text-emerald-400 shadow-sm shadow-emerald-500/10",
+          },
+          {
+            key: "draft",
+            label: "Draft",
+            count: optimisticArticles.filter((a) => !a.isPublished).length,
+            activeColor: "border-amber-500/30 bg-amber-500/15 text-amber-400 shadow-sm shadow-amber-500/10",
+          },
+        ].map((tab) => {
+          const isActive =
+            (tab.key === null && !rawStatus) ||
+            rawStatus === tab.key ||
+            (tab.key === "terbit" && rawStatus === "published");
+
+          return (
+            <button
+              key={tab.label}
+              type="button"
+              onClick={() => updateUrl({ status: tab.key, page: null })}
+              className={cn(
+                "inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer border",
+                isActive
+                  ? tab.activeColor || "border-brand-500/30 bg-brand-500/15 text-brand-400 shadow-sm shadow-brand-500/10"
+                  : "border-white/5 bg-zinc-900/60 text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
+              )}
+            >
+              <span>{tab.label}</span>
+              <span
+                className={cn(
+                  "rounded-full px-1.5 py-0.2 text-[10px] font-semibold",
+                  isActive
+                    ? "bg-white/10 text-white"
+                    : "bg-white/5 text-zinc-500"
+                )}
+              >
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Filter and Search Toolbar */}
