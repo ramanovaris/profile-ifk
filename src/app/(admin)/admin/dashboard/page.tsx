@@ -90,6 +90,7 @@ export default async function AdminDashboardPage() {
     {
       label: "Total Artikel",
       value: totalArticles,
+      href: "/admin/berita/",
       icon: FileText,
       glow: "bg-brand-500/15 text-brand-400 border-brand-500/30",
       watermark: "text-brand-500/[0.05] group-hover:text-brand-500/[0.10]",
@@ -98,6 +99,7 @@ export default async function AdminDashboardPage() {
     {
       label: "Artikel Terbit",
       value: publishedArticles,
+      href: "/admin/berita/?status=terbit",
       icon: CheckCircle,
       glow: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
       watermark: "text-emerald-500/[0.05] group-hover:text-emerald-500/[0.10]",
@@ -106,6 +108,7 @@ export default async function AdminDashboardPage() {
     {
       label: "Artikel Draf",
       value: draftArticles,
+      href: "/admin/berita/?status=draft",
       icon: FilePen,
       glow: "bg-amber-500/15 text-amber-400 border-amber-500/30",
       watermark: "text-amber-500/[0.05] group-hover:text-amber-500/[0.10]",
@@ -114,6 +117,7 @@ export default async function AdminDashboardPage() {
     {
       label: "Master Stok Obat",
       value: totalStock,
+      href: "/admin/stok/",
       icon: Package,
       glow: "bg-sky-500/15 text-sky-400 border-sky-500/30",
       watermark: "text-sky-500/[0.05] group-hover:text-sky-500/[0.10]",
@@ -124,6 +128,7 @@ export default async function AdminDashboardPage() {
           {
             label: "Pengguna Aktif",
             value: superAdminUsers.length,
+            href: "/admin/pengguna/",
             icon: Users,
             glow: "bg-purple-500/15 text-purple-400 border-purple-500/30",
             watermark: "text-purple-500/[0.05] group-hover:text-purple-500/[0.10]",
@@ -163,9 +168,10 @@ export default async function AdminDashboardPage() {
         }`}
       >
         {statCards.map((stat, idx) => (
-          <div
+          <Link
             key={stat.label}
-            className={`group relative overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 p-4 sm:p-5 backdrop-blur-xl transition-all duration-200 ${
+            href={stat.href}
+            className={`group relative overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 p-4 sm:p-5 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40 cursor-pointer ${
               stat.borderHover
             } ${
               isSuperAdmin && idx === 4 ? "col-span-2 sm:col-span-1" : ""
@@ -179,10 +185,16 @@ export default async function AdminDashboardPage() {
             </div>
 
             <div className="relative z-10 flex h-full flex-col justify-between">
-              <div
-                className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl border ${stat.glow}`}
-              >
-                <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+              <div className="flex items-center justify-between">
+                <div
+                  className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl border ${stat.glow}`}
+                >
+                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                </div>
+                <div className="flex items-center gap-0.5 text-zinc-500 transition-colors group-hover:text-zinc-300">
+                  <span className="text-[10px] font-medium opacity-0 sm:group-hover:opacity-100 transition-opacity">Buka</span>
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </div>
               </div>
               <div className="mt-3 sm:mt-4">
                 <p className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
@@ -193,7 +205,7 @@ export default async function AdminDashboardPage() {
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
