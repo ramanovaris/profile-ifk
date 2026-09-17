@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useMemo, useTransition, useCallback, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { 
   Search, 
   Package, 
@@ -46,6 +46,9 @@ interface StockTableProps {
 
 export function StockTable({ initialItems }: StockTableProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+
   const [items, setItems] = useState<MedicineStockItem[]>(initialItems);
   const [prevInitialItems, setPrevInitialItems] = useState(initialItems);
 
@@ -54,10 +57,73 @@ export function StockTable({ initialItems }: StockTableProps) {
     setItems(initialItems);
   }
 
-  const [search, setSearch] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  // URL query search
+  const urlQ = searchParams.get("q") || "";
+  const [search, setSearch] = useState(urlQ);
+  const [prevUrlQ, setPrevUrlQ] = useState(urlQ);
+
+  if (urlQ !== prevUrlQ) {
+    setPrevUrlQ(urlQ);
+    setSearch(urlQ);
+  }
+
+  // URL query kategori
+  const rawKategori = searchParams.get("kategori");
+  const selectedCategories = useMemo(() => {
+    return rawKategori
+      ? rawKategori
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+  }, [rawKategori]);
+
+  // URL query status
+  const rawStatus = searchParams.get("status");
+  const selectedStatuses = useMemo(() => {
+    return rawStatus
+      ? rawStatus
+          .split(",")
+          .map((s) => s.trim().toUpperCase())
+          .filter(Boolean)
+      : [];
+  }, [rawStatus]);
+
+  // URL query page
+  const rawPage = Number(searchParams.get("page"));
+  const currentPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+
+  // Helper untuk memperbarui URL query parameter secara terpusat & konsisten
+  const updateUrl = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === "" || (key === "page" && value === "1")) {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      const queryString = params.toString();
+      const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.replace(targetUrl, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  // Debounce sinkronisasi search query ke URL (350ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentQ = searchParams.get("q") || "";
+      const trimmed = search.trim();
+      if (currentQ !== trimmed) {
+        updateUrl({ q: trimmed || null, page: null });
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [search, searchParams, updateUrl]);
+
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -320,6 +386,24 @@ export function StockTable({ initialItems }: StockTableProps) {
     toast.success("Template format CSV berhasil diunduh");
   };
 
+  // Status kartu aktif
+  const isAllActive = selectedStatuses.length === 0;
+  const isAvailableActive = selectedStatuses.includes("AVAILABLE");
+  const isLowActive = selectedStatuses.includes("LOW");
+  const isEmptyActive = selectedStatuses.includes("EMPTY");
+
+  const handleCardStatusClick = (statusKey?: StockStatus) => {
+    if (!statusKey) {
+      updateUrl({ status: null, page: null });
+    } else {
+      if (selectedStatuses.length === 1 && selectedStatuses[0] === statusKey) {
+        updateUrl({ status: null, page: null });
+      } else {
+        updateUrl({ status: statusKey, page: null });
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 p-4 md:p-8 max-w-7xl mx-auto w-full">
       {/* ── Header ─────────────────────────────────────────────────────── */}
@@ -360,36 +444,115 @@ export function StockTable({ initialItems }: StockTableProps) {
         </div>
       </div>
 
-      {/* ── Metrik ─────────────────────────────────────────────────────── */}
+      {/* ── Metrik Ringkasan Interaktif ─────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-zinc-400 mb-2">
-            <Package className="h-5 w-5" />
-            <span className="text-sm font-medium">Total Item</span>
+        {/* Total Item */}
+        <button
+          type="button"
+          onClick={() => handleCardStatusClick()}
+          aria-pressed={isAllActive}
+          className={cn(
+            "group relative w-full text-left rounded-xl border p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
+            isAllActive
+              ? "border-brand-500/60 bg-brand-500/15 ring-2 ring-brand-500/40"
+              : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-900/60"
+          )}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-zinc-400">
+              <Package className="h-5 w-5 text-brand-400" />
+              <span className="text-sm font-medium">Total Item</span>
+            </div>
+            {isAllActive && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-2 py-0.5 text-[10px] font-semibold text-brand-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+                Aktif
+              </span>
+            )}
           </div>
           <p className="text-3xl font-bold text-zinc-100">{summary.totalItems}</p>
-        </div>
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-emerald-400 mb-2">
-            <CheckCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Stok Aman</span>
+        </button>
+
+        {/* Stok Aman */}
+        <button
+          type="button"
+          onClick={() => handleCardStatusClick("AVAILABLE")}
+          aria-pressed={isAvailableActive}
+          className={cn(
+            "group relative w-full text-left rounded-xl border p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
+            isAvailableActive
+              ? "border-emerald-500/60 bg-emerald-950/40 ring-2 ring-emerald-500/40"
+              : "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10"
+          )}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-emerald-400">
+              <CheckCircle className="h-5 w-5" />
+              <span className="text-sm font-medium">Stok Aman</span>
+            </div>
+            {isAvailableActive && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                Aktif
+              </span>
+            )}
           </div>
           <p className="text-3xl font-bold text-emerald-400">{summary.availableItems}</p>
-        </div>
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-5 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-amber-400 mb-2">
-            <AlertTriangle className="h-5 w-5" />
-            <span className="text-sm font-medium">Menipis</span>
+        </button>
+
+        {/* Menipis */}
+        <button
+          type="button"
+          onClick={() => handleCardStatusClick("LOW")}
+          aria-pressed={isLowActive}
+          className={cn(
+            "group relative w-full text-left rounded-xl border p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
+            isLowActive
+              ? "border-amber-500/60 bg-amber-950/40 ring-2 ring-amber-500/40"
+              : "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/10"
+          )}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-amber-400">
+              <AlertTriangle className="h-5 w-5" />
+              <span className="text-sm font-medium">Menipis</span>
+            </div>
+            {isLowActive && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                Aktif
+              </span>
+            )}
           </div>
           <p className="text-3xl font-bold text-amber-400">{summary.lowItems}</p>
-        </div>
-        <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-5 backdrop-blur-sm">
-          <div className="flex items-center gap-2 text-rose-400 mb-2">
-            <XCircle className="h-5 w-5" />
-            <span className="text-sm font-medium">Kosong</span>
+        </button>
+
+        {/* Kosong */}
+        <button
+          type="button"
+          onClick={() => handleCardStatusClick("EMPTY")}
+          aria-pressed={isEmptyActive}
+          className={cn(
+            "group relative w-full text-left rounded-xl border p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
+            isEmptyActive
+              ? "border-rose-500/60 bg-rose-950/40 ring-2 ring-rose-500/40"
+              : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
+          )}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-rose-400">
+              <XCircle className="h-5 w-5" />
+              <span className="text-sm font-medium">Kosong</span>
+            </div>
+            {isEmptyActive && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-2 py-0.5 text-[10px] font-semibold text-rose-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+                Aktif
+              </span>
+            )}
           </div>
           <p className="text-3xl font-bold text-rose-400">{summary.emptyItems}</p>
-        </div>
+        </button>
       </div>
 
       {/* ── Toolbar Pencarian & Filter Terpadu ────────────────────────── */}
@@ -401,10 +564,7 @@ export function StockTable({ initialItems }: StockTableProps) {
             type="text"
             placeholder="Cari nama obat, kode barang, atau kategori..."
             value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setCurrentPage(1);
-            }}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
           />
         </div>
@@ -417,8 +577,10 @@ export function StockTable({ initialItems }: StockTableProps) {
             options={categoryOptions}
             selectedValues={selectedCategories}
             onChange={(vals) => {
-              setSelectedCategories(vals);
-              setCurrentPage(1);
+              updateUrl({
+                kategori: vals.length > 0 ? vals.join(",") : null,
+                page: null,
+              });
             }}
             enableSearch={true}
           />
@@ -429,8 +591,10 @@ export function StockTable({ initialItems }: StockTableProps) {
             options={statusOptions}
             selectedValues={selectedStatuses}
             onChange={(vals) => {
-              setSelectedStatuses(vals);
-              setCurrentPage(1);
+              updateUrl({
+                status: vals.length > 0 ? vals.join(",") : null,
+                page: null,
+              });
             }}
             enableSearch={false}
           />
@@ -525,8 +689,12 @@ export function StockTable({ initialItems }: StockTableProps) {
             </p>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
+                onClick={() =>
+                  updateUrl({
+                    page: currentPage > 2 ? String(currentPage - 1) : null,
+                  })
+                }
+                disabled={currentPage <= 1}
                 className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 Sebelumnya
@@ -535,8 +703,12 @@ export function StockTable({ initialItems }: StockTableProps) {
                 Hal {currentPage} / {totalPages}
               </span>
               <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
+                onClick={() =>
+                  updateUrl({
+                    page: String(currentPage + 1),
+                  })
+                }
+                disabled={currentPage >= totalPages}
                 className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 Selanjutnya
