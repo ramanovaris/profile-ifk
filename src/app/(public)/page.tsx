@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Building2, ShieldCheck, Clock } from "lucide-react";
+import { ArrowRight, Building2, ShieldCheck, Clock, Pill } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
@@ -92,7 +92,7 @@ export default async function HomePage() {
         <div aria-hidden className="hero-aurora pointer-events-none absolute inset-0" />
         {/* Grid halus bermask */}
         <div aria-hidden className="hero-grid pointer-events-none absolute inset-0" />
-        <div className="section-container relative z-10 flex flex-1 flex-col justify-center pb-[clamp(1rem,3vh,2rem)] pt-[clamp(2rem,5vh,3.5rem)] md:pb-[clamp(1.5rem,6vh,4rem)] md:pt-[clamp(3rem,12vh,9rem)]">
+        <div className="section-container relative z-10 flex flex-1 flex-col justify-center pb-12 pt-[clamp(2rem,5vh,3.5rem)] md:pb-[clamp(1.5rem,6vh,4rem)] md:pt-[clamp(3rem,12vh,9rem)]">
           <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_1fr]">
             {/* Kiri — massive typography */}
             <div>
@@ -111,21 +111,22 @@ export default async function HomePage() {
                 waktu, tepat mutu, ke seluruh fasilitas kesehatan binaan.
               </p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-3 lg:mt-10">
+              <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:gap-3 lg:mt-10">
                 <Link
                   href="/layanan"
-                  className="group inline-flex items-center gap-3 rounded-full bg-brand-600 py-2.5 pl-6 pr-2.5 text-sm font-medium text-white transition-all duration-500 ease-luxe hover:bg-brand-500 active:scale-[0.98]"
+                  className="group inline-flex items-center gap-2 sm:gap-3 rounded-xl bg-brand-600 px-4 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-medium text-white shadow-sm shadow-brand-950/20 transition-all duration-300 ease-luxe hover:bg-brand-500 active:scale-[0.98]"
                 >
                   Lihat Layanan
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 transition-transform duration-500 ease-luxe group-hover:translate-x-0.5 group-hover:scale-105">
-                    <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+                  <span className="flex h-5 w-5 sm:h-6 sm:w-6 items-center justify-center rounded-lg bg-white/15 transition-transform duration-300 ease-luxe group-hover:translate-x-0.5">
+                    <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={1.75} />
                   </span>
                 </Link>
                 <Link
-                  href="/kontak"
-                  className="inline-flex items-center rounded-full border border-white/15 px-6 py-3 text-sm font-medium text-zinc-300 transition-all duration-500 ease-luxe hover:bg-white/5 hover:text-white active:scale-[0.98]"
+                  href="/stok"
+                  className="group inline-flex items-center gap-2 sm:gap-2.5 rounded-xl border border-white/15 bg-white/5 px-3.5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-medium text-zinc-200 backdrop-blur-sm transition-all duration-300 ease-luxe hover:border-white/25 hover:bg-white/10 hover:text-white active:scale-[0.98]"
                 >
-                  Hubungi Kami
+                  <Pill className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand-400 transition-transform duration-300 ease-luxe group-hover:scale-110" strokeWidth={1.75} />
+                  Ketersediaan Obat
                 </Link>
               </div>
 
@@ -208,9 +209,9 @@ export default async function HomePage() {
         </div>
 
         {/* Scroll indicator — mobile centered, desktop kanan-bawah */}
-        <div className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:left-auto md:right-10 md:bottom-6 md:translate-x-0 md:gap-3">
-          <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500">Gulir</span>
-          <span className="relative h-10 w-px overflow-hidden bg-white/10 md:h-12">
+        <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:left-auto md:right-10 md:bottom-6 md:translate-x-0 md:gap-3">
+          <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-500 md:text-[10px] md:tracking-[0.25em]">Gulir</span>
+          <span className="relative h-6 w-px overflow-hidden bg-white/10 md:h-12">
             <span className="scroll-line absolute inset-0 bg-brand-400" aria-hidden />
           </span>
         </div>
