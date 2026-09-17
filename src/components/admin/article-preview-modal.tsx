@@ -3,15 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import {
-  X,
-  Monitor,
-  Smartphone,
-  Calendar,
-  User,
-  Eye,
-  FileText,
-} from "lucide-react";
+import { X, Monitor, Smartphone, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/public/breadcrumb";
 
@@ -72,6 +64,11 @@ export function ArticlePreviewModal({
   const displayCategory = data.categoryName.trim() || "Umum";
   const displayAuthor = data.authorName || "Administrator";
   const hasContent = !!data.content?.trim();
+
+  // Estimasi Waktu Baca (Reading Time: rata-rata 200 kata/menit)
+  const plainText = (data.content || "").replace(/<[^>]*>/g, " ").trim();
+  const wordCount = plainText ? plainText.split(/\s+/).filter(Boolean).length : 0;
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
 
   const formattedDate = new Date().toLocaleDateString("id-ID", {
     day: "numeric",
@@ -175,71 +172,76 @@ export function ArticlePreviewModal({
                 viewportMode === "mobile" ? "border-0 shadow-none" : ""
               }`}
             >
-              {/* Cover Image */}
-              <div className="relative aspect-[21/9] w-full overflow-hidden bg-zinc-900">
-                {data.coverPreviewUrl ? (
-                  <Image
-                    src={data.coverPreviewUrl}
-                    alt={displayTitle}
-                    fill
-                    unoptimized
-                    sizes="100vw"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-zinc-500">
-                    <FileText className="h-8 w-8 text-zinc-600" />
-                    <span className="text-xs">Belum ada gambar sampul</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Konten Artikel */}
               <div className="p-6 sm:p-8">
-                {/* Breadcrumb */}
+                {/* ── 1. Header Artikel: Breadcrumb, Badge, Judul, Metadata ── */}
                 <Breadcrumb
                   items={[
-                    { label: "Beranda", href: "#" },
-                    { label: "Berita", href: "#" },
+                    { label: "Beranda" },
+                    { label: "Berita" },
                     { label: displayCategory },
                   ]}
                 />
 
-                {/* Badge Kategori */}
                 <Badge
                   variant="default"
-                  className="mt-4 bg-brand-50 text-brand-700"
+                  className="mt-5 inline-flex bg-brand-50 text-brand-700 border border-brand-200/60 font-medium px-3 py-1 rounded-full text-xs"
                 >
                   {displayCategory}
                 </Badge>
 
-                {/* Judul Artikel */}
-                <h1 className="mt-3 text-xl font-bold tracking-tight text-heading sm:text-2xl md:text-3xl">
+                <h1 className="mt-4 text-xl font-extrabold tracking-tight text-heading sm:text-2xl md:text-3xl leading-tight">
                   {displayTitle}
                 </h1>
 
-                {/* Metadata Tanggal & Penulis */}
-                <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-mono text-muted">
-                  <span className="inline-flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" />
+                <div className="mt-5 flex flex-wrap items-center gap-y-2 text-xs sm:text-sm text-muted">
+                  <div className="flex items-center gap-2 font-medium text-zinc-800">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-50 border border-brand-200 text-[11px] font-semibold text-brand-700">
+                      {displayAuthor.charAt(0).toUpperCase()}
+                    </span>
+                    <span>{displayAuthor}</span>
+                  </div>
+                  <span className="mx-2.5 text-zinc-400">&middot;</span>
+                  <time className="font-mono text-xs sm:text-sm text-zinc-600">
                     {formattedDate}
-                  </span>
-                  <span>&middot;</span>
-                  <span className="inline-flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
-                    {displayAuthor}
+                  </time>
+                  <span className="mx-2.5 text-zinc-400">&middot;</span>
+                  <span className="font-mono text-xs sm:text-sm text-zinc-600">
+                    {readingMinutes} menit baca
                   </span>
                 </div>
 
-                {/* Isi Artikel */}
-                <div className="mt-6 border-t border-border pt-6">
+                {/* ── 2. Foto Sampul Ekspansif (16:9 aspect-video) ────────── */}
+                <div className="my-6 sm:my-8 relative aspect-video w-full overflow-hidden rounded-xl sm:rounded-2xl border border-border/80 bg-zinc-100 shadow-md">
+                  {data.coverPreviewUrl ? (
+                    <Image
+                      src={data.coverPreviewUrl}
+                      alt={displayTitle}
+                      fill
+                      unoptimized
+                      sizes="100vw"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center bg-zinc-100 p-6 text-center text-zinc-600">
+                      <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white text-brand-700 shadow-xs">
+                        <span className="text-sm font-bold">IFK</span>
+                      </div>
+                      <span className="text-sm font-medium text-zinc-600">
+                        UPTD Instalasi Farmasi Kabupaten Kotabaru
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* ── 3. Tubuh Naskah Artikel (Prose) ──────────────────────── */}
+                <div className="pt-2">
                   {hasContent ? (
                     <div
-                      className="prose prose-zinc max-w-none text-sm leading-relaxed"
+                      className="prose prose-zinc max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-800"
                       dangerouslySetInnerHTML={{ __html: data.content }}
                     />
                   ) : (
-                    <div className="rounded-lg border border-dashed border-border p-8 text-center text-muted">
+                    <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted">
                       <p className="text-sm italic">
                         Isi berita masih kosong. Tuliskan naskah berita pada editor untuk melihat pratinjau lengkap.
                       </p>
