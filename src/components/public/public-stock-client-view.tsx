@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Search,
   Package,
@@ -18,6 +19,7 @@ import {
   getStockSummary,
   type MedicineStockItem,
   type MedicineCategory,
+  type StockStatus,
 } from "@/lib/dummy-data";
 import { cn } from "@/lib/utils";
 
@@ -26,11 +28,77 @@ interface PublicStockClientViewProps {
 }
 
 export function PublicStockClientView({ initialItems }: PublicStockClientViewProps) {
-  const [search, setSearch] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // URL query search
+  const urlQ = searchParams.get("q") || "";
+  const [search, setSearch] = useState(urlQ);
+  const [prevUrlQ, setPrevUrlQ] = useState(urlQ);
+
+  if (urlQ !== prevUrlQ) {
+    setPrevUrlQ(urlQ);
+    setSearch(urlQ);
+  }
+
+  // URL query kategori
+  const rawKategori = searchParams.get("kategori");
+  const selectedCategories = useMemo(() => {
+    return rawKategori
+      ? rawKategori
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+  }, [rawKategori]);
+
+  // URL query status
+  const rawStatus = searchParams.get("status");
+  const selectedStatuses = useMemo(() => {
+    return rawStatus
+      ? rawStatus
+          .split(",")
+          .map((s) => s.trim().toUpperCase())
+          .filter(Boolean)
+      : [];
+  }, [rawStatus]);
+
+  // URL query page
+  const rawPage = Number(searchParams.get("page"));
+  const currentPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
   const [itemsPerPage, setItemsPerPage] = useState(15);
+
+  // Helper untuk memperbarui URL query parameter secara terpusat & konsisten tanpa lonjakan scroll
+  const updateUrl = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === "" || (key === "page" && value === "1")) {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      const queryString = params.toString();
+      const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
+      router.replace(targetUrl, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  // Debounce sinkronisasi search query ke URL (350ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentQ = searchParams.get("q") || "";
+      const trimmed = search.trim();
+      if (currentQ !== trimmed) {
+        updateUrl({ q: trimmed || null, page: null });
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [search, searchParams, updateUrl]);
 
   const summary = useMemo(() => getStockSummary(initialItems), [initialItems]);
 
@@ -98,6 +166,27 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
     currentPage * itemsPerPage
   );
 
+  // Status kartu aktif
+  const isAllActive = selectedStatuses.length === 0;
+  const isAvailableActive = selectedStatuses.includes("AVAILABLE");
+  const isLowActive = selectedStatuses.includes("LOW");
+  const isEmptyActive = selectedStatuses.includes("EMPTY");
+
+  // Handler interaksi kartu ringkasan
+  const handleCardStatusClick = (statusKey?: StockStatus) => {
+    if (!statusKey) {
+      // Total Perbekalan: reset filter status
+      updateUrl({ status: null, page: null });
+    } else {
+      // Toggle jika sedang aktif
+      if (selectedStatuses.length === 1 && selectedStatuses[0] === statusKey) {
+        updateUrl({ status: null, page: null });
+      } else {
+        updateUrl({ status: statusKey, page: null });
+      }
+    }
+  };
+
   return (
     <>
       <PageHero
@@ -132,52 +221,128 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
             </div>
           </Reveal>
 
-          {/* ── Kartu Metrik Ringkasan ─────────────────────────────── */}
+          {/* ── Kartu Metrik Ringkasan Interaktif ─────────────────── */}
           <Reveal delay={60}>
             <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <div className="rounded-2xl border border-border bg-surface-alt/50 p-5 shadow-xs transition-all duration-300 hover:border-brand-500/30">
-                <div className="flex items-center gap-2 text-muted">
-                  <Package className="h-4 w-4 text-brand-600" />
-                  <span className="text-xs font-medium">Total Perbekalan</span>
+              {/* Total Item */}
+              <button
+                type="button"
+                onClick={() => handleCardStatusClick()}
+                aria-pressed={isAllActive}
+                className={cn(
+                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  isAllActive
+                    ? "border-brand-500/60 bg-brand-500/10 ring-2 ring-brand-500/30"
+                    : "border-border bg-surface-alt/50 hover:border-brand-500/40"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-muted">
+                    <Package className="h-4 w-4 text-brand-600" />
+                    <span className="text-xs font-medium">Total Perbekalan</span>
+                  </div>
+                  {isAllActive && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-600" />
+                      Aktif
+                    </span>
+                  )}
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-heading">
                   {summary.totalItems}
                 </p>
                 <p className="mt-1 text-xs text-muted">Item Obat &amp; Alkes</p>
-              </div>
+              </button>
 
-              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 shadow-xs">
-                <div className="flex items-center gap-2 text-emerald-700">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span className="text-xs font-medium">Stok Aman</span>
+              {/* Stok Aman */}
+              <button
+                type="button"
+                onClick={() => handleCardStatusClick("AVAILABLE")}
+                aria-pressed={isAvailableActive}
+                className={cn(
+                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  isAvailableActive
+                    ? "border-emerald-500/60 bg-emerald-500/15 ring-2 ring-emerald-500/30"
+                    : "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-emerald-700">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span className="text-xs font-medium">Stok Aman</span>
+                  </div>
+                  {isAvailableActive && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      Aktif
+                    </span>
+                  )}
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-emerald-800">
                   {summary.availableItems}
                 </p>
                 <p className="mt-1 text-xs text-emerald-700/80">Kondisi cukup untuk faskes</p>
-              </div>
+              </button>
 
-              <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 shadow-xs">
-                <div className="flex items-center gap-2 text-amber-700">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span className="text-xs font-medium">Stok Menipis</span>
+              {/* Stok Menipis */}
+              <button
+                type="button"
+                onClick={() => handleCardStatusClick("LOW")}
+                aria-pressed={isLowActive}
+                className={cn(
+                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  isLowActive
+                    ? "border-amber-500/60 bg-amber-500/15 ring-2 ring-amber-500/30"
+                    : "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/10"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-amber-700">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="text-xs font-medium">Stok Menipis</span>
+                  </div>
+                  {isLowActive && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                      Aktif
+                    </span>
+                  )}
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-amber-800">
                   {summary.lowItems}
                 </p>
                 <p className="mt-1 text-xs text-amber-700/80">Di bawah batas buffer</p>
-              </div>
+              </button>
 
-              <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-5 shadow-xs">
-                <div className="flex items-center gap-2 text-rose-700">
-                  <XCircle className="h-4 w-4" />
-                  <span className="text-xs font-medium">Stok Kosong</span>
+              {/* Stok Kosong */}
+              <button
+                type="button"
+                onClick={() => handleCardStatusClick("EMPTY")}
+                aria-pressed={isEmptyActive}
+                className={cn(
+                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  isEmptyActive
+                    ? "border-rose-500/60 bg-rose-500/15 ring-2 ring-rose-500/30"
+                    : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-rose-700">
+                    <XCircle className="h-4 w-4" />
+                    <span className="text-xs font-medium">Stok Kosong</span>
+                  </div>
+                  {isEmptyActive && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                      Aktif
+                    </span>
+                  )}
                 </div>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-rose-800">
                   {summary.emptyItems}
                 </p>
                 <p className="mt-1 text-xs text-rose-700/80">Dalam proses pengadaan</p>
-              </div>
+              </button>
             </div>
           </Reveal>
 
@@ -194,10 +359,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   type="text"
                   placeholder="Cari nama obat (contoh: Paracetamol, Amoxicillin, Infus)..."
                   value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => setSearch(e.target.value)}
                   className="w-full rounded-full border border-border bg-surface py-2 pl-10 pr-4 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
                 />
               </div>
@@ -210,8 +372,10 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   options={categoryOptions}
                   selectedValues={selectedCategories}
                   onChange={(vals) => {
-                    setSelectedCategories(vals);
-                    setCurrentPage(1);
+                    updateUrl({
+                      kategori: vals.length > 0 ? vals.join(",") : null,
+                      page: null,
+                    });
                   }}
                   enableSearch={true}
                 />
@@ -222,8 +386,10 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   options={statusOptions}
                   selectedValues={selectedStatuses}
                   onChange={(vals) => {
-                    setSelectedStatuses(vals);
-                    setCurrentPage(1);
+                    updateUrl({
+                      status: vals.length > 0 ? vals.join(",") : null,
+                      page: null,
+                    });
                   }}
                   enableSearch={false}
                 />
@@ -303,7 +469,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                     Item tidak ditemukan
                   </p>
                   <p className="mt-1 text-sm text-muted">
-                    Tidak ada obat atau BMHP yang cocok dengan kata kunci &quot;{search}&quot;.
+                    Tidak ada perbekalan farmasi yang cocok dengan kriteria pencarian dan filter aktif.
                   </p>
                 </div>
               )}
@@ -330,7 +496,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                         value={itemsPerPage}
                         onChange={(e) => {
                           setItemsPerPage(Number(e.target.value));
-                          setCurrentPage(1);
+                          updateUrl({ page: null });
                         }}
                         className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-heading focus:outline-none"
                       >
@@ -344,8 +510,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
+                      onClick={() =>
+                        updateUrl({
+                          page: currentPage > 2 ? String(currentPage - 1) : null,
+                        })
+                      }
+                      disabled={currentPage <= 1}
                       className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-heading transition-colors hover:bg-surface-alt disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       <ChevronLeft className="h-3.5 w-3.5" />
@@ -355,8 +525,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                       {currentPage} / {totalPages}
                     </span>
                     <button
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
+                      onClick={() =>
+                        updateUrl({
+                          page: String(currentPage + 1),
+                        })
+                      }
+                      disabled={currentPage >= totalPages}
                       className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-heading transition-colors hover:bg-surface-alt disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Selanjutnya
