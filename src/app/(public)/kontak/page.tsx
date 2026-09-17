@@ -51,9 +51,9 @@ export default async function KontakPage() {
     <>
       <PageHero
         breadcrumb={[{ label: "Beranda", href: "/" }, { label: "Kontak" }]}
-        eyebrow="Hubungi"
-        title="Kontak Kami"
-        subtitle="Hubungi kami untuk informasi lebih lanjut seputar layanan kefarmasian."
+        eyebrow="Pelayanan Publik"
+        title="Layanan Kontak & Informasi"
+        subtitle="Saluran resmi komunikasi, konsultasi kefarmasian, dan layanan pengaduan terpadu UPTD Instalasi Farmasi Kabupaten Kotabaru."
       />
 
       <section className="border-t border-border bg-surface py-24">
