@@ -1,20 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Search,
-  SlidersHorizontal,
-  ChevronDown,
-  Check,
-  X,
-  Loader2,
-  ArrowDown,
-} from "lucide-react";
+import { Search, X, Loader2, ArrowDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
+import { PublicMultiSelectFilter } from "@/components/public/public-stock-filter";
 import { cn } from "@/lib/utils";
 import {
   getPublicArticlesAction,
@@ -45,36 +38,44 @@ export function BeritaClientView({
 
   // Inisialisasi state dari query parameter URL jika ada
   const initialQ = searchParams.get("q") || "";
-  const initialCategoryParam = searchParams.get("kategori") || "semua";
+  const initialCategoryParam = searchParams.get("kategori") || "";
+
+  const initialSelectedCategories = useMemo(() => {
+    if (!initialCategoryParam || initialCategoryParam === "semua") return [];
+    return initialCategoryParam
+      .split(",")
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+  }, [initialCategoryParam]);
 
   const [articles, setArticles] = useState<PublicArticleItem[]>(initialArticles);
   const [search, setSearch] = useState(initialQ);
-  const [activeCategory, setActiveCategory] = useState<string>(initialCategoryParam);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialSelectedCategories
+  );
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
 
-  // Kategori filter: 'Semua Kategori' + kategori aktif dinamis
-  const filterCategories = [
-    { id: "semua", name: "Semua Kategori", slug: "semua" },
-    ...categories,
-  ];
+  // Opsi kategori untuk PublicMultiSelectFilter
+  const categoryOptions = useMemo(
+    () => categories.map((c) => ({ value: c.slug, label: c.name })),
+    [categories]
+  );
 
   // Helper untuk memperbarui URL query parameter tanpa lonjakan scroll
   const updateUrlParams = useCallback(
-    (newSearch: string, newCategory: string) => {
+    (newSearch: string, newCategories: string[]) => {
       if (typeof window === "undefined") return;
 
       const currentParams = new URLSearchParams(window.location.search);
       const currentQ = currentParams.get("q") || "";
-      const currentCat = currentParams.get("kategori") || "semua";
+      const currentCat = currentParams.get("kategori") || "";
       const trimmed = newSearch.trim();
-      const targetCat = newCategory && newCategory !== "semua" ? newCategory : "semua";
+      const targetCat = newCategories.join(",");
 
       // Guard: jangan panggil router.replace jika parameter tidak berubah
       if (currentQ === trimmed && currentCat === targetCat) {
@@ -89,7 +90,7 @@ export function BeritaClientView({
         params.delete("q");
       }
 
-      if (targetCat !== "semua") {
+      if (targetCat) {
         params.set("kategori", targetCat);
       } else {
         params.delete("kategori");
@@ -102,34 +103,18 @@ export function BeritaClientView({
     [pathname, router]
   );
 
-  // Tutup dropdown saat klik di luar
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsCategoryOpen(false);
-      }
-    }
-    if (isCategoryOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isCategoryOpen]);
-
   // Fetch data awal jika halaman dibuka langsung dengan query parameter URL non-default
   useEffect(() => {
-    if (initialQ || (initialCategoryParam && initialCategoryParam !== "semua")) {
+    if (initialQ || initialSelectedCategories.length > 0) {
       const fetchInitialFiltered = async () => {
         setIsLoading(true);
         const res = await getPublicArticlesAction({
           page: 1,
           limit: 12,
-          categorySlug:
-            initialCategoryParam === "semua" ? undefined : initialCategoryParam,
+          categorySlugs:
+            initialSelectedCategories.length > 0
+              ? initialSelectedCategories
+              : undefined,
           search: initialQ.trim() || undefined,
         });
         if (res.success) {
@@ -140,7 +125,7 @@ export function BeritaClientView({
       };
       fetchInitialFiltered();
     }
-  }, [initialCategoryParam, initialQ]);
+  }, [initialSelectedCategories, initialQ]);
 
   // Debounced search & filter kategori (350ms) saat pengguna berinteraksi
   useEffect(() => {
@@ -154,12 +139,13 @@ export function BeritaClientView({
       setPage(1);
 
       // Sinkronkan ke URL
-      updateUrlParams(search, activeCategory);
+      updateUrlParams(search, selectedCategories);
 
       const res = await getPublicArticlesAction({
         page: 1,
         limit: 12,
-        categorySlug: activeCategory === "semua" ? undefined : activeCategory,
+        categorySlugs:
+          selectedCategories.length > 0 ? selectedCategories : undefined,
         search: search.trim() || undefined,
       });
 
@@ -171,20 +157,13 @@ export function BeritaClientView({
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [search, activeCategory, updateUrlParams]);
+  }, [search, selectedCategories, updateUrlParams]);
 
   // Hapus pencarian seketika (0ms)
   const handleClearSearch = () => {
     setSearch("");
     setPage(1);
-    updateUrlParams("", activeCategory);
-  };
-
-  const handleSelectCategory = (catSlug: string) => {
-    setActiveCategory(catSlug);
-    setIsCategoryOpen(false);
-    setPage(1);
-    updateUrlParams(search, catSlug);
+    updateUrlParams("", selectedCategories);
   };
 
   const handleLoadMore = async () => {
@@ -195,7 +174,8 @@ export function BeritaClientView({
     const res = await getPublicArticlesAction({
       page: nextPage,
       limit: 12,
-      categorySlug: activeCategory === "semua" ? undefined : activeCategory,
+      categorySlugs:
+        selectedCategories.length > 0 ? selectedCategories : undefined,
       search: search.trim() || undefined,
     });
 
@@ -207,113 +187,54 @@ export function BeritaClientView({
     setIsLoadingMore(false);
   };
 
-  const activeCategoryObj = filterCategories.find(
-    (c) => c.slug === activeCategory
-  );
-  const activeCategoryLabel = activeCategoryObj
-    ? activeCategoryObj.name
-    : "Semua Kategori";
-
   return (
     <div className="section-container">
-      {/* ── Toolbar Pencarian & Filter Terpadu (Serasi Halaman Stok) ─ */}
-      <Reveal className="relative z-30">
-        <div className="relative z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
-          {/* Kolom Pencarian dengan Tombol Clear 'X' */}
-          <div className="relative flex-1">
-            <Search
-              className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
-              strokeWidth={1.5}
-            />
-            <input
-              type="text"
-              placeholder="Cari judul berita, artikel, atau pengumuman..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-full border border-border bg-surface py-2.5 pl-10 pr-12 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
-            />
-            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
-              {isLoading && (
-                <Loader2 className="h-4 w-4 animate-spin text-brand-600" />
-              )}
-              {search && !isLoading && (
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  aria-label="Bersihkan pencarian"
-                  className="flex h-5 w-5 items-center justify-center rounded-full text-muted transition-colors hover:bg-zinc-200 hover:text-heading cursor-pointer"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Dropdown Filter Kategori */}
-          <div ref={dropdownRef} className="relative inline-block w-full sm:w-auto">
-            <button
-              type="button"
-              onClick={() => setIsCategoryOpen((prev) => !prev)}
-              aria-expanded={isCategoryOpen}
-              aria-haspopup="listbox"
-              className={cn(
-                "inline-flex h-10 w-full items-center justify-between gap-2.5 rounded-full border px-4 text-xs font-medium transition-all duration-300 sm:w-auto sm:min-w-[180px] cursor-pointer",
-                activeCategory !== "semua"
-                  ? "border-brand-600/30 bg-brand-500/10 text-brand-700 shadow-xs"
-                  : "border-border bg-surface text-muted hover:border-zinc-300 hover:text-heading hover:bg-surface-alt/80"
-              )}
-            >
-              <div className="flex items-center gap-2 truncate">
-                <SlidersHorizontal
-                  className={cn(
-                    "h-3.5 w-3.5 shrink-0 transition-colors",
-                    activeCategory !== "semua" ? "text-brand-600" : "text-muted"
-                  )}
-                />
-                <span className="truncate">{activeCategoryLabel}</span>
-              </div>
-              <ChevronDown
-                className={cn(
-                  "h-3.5 w-3.5 text-muted transition-transform duration-200 shrink-0",
-                  isCategoryOpen && "rotate-180"
-                )}
-              />
-            </button>
-
-            {/* Popover Menu Dropdown */}
-            {isCategoryOpen && (
-              <div
-                role="listbox"
-                className="absolute right-0 top-full z-50 mt-2 w-56 max-w-[calc(100vw-2rem)] origin-top-right rounded-2xl border border-border bg-surface/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+      {/* ── Toolbar Pencarian & Filter Terpadu Sticky ──────────────── */}
+      {/* ponytail: native CSS sticky container; offset top-20 (mobile) & top-24 (desktop) clears floating navbar */}
+      <div className="sticky top-20 sm:top-24 z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border/80 bg-surface/90 sm:bg-surface-alt/85 p-3.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.05)] backdrop-blur-xl transition-all">
+        {/* Kolom Pencarian dengan Tombol Clear 'X' */}
+        <div className="relative flex-1">
+          <Search
+            className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            strokeWidth={1.5}
+          />
+          <input
+            type="text"
+            placeholder="Cari judul berita, artikel, atau pengumuman..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-full border border-border bg-surface py-2.5 pl-10 pr-12 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
+          />
+          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+            {isLoading && (
+              <Loader2 className="h-4 w-4 animate-spin text-brand-600" />
+            )}
+            {search && !isLoading && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                aria-label="Bersihkan pencarian"
+                className="flex h-5 w-5 items-center justify-center rounded-full text-muted transition-colors hover:bg-zinc-200 hover:text-heading cursor-pointer"
               >
-                <div className="max-h-64 overflow-y-auto py-1 space-y-0.5">
-                  {filterCategories.map((cat) => {
-                    const isSelected = activeCategory === cat.slug;
-                    return (
-                      <button
-                        key={cat.slug}
-                        type="button"
-                        onClick={() => handleSelectCategory(cat.slug)}
-                        className={cn(
-                          "flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-colors cursor-pointer text-left",
-                          isSelected
-                            ? "bg-brand-500/10 text-brand-700"
-                            : "text-zinc-700 hover:bg-surface-alt hover:text-heading"
-                        )}
-                      >
-                        <span className="truncate">{cat.name}</span>
-                        {isSelected && (
-                          <Check className="h-3.5 w-3.5 text-brand-600 shrink-0 ml-2" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                <X className="h-3.5 w-3.5" />
+              </button>
             )}
           </div>
         </div>
-      </Reveal>
+
+        {/* Dropdown Filter Kategori Multi-Select dengan Fitur Pencarian */}
+        <PublicMultiSelectFilter
+          title="Kategori"
+          allLabel="Semua Kategori"
+          options={categoryOptions}
+          selectedValues={selectedCategories}
+          onChange={(vals) => {
+            setSelectedCategories(vals);
+            setPage(1);
+          }}
+          enableSearch={true}
+        />
+      </div>
 
       {/* ── Grid Daftar Artikel ────────────────────────────────────── */}
       <Reveal delay={100}>
@@ -374,13 +295,13 @@ export function BeritaClientView({
             <p className="mt-1 text-xs text-muted">
               Coba sesuaikan kata kunci pencarian atau pilih kategori lain.
             </p>
-            {(search || activeCategory !== "semua") && (
+            {(search || selectedCategories.length > 0) && (
               <button
                 type="button"
                 onClick={() => {
                   setSearch("");
-                  setActiveCategory("semua");
-                  updateUrlParams("", "semua");
+                  setSelectedCategories([]);
+                  updateUrlParams("", []);
                 }}
                 className="mt-4 rounded-full bg-surface-alt px-4 py-1.5 text-xs font-medium text-brand-700 hover:bg-zinc-200 transition-colors cursor-pointer"
               >
