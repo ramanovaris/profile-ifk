@@ -58,8 +58,6 @@ export function BeritaClientView({
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
-  const searchParamsRef = useRef(searchParams);
-  searchParamsRef.current = searchParams;
 
   // Kategori filter: 'Semua Kategori' + kategori aktif dinamis
   const filterCategories = [
@@ -70,9 +68,11 @@ export function BeritaClientView({
   // Helper untuk memperbarui URL query parameter tanpa lonjakan scroll
   const updateUrlParams = useCallback(
     (newSearch: string, newCategory: string) => {
-      const currentSearchParams = searchParamsRef.current;
-      const currentQ = currentSearchParams.get("q") || "";
-      const currentCat = currentSearchParams.get("kategori") || "semua";
+      if (typeof window === "undefined") return;
+
+      const currentParams = new URLSearchParams(window.location.search);
+      const currentQ = currentParams.get("q") || "";
+      const currentCat = currentParams.get("kategori") || "semua";
       const trimmed = newSearch.trim();
       const targetCat = newCategory && newCategory !== "semua" ? newCategory : "semua";
 
@@ -81,7 +81,7 @@ export function BeritaClientView({
         return;
       }
 
-      const params = new URLSearchParams(currentSearchParams.toString());
+      const params = new URLSearchParams(window.location.search);
 
       if (trimmed) {
         params.set("q", trimmed);
@@ -120,29 +120,32 @@ export function BeritaClientView({
     };
   }, [isCategoryOpen]);
 
-  // Debounced search & filter kategori (350ms)
+  // Fetch data awal jika halaman dibuka langsung dengan query parameter URL non-default
+  useEffect(() => {
+    if (initialQ || (initialCategoryParam && initialCategoryParam !== "semua")) {
+      const fetchInitialFiltered = async () => {
+        setIsLoading(true);
+        const res = await getPublicArticlesAction({
+          page: 1,
+          limit: 12,
+          categorySlug:
+            initialCategoryParam === "semua" ? undefined : initialCategoryParam,
+          search: initialQ.trim() || undefined,
+        });
+        if (res.success) {
+          setArticles(res.articles);
+          setHasMore(res.hasMore);
+        }
+        setIsLoading(false);
+      };
+      fetchInitialFiltered();
+    }
+  }, [initialCategoryParam, initialQ]);
+
+  // Debounced search & filter kategori (350ms) saat pengguna berinteraksi
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      // Jika saat pertama kali load terdapat param URL non-default, lakukan fetch sinkron
-      if (initialQ || (initialCategoryParam && initialCategoryParam !== "semua")) {
-        const fetchInitialFiltered = async () => {
-          setIsLoading(true);
-          const res = await getPublicArticlesAction({
-            page: 1,
-            limit: 12,
-            categorySlug:
-              initialCategoryParam === "semua" ? undefined : initialCategoryParam,
-            search: initialQ.trim() || undefined,
-          });
-          if (res.success) {
-            setArticles(res.articles);
-            setHasMore(res.hasMore);
-          }
-          setIsLoading(false);
-        };
-        fetchInitialFiltered();
-      }
       return;
     }
 
