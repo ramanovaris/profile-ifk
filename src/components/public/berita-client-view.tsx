@@ -68,16 +68,29 @@ export function BeritaClientView({
   // Helper untuk memperbarui URL query parameter tanpa lonjakan scroll
   const updateUrlParams = useCallback(
     (newSearch: string, newCategory: string) => {
-      const params = new URLSearchParams(searchParams.toString());
+      if (typeof window === "undefined") return;
 
-      if (newSearch.trim()) {
-        params.set("q", newSearch.trim());
+      const currentParams = new URLSearchParams(window.location.search);
+      const currentQ = currentParams.get("q") || "";
+      const currentCat = currentParams.get("kategori") || "semua";
+      const trimmed = newSearch.trim();
+      const targetCat = newCategory && newCategory !== "semua" ? newCategory : "semua";
+
+      // Guard: jangan panggil router.replace jika parameter tidak berubah
+      if (currentQ === trimmed && currentCat === targetCat) {
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+
+      if (trimmed) {
+        params.set("q", trimmed);
       } else {
         params.delete("q");
       }
 
-      if (newCategory && newCategory !== "semua") {
-        params.set("kategori", newCategory);
+      if (targetCat !== "semua") {
+        params.set("kategori", targetCat);
       } else {
         params.delete("kategori");
       }
@@ -86,7 +99,7 @@ export function BeritaClientView({
       const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
       router.replace(targetUrl, { scroll: false });
     },
-    [pathname, router, searchParams]
+    [pathname, router]
   );
 
   // Tutup dropdown saat klik di luar
@@ -107,29 +120,32 @@ export function BeritaClientView({
     };
   }, [isCategoryOpen]);
 
-  // Debounced search & filter kategori (350ms)
+  // Fetch data awal jika halaman dibuka langsung dengan query parameter URL non-default
+  useEffect(() => {
+    if (initialQ || (initialCategoryParam && initialCategoryParam !== "semua")) {
+      const fetchInitialFiltered = async () => {
+        setIsLoading(true);
+        const res = await getPublicArticlesAction({
+          page: 1,
+          limit: 12,
+          categorySlug:
+            initialCategoryParam === "semua" ? undefined : initialCategoryParam,
+          search: initialQ.trim() || undefined,
+        });
+        if (res.success) {
+          setArticles(res.articles);
+          setHasMore(res.hasMore);
+        }
+        setIsLoading(false);
+      };
+      fetchInitialFiltered();
+    }
+  }, [initialCategoryParam, initialQ]);
+
+  // Debounced search & filter kategori (350ms) saat pengguna berinteraksi
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
-      // Jika saat pertama kali load terdapat param URL non-default, lakukan fetch sinkron
-      if (initialQ || (initialCategoryParam && initialCategoryParam !== "semua")) {
-        const fetchInitialFiltered = async () => {
-          setIsLoading(true);
-          const res = await getPublicArticlesAction({
-            page: 1,
-            limit: 12,
-            categorySlug:
-              initialCategoryParam === "semua" ? undefined : initialCategoryParam,
-            search: initialQ.trim() || undefined,
-          });
-          if (res.success) {
-            setArticles(res.articles);
-            setHasMore(res.hasMore);
-          }
-          setIsLoading(false);
-        };
-        fetchInitialFiltered();
-      }
       return;
     }
 
@@ -155,7 +171,7 @@ export function BeritaClientView({
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [search, activeCategory, updateUrlParams, initialQ, initialCategoryParam]);
+  }, [search, activeCategory, updateUrlParams]);
 
   // Hapus pencarian seketika (0ms)
   const handleClearSearch = () => {
@@ -214,18 +230,23 @@ export function BeritaClientView({
               placeholder="Cari judul berita, artikel, atau pengumuman..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-full border border-border bg-surface py-2.5 pl-10 pr-10 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
+              className="w-full rounded-full border border-border bg-surface py-2.5 pl-10 pr-12 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
             />
-            {search && (
-              <button
-                type="button"
-                onClick={handleClearSearch}
-                aria-label="Bersihkan pencarian"
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-muted transition-colors hover:bg-zinc-200 hover:text-heading cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              {isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-brand-600" />
+              )}
+              {search && !isLoading && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  aria-label="Bersihkan pencarian"
+                  className="flex h-5 w-5 items-center justify-center rounded-full text-muted transition-colors hover:bg-zinc-200 hover:text-heading cursor-pointer"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Dropdown Filter Kategori */}
@@ -296,12 +317,7 @@ export function BeritaClientView({
 
       {/* ── Grid Daftar Artikel ────────────────────────────────────── */}
       <Reveal delay={100}>
-        <div
-          className={cn(
-            "mt-10 grid gap-8 sm:grid-cols-2 transition-opacity duration-300",
-            isLoading ? "opacity-40 pointer-events-none" : "opacity-100"
-          )}
-        >
+        <div className="mt-10 grid gap-8 sm:grid-cols-2">
           {articles.map((article) => (
             <Link
               key={article.id}
