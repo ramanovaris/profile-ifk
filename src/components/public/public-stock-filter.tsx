@@ -327,3 +327,5 @@ export function PublicStockFilter({
     </div>
   );
 }
+
+export { PublicStockFilter as PublicMultiSelectFilter };

@@ -494,6 +494,7 @@ export type GetPublicArticlesParams = {
   page?: number;
   limit?: number;
   categorySlug?: string;
+  categorySlugs?: string[];
   search?: string;
 };
 
@@ -528,14 +529,27 @@ export async function getPublicArticlesAction(
 
     const trimmedSearch = typeof params.search === "string" ? params.search.trim().slice(0, 100) : "";
     const categorySlug = typeof params.categorySlug === "string" ? params.categorySlug.trim().toLowerCase() : "";
+    const rawCategorySlugs = Array.isArray(params.categorySlugs)
+      ? params.categorySlugs
+      : categorySlug && categorySlug !== "semua"
+      ? [categorySlug]
+      : [];
+    const validCategorySlugs = rawCategorySlugs
+      .map((s) => (typeof s === "string" ? s.trim().toLowerCase() : ""))
+      .filter((s) => s && s !== "semua");
 
     const whereClause: Prisma.ArticleWhereInput = {
       isPublished: true,
     };
 
-    if (categorySlug && categorySlug !== "semua") {
+    if (validCategorySlugs.length === 1) {
       whereClause.category = {
-        slug: categorySlug,
+        slug: validCategorySlugs[0],
+        status: "ACTIVE",
+      };
+    } else if (validCategorySlugs.length > 1) {
+      whereClause.category = {
+        slug: { in: validCategorySlugs },
         status: "ACTIVE",
       };
     }
