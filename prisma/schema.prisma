@@ -33,6 +33,8 @@ model User {
   username  String      @unique
   password  String      // bcrypt hash
   name      String
+  email     String?
+  avatar    String?
   role      Role        @default(STAFF)
   status    UserStatus  @default(ACTIVE)
   createdAt DateTime    @default(now())

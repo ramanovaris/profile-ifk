@@ -15,6 +15,8 @@ export type AuthUserInfo = {
   name: string;
   username: string;
   role: Role;
+  email?: string | null;
+  avatar?: string | null;
 };
 
 /**
@@ -28,6 +30,8 @@ export async function getCurrentUserAction(): Promise<AuthUserInfo | null> {
     name: session.user.name,
     username: session.user.username,
     role: session.user.role,
+    email: session.user.email,
+    avatar: session.user.avatar,
   };
 }
 
