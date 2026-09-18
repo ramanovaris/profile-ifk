@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { 
@@ -47,5 +48,9 @@ export default async function StokPublikPage() {
     items = initialMedicineStock;
   }
 
-  return <PublicStockClientView initialItems={items} />;
+  return (
+    <Suspense fallback={null}>
+      <PublicStockClientView initialItems={items} />
+    </Suspense>
+  );
 }

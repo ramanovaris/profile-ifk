@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { db } from "@/lib/db";
 import { getCurrentSession } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/admin-shell";
@@ -28,7 +29,9 @@ export default async function AdminStokPage() {
 
   return (
     <AdminShell currentUser={session?.user}>
-      <StockTable initialItems={initialItems} />
+      <Suspense fallback={null}>
+        <StockTable initialItems={initialItems} />
+      </Suspense>
     </AdminShell>
   );
 }
