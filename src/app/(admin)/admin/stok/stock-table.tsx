@@ -95,7 +95,10 @@ export function StockTable({ initialItems }: StockTableProps) {
 
   // Helper untuk memperbarui URL query parameter secara terpusat & konsisten
   const updateUrl = useCallback(
-    (updates: Record<string, string | null>) => {
+    (
+      updates: Record<string, string | null>,
+      method: "push" | "replace" = "push"
+    ) => {
       const params = new URLSearchParams(searchParams.toString());
       for (const [key, value] of Object.entries(updates)) {
         if (value === null || value === "" || (key === "page" && value === "1")) {
@@ -105,8 +108,16 @@ export function StockTable({ initialItems }: StockTableProps) {
         }
       }
       const queryString = params.toString();
+      const currentQuery = searchParams.toString();
+      if (queryString === currentQuery) {
+        return;
+      }
       const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
-      router.replace(targetUrl, { scroll: false });
+      if (method === "push") {
+        router.push(targetUrl, { scroll: false });
+      } else {
+        router.replace(targetUrl, { scroll: false });
+      }
     },
     [pathname, router, searchParams]
   );
@@ -117,7 +128,9 @@ export function StockTable({ initialItems }: StockTableProps) {
       const currentQ = searchParams.get("q") || "";
       const trimmed = search.trim();
       if (currentQ !== trimmed) {
-        updateUrl({ q: trimmed || null, page: null });
+        // Jika mulai mengetik dari query kosong, gunakan push agar navigasi Back dapat membatalkan pencarian
+        const method = currentQ === "" ? "push" : "replace";
+        updateUrl({ q: trimmed || null, page: null }, method);
       }
     }, 350);
 

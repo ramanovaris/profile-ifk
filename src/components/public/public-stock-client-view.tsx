@@ -71,7 +71,10 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
 
   // Helper untuk memperbarui URL query parameter secara terpusat & konsisten tanpa lonjakan scroll
   const updateUrl = useCallback(
-    (updates: Record<string, string | null>) => {
+    (
+      updates: Record<string, string | null>,
+      method: "push" | "replace" = "push"
+    ) => {
       const params = new URLSearchParams(searchParams.toString());
       for (const [key, value] of Object.entries(updates)) {
         if (value === null || value === "" || (key === "page" && value === "1")) {
@@ -81,8 +84,16 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
         }
       }
       const queryString = params.toString();
+      const currentQuery = searchParams.toString();
+      if (queryString === currentQuery) {
+        return;
+      }
       const targetUrl = queryString ? `${pathname}?${queryString}` : pathname;
-      router.replace(targetUrl, { scroll: false });
+      if (method === "push") {
+        router.push(targetUrl, { scroll: false });
+      } else {
+        router.replace(targetUrl, { scroll: false });
+      }
     },
     [pathname, router, searchParams]
   );
@@ -93,7 +104,9 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
       const currentQ = searchParams.get("q") || "";
       const trimmed = search.trim();
       if (currentQ !== trimmed) {
-        updateUrl({ q: trimmed || null, page: null });
+        // Jika mulai mengetik dari query kosong, gunakan push agar navigasi Back dapat membatalkan pencarian
+        const method = currentQ === "" ? "push" : "replace";
+        updateUrl({ q: trimmed || null, page: null }, method);
       }
     }, 350);
 
@@ -200,23 +213,17 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
         <div className="section-container">
           {/* ── Info Bar Pembaruan Cut-off ──────────────────────────── */}
           <Reveal>
-            <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
-                  <Calendar className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-                    Periode Data Stok
-                  </p>
-                  <p className="text-sm font-medium text-heading">
-                    Stok Fisik Terverifikasi (Basis Data Terintegrasi)
-                  </p>
-                </div>
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:px-6">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
+                <Calendar className="h-5 w-5" />
               </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 text-xs font-medium text-emerald-700">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                Data Terverifikasi Petugas Farmasi
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+                  Periode Data Stok
+                </p>
+                <p className="text-sm font-medium text-heading">
+                  Cut-off 31 Agustus 2026
+                </p>
               </div>
             </div>
           </Reveal>
@@ -230,17 +237,20 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick()}
                 aria-pressed={isAllActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isAllActive
                     ? "border-brand-500/60 bg-brand-500/10 ring-2 ring-brand-500/30"
                     : "border-border bg-surface-alt/50 hover:border-brand-500/40"
                 )}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-muted">
-                    <Package className="h-4 w-4 text-brand-600" />
-                    <span className="text-xs font-medium">Total Perbekalan</span>
-                  </div>
+                <div className="flex items-center gap-2 text-muted">
+                  <Package className="h-4 w-4 text-brand-600" />
+                  <span className="text-xs font-medium">Total Perbekalan</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-3xl font-bold tracking-tight text-heading">
+                    {summary.totalItems}
+                  </p>
                   {isAllActive && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-brand-600" />
@@ -248,9 +258,6 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                     </span>
                   )}
                 </div>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-heading">
-                  {summary.totalItems}
-                </p>
                 <p className="mt-1 text-xs text-muted">Item Obat &amp; Alkes</p>
               </button>
 
@@ -260,17 +267,20 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("AVAILABLE")}
                 aria-pressed={isAvailableActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isAvailableActive
                     ? "border-emerald-500/60 bg-emerald-500/15 ring-2 ring-emerald-500/30"
                     : "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10"
                 )}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-emerald-700">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span className="text-xs font-medium">Stok Aman</span>
-                  </div>
+                <div className="flex items-center gap-2 text-emerald-700">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="text-xs font-medium">Stok Aman</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-3xl font-bold tracking-tight text-emerald-800">
+                    {summary.availableItems}
+                  </p>
                   {isAvailableActive && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -278,9 +288,6 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                     </span>
                   )}
                 </div>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-emerald-800">
-                  {summary.availableItems}
-                </p>
                 <p className="mt-1 text-xs text-emerald-700/80">Kondisi cukup untuk faskes</p>
               </button>
 
@@ -290,17 +297,20 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("LOW")}
                 aria-pressed={isLowActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isLowActive
                     ? "border-amber-500/60 bg-amber-500/15 ring-2 ring-amber-500/30"
                     : "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/10"
                 )}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-amber-700">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span className="text-xs font-medium">Stok Menipis</span>
-                  </div>
+                <div className="flex items-center gap-2 text-amber-700">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span className="text-xs font-medium">Stok Menipis</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-3xl font-bold tracking-tight text-amber-800">
+                    {summary.lowItems}
+                  </p>
                   {isLowActive && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
@@ -308,9 +318,6 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                     </span>
                   )}
                 </div>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-amber-800">
-                  {summary.lowItems}
-                </p>
                 <p className="mt-1 text-xs text-amber-700/80">Di bawah batas buffer</p>
               </button>
 
@@ -320,17 +327,20 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("EMPTY")}
                 aria-pressed={isEmptyActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isEmptyActive
                     ? "border-rose-500/60 bg-rose-500/15 ring-2 ring-rose-500/30"
                     : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
                 )}
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-rose-700">
-                    <XCircle className="h-4 w-4" />
-                    <span className="text-xs font-medium">Stok Kosong</span>
-                  </div>
+                <div className="flex items-center gap-2 text-rose-700">
+                  <XCircle className="h-4 w-4" />
+                  <span className="text-xs font-medium">Stok Kosong</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-3xl font-bold tracking-tight text-rose-800">
+                    {summary.emptyItems}
+                  </p>
                   {isEmptyActive && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
@@ -338,9 +348,6 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                     </span>
                   )}
                 </div>
-                <p className="mt-2 text-3xl font-bold tracking-tight text-rose-800">
-                  {summary.emptyItems}
-                </p>
                 <p className="mt-1 text-xs text-rose-700/80">Dalam proses pengadaan</p>
               </button>
             </div>
@@ -496,7 +503,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                         value={itemsPerPage}
                         onChange={(e) => {
                           setItemsPerPage(Number(e.target.value));
-                          updateUrl({ page: null });
+                          updateUrl({ page: null }, "replace");
                         }}
                         className="rounded-md border border-border bg-surface px-2 py-1 text-xs text-heading focus:outline-none"
                       >
