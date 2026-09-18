@@ -23,9 +23,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 import { logoutAction, getCurrentUserAction, type AuthUserInfo } from "@/actions/auth";
 import type { Role } from "@prisma/client";
@@ -150,6 +150,8 @@ export type AdminShellProps = {
     name: string;
     username: string;
     role: Role;
+    email?: string | null;
+    avatar?: string | null;
   };
 };
 
@@ -164,6 +166,8 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
         name: currentUser.name,
         username: currentUser.username,
         role: currentUser.role,
+        email: currentUser.email,
+        avatar: currentUser.avatar,
       }
     : fetchedUser;
 
@@ -246,6 +250,9 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
                 {displayName}
               </span>
               <Avatar className="h-8 w-8 ring-1 ring-brand-500/30">
+                {user?.avatar ? (
+                  <AvatarImage src={getAssetUrl(user.avatar)} alt={displayName} />
+                ) : null}
                 <AvatarFallback className="bg-brand-500/20 text-xs font-semibold text-brand-300">
                   {initials}
                 </AvatarFallback>
