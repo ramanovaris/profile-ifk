@@ -7,7 +7,6 @@ import {
   FileText,
   X,
   Building2,
-  Info,
   ExternalLink,
 } from "lucide-react";
 import { getAssetUrl } from "@/lib/utils";
@@ -102,24 +101,16 @@ export function SuratPengantarModalButton() {
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-              {/* Petunjuk Singkat */}
-              <div className="flex items-start gap-3 rounded-xl border border-brand-200/70 bg-brand-50/50 p-3.5 text-xs sm:text-sm text-brand-900">
-                <Info className="h-4 w-4 shrink-0 mt-0.5 text-brand-700" />
-                <p className="text-xs text-brand-800 leading-relaxed">
-                  Contoh surat pengantar resmi dari UPTD Puskesmas ke Kepala Dinas Kesehatan Kab. Kotabaru Cq. Kepala UPTD Instalasi Farmasi untuk permohonan penyaluran perbekalan farmasi.
-                </p>
-              </div>
-
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col items-center justify-center">
               {/* Tampilan Gambar Contoh Surat */}
-              <div className="overflow-hidden rounded-xl border border-border bg-zinc-50 p-2 sm:p-4 flex items-center justify-center shadow-2xs">
+              <div className="w-full overflow-hidden rounded-xl border border-border bg-zinc-50 p-2 sm:p-4 flex items-center justify-center shadow-2xs">
                 <Image
                   src={imageUrl}
                   alt="Contoh Surat Pengantar Puskesmas"
                   width={533}
                   height={647}
                   unoptimized
-                  className="h-auto max-h-[58vh] w-auto max-w-full rounded border border-border/80 shadow-xs object-contain"
+                  className="h-auto max-h-[62vh] w-auto max-w-full rounded border border-border/80 shadow-xs object-contain"
                 />
               </div>
             </div>
