@@ -23,6 +23,7 @@ import {
 
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
+import { SuratPengantarModalButton } from "@/components/public/surat-pengantar-modal";
 
 const supplyCycle = [
   {
@@ -633,10 +634,7 @@ export default function LayananPage() {
                         <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     ) : (
-                      <div className="flex items-center justify-center gap-1.5 rounded-xl border border-dashed border-border bg-surface/80 py-2.5 text-xs font-medium text-muted">
-                        <FileCheck className="h-3.5 w-3.5 text-brand-600" />
-                        <span>Sesuai Tata Naskah Faskes</span>
-                      </div>
+                      <SuratPengantarModalButton />
                     )}
                   </div>
                 </div>
