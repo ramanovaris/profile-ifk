@@ -246,39 +246,49 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Pilar Komitmen Pelayanan ───────────────────────────────── */}
-      <section className="border-b border-border bg-surface py-20 sm:py-28">
+      {/* ── Pilar Komitmen Pelayanan (Editorial Numbered Strip) ───────── */}
+      <section className="border-b border-border bg-white py-14 sm:py-20">
         <div className="section-container">
           <Reveal>
-            <div className="mx-auto max-w-[68ch] text-center">
-              <span className="eyebrow bg-brand-50 text-brand-700">Pilar Pelayanan</span>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight text-heading sm:text-4xl">
-                Prinsip Tata Kelola Farmasi Daerah
-              </h2>
-              <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
-                Tiga pilar komitmen UPTD Instalasi Farmasi Kabupaten Kotabaru dalam memastikan
-                rantai pasok perbekalan farmasi yang andal, merata, dan aman.
+            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
+              <div>
+                <span className="eyebrow bg-brand-50 text-brand-700">Pilar Pelayanan</span>
+                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
+                  Prinsip Tata Kelola Farmasi Daerah
+                </h2>
+              </div>
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+                Landasan UPTD Instalasi Farmasi Kabupaten Kotabaru dalam memastikan rantai pasok
+                perbekalan farmasi yang andal, merata, dan bermutu tinggi.
               </p>
             </div>
           </Reveal>
 
-          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
+          {/* Kontainer tunggal editorial: divide-y di mobile, 3 kolom di desktop */}
+          <div className="mt-6 sm:mt-8 divide-y divide-border rounded-2xl border border-border bg-surface lg:grid lg:grid-cols-3 lg:divide-x lg:divide-y-0 shadow-xs">
             {pillars.map((pillar, i) => (
-              <Reveal key={pillar.tag} delay={80 + i * 80} className="block">
-                <div className="group relative flex h-full flex-col justify-between rounded-2xl border border-border bg-white p-7 shadow-xs transition-all duration-300 ease-luxe hover:-translate-y-1 hover:border-brand-200 hover:shadow-md">
+              <Reveal key={pillar.tag} delay={80 + i * 80} className="block h-full">
+                <div className="group flex h-full flex-col justify-between p-5 sm:p-7 lg:p-8 transition-colors duration-300 hover:bg-white">
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors duration-300 group-hover:bg-brand-600 group-hover:text-white">
-                        <pillar.icon className="h-6 w-6" strokeWidth={1.5} />
+                      <span className="font-mono text-xs font-bold tracking-widest text-brand-700 bg-brand-100/70 px-2 py-0.5 rounded-md">
+                        0{i + 1}
                       </span>
-                      <span className="font-mono text-xs font-semibold tracking-wider uppercase text-brand-700/80">
+                      <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted">
                         {pillar.tag}
                       </span>
                     </div>
-                    <h3 className="mt-5 text-lg font-bold tracking-tight text-heading sm:text-xl">
-                      {pillar.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
+
+                    <div className="mt-4 flex items-center gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white border border-border text-brand-700 shadow-xs transition-colors group-hover:border-brand-300 group-hover:bg-brand-50">
+                        <pillar.icon className="h-4 w-4" strokeWidth={1.75} />
+                      </span>
+                      <h3 className="text-base sm:text-lg font-bold tracking-tight text-heading">
+                        {pillar.title}
+                      </h3>
+                    </div>
+
+                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-muted">
                       {pillar.desc}
                     </p>
                   </div>
