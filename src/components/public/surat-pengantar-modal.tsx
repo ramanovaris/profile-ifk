@@ -9,7 +9,6 @@ import {
   Check,
   Building2,
   Info,
-  ExternalLink,
 } from "lucide-react";
 
 const emptySubscribe = () => () => {};
