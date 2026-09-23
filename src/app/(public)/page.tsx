@@ -1,6 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Building2, ShieldCheck, Clock, Pill } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  ShieldCheck,
+  Pill,
+  Compass,
+  Users,
+  PackageCheck,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
@@ -10,9 +18,30 @@ import { placeholderImage } from "@/lib/placeholder";
 import { getSiteSettings } from "@/actions/setting";
 
 const stats = [
-  { icon: Building2, value: "28 Faskes", label: "Jaringan Kesehatan Binaan" },
-  { icon: ShieldCheck, value: "100%", label: "Standar Mutu Terjamin" },
-  { icon: Clock, value: "Tepat Waktu", label: "Pengiriman Tepat Waktu" },
+  { icon: Building2, value: "30 Faskes", label: "28 Puskesmas & 2 RSUD" },
+  { icon: Compass, value: "45 Pulau", label: "Jangkauan Kepulauan" },
+  { icon: Users, value: "334 Ribu+", label: "Masyarakat Terlayani" },
+] as const;
+
+const pillars = [
+  {
+    icon: PackageCheck,
+    tag: "Availability",
+    title: "Ketersediaan Pasti",
+    desc: "Menjamin ketersediaan obat esensial, vaksin, dan BMHP secara berkesinambungan dengan buffer stock 6 bulan untuk kebutuhan pelayanan kesehatan.",
+  },
+  {
+    icon: Compass,
+    tag: "Equity",
+    title: "Pemerataan Berkeadilan",
+    desc: "Distribusi logistik kefarmasian merata dan berkesinambungan ke 28 Puskesmas di wilayah daratan maupun gugusan pulau terpencil Kabupaten Kotabaru.",
+  },
+  {
+    icon: ShieldCheck,
+    tag: "Quality & Safety",
+    title: "Jaminan Mutu & Keamanan",
+    desc: "Penyimpanan berstandar CDOB, rantai dingin (cold chain 2°C–8°C) terkalibrasi, serta sistem relokasi aktif untuk mencegah risiko kedaluwarsa.",
+  },
 ] as const;
 
 export default async function HomePage() {
@@ -107,8 +136,8 @@ export default async function HomePage() {
               </h1>
               <p className="mt-4 max-w-[54ch] text-[15px] leading-relaxed text-zinc-400 lg:mt-7 lg:text-lg">
                 <span className="font-medium text-zinc-100">Melayani dengan Integritas.</span>{" "}
-                Menjamin mutu obat untuk kesehatan masyarakat — distribusi kefarmasian tepat
-                waktu, tepat mutu, ke seluruh fasilitas kesehatan binaan.
+                Menjamin ketersediaan dan mutu perbekalan farmasi bagi 334 ribu lebih masyarakat di
+                seluruh penjuru daratan hingga kepulauan Kabupaten Kotabaru.
               </p>
 
               <div className="mt-5 flex flex-wrap items-center gap-2.5 sm:gap-3 lg:mt-10">
@@ -214,6 +243,49 @@ export default async function HomePage() {
           <span className="relative h-6 w-px overflow-hidden bg-white/10 md:h-12">
             <span className="scroll-line absolute inset-0 bg-brand-400" aria-hidden />
           </span>
+        </div>
+      </section>
+
+      {/* ── Pilar Komitmen Pelayanan ───────────────────────────────── */}
+      <section className="border-b border-border bg-surface py-20 sm:py-28">
+        <div className="section-container">
+          <Reveal>
+            <div className="mx-auto max-w-[68ch] text-center">
+              <span className="eyebrow bg-brand-50 text-brand-700">Pilar Pelayanan</span>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight text-heading sm:text-4xl">
+                Prinsip Tata Kelola Farmasi Daerah
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
+                Tiga pilar komitmen UPTD Instalasi Farmasi Kabupaten Kotabaru dalam memastikan
+                rantai pasok perbekalan farmasi yang andal, merata, dan aman.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
+            {pillars.map((pillar, i) => (
+              <Reveal key={pillar.tag} delay={80 + i * 80} className="block">
+                <div className="group relative flex h-full flex-col justify-between rounded-2xl border border-border bg-white p-7 shadow-xs transition-all duration-300 ease-luxe hover:-translate-y-1 hover:border-brand-200 hover:shadow-md">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition-colors duration-300 group-hover:bg-brand-600 group-hover:text-white">
+                        <pillar.icon className="h-6 w-6" strokeWidth={1.5} />
+                      </span>
+                      <span className="font-mono text-xs font-semibold tracking-wider uppercase text-brand-700/80">
+                        {pillar.tag}
+                      </span>
+                    </div>
+                    <h3 className="mt-5 text-lg font-bold tracking-tight text-heading sm:text-xl">
+                      {pillar.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted">
+                      {pillar.desc}
+                    </p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
