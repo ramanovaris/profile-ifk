@@ -227,28 +227,30 @@ export default async function ProfilPage() {
 
           {/* Visi */}
           <Reveal delay={80} className="mt-12 block">
-            <h3 className="text-lg font-semibold text-muted">Visi</h3>
-            <p className="mt-4 max-w-[65ch] text-base italic leading-relaxed text-heading">
-              {settings.vision}
-            </p>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-brand-700">Visi</h3>
+            <div className="mt-3 border-l-2 border-brand-500 pl-4 sm:pl-5">
+              <p className="max-w-[70ch] text-base sm:text-lg font-medium leading-relaxed text-zinc-900">
+                &ldquo;{settings.vision}&rdquo;
+              </p>
+            </div>
           </Reveal>
 
           {/* Misi */}
-          <div className="mt-16">
+          <div className="mt-14">
             <Reveal delay={160} className="block">
-              <h3 className="text-lg font-semibold text-muted">Misi</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-brand-700">Misi</h3>
             </Reveal>
             <div className="mt-6 grid gap-6 sm:grid-cols-2">
               {missionItems.map((item, i) => (
                 <Reveal key={i} delay={240 + i * 60} className="block">
                   <div className="flex items-start gap-4 border-t border-border pt-4">
                     <span
-                      className="shrink-0 text-4xl font-bold text-brand-200"
+                      className="shrink-0 mt-0.5 font-mono text-xs font-bold text-brand-700 bg-brand-50 border border-brand-200/60 px-2 py-1 rounded-md"
                       aria-hidden="true"
                     >
-                      {i + 1}
+                      {String(i + 1).padStart(2, "0")}
                     </span>
-                    <p className="text-sm leading-relaxed text-muted">{item}</p>
+                    <p className="text-sm sm:text-base leading-relaxed text-zinc-800">{item}</p>
                   </div>
                 </Reveal>
               ))}
