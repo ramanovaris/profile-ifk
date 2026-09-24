@@ -257,7 +257,7 @@ export default async function HomePage() {
                   Prinsip Tata Kelola Farmasi Daerah
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Landasan UPTD Instalasi Farmasi Kabupaten Kotabaru dalam memastikan rantai pasok
                 perbekalan farmasi yang andal, merata, dan bermutu tinggi.
               </p>
@@ -274,7 +274,7 @@ export default async function HomePage() {
                       <span className="font-mono text-xs font-bold tracking-widest text-brand-700 bg-brand-100/70 px-2 py-0.5 rounded-md">
                         0{i + 1}
                       </span>
-                      <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted">
+                      <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-600">
                         {pillar.tag}
                       </span>
                     </div>
@@ -288,7 +288,7 @@ export default async function HomePage() {
                       </h3>
                     </div>
 
-                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-muted">
+                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-zinc-700">
                       {pillar.desc}
                     </p>
                   </div>
@@ -310,7 +310,7 @@ export default async function HomePage() {
                 <h2 className="mt-4 text-4xl font-bold tracking-tighter text-heading sm:text-5xl">
                   Layanan Farmasi
                 </h2>
-                <p className="mt-4 max-w-[55ch] text-base leading-relaxed text-muted">
+                <p className="mt-4 max-w-[55ch] text-base leading-relaxed text-zinc-700">
                   Standar pelayanan dan alur distribusi obat ke seluruh faskes binaan Kabupaten
                   Kotabaru.
                 </p>
@@ -348,7 +348,7 @@ export default async function HomePage() {
                 <h2 className="mt-4 text-4xl font-bold tracking-tighter text-heading sm:text-5xl">
                   Berita &amp; Informasi
                 </h2>
-                <p className="mt-4 max-w-[55ch] text-base leading-relaxed text-muted">
+                <p className="mt-4 max-w-[55ch] text-base leading-relaxed text-zinc-700">
                   Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian.
                 </p>
                 <Link
@@ -423,7 +423,7 @@ export default async function HomePage() {
                     <h3 className="mt-3 text-2xl font-bold tracking-tight text-heading transition-colors duration-500 ease-luxe group-hover:text-brand-800">
                       {featuredArticle.title}
                     </h3>
-                    <p className="mt-2 font-mono text-xs text-muted">
+                    <p className="mt-2 font-mono text-xs text-zinc-500">
                       {new Date(featuredArticle.publishedAt).toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "long",
@@ -443,7 +443,7 @@ export default async function HomePage() {
                     className="group py-6 transition-transform duration-500 ease-luxe"
                   >
                     <div className="flex gap-4">
-                      <span className="shrink-0 pt-0.5 font-mono text-xs text-muted">
+                      <span className="shrink-0 pt-0.5 font-mono text-xs text-zinc-500 font-medium">
                         {new Date(article.publishedAt).toLocaleDateString("id-ID", {
                           month: "short",
                           day: "numeric",
