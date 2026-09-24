@@ -19,6 +19,9 @@ import {
   Share2,
   Megaphone,
   Network,
+  FileSpreadsheet,
+  BarChart3,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,9 +30,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { placeholderImage } from "@/lib/placeholder";
 import { cn, getAssetUrl } from "@/lib/utils";
-import { updateSiteIdentityAction, updateSiteProfileAction, updateSiteLinksAction } from "@/actions/setting";
+import {
+  updateSiteIdentityAction,
+  updateSiteProfileAction,
+  updateSiteLinksAction,
+  updateSiteServiceDocsAction,
+  updateSitePublicStatsAction,
+} from "@/actions/setting";
 
-type TabKey = "identitas" | "profil" | "tautan";
+type TabKey = "identitas" | "profil" | "tautan" | "dokumen" | "statistik";
 
 interface SettingsFormProps {
   initialSettings: SiteSetting;
@@ -93,6 +102,29 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     announcementText: initialSettings.announcementText || "",
   };
   const [linksForm, setLinksForm] = useState(initialLinks);
+
+  // ── Tab 4: Dokumen Layanan State ──────────────────────────────────────────
+  const initialDocs = {
+    lplpoUrl: initialSettings.lplpoUrl || "",
+    permintaanSewaktuUrl: initialSettings.permintaanSewaktuUrl || "",
+  };
+  const [docsForm, setDocsForm] = useState(initialDocs);
+
+  // ── Tab 5: Statistik & SDM State ──────────────────────────────────────────
+  const initialStats = {
+    statsFaskesCount: initialSettings.statsFaskesCount || "30 Faskes",
+    statsFaskesLabel: initialSettings.statsFaskesLabel || "28 Puskesmas & 2 RSUD",
+    statsPulauCount: initialSettings.statsPulauCount || "45 Pulau",
+    statsPulauLabel: initialSettings.statsPulauLabel || "Jangkauan Kepulauan",
+    statsMasyarakatCount: initialSettings.statsMasyarakatCount || "334 Ribu+",
+    statsMasyarakatLabel: initialSettings.statsMasyarakatLabel || "Masyarakat Terlayani",
+    sdmTotalCount: initialSettings.sdmTotalCount || "24 Orang",
+    sdmApotekerCount: initialSettings.sdmApotekerCount || "5 Orang",
+    sdmTtkCount: initialSettings.sdmTtkCount || "7 Orang",
+    sdmPendukungCount: initialSettings.sdmPendukungCount || "11 Orang",
+    saranaGudangLuas: initialSettings.saranaGudangLuas || "690 m²",
+  };
+  const [statsForm, setStatsForm] = useState(initialStats);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleIdentitySave = (e: FormEvent) => {
@@ -225,6 +257,40 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     toast.info("Form tautan layanan dikembalikan ke data default.");
   };
 
+  const handleDocsSave = (e: FormEvent) => {
+    e.preventDefault();
+    startTransition(async () => {
+      const res = await updateSiteServiceDocsAction(docsForm);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan tautan dokumen.");
+        return;
+      }
+      toast.success("Tautan dokumen layanan berhasil disimpan.");
+    });
+  };
+
+  const handleDocsReset = () => {
+    setDocsForm(initialDocs);
+    toast.info("Form tautan dokumen dikembalikan ke data awal.");
+  };
+
+  const handleStatsSave = (e: FormEvent) => {
+    e.preventDefault();
+    startTransition(async () => {
+      const res = await updateSitePublicStatsAction(statsForm);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan statistik & SDM.");
+        return;
+      }
+      toast.success("Statistik publik & SDM berhasil disimpan.");
+    });
+  };
+
+  const handleStatsReset = () => {
+    setStatsForm(initialStats);
+    toast.info("Form statistik dikembalikan ke data awal.");
+  };
+
   return (
     <div className="space-y-6">
       {/* Horizontal Segmented Tab Bar */}
@@ -269,6 +335,34 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         >
           <Link2 className="h-4 w-4" />
           <span>Tautan &amp; Layanan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("dokumen")}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
+            activeTab === "dokumen"
+              ? "border border-brand-500/30 bg-brand-500/15 font-semibold text-brand-300 shadow-sm shadow-brand-500/20"
+              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+          )}
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          <span>Dokumen Layanan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("statistik")}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
+            activeTab === "statistik"
+              ? "border border-brand-500/30 bg-brand-500/15 font-semibold text-brand-300 shadow-sm shadow-brand-500/20"
+              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+          )}
+        >
+          <BarChart3 className="h-4 w-4" />
+          <span>Statistik &amp; SDM</span>
         </button>
       </div>
 
@@ -968,6 +1062,317 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             >
               <Save className="h-4 w-4" />
               <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
+            </Button>
+          </div>
+        </form>
+      )}
+
+      {/* ── TAB 4: DOKUMEN LAYANAN ───────────────────────────────────────── */}
+      {activeTab === "dokumen" && (
+        <form onSubmit={handleDocsSave} className="space-y-6">
+          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
+
+            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+                <FileSpreadsheet className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-white">Tautan Dokumen &amp; Formulir Layanan</h2>
+                <p className="text-xs text-zinc-400">
+                  Kelola tautan Google Sheets atau Drive untuk formulir LPLPO rutin dan formulir permintaan sewaktu bagi Puskesmas.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 space-y-5">
+              {/* LPLPO */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="doc-lplpo" className="text-xs font-medium text-zinc-300">
+                    URL Formulir LPLPO (Lembar Permintaan &amp; Pemakaian Obat)
+                  </Label>
+                  {docsForm.lplpoUrl && (
+                    <a
+                      href={docsForm.lplpoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-brand-400 hover:text-brand-300 transition-colors"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      <span>Uji Buka Tautan</span>
+                    </a>
+                  )}
+                </div>
+                <Input
+                  id="doc-lplpo"
+                  type="url"
+                  value={docsForm.lplpoUrl}
+                  onChange={(e) => setDocsForm({ ...docsForm, lplpoUrl: e.target.value })}
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                />
+                <p className="text-[11px] text-zinc-500">
+                  Digunakan pada tombol &quot;Buka Dokumen Resmi&quot; kartu LPLPO di halaman <code>/layanan</code>.
+                </p>
+              </div>
+
+              {/* Permintaan Sewaktu */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="doc-sewaktu" className="text-xs font-medium text-zinc-300">
+                    URL Formulir Permintaan Sewaktu (Program &amp; Non-Program)
+                  </Label>
+                  {docsForm.permintaanSewaktuUrl && (
+                    <a
+                      href={docsForm.permintaanSewaktuUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-brand-400 hover:text-brand-300 transition-colors"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      <span>Uji Buka Tautan</span>
+                    </a>
+                  )}
+                </div>
+                <Input
+                  id="doc-sewaktu"
+                  type="url"
+                  value={docsForm.permintaanSewaktuUrl}
+                  onChange={(e) => setDocsForm({ ...docsForm, permintaanSewaktuUrl: e.target.value })}
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                />
+                <p className="text-[11px] text-zinc-500">
+                  Digunakan pada tombol &quot;Buka Dokumen Resmi&quot; kartu Permintaan Sewaktu di halaman <code>/layanan</code>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDocsReset}
+              className="gap-2 border-white/10 bg-zinc-800/60 text-zinc-300 transition-colors [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white active:scale-[0.98]"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Reset Form</span>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
+            >
+              <Save className="h-4 w-4" />
+              <span>{isPending ? "Menyimpan..." : "Simpan Dokumen"}</span>
+            </Button>
+          </div>
+        </form>
+      )}
+
+      {/* ── TAB 5: STATISTIK & SDM ───────────────────────────────────────── */}
+      {activeTab === "statistik" && (
+        <form onSubmit={handleStatsSave} className="space-y-6">
+          {/* Kartu Metrik Wilayah Beranda */}
+          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
+
+            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+                <BarChart3 className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-white">Indikator Wilayah Beranda</h2>
+                <p className="text-xs text-zinc-400">
+                  Tiga kartu metrik utama yang tampil pada bagian hero halaman depan portal publik.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 grid gap-6 sm:grid-cols-3">
+              {/* Metrik 1: Faskes */}
+              <div className="space-y-3 rounded-xl border border-white/5 bg-zinc-950/40 p-4">
+                <div className="text-xs font-semibold text-brand-400">Indikator 1 (Faskes)</div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-faskes-count" className="text-[11px] text-zinc-400">Jumlah / Angka</Label>
+                  <Input
+                    id="stat-faskes-count"
+                    value={statsForm.statsFaskesCount}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsFaskesCount: e.target.value })}
+                    placeholder="30 Faskes"
+                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-faskes-label" className="text-[11px] text-zinc-400">Keterangan Label</Label>
+                  <Input
+                    id="stat-faskes-label"
+                    value={statsForm.statsFaskesLabel}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsFaskesLabel: e.target.value })}
+                    placeholder="28 Puskesmas &amp; 2 RSUD"
+                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  />
+                </div>
+              </div>
+
+              {/* Metrik 2: Pulau */}
+              <div className="space-y-3 rounded-xl border border-white/5 bg-zinc-950/40 p-4">
+                <div className="text-xs font-semibold text-brand-400">Indikator 2 (Pulau)</div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-pulau-count" className="text-[11px] text-zinc-400">Jumlah / Angka</Label>
+                  <Input
+                    id="stat-pulau-count"
+                    value={statsForm.statsPulauCount}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsPulauCount: e.target.value })}
+                    placeholder="45 Pulau"
+                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-pulau-label" className="text-[11px] text-zinc-400">Keterangan Label</Label>
+                  <Input
+                    id="stat-pulau-label"
+                    value={statsForm.statsPulauLabel}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsPulauLabel: e.target.value })}
+                    placeholder="Jangkauan Kepulauan"
+                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  />
+                </div>
+              </div>
+
+              {/* Metrik 3: Masyarakat */}
+              <div className="space-y-3 rounded-xl border border-white/5 bg-zinc-950/40 p-4">
+                <div className="text-xs font-semibold text-brand-400">Indikator 3 (Masyarakat)</div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-masyarakat-count" className="text-[11px] text-zinc-400">Jumlah / Angka</Label>
+                  <Input
+                    id="stat-masyarakat-count"
+                    value={statsForm.statsMasyarakatCount}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsMasyarakatCount: e.target.value })}
+                    placeholder="334 Ribu+"
+                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-masyarakat-label" className="text-[11px] text-zinc-400">Keterangan Label</Label>
+                  <Input
+                    id="stat-masyarakat-label"
+                    value={statsForm.statsMasyarakatLabel}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsMasyarakatLabel: e.target.value })}
+                    placeholder="Masyarakat Terlayani"
+                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Kartu Komposisi SDM & Fasilitas Profil */}
+          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-white">Ketenagaan SDM &amp; Fasilitas Gudang</h2>
+                <p className="text-xs text-zinc-400">
+                  Statistik jumlah personel farmasi dan luasan gudang pada halaman Profil lembaga.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="space-y-2">
+                <Label htmlFor="sdm-total" className="text-xs font-medium text-zinc-300">
+                  Total SDM Keseluruhan
+                </Label>
+                <Input
+                  id="sdm-total"
+                  value={statsForm.sdmTotalCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmTotalCount: e.target.value })}
+                  placeholder="24 Orang"
+                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sdm-apoteker" className="text-xs font-medium text-zinc-300">
+                  Tenaga Apoteker
+                </Label>
+                <Input
+                  id="sdm-apoteker"
+                  value={statsForm.sdmApotekerCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmApotekerCount: e.target.value })}
+                  placeholder="5 Orang"
+                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sdm-ttk" className="text-xs font-medium text-zinc-300">
+                  Tenaga Teknis (TTK)
+                </Label>
+                <Input
+                  id="sdm-ttk"
+                  value={statsForm.sdmTtkCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmTtkCount: e.target.value })}
+                  placeholder="7 Orang"
+                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sdm-pendukung" className="text-xs font-medium text-zinc-300">
+                  Tenaga Pendukung / Operasional
+                </Label>
+                <Input
+                  id="sdm-pendukung"
+                  value={statsForm.sdmPendukungCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmPendukungCount: e.target.value })}
+                  placeholder="11 Orang"
+                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                />
+              </div>
+
+              <div className="space-y-2 sm:col-span-2 lg:col-span-4">
+                <Label htmlFor="sarana-luas" className="text-xs font-medium text-zinc-300">
+                  Kapasitas / Luas Gudang Farmasi
+                </Label>
+                <Input
+                  id="sarana-luas"
+                  value={statsForm.saranaGudangLuas}
+                  onChange={(e) => setStatsForm({ ...statsForm, saranaGudangLuas: e.target.value })}
+                  placeholder="690 m²"
+                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100 max-w-sm"
+                />
+                <p className="text-[11px] text-zinc-500">
+                  Tampil pada kartu &quot;Gudang Farmasi&quot; di seksi Sarana &amp; Fasilitas Gudang.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleStatsReset}
+              className="gap-2 border-white/10 bg-zinc-800/60 text-zinc-300 transition-colors [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white active:scale-[0.98]"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Reset Form</span>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
+            >
+              <Save className="h-4 w-4" />
+              <span>{isPending ? "Menyimpan..." : "Simpan Statistik"}</span>
             </Button>
           </div>
         </form>
