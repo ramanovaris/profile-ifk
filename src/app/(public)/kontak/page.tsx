@@ -104,7 +104,7 @@ export default async function KontakPage() {
                           </a>
                         ) : (
                           <p
-                            className={`mt-1 ${item.pre ? "whitespace-pre-line" : ""} text-sm text-muted`}
+                            className={`mt-1 ${item.pre ? "whitespace-pre-line" : ""} text-sm text-zinc-700`}
                           >
                             {item.value}
                           </p>

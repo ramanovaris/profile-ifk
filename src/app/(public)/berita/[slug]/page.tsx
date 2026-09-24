@@ -187,7 +187,7 @@ export default async function BeritaDetailPage(props: {
               {title}
             </h1>
 
-            <div className="mt-5 flex flex-wrap items-center gap-y-2 text-sm text-muted">
+            <div className="mt-5 flex flex-wrap items-center gap-y-2 text-sm text-zinc-600">
               <div className="flex items-center gap-2 font-medium text-zinc-800">
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-50 border border-brand-200 text-[11px] font-semibold text-brand-700">
                   {authorName.charAt(0).toUpperCase()}
@@ -302,7 +302,7 @@ export default async function BeritaDetailPage(props: {
                         <h3 className="line-clamp-2 text-base font-semibold text-heading group-hover:text-brand-800 transition-colors">
                           {a.title}
                         </h3>
-                        <p className="mt-2 font-mono text-xs text-muted">
+                        <p className="mt-2 font-mono text-xs text-zinc-500">
                           {new Date(a.publishedAt).toLocaleDateString("id-ID", {
                             day: "numeric",
                             month: "long",
