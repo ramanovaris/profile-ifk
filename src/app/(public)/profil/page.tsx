@@ -204,8 +204,8 @@ export default async function ProfilPage() {
                 <p className="text-sm font-semibold text-brand-700">
                   {settings.headName}
                 </p>
-                <p className="text-xs text-muted">{settings.headRole}</p>
-                <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted">
+                <p className="text-xs font-medium text-zinc-600">{settings.headRole}</p>
+                <div className="mt-4 space-y-4 text-sm sm:text-base leading-relaxed text-zinc-700">
                   {greetingParagraphs.map((p, idx) => (
                     <p key={idx}>{p}</p>
                   ))}
@@ -269,7 +269,7 @@ export default async function ProfilPage() {
           </Reveal>
 
           <Reveal delay={80} className="mt-12 block">
-            <div className="space-y-4 max-w-[75ch] text-sm leading-relaxed text-muted">
+            <div className="space-y-4 max-w-[75ch] text-sm sm:text-base leading-relaxed text-zinc-700">
               {tupoksiParagraphs.map((p, idx) => (
                 <p key={idx}>{p}</p>
               ))}
@@ -306,7 +306,7 @@ export default async function ProfilPage() {
                   Sumber Daya Manusia
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Didukung oleh 24 personel tenaga kefarmasian profesional dan tenaga pendukung
                 teknis yang berdedikasi menjaga ketahanan rantai pasok obat Kabupaten Kotabaru.
               </p>
@@ -324,7 +324,7 @@ export default async function ProfilPage() {
                   <h3 className="text-lg font-bold text-heading sm:text-xl">
                     Total 24 Personel Aktif
                   </h3>
-                  <p className="text-xs sm:text-sm text-muted">
+                  <p className="text-xs sm:text-sm text-zinc-600">
                     Kepala UPTD, Tenaga Fungsional Kefarmasian, dan Tenaga Teknis Operasional
                   </p>
                 </div>
@@ -363,7 +363,7 @@ export default async function ProfilPage() {
                     <h3 className="mt-5 text-base sm:text-lg font-bold tracking-tight text-heading">
                       {item.role}
                     </h3>
-                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted">
+                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-zinc-700">
                       {item.desc}
                     </p>
                   </div>
@@ -385,7 +385,7 @@ export default async function ProfilPage() {
                   Siklus Pengelolaan Perbekalan Farmasi
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Empat tahapan terpadu dalam tata kelola logistik kefarmasian UPTD IFK Kotabaru untuk menjamin
                 efektivitas, mutu, dan kesinambungan ketersediaan obat.
               </p>
@@ -411,7 +411,7 @@ export default async function ProfilPage() {
                       {item.title}
                     </h3>
 
-                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted">
+                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-zinc-700">
                       {item.desc}
                     </p>
                   </div>
@@ -433,7 +433,7 @@ export default async function ProfilPage() {
                   Perencanaan Obat (RKO) &amp; Penganggaran
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Penyusunan Rencana Kebutuhan Obat (RKO) secara ilmiah, transparan, dan terkoordinasi
                 lintas sumber pembiayaan daerah maupun nasional.
               </p>
@@ -453,7 +453,7 @@ export default async function ProfilPage() {
                       <h3 className="text-lg font-bold text-heading">
                         Metodologi Analisis RKO
                       </h3>
-                      <p className="text-xs text-muted">Pendekatan saintifik perhitungan kebutuhan</p>
+                      <p className="text-xs text-zinc-600">Pendekatan saintifik perhitungan kebutuhan</p>
                     </div>
                   </div>
 
@@ -465,7 +465,7 @@ export default async function ProfilPage() {
                         </span>
                         <div>
                           <h4 className="text-sm font-semibold text-heading">{m.title}</h4>
-                          <p className="mt-0.5 text-xs sm:text-sm leading-relaxed text-muted">{m.desc}</p>
+                          <p className="mt-0.5 text-xs sm:text-sm leading-relaxed text-zinc-700">{m.desc}</p>
                         </div>
                       </div>
                     ))}
@@ -486,7 +486,7 @@ export default async function ProfilPage() {
                       <h3 className="text-lg font-bold text-heading">
                         Sinergi Sumber Pembiayaan
                       </h3>
-                      <p className="text-xs text-muted">Pengalokasian pos anggaran pengadaan perbekalan</p>
+                      <p className="text-xs text-zinc-600">Pengalokasian pos anggaran pengadaan perbekalan</p>
                     </div>
                   </div>
 
@@ -500,7 +500,7 @@ export default async function ProfilPage() {
                               {f.tag}
                             </span>
                           </div>
-                          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-muted">{f.desc}</p>
+                          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-zinc-700">{f.desc}</p>
                         </div>
                       </div>
                     ))}
@@ -523,7 +523,7 @@ export default async function ProfilPage() {
                   Satu Pintu &amp; Relokasi Aktif
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Strategi pengendalian terpusat untuk menjaga pemerataan stok, mencegah pemborosan obat,
                 dan mengeliminasi risiko kekosongan di faskes binaan.
               </p>
@@ -538,14 +538,14 @@ export default async function ProfilPage() {
                     <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-border text-brand-700 transition-colors group-hover:bg-brand-600 group-hover:text-white">
                       <GitMerge className="h-6 w-6" strokeWidth={1.5} />
                     </span>
-                    <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted">
+                    <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-600">
                       One Gate Policy
                     </span>
                   </div>
                   <h3 className="mt-5 text-lg font-bold tracking-tight text-heading sm:text-xl">
                     Kebijakan Distribusi Satu Pintu
                   </h3>
-                  <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted">
+                  <p className="mt-2 text-xs sm:text-sm leading-relaxed text-zinc-700">
                     Seluruh perbekalan farmasi dari anggaran daerah maupun dropping program pusat dikelola
                     satu pintu melalui UPTD Instalasi Farmasi guna menjamin tertib administrasi, standardisasi
                     penyimpanan, dan pengawasan mutu rantai dingin yang ketat.
@@ -561,14 +561,14 @@ export default async function ProfilPage() {
                     <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-border text-brand-700 transition-colors group-hover:bg-brand-600 group-hover:text-white">
                       <ArrowLeftRight className="h-6 w-6" strokeWidth={1.5} />
                     </span>
-                    <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted">
+                    <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-600">
                       Buffer &amp; Mutasi
                     </span>
                   </div>
                   <h3 className="mt-5 text-lg font-bold tracking-tight text-heading sm:text-xl">
                     Sistem Relokasi Antar-Puskesmas
                   </h3>
-                  <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted">
+                  <p className="mt-2 text-xs sm:text-sm leading-relaxed text-zinc-700">
                     Pemantauan ketersediaan secara aktif memfasilitasi relokasi perbekalan antarfaskes
                     apabila terjadi ketimpangan tren pemakaian. Sistem ini efektif mencegah penumpukan obat
                     kedaluwarsa (dead stock) dan mengamankan faskes dari risiko kekosongan obat.
@@ -591,7 +591,7 @@ export default async function ProfilPage() {
                   Sarana &amp; Fasilitas Gudang
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Fasilitas penyimpanan terstandarisasi, sistem pendingin bersertifikasi, dan pengawasan
                 berkelanjutan untuk menjaga stabilitas perbekalan farmasi.
               </p>
@@ -607,14 +607,14 @@ export default async function ProfilPage() {
                       <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-600 group-hover:text-white">
                         <facility.icon className="h-6 w-6" strokeWidth={1.5} />
                       </span>
-                      <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted">
+                      <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-600">
                         {facility.tag}
                       </span>
                     </div>
                     <h3 className="mt-5 text-lg font-bold tracking-tight text-heading sm:text-xl">
                       {facility.title}
                     </h3>
-                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted">
+                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-zinc-700">
                       {facility.desc}
                     </p>
                   </div>
