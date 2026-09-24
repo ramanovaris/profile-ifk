@@ -114,7 +114,7 @@ export default function LayananPage() {
                   Mekanisme Pengajuan Permintaan
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Dua opsi alur resmi bagi Puskesmas dan fasilitas kesehatan jejaring untuk pengajuan
                 LPLPO berkala maupun perbekalan insidental sewaktu.
               </p>
@@ -136,7 +136,7 @@ export default function LayananPage() {
                         <h3 className="text-base sm:text-lg font-bold text-heading">
                           Jalur Berkas Fisik (Hardcopy)
                         </h3>
-                        <p className="text-xs text-muted">Penomoran langsung di TU Dinas Kesehatan</p>
+                        <p className="text-xs text-zinc-600">Penomoran langsung di TU Dinas Kesehatan</p>
                       </div>
                     </div>
                     <span className="font-mono text-[10px] font-semibold uppercase text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-200/60">
@@ -152,14 +152,14 @@ export default function LayananPage() {
                         </span>
                         <div>
                           <h4 className="text-sm font-semibold text-heading">{step.title}</h4>
-                          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-muted">{step.desc}</p>
+                          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-zinc-700">{step.desc}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs text-muted">
+                <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs text-zinc-600">
                   <CheckCircle2 className="h-4 w-4 text-brand-600 shrink-0" />
                   <span>Membawa 1 rangkap ke IFK dan 1 rangkap arsip disposisi Dinkes.</span>
                 </div>
@@ -179,7 +179,7 @@ export default function LayananPage() {
                         <h3 className="text-base sm:text-lg font-bold text-heading">
                           Jalur Digital Cepat (WhatsApp)
                         </h3>
-                        <p className="text-xs text-muted">Verifikasi digital &amp; konfirmasi H-1</p>
+                        <p className="text-xs text-zinc-600">Verifikasi digital &amp; konfirmasi H-1</p>
                       </div>
                     </div>
                     <span className="font-mono text-[10px] font-semibold uppercase text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md border border-brand-200/60">
@@ -195,14 +195,14 @@ export default function LayananPage() {
                         </span>
                         <div>
                           <h4 className="text-sm font-semibold text-heading">{step.title}</h4>
-                          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-muted">{step.desc}</p>
+                          <p className="mt-1 text-xs sm:text-sm leading-relaxed text-zinc-700">{step.desc}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs text-muted">
+                <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-xs text-zinc-600">
                   <Clock className="h-4 w-4 text-brand-600 shrink-0" />
                   <span>Pengiriman berkas PDF minimal H-1 sebelum pengambilan fisik perbekalan.</span>
                 </div>
@@ -227,7 +227,7 @@ export default function LayananPage() {
                         Wajib
                       </span>
                     </div>
-                    <p className="mt-1 text-xs sm:text-sm leading-relaxed text-muted max-w-[85ch]">
+                    <p className="mt-1 text-xs sm:text-sm leading-relaxed text-zinc-700 max-w-[85ch]">
                       Untuk perbekalan program nasional seperti <strong>Imunisasi (Vaksin), HIV-Sifilis, Hepatitis, Malaria, Tuberkulosis (TB), VAR (Anti-Rabies), dan PKG</strong>, pemesanan wajib terdaftar dan diproses melalui platform digital <strong>SMILE</strong> sebelum penyerahan fisik perbekalan di gudang IFK.
                     </p>
                   </div>
@@ -249,7 +249,7 @@ export default function LayananPage() {
                   Formulir &amp; Format Resmi
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Akses dan unduh formulir standar dinas untuk pengajuan distribusi LPLPO rutin maupun
                 kebutuhan perbekalan sewaktu.
               </p>
@@ -275,7 +275,7 @@ export default function LayananPage() {
                     </h3>
                     <p className="text-xs font-medium text-brand-700">{item.subtitle}</p>
 
-                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-muted">
+                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-zinc-700">
                       {item.desc}
                     </p>
                   </div>
@@ -313,7 +313,7 @@ export default function LayananPage() {
                   Standar Mutu &amp; Penyimpanan
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Protokol ketat penjagaan mutu sediaan farmasi selama masa simpan di instalasi
                 hingga didistribusikan ke fasilitas pelayanan kesehatan.
               </p>
@@ -330,7 +330,7 @@ export default function LayananPage() {
                   <item.icon className="h-10 w-10 shrink-0 text-brand-600" strokeWidth={1.5} />
                   <div>
                     <h3 className="font-semibold text-heading">{item.title}</h3>
-                    <p className="mt-1 text-xs sm:text-sm text-muted leading-relaxed">{item.desc}</p>
+                    <p className="mt-1 text-xs sm:text-sm text-zinc-700 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               </Reveal>
@@ -350,7 +350,7 @@ export default function LayananPage() {
                   Penanganan Obat Rusak &amp; Kedaluwarsa
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Tata cara pelaporan, pengembalian, dan karantina perbekalan farmasi rusak atau kedaluwarsa
                 dari fasilitas kesehatan untuk dimusnahkan sesuai regulasi.
               </p>
@@ -418,7 +418,7 @@ export default function LayananPage() {
                   Jam Pelayanan
                 </h2>
               </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-muted">
+              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
                 Jadwal resmi pelayanan administrasi, penerimaan berkas permohonan, dan pengambilan fisik
                 perbekalan farmasi di UPTD Instalasi Farmasi.
               </p>
@@ -430,10 +430,10 @@ export default function LayananPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-surface/50 font-mono">
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-muted">
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600">
                       Hari Pelayanan
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-muted">
+                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-zinc-600">
                       Jam Kerja
                     </th>
                   </tr>
@@ -441,13 +441,13 @@ export default function LayananPage() {
                 <tbody className="divide-y divide-border">
                   <tr className="transition-colors hover:bg-surface/30">
                     <td className="px-6 py-4 font-medium text-heading">Senin — Kamis</td>
-                    <td className="px-6 py-4 text-right font-mono text-muted">08.00 — 16.30 WITA</td>
+                    <td className="px-6 py-4 text-right font-mono text-zinc-700 font-medium">08.00 — 16.30 WITA</td>
                   </tr>
                   <tr className="transition-colors hover:bg-surface/30">
                     <td className="px-6 py-4 font-medium text-heading">Jumat</td>
-                    <td className="px-6 py-4 text-right font-mono text-muted">08.00 — 11.00 WITA</td>
+                    <td className="px-6 py-4 text-right font-mono text-zinc-700 font-medium">08.00 — 11.00 WITA</td>
                   </tr>
-                  <tr className="bg-surface/30 text-xs text-muted">
+                  <tr className="bg-surface/30 text-xs text-zinc-600">
                     <td className="px-6 py-3 italic" colSpan={2}>
                       * Sabtu, Minggu, dan Hari Libur Nasional tutup (kecuali kondisi darurat / KLB).
                     </td>
