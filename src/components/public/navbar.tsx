@@ -70,8 +70,8 @@ export function Navbar({ settings }: NavbarProps = {}) {
                     className={cn(
                       "rounded-full px-3 py-1.5 text-sm transition-all duration-300 ease-luxe whitespace-nowrap",
                       isActive
-                        ? "bg-black/5 font-medium text-heading"
-                        : "text-muted hover:text-heading"
+                        ? "bg-black/5 font-semibold text-heading"
+                        : "font-medium text-zinc-700 hover:text-heading"
                     )}
                   >
                     {link.label}
@@ -120,7 +120,7 @@ export function Navbar({ settings }: NavbarProps = {}) {
                   onClick={() => setOpen(false)}
                   className={cn(
                     "rounded-xl px-4 py-3 text-sm font-medium",
-                    isActive ? "bg-black/5 text-heading" : "text-muted hover:bg-black/5 hover:text-heading"
+                    isActive ? "bg-black/5 font-semibold text-heading" : "text-zinc-700 hover:bg-black/5 hover:text-heading"
                   )}
                 >
                   {link.label}
