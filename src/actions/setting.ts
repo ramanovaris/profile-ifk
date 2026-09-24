@@ -33,6 +33,25 @@ export interface UpdateLinksInput {
   announcementText: string;
 }
 
+export interface UpdateServiceDocsInput {
+  lplpoUrl: string;
+  permintaanSewaktuUrl: string;
+}
+
+export interface UpdatePublicStatsInput {
+  statsFaskesCount: string;
+  statsFaskesLabel: string;
+  statsPulauCount: string;
+  statsPulauLabel: string;
+  statsMasyarakatCount: string;
+  statsMasyarakatLabel: string;
+  sdmTotalCount: string;
+  sdmApotekerCount: string;
+  sdmTtkCount: string;
+  sdmPendukungCount: string;
+  saranaGudangLuas: string;
+}
+
 export type SettingActionResult<T = SiteSetting> = {
   success: boolean;
   data?: T;
@@ -104,6 +123,21 @@ export const getSiteSettings = cache(async (): Promise<SiteSetting> => {
     vision: DEFAULT_VISION,
     mission: DEFAULT_MISSION,
     tupoksi: DEFAULT_TUPOKSI,
+    lplpoUrl:
+      "https://docs.google.com/spreadsheets/d/1ypgpgMjzoZiWWisXV5G_8lPwp6r4PXDI/edit?usp=drive_link&ouid=115052879703335488719&rtpof=true&sd=true",
+    permintaanSewaktuUrl:
+      "https://docs.google.com/spreadsheets/d/19Eilxy1uqE6JM45kY5b7ZMj0OlKP-I6H/edit?usp=sharing&ouid=115052879703335488719&rtpof=true&sd=true",
+    statsFaskesCount: "30 Faskes",
+    statsFaskesLabel: "28 Puskesmas & 2 RSUD",
+    statsPulauCount: "45 Pulau",
+    statsPulauLabel: "Jangkauan Kepulauan",
+    statsMasyarakatCount: "334 Ribu+",
+    statsMasyarakatLabel: "Masyarakat Terlayani",
+    sdmTotalCount: "24 Orang",
+    sdmApotekerCount: "5 Orang",
+    sdmTtkCount: "7 Orang",
+    sdmPendukungCount: "11 Orang",
+    saranaGudangLuas: "690 m²",
     updatedAt: new Date(),
   };
 });
@@ -504,6 +538,182 @@ export async function updateSiteLinksAction(
     return {
       success: false,
       error: "Terjadi kesalahan saat menyimpan pengaturan.",
+    };
+  }
+}
+
+/**
+ * Memperbarui tautan unduhan dokumen resmi layanan (LPLPO & Permintaan Sewaktu) di PostgreSQL.
+ * Memerlukan otentikasi sesi aktif dengan peran SUPER_ADMIN.
+ */
+export async function updateSiteServiceDocsAction(
+  data: UpdateServiceDocsInput
+): Promise<SettingActionResult> {
+  const auth = await getCurrentSession();
+  if (!auth) {
+    return {
+      success: false,
+      error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
+    };
+  }
+
+  if (auth.user.role !== "SUPER_ADMIN") {
+    return {
+      success: false,
+      error: "Hanya Super Admin yang berwenang mengubah dokumen layanan.",
+    };
+  }
+
+  const lplpoUrl = data.lplpoUrl?.trim() || "";
+  const permintaanSewaktuUrl = data.permintaanSewaktuUrl?.trim() || "";
+
+  const urlPattern = /^(https?:\/\/).+/;
+  if (lplpoUrl && !urlPattern.test(lplpoUrl)) {
+    return {
+      success: false,
+      error: "Format tautan Formulir LPLPO tidak valid. Gunakan format https://...",
+    };
+  }
+
+  if (permintaanSewaktuUrl && !urlPattern.test(permintaanSewaktuUrl)) {
+    return {
+      success: false,
+      error: "Format tautan Formulir Permintaan Sewaktu tidak valid. Gunakan format https://...",
+    };
+  }
+
+  try {
+    const updated = await db.siteSetting.upsert({
+      where: { id: "default" },
+      update: {
+        lplpoUrl,
+        permintaanSewaktuUrl,
+      },
+      create: {
+        id: "default",
+        name: siteConfig.name,
+        shortName: siteConfig.shortName,
+        tagline: siteConfig.tagline,
+        motto: siteConfig.motto,
+        address: siteConfig.address,
+        operationalHours: siteConfig.operationalHours,
+        phone: siteConfig.phone,
+        whatsappLink: siteConfig.whatsappLink,
+        email: siteConfig.email,
+        googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
+        sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+        lplpoUrl,
+        permintaanSewaktuUrl,
+      },
+    });
+
+    revalidatePath("/layanan");
+    revalidatePath("/admin/pengaturan");
+
+    return {
+      success: true,
+      data: updated,
+    };
+  } catch (err) {
+    console.error("[Settings] Gagal menyimpan tautan dokumen layanan:", err);
+    return {
+      success: false,
+      error: "Terjadi kesalahan saat menyimpan dokumen layanan.",
+    };
+  }
+}
+
+/**
+ * Memperbarui indikator wilayah beranda dan statistik ketenagaan SDM profil di PostgreSQL.
+ * Memerlukan otentikasi sesi aktif dengan peran SUPER_ADMIN.
+ */
+export async function updateSitePublicStatsAction(
+  data: UpdatePublicStatsInput
+): Promise<SettingActionResult> {
+  const auth = await getCurrentSession();
+  if (!auth) {
+    return {
+      success: false,
+      error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
+    };
+  }
+
+  if (auth.user.role !== "SUPER_ADMIN") {
+    return {
+      success: false,
+      error: "Hanya Super Admin yang berwenang mengubah statistik & SDM.",
+    };
+  }
+
+  const statsFaskesCount = data.statsFaskesCount?.trim() || "30 Faskes";
+  const statsFaskesLabel = data.statsFaskesLabel?.trim() || "28 Puskesmas & 2 RSUD";
+  const statsPulauCount = data.statsPulauCount?.trim() || "45 Pulau";
+  const statsPulauLabel = data.statsPulauLabel?.trim() || "Jangkauan Kepulauan";
+  const statsMasyarakatCount = data.statsMasyarakatCount?.trim() || "334 Ribu+";
+  const statsMasyarakatLabel = data.statsMasyarakatLabel?.trim() || "Masyarakat Terlayani";
+
+  const sdmTotalCount = data.sdmTotalCount?.trim() || "24 Orang";
+  const sdmApotekerCount = data.sdmApotekerCount?.trim() || "5 Orang";
+  const sdmTtkCount = data.sdmTtkCount?.trim() || "7 Orang";
+  const sdmPendukungCount = data.sdmPendukungCount?.trim() || "11 Orang";
+  const saranaGudangLuas = data.saranaGudangLuas?.trim() || "690 m²";
+
+  try {
+    const updated = await db.siteSetting.upsert({
+      where: { id: "default" },
+      update: {
+        statsFaskesCount,
+        statsFaskesLabel,
+        statsPulauCount,
+        statsPulauLabel,
+        statsMasyarakatCount,
+        statsMasyarakatLabel,
+        sdmTotalCount,
+        sdmApotekerCount,
+        sdmTtkCount,
+        sdmPendukungCount,
+        saranaGudangLuas,
+      },
+      create: {
+        id: "default",
+        name: siteConfig.name,
+        shortName: siteConfig.shortName,
+        tagline: siteConfig.tagline,
+        motto: siteConfig.motto,
+        address: siteConfig.address,
+        operationalHours: siteConfig.operationalHours,
+        phone: siteConfig.phone,
+        whatsappLink: siteConfig.whatsappLink,
+        email: siteConfig.email,
+        googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
+        sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+        statsFaskesCount,
+        statsFaskesLabel,
+        statsPulauCount,
+        statsPulauLabel,
+        statsMasyarakatCount,
+        statsMasyarakatLabel,
+        sdmTotalCount,
+        sdmApotekerCount,
+        sdmTtkCount,
+        sdmPendukungCount,
+        saranaGudangLuas,
+      },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/profil");
+    revalidatePath("/admin/pengaturan");
+
+    return {
+      success: true,
+      data: updated,
+    };
+  } catch (err) {
+    console.error("[Settings] Gagal menyimpan statistik publik & SDM:", err);
+    return {
+      success: false,
+      error: "Terjadi kesalahan saat menyimpan statistik publik & SDM.",
     };
   }
 }

@@ -17,12 +17,6 @@ import { db } from "@/lib/db";
 import { placeholderImage } from "@/lib/placeholder";
 import { getSiteSettings } from "@/actions/setting";
 
-const stats = [
-  { icon: Building2, value: "30 Faskes", label: "28 Puskesmas & 2 RSUD" },
-  { icon: Compass, value: "45 Pulau", label: "Jangkauan Kepulauan" },
-  { icon: Users, value: "334 Ribu+", label: "Masyarakat Terlayani" },
-] as const;
-
 const pillars = [
   {
     icon: PackageCheck,
@@ -46,6 +40,24 @@ const pillars = [
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
+
+  const stats = [
+    {
+      icon: Building2,
+      value: settings.statsFaskesCount || "30 Faskes",
+      label: settings.statsFaskesLabel || "28 Puskesmas & 2 RSUD",
+    },
+    {
+      icon: Compass,
+      value: settings.statsPulauCount || "45 Pulau",
+      label: settings.statsPulauLabel || "Jangkauan Kepulauan",
+    },
+    {
+      icon: Users,
+      value: settings.statsMasyarakatCount || "334 Ribu+",
+      label: settings.statsMasyarakatLabel || "Masyarakat Terlayani",
+    },
+  ];
 
   let latestArticles: Array<{
     id: string;

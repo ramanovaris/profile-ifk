@@ -29,27 +29,6 @@ import { getSiteSettings } from "@/actions/setting";
 import { OrgStructureViewer } from "@/components/public/org-structure-viewer";
 import { ColdRoomImageModal } from "@/components/public/cold-room-image-modal";
 
-const sdmCategories = [
-  {
-    role: "Tenaga Apoteker",
-    count: "5 Orang",
-    icon: Pill,
-    desc: "Penanggung jawab teknis kefarmasian, pengawasan mutu sediaan, perencanaan kebutuhan obat daerah (RKO), serta kepatuhan standar CDOB.",
-  },
-  {
-    role: "Tenaga Teknis Kefarmasian (TTK)",
-    count: "7 Orang",
-    icon: FlaskConical,
-    desc: "Pelaksanaan teknis tata kelola penyimpanan gudang, pengendalian kedaluwarsa sistem FEFO, verifikasi batch, dan penyiapan distribusi.",
-  },
-  {
-    role: "Tenaga Fungsional & Pendukung",
-    count: "11 Orang",
-    icon: UserCog,
-    desc: "Pengelolaan SIM logistik terintegrasi (e-Farmasi & SMILE), pemeliharaan elektromedis rantai dingin, tata usaha, serta pengamanan fasilitas.",
-  },
-] as const;
-
 const supplyCycle = [
   {
     step: "01",
@@ -113,29 +92,50 @@ const fundingSources = [
   },
 ] as const;
 
-const facilities = [
-  {
-    title: "Gudang Farmasi 690 m²",
-    tag: "Kapasitas Fisik",
-    icon: Warehouse,
-    desc: "Bangunan gudang penyimpanan utama seluas 690 m² (Sertifikat Hak Pakai No. 30) dengan tata letak palet dan rak terstandarisasi.",
-  },
-  {
-    title: "Pengamanan Narkotika & Psikotropika",
-    tag: "Double Lock System",
-    icon: Lock,
-    desc: "Lemari penyimpanan khusus berpintu ganda dengan mekanisme kunci ganda (double lock) dan pengawasan akses berkala sesuai regulasi.",
-  },
-  {
-    title: "SIM Logistik Terintegrasi",
-    tag: "Digital Logistik",
-    icon: Network,
-    desc: "Pencatatan dan pemantauan distribusi perbekalan secara real-time melalui integrasi aplikasi e-Farmasi Kemenkes RI dan aplikasi SMILE.",
-  },
-] as const;
-
 export default async function ProfilPage() {
   const settings = await getSiteSettings();
+
+  const sdmItems = [
+    {
+      role: "Tenaga Apoteker",
+      count: settings.sdmApotekerCount || "5 Orang",
+      icon: Pill,
+      desc: "Penanggung jawab teknis kefarmasian, pengawasan mutu sediaan, perencanaan kebutuhan obat daerah (RKO), serta kepatuhan standar CDOB.",
+    },
+    {
+      role: "Tenaga Teknis Kefarmasian (TTK)",
+      count: settings.sdmTtkCount || "7 Orang",
+      icon: FlaskConical,
+      desc: "Pelaksanaan teknis tata kelola penyimpanan gudang, pengendalian kedaluwarsa sistem FEFO, verifikasi batch, dan penyiapan distribusi.",
+    },
+    {
+      role: "Tenaga Fungsional & Pendukung",
+      count: settings.sdmPendukungCount || "11 Orang",
+      icon: UserCog,
+      desc: "Pengelolaan SIM logistik terintegrasi (e-Farmasi & SMILE), pemeliharaan elektromedis rantai dingin, tata usaha, serta pengamanan fasilitas.",
+    },
+  ];
+
+  const facilityItems = [
+    {
+      title: settings.saranaGudangLuas ? `Gudang Farmasi ${settings.saranaGudangLuas}` : "Gudang Farmasi 690 m²",
+      tag: "Kapasitas Fisik",
+      icon: Warehouse,
+      desc: `Bangunan gudang penyimpanan utama seluas ${settings.saranaGudangLuas || "690 m²"} (Sertifikat Hak Pakai No. 30) dengan tata letak palet dan rak terstandarisasi.`,
+    },
+    {
+      title: "Pengamanan Narkotika & Psikotropika",
+      tag: "Double Lock System",
+      icon: Lock,
+      desc: "Lemari penyimpanan khusus berpintu ganda dengan mekanisme kunci ganda (double lock) dan pengawasan akses berkala sesuai regulasi.",
+    },
+    {
+      title: "SIM Logistik Terintegrasi",
+      tag: "Digital Logistik",
+      icon: Network,
+      desc: "Pencatatan dan pemantauan distribusi perbekalan secara real-time melalui integrasi aplikasi e-Farmasi Kemenkes RI dan aplikasi SMILE.",
+    },
+  ];
 
   const headPhotoSrc = settings.headPhoto
     ? getAssetUrl(settings.headPhoto)
@@ -318,7 +318,7 @@ export default async function ProfilPage() {
                 </span>
                 <div>
                   <h3 className="text-lg font-bold text-heading sm:text-xl">
-                    Total 24 Personel Aktif
+                    Total {settings.sdmTotalCount || "24 Orang"} Personel Aktif
                   </h3>
                   <p className="text-xs sm:text-sm text-zinc-600">
                     Kepala UPTD, Tenaga Fungsional Kefarmasian, dan Tenaga Teknis Operasional
@@ -330,13 +330,13 @@ export default async function ProfilPage() {
                   1 Kepala UPTD
                 </span>
                 <span className="rounded-lg bg-white px-3 py-1.5 border border-brand-200/80 shadow-xs">
-                  5 Apoteker
+                  {settings.sdmApotekerCount ? (settings.sdmApotekerCount.toLowerCase().includes("apoteker") ? settings.sdmApotekerCount : `${settings.sdmApotekerCount.replace(/orang/i, "").trim()} Apoteker`) : "5 Apoteker"}
                 </span>
                 <span className="rounded-lg bg-white px-3 py-1.5 border border-brand-200/80 shadow-xs">
-                  7 Tenaga Teknis (TTK)
+                  {settings.sdmTtkCount ? (settings.sdmTtkCount.toLowerCase().includes("ttk") || settings.sdmTtkCount.toLowerCase().includes("teknis") ? settings.sdmTtkCount : `${settings.sdmTtkCount.replace(/orang/i, "").trim()} Tenaga Teknis (TTK)`) : "7 Tenaga Teknis (TTK)"}
                 </span>
                 <span className="rounded-lg bg-white px-3 py-1.5 border border-brand-200/80 shadow-xs">
-                  11 Staf Pendukung
+                  {settings.sdmPendukungCount ? (settings.sdmPendukungCount.toLowerCase().includes("pendukung") || settings.sdmPendukungCount.toLowerCase().includes("staf") ? settings.sdmPendukungCount : `${settings.sdmPendukungCount.replace(/orang/i, "").trim()} Staf Pendukung`) : "11 Staf Pendukung"}
                 </span>
               </div>
             </div>
@@ -344,7 +344,7 @@ export default async function ProfilPage() {
 
           {/* Grid Kategori SDM */}
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {sdmCategories.map((item, i) => (
+            {sdmItems.map((item, i) => (
               <Reveal key={item.role} delay={120 + i * 80} className="block h-full">
                 <div className="group flex h-full flex-col justify-between rounded-2xl border border-border bg-white p-6 sm:p-7 transition-all duration-300 ease-luxe hover:-translate-y-1 hover:border-brand-200 hover:shadow-sm">
                   <div>
@@ -658,7 +658,7 @@ export default async function ProfilPage() {
 
           {/* ── 3 Kartu Pendukung di Bawahnya ── */}
           <div className="mt-6 grid gap-6 sm:grid-cols-3">
-            {facilities.map((facility, i) => (
+            {facilityItems.map((facility, i) => (
               <Reveal key={facility.title} delay={160 + i * 80} className="block h-full">
                 <div className="group flex h-full flex-col justify-between rounded-2xl border border-border bg-white p-6 transition-all duration-300 ease-luxe hover:-translate-y-1 hover:border-brand-200 hover:shadow-xs">
                   <div>

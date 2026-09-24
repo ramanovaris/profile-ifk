@@ -16,6 +16,7 @@ import {
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
 import { SuratPengantarModalButton } from "@/components/public/surat-pengantar-modal";
+import { getSiteSettings } from "@/actions/setting";
 
 const hardcopySteps = [
   {
@@ -63,37 +64,53 @@ const softcopySteps = [
   },
 ] as const;
 
-const downloadTemplates = [
-  {
-    title: "Format LPLPO",
-    subtitle: "Lembar Permintaan & Pemakaian Obat",
-    tag: "Distribusi Berkala",
-    desc: "Formulir standar resmi pelaporan pemakaian dan permintaan rutin perbekalan farmasi faskes per periode distribusi.",
-    href: "https://docs.google.com/spreadsheets/d/1ypgpgMjzoZiWWisXV5G_8lPwp6r4PXDI/edit?usp=drive_link&ouid=115052879703335488719&rtpof=true&sd=true",
-    icon: FileSpreadsheet,
-    format: "Google Sheets / Excel",
-  },
-  {
-    title: "Format Permintaan Sewaktu",
-    subtitle: "Kategori Program & Non-Program",
-    tag: "Insidental / Cito",
-    desc: "Formulir baku pengajuan perbekalan insidental di luar siklus LPLPO rutin untuk kebutuhan program prioritas maupun non-program.",
-    href: "https://docs.google.com/spreadsheets/d/19Eilxy1uqE6JM45kY5b7ZMj0OlKP-I6H/edit?usp=sharing&ouid=115052879703335488719&rtpof=true&sd=true",
-    icon: FileSpreadsheet,
-    format: "Google Sheets / Excel",
-  },
-  {
-    title: "Pedoman Surat Pengantar",
-    subtitle: "Standar Naskah Dinas Faskes",
-    tag: "Tata Naskah Resmi",
-    desc: "Format standar kop surat dan pengantar dinas resmi dari pimpinan faskes kepada Dinas Kesehatan & UPTD Instalasi Farmasi.",
-    href: null,
-    icon: FileCheck,
-    format: "Dokumen Resmi Faskes",
-  },
-] as const;
+export default async function LayananPage() {
+  const settings = await getSiteSettings();
 
-export default function LayananPage() {
+  const downloadTemplates = [
+    {
+      title: "Format LPLPO",
+      subtitle: "Lembar Permintaan & Pemakaian Obat",
+      tag: "Distribusi Berkala",
+      desc: "Formulir standar resmi pelaporan pemakaian dan permintaan rutin perbekalan farmasi faskes per periode distribusi.",
+      href: settings.lplpoUrl || "https://docs.google.com/spreadsheets/d/1ypgpgMjzoZiWWisXV5G_8lPwp6r4PXDI/edit?usp=drive_link&ouid=115052879703335488719&rtpof=true&sd=true",
+      icon: FileSpreadsheet,
+      format: "Google Sheets / Excel",
+    },
+    {
+      title: "Format Permintaan Sewaktu",
+      subtitle: "Kategori Program & Non-Program",
+      tag: "Insidental / Cito",
+      desc: "Formulir baku pengajuan perbekalan insidental di luar siklus LPLPO rutin untuk kebutuhan program prioritas maupun non-program.",
+      href: settings.permintaanSewaktuUrl || "https://docs.google.com/spreadsheets/d/19Eilxy1uqE6JM45kY5b7ZMj0OlKP-I6H/edit?usp=sharing&ouid=115052879703335488719&rtpof=true&sd=true",
+      icon: FileSpreadsheet,
+      format: "Google Sheets / Excel",
+    },
+    {
+      title: "Pedoman Surat Pengantar",
+      subtitle: "Standar Naskah Dinas Faskes",
+      tag: "Tata Naskah Resmi",
+      desc: "Format standar kop surat dan pengantar dinas resmi dari pimpinan faskes kepada Dinas Kesehatan & UPTD Instalasi Farmasi.",
+      href: null,
+      icon: FileCheck,
+      format: "Dokumen Resmi Faskes",
+    },
+  ];
+
+  const parsedHours = (settings.operationalHours || "Senin - Kamis: 08.00 - 16.30 WITA\nJumat: 08.00 - 11.00 WITA")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const colonIdx = line.indexOf(":");
+      if (colonIdx !== -1) {
+        return {
+          day: line.slice(0, colonIdx).trim(),
+          time: line.slice(colonIdx + 1).trim(),
+        };
+      }
+      return { day: line, time: "" };
+    });
   return (
     <>
       <PageHero
@@ -439,14 +456,12 @@ export default function LayananPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  <tr className="transition-colors hover:bg-surface/30">
-                    <td className="px-6 py-4 font-medium text-heading">Senin — Kamis</td>
-                    <td className="px-6 py-4 text-right font-mono text-zinc-700 font-medium">08.00 — 16.30 WITA</td>
-                  </tr>
-                  <tr className="transition-colors hover:bg-surface/30">
-                    <td className="px-6 py-4 font-medium text-heading">Jumat</td>
-                    <td className="px-6 py-4 text-right font-mono text-zinc-700 font-medium">08.00 — 11.00 WITA</td>
-                  </tr>
+                  {parsedHours.map((item, idx) => (
+                    <tr key={idx} className="transition-colors hover:bg-surface/30">
+                      <td className="px-6 py-4 font-medium text-heading">{item.day}</td>
+                      <td className="px-6 py-4 text-right font-mono text-zinc-700 font-medium">{item.time}</td>
+                    </tr>
+                  ))}
                   <tr className="bg-surface/30 text-xs text-zinc-600">
                     <td className="px-6 py-3 italic" colSpan={2}>
                       * Sabtu, Minggu, dan Hari Libur Nasional tutup (kecuali kondisi darurat / KLB).

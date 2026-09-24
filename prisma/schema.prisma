@@ -141,6 +141,25 @@ model SiteSetting {
   mission             String   @default("1. Menjamin ketersediaan, pemerataan, dan keterjangkauan obat dan perbekalan kesehatan di seluruh fasilitas kesehatan binaan.\n2. Meningkatkan mutu pengelolaan dan pengawasan obat secara transparan dan akuntabel.\n3. Mengembangkan kapasitas sumber daya manusia dan pemanfaatan teknologi informasi dalam pengelolaan kefarmasian.\n4. Mendorong pemberdayaan masyarakat dalam penggunaan obat yang rasional dan bijak.") @db.Text
   tupoksi             String   @default("UPTD Instalasi Farmasi mempunyai tugas melaksanakan kegiatan teknis operasional dinas dalam pengelolaan obat, alat kesehatan, dan perbekalan kesehatan lainnya yang meliputi perencanaan kebutuhan, penerimaan, penyimpanan, pemeliharaan, pendistribusian, pemantauan, serta evaluasi.") @db.Text
 
+  // Tautan Dokumen Layanan Publik (/layanan)
+  lplpoUrl            String   @default("https://docs.google.com/spreadsheets/d/1ypgpgMjzoZiWWisXV5G_8lPwp6r4PXDI/edit?usp=drive_link&ouid=115052879703335488719&rtpof=true&sd=true")
+  permintaanSewaktuUrl String   @default("https://docs.google.com/spreadsheets/d/19Eilxy1uqE6JM45kY5b7ZMj0OlKP-I6H/edit?usp=sharing&ouid=115052879703335488719&rtpof=true&sd=true")
+
+  // Indikator Wilayah & Pelayanan Beranda (/)
+  statsFaskesCount    String   @default("30 Faskes")
+  statsFaskesLabel    String   @default("28 Puskesmas & 2 RSUD")
+  statsPulauCount     String   @default("45 Pulau")
+  statsPulauLabel     String   @default("Jangkauan Kepulauan")
+  statsMasyarakatCount String  @default("334 Ribu+")
+  statsMasyarakatLabel String  @default("Masyarakat Terlayani")
+
+  // Statistik Ketenagaan SDM & Fasilitas Profil (/profil)
+  sdmTotalCount       String   @default("24 Orang")
+  sdmApotekerCount    String   @default("5 Orang")
+  sdmTtkCount         String   @default("7 Orang")
+  sdmPendukungCount   String   @default("11 Orang")
+  saranaGudangLuas    String   @default("690 m²")
+
   updatedAt           DateTime @updatedAt
 
   @@map("site_settings")
