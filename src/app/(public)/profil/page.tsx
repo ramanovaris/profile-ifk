@@ -201,11 +201,11 @@ export default async function ProfilPage() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-semibold text-brand-700">
+                <p className="text-lg sm:text-xl font-bold tracking-tight text-brand-700">
                   {settings.headName}
                 </p>
-                <p className="text-xs font-medium text-zinc-600">{settings.headRole}</p>
-                <div className="mt-4 space-y-4 text-sm sm:text-base leading-relaxed text-zinc-700">
+                <p className="mt-1 text-sm sm:text-base font-medium text-zinc-600">{settings.headRole}</p>
+                <div className="mt-6 space-y-4 text-sm sm:text-base leading-relaxed text-zinc-700">
                   {greetingParagraphs.map((p, idx) => (
                     <p key={idx}>{p}</p>
                   ))}
