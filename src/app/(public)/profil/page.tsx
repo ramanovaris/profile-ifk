@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   GitMerge,
   ArrowLeftRight,
+  Check,
 } from "lucide-react";
 
 import { PageHero } from "@/components/public/page-hero";
@@ -26,6 +27,7 @@ import { placeholderImage } from "@/lib/placeholder";
 import { getAssetUrl } from "@/lib/utils";
 import { getSiteSettings } from "@/actions/setting";
 import { OrgStructureViewer } from "@/components/public/org-structure-viewer";
+import { ColdRoomImageModal } from "@/components/public/cold-room-image-modal";
 
 const sdmCategories = [
   {
@@ -117,12 +119,6 @@ const facilities = [
     tag: "Kapasitas Fisik",
     icon: Warehouse,
     desc: "Bangunan gudang penyimpanan utama seluas 690 m² (Sertifikat Hak Pakai No. 30) dengan tata letak palet dan rak terstandarisasi.",
-  },
-  {
-    title: "Rantai Dingin (Cold Chain)",
-    tag: "Suhu 2°C – 8°C",
-    icon: Snowflake,
-    desc: "1 unit Cold Room berkapasitas besar dan 5 unit Cold Chain terkalibrasi berkala untuk menjamin stabilitas vaksin dan produk biologi.",
   },
   {
     title: "Pengamanan Narkotika & Psikotropika",
@@ -598,20 +594,83 @@ export default async function ProfilPage() {
             </div>
           </Reveal>
 
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-2 lg:gap-8">
+          {/* ── Featured Hero Card: Cold Room ── */}
+          <Reveal delay={80} className="mt-8 block">
+            <div className="rounded-2xl border border-brand-200/80 bg-white p-6 sm:p-8 shadow-xs ring-1 ring-brand-500/10">
+              <div className="grid gap-6 md:grid-cols-12 md:items-stretch">
+                {/* Kolom Foto Kiri */}
+                <div className="md:col-span-5 flex flex-col">
+                  <ColdRoomImageModal />
+                </div>
+
+                {/* Kolom Deskripsi & Spesifikasi Kanan */}
+                <div className="md:col-span-7 flex flex-col justify-between py-1">
+                  <div>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-200">
+                        Fasilitas Utama Rantai Dingin
+                      </span>
+                      <span className="font-mono text-xs font-semibold text-zinc-700 bg-zinc-100 px-2.5 py-1 rounded-md border border-zinc-200">
+                        Suhu 2°C – 8°C
+                      </span>
+                    </div>
+
+                    <h3 className="mt-4 text-xl sm:text-2xl font-bold tracking-tight text-heading">
+                      Instalasi Cold Room &amp; Rantai Dingin
+                    </h3>
+
+                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-zinc-700">
+                      1 unit Cold Room berkapasitas besar dan 5 unit Cold Chain terkalibrasi berkala untuk menjamin stabilitas dan mutu vaksin, sera, serta produk biologi program kesehatan nasional di seluruh fasilitas pelayanan kesehatan Kabupaten Kotabaru.
+                    </p>
+
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-zinc-700 border-t border-border pt-4">
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-brand-600 shrink-0" strokeWidth={2.5} />
+                        <span>Pemantauan Suhu Digital 24 Jam</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-brand-600 shrink-0" strokeWidth={2.5} />
+                        <span>Kalibrasi Berkala Bersertifikat</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-brand-600 shrink-0" strokeWidth={2.5} />
+                        <span>Backup Genset &amp; Panel Otomatis</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-brand-600 shrink-0" strokeWidth={2.5} />
+                        <span>Standar Cold Chain Kemenkes RI</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-brand-50/70 border border-brand-200/70 p-3 text-xs">
+                    <span className="text-brand-800 font-medium">
+                      Kesiapan pasokan vaksin 28 Puskesmas &amp; 2 Rumah Sakit
+                    </span>
+                    <span className="font-mono font-bold text-brand-900 bg-white px-2.5 py-0.5 rounded-md border border-brand-200 shadow-2xs">
+                      100% Terpantau
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* ── 3 Kartu Pendukung di Bawahnya ── */}
+          <div className="mt-6 grid gap-6 sm:grid-cols-3">
             {facilities.map((facility, i) => (
-              <Reveal key={facility.title} delay={80 + i * 80} className="block h-full">
-                <div className="group flex h-full flex-col justify-between rounded-2xl border border-border bg-white p-6 sm:p-8 transition-all duration-300 ease-luxe hover:-translate-y-1 hover:border-brand-200 hover:shadow-sm">
+              <Reveal key={facility.title} delay={160 + i * 80} className="block h-full">
+                <div className="group flex h-full flex-col justify-between rounded-2xl border border-border bg-white p-6 transition-all duration-300 ease-luxe hover:-translate-y-1 hover:border-brand-200 hover:shadow-xs">
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-600 group-hover:text-white">
-                        <facility.icon className="h-6 w-6" strokeWidth={1.5} />
+                      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-600 group-hover:text-white">
+                        <facility.icon className="h-5 w-5" strokeWidth={1.5} />
                       </span>
-                      <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-600">
+                      <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
                         {facility.tag}
                       </span>
                     </div>
-                    <h3 className="mt-5 text-lg font-bold tracking-tight text-heading sm:text-xl">
+                    <h3 className="mt-4 text-base sm:text-lg font-bold tracking-tight text-heading">
                       {facility.title}
                     </h3>
                     <p className="mt-2 text-xs sm:text-sm leading-relaxed text-zinc-700">
