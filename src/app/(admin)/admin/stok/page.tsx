@@ -25,6 +25,11 @@ export default async function AdminStokPage() {
     quantity: s.quantity,
     status: s.status as StockStatus,
     updatedAt: s.updatedAt.toISOString(),
+    avgUsage: s.avgUsage,
+    mos: s.mos,
+    expiryDate: s.expiryDate,
+    nomenklatur: s.nomenklatur,
+    source: s.source,
   }));
 
   return (

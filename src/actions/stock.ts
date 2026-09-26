@@ -407,7 +407,7 @@ export async function batchImportStockAction(
  * 2. Format Laporan Obat Program (Kemenkes dengan sheet Detil Stok)
  * 3. Format CSV/Excel Standar (Kode, Nama, Kategori, Satuan, Stok, dll.)
  */
-export function parseStockWorkbook(buffer: Buffer): StockItemInput[] {
+function parseStockWorkbook(buffer: Buffer): StockItemInput[] {
   const wb = XLSX.read(buffer, { type: "buffer" });
   const sheetNames = wb.SheetNames;
 
