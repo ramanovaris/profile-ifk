@@ -17,6 +17,7 @@ import { Reveal } from "@/components/public/reveal";
 import { PublicStockFilter } from "@/components/public/public-stock-filter";
 import {
   getStockSummary,
+  getMosBadgeInfo,
   type MedicineStockItem,
   type MedicineCategory,
   type StockStatus,
@@ -222,7 +223,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   Periode Data Stok
                 </p>
                 <p className="text-sm font-medium text-heading">
-                  Cut-off 31 Agustus 2026
+                  Cut-off 30 Juni 2026
                 </p>
               </div>
             </div>
@@ -408,15 +409,16 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
           <Reveal delay={140} className="relative z-10">
             <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[768px] text-left text-sm">
+                <table className="w-full min-w-[850px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface-alt/70 text-xs font-semibold uppercase tracking-wider text-muted">
-                      <th className="px-5 py-3.5 w-16">No</th>
-                      <th className="px-5 py-3.5">Nama Obat / Barang</th>
-                      <th className="px-5 py-3.5">Kategori</th>
-                      <th className="px-5 py-3.5">Satuan</th>
-                      <th className="px-5 py-3.5 text-right">Stok Fisik</th>
-                      <th className="px-5 py-3.5 text-center">Status</th>
+                      <th className="px-4 py-3.5 w-14">No</th>
+                      <th className="px-4 py-3.5">Nama Perbekalan / Kode</th>
+                      <th className="px-4 py-3.5">Kategori</th>
+                      <th className="px-4 py-3.5">Satuan</th>
+                      <th className="px-4 py-3.5 text-right">Stok Fisik</th>
+                      <th className="px-4 py-3.5 text-center">Kecukupan Stok</th>
+                      <th className="px-4 py-3.5 text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -425,19 +427,53 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                         key={item.id}
                         className="transition-colors duration-150 hover:bg-surface-alt/40"
                       >
-                        <td className="px-5 py-3.5 font-mono text-xs text-muted">
+                        <td className="px-4 py-3.5 font-mono text-xs text-muted">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
-                        <td className="px-5 py-3.5">
+                        <td className="px-4 py-3.5">
                           <div className="font-semibold text-heading">{item.name}</div>
-                          <div className="font-mono text-xs text-muted">{item.code}</div>
+                          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+                            <span className="font-mono">{item.code}</span>
+                            {item.nomenklatur && (
+                              <>
+                                <span>•</span>
+                                <span className="inline-block truncate max-w-[180px] text-zinc-500" title={item.nomenklatur}>
+                                  {item.nomenklatur}
+                                </span>
+                              </>
+                            )}
+                            {item.expiryDate && (
+                              <>
+                                <span>•</span>
+                                <span className="text-amber-700/90 font-medium">
+                                  ED: {item.expiryDate}
+                                </span>
+                              </>
+                            )}
+                          </div>
                         </td>
-                        <td className="px-5 py-3.5 text-muted">{item.category}</td>
-                        <td className="px-5 py-3.5 text-muted">{item.unit}</td>
-                        <td className="px-5 py-3.5 text-right font-mono font-semibold text-heading">
+                        <td className="px-4 py-3.5 text-muted">{item.category}</td>
+                        <td className="px-4 py-3.5 text-muted">{item.unit}</td>
+                        <td className="px-4 py-3.5 text-right font-mono font-semibold text-heading">
                           {item.quantity.toLocaleString("id-ID")}
                         </td>
-                        <td className="px-5 py-3.5 text-center">
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                          {(() => {
+                            const mosInfo = getMosBadgeInfo(item.quantity, item.mos);
+                            return (
+                              <span
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium border",
+                                  mosInfo.badgeClass
+                                )}
+                              >
+                                <span className={cn("h-1.5 w-1.5 rounded-full", mosInfo.dotClass)} />
+                                {mosInfo.label}
+                              </span>
+                            );
+                          })()}
+                        </td>
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span
                             className={cn(
                               "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
