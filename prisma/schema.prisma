@@ -95,18 +95,27 @@ model Article {
 }
 
 model MedicineStock {
-  id        String      @id @default(cuid())
-  code      String      @unique
-  name      String
-  category  String
-  unit      String
-  quantity  Int         @default(0)
-  status    StockStatus @default(AVAILABLE)
-  updatedAt DateTime    @updatedAt
-  createdAt DateTime    @default(now())
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        String
+  category    String
+  unit        String
+  quantity    Int         @default(0)
+  status      StockStatus @default(AVAILABLE)
+
+  // Metrik logistik real Excel
+  avgUsage    Float?      @default(0)
+  mos         Float?
+  expiryDate  String?
+  nomenklatur String?
+  source      String?     @default("MANUAL")
+
+  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime    @default(now())
 
   @@index([category])
   @@index([status])
+  @@index([source])
   @@map("medicine_stocks")
 }
 
