@@ -231,14 +231,14 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
 
           {/* ── Kartu Metrik Ringkasan Interaktif ─────────────────── */}
           <Reveal delay={60}>
-            <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
               {/* Total Item */}
               <button
                 type="button"
                 onClick={() => handleCardStatusClick()}
                 aria-pressed={isAllActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isAllActive
                     ? "border-brand-500/60 bg-brand-500/10 ring-2 ring-brand-500/30"
                     : "border-border bg-surface-alt/50 hover:border-brand-500/40"
@@ -248,12 +248,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <Package className="h-4 w-4 text-brand-600" />
                   <span className="text-xs font-medium">Total Perbekalan</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-heading">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-heading">
                     {summary.totalItems}
                   </p>
                   {isAllActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-brand-600" />
                       Aktif
                     </span>
@@ -268,7 +268,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("AVAILABLE")}
                 aria-pressed={isAvailableActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isAvailableActive
                     ? "border-emerald-500/60 bg-emerald-500/15 ring-2 ring-emerald-500/30"
                     : "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10"
@@ -278,12 +278,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <CheckCircle2 className="h-4 w-4" />
                   <span className="text-xs font-medium">Stok Aman</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-emerald-800">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-800">
                     {summary.availableItems}
                   </p>
                   {isAvailableActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       Aktif
                     </span>
@@ -298,7 +298,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("LOW")}
                 aria-pressed={isLowActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isLowActive
                     ? "border-amber-500/60 bg-amber-500/15 ring-2 ring-amber-500/30"
                     : "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/10"
@@ -308,12 +308,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <AlertTriangle className="h-4 w-4" />
                   <span className="text-xs font-medium">Stok Menipis</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-amber-800">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-amber-800">
                     {summary.lowItems}
                   </p>
                   {isLowActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                       Aktif
                     </span>
@@ -328,7 +328,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("EMPTY")}
                 aria-pressed={isEmptyActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isEmptyActive
                     ? "border-rose-500/60 bg-rose-500/15 ring-2 ring-rose-500/30"
                     : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
@@ -338,12 +338,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <XCircle className="h-4 w-4" />
                   <span className="text-xs font-medium">Stok Kosong</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-rose-800">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-rose-800">
                     {summary.emptyItems}
                   </p>
                   {isEmptyActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                       Aktif
                     </span>
