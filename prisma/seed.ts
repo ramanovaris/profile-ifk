@@ -229,23 +229,21 @@ async function main() {
 
   // 5. Data Awal Stok Obat (MedicineStock)
   console.log(`[Seed] Menyinkronkan data stok obat (${initialMedicineStock.length} item)...`);
+  await prisma.medicineStock.deleteMany({});
   for (const item of initialMedicineStock) {
-    await prisma.medicineStock.upsert({
-      where: { code: item.code },
-      update: {
-        name: item.name,
-        category: item.category,
-        unit: item.unit,
-        quantity: item.quantity,
-        status: item.status as StockStatus,
-      },
-      create: {
+    await prisma.medicineStock.create({
+      data: {
         code: item.code,
         name: item.name,
         category: item.category,
         unit: item.unit,
         quantity: item.quantity,
         status: item.status as StockStatus,
+        avgUsage: item.avgUsage ?? 0,
+        mos: item.mos ?? null,
+        expiryDate: item.expiryDate ?? null,
+        nomenklatur: item.nomenklatur ?? null,
+        source: item.source ?? "MANUAL",
       },
     });
   }
