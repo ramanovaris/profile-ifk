@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Info,
 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
@@ -573,6 +574,87 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   </div>
                 </div>
               )}
+            </div>
+          </Reveal>
+
+          {/* ── Panduan Indikator Status & Tingkat Ketersediaan ── */}
+          <Reveal delay={160} className="relative z-10">
+            <div className="mt-8 rounded-2xl border border-border bg-surface-alt/40 p-4 sm:p-5 backdrop-blur-xs">
+              <div className="flex items-start gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600 dark:bg-brand-500/20">
+                  <Info className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-sm font-semibold text-heading">
+                    Panduan Indikator Status & Tingkat Ketersediaan
+                  </h2>
+                  <p className="mt-0.5 text-xs text-muted leading-relaxed">
+                    Status ketersediaan dihitung berdasarkan metode standar logistik farmasi (<em>Months of Supply / MOS</em>): sisa stok fisik dibagi rata-rata pemakaian bulanan.
+                  </p>
+
+                  <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 text-[11px] font-medium text-sky-700 dark:text-sky-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+                        Melimpah
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Stok melebihi estimasi pemakaian 18 bulan (&gt; 18 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        Aman
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Rentang ideal ketersediaan logistik farmasi (3 – 18 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                        Menipis
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Perbekalan terbatas, dalam prioritas pemantauan (1 – 3 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-700 dark:text-rose-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        Kritis
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Stok sangat minim di bawah 1 bulan pemakaian (&lt; 1 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-700 dark:text-rose-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        Kosong
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Sisa stok fisik di gudang 0 (dalam proses pengadaan).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        Tersedia
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Stok siap salur (riwayat rata-rata pemakaian belum tercatat).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </Reveal>
         </div>
