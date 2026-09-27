@@ -11,6 +11,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  X,
 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
@@ -113,6 +114,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
 
     return () => clearTimeout(timer);
   }, [search, searchParams, updateUrl]);
+
+  // Hapus pencarian seketika
+  const handleClearSearch = () => {
+    setSearch("");
+    updateUrl({ q: null, page: null }, "replace");
+  };
 
   const summary = useMemo(() => getStockSummary(initialItems), [initialItems]);
 
@@ -368,8 +375,18 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   placeholder="Cari nama obat (contoh: Paracetamol, Amoxicillin, Infus)..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full rounded-full border border-border bg-surface py-2 pl-10 pr-4 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
+                  className="w-full rounded-full border border-border bg-surface py-2 pl-10 pr-10 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
                 />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    aria-label="Bersihkan pencarian"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-alt hover:text-heading cursor-pointer"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
 
               {/* Filter Dropdowns (Kategori & Status) */}
