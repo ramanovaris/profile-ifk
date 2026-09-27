@@ -305,10 +305,64 @@ export async function batchImportStockAction(
     let inserted = 0;
     let updated = 0;
 
+    // Ambil seluruh data obat eksisting untuk pencocokan cerdas berbasis nama & pencegahan bentrok kode
+    const existingRecords = await db.medicineStock.findMany();
+
+    const normalizeName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
+    const byName = new Map<string, (typeof existingRecords)[number]>();
+    const byCode = new Map<string, (typeof existingRecords)[number]>();
+
+    let maxInd = 0;
+    let maxPrg = 0;
+    let maxStk = 0;
+
+    for (const record of existingRecords) {
+      byName.set(normalizeName(record.name), record);
+      byCode.set(record.code.trim().toLowerCase(), record);
+
+      const indMatch = record.code.match(/^IND-(\d+)$/i);
+      if (indMatch) maxInd = Math.max(maxInd, parseInt(indMatch[1], 10));
+
+      const prgMatch = record.code.match(/^PRG-(\d+)$/i);
+      if (prgMatch) maxPrg = Math.max(maxPrg, parseInt(prgMatch[1], 10));
+
+      const stkMatch = record.code.match(/^STK-(\d+)$/i);
+      if (stkMatch) maxStk = Math.max(maxStk, parseInt(stkMatch[1], 10));
+    }
+
     for (const item of items) {
-      const code = item.code?.trim();
       const name = item.name?.trim();
-      if (!code || !name) continue;
+      const code = item.code?.trim();
+      if (!name) continue;
+
+      const normName = normalizeName(name);
+      const matchedByName = byName.get(normName);
+
+      let targetId: string | null = null;
+      let finalCode = code || "";
+
+      if (matchedByName) {
+        // Obat dengan nama yang sama sudah ada: update data dan pertahankan kode tetap
+        targetId = matchedByName.id;
+        finalCode = matchedByName.code;
+      } else {
+        // Obat baru: jika kodenya sudah terpakai oleh obat lain, buatkan nomor kode baru
+        if (code && byCode.has(code.toLowerCase())) {
+          if (code.toUpperCase().startsWith("IND-")) {
+            maxInd++;
+            finalCode = `IND-${String(maxInd).padStart(3, "0")}`;
+          } else if (code.toUpperCase().startsWith("PRG-")) {
+            maxPrg++;
+            finalCode = `PRG-${String(maxPrg).padStart(3, "0")}`;
+          } else {
+            maxStk++;
+            finalCode = `STK-${String(maxStk).padStart(3, "0")}`;
+          }
+        } else if (!code) {
+          maxStk++;
+          finalCode = `STK-${String(maxStk).padStart(3, "0")}`;
+        }
+      }
 
       const category = item.category?.trim() || "Obat Generik";
       const unit = item.unit?.trim() || "Tablet";
@@ -325,13 +379,9 @@ export async function batchImportStockAction(
       const source = item.source?.trim() || "MANUAL";
       const status = calculateStockStatus(quantity, item.status, mos);
 
-      const existing = await db.medicineStock.findUnique({
-        where: { code },
-      });
-
-      if (existing) {
-        await db.medicineStock.update({
-          where: { code },
+      if (targetId) {
+        const updatedRecord = await db.medicineStock.update({
+          where: { id: targetId },
           data: {
             name,
             category,
@@ -345,11 +395,13 @@ export async function batchImportStockAction(
             source,
           },
         });
+        byName.set(normName, updatedRecord);
+        byCode.set(updatedRecord.code.toLowerCase(), updatedRecord);
         updated++;
       } else {
-        await db.medicineStock.create({
+        const createdRecord = await db.medicineStock.create({
           data: {
-            code,
+            code: finalCode,
             name,
             category,
             unit,
@@ -362,6 +414,8 @@ export async function batchImportStockAction(
             source,
           },
         });
+        byName.set(normName, createdRecord);
+        byCode.set(createdRecord.code.toLowerCase(), createdRecord);
         inserted++;
       }
     }
