@@ -1,5 +1,6 @@
 import * as fs from "fs";
-import { parseStockWorkbook, batchImportStockAction, createStockAction, updateStockAction, deleteStockAction } from "../src/actions/stock";
+import { parseStockWorkbook } from "../src/lib/stock-parser";
+import { batchImportStockAction, createStockAction, updateStockAction, deleteStockAction } from "../src/actions/stock";
 import { db } from "../src/lib/db";
 
 async function main() {
