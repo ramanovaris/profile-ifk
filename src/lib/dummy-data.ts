@@ -246,8 +246,12 @@ export type MosBadgeInfo = {
   dotClass: string;
 };
 
-export function getMosBadgeInfo(quantity: number, mos?: number | null): MosBadgeInfo {
-  if (quantity <= 0) {
+export function getMosBadgeInfo(
+  quantity: number,
+  mos?: number | null,
+  fallbackStatus?: StockStatus | string
+): MosBadgeInfo {
+  if (quantity <= 0 || fallbackStatus === "EMPTY") {
     return {
       label: "Kosong (0 bln)",
       variant: "empty",
@@ -256,6 +260,22 @@ export function getMosBadgeInfo(quantity: number, mos?: number | null): MosBadge
     };
   }
   if (mos === undefined || mos === null || isNaN(mos)) {
+    if (fallbackStatus === "AVAILABLE") {
+      return {
+        label: "Tersedia",
+        variant: "safe",
+        badgeClass: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 dark:border-emerald-500/20",
+        dotClass: "bg-emerald-500",
+      };
+    }
+    if (fallbackStatus === "LOW") {
+      return {
+        label: "Menipis",
+        variant: "low",
+        badgeClass: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 dark:border-amber-500/20",
+        dotClass: "bg-amber-500",
+      };
+    }
     return {
       label: "-",
       variant: "unknown",

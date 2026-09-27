@@ -669,7 +669,6 @@ export function StockTable({ initialItems }: StockTableProps) {
                 <th className="px-4 py-3 font-medium text-zinc-400">Kategori</th>
                 <th className="px-4 py-3 font-medium text-zinc-400">Satuan</th>
                 <th className="px-4 py-3 font-medium text-zinc-400 text-right">Stok Fisik</th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-center">Kecukupan Stok</th>
                 <th className="px-4 py-3 font-medium text-zinc-400 text-center">Status</th>
                 <th className="px-4 py-3 font-medium text-zinc-400 text-right">Aksi</th>
               </tr>
@@ -709,7 +708,7 @@ export function StockTable({ initialItems }: StockTableProps) {
                   </td>
                   <td className="px-4 py-3 text-center whitespace-nowrap">
                     {(() => {
-                      const mosInfo = getMosBadgeInfo(item.quantity, item.mos);
+                      const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
                       const badgeClasses: Record<string, string> = {
                         empty: "bg-rose-500/10 text-rose-400 border-rose-500/20",
                         critical: "bg-rose-500/10 text-rose-400 border-rose-500/20",
@@ -743,26 +742,6 @@ export function StockTable({ initialItems }: StockTableProps) {
                         </span>
                       );
                     })()}
-                  </td>
-                  <td className="px-4 py-3 text-center whitespace-nowrap">
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium",
-                        item.status === "AVAILABLE" && "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-                        item.status === "LOW" && "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-                        item.status === "EMPTY" && "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                      )}
-                    >
-                      <span className={cn(
-                        "h-1.5 w-1.5 rounded-full",
-                        item.status === "AVAILABLE" && "bg-emerald-400",
-                        item.status === "LOW" && "bg-amber-400",
-                        item.status === "EMPTY" && "bg-rose-400"
-                      )} />
-                      {item.status === "AVAILABLE" && "Tersedia"}
-                      {item.status === "LOW" && "Menipis"}
-                      {item.status === "EMPTY" && "Kosong"}
-                    </span>
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <div className="inline-flex items-center gap-1 justify-end">

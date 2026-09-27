@@ -409,7 +409,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
           <Reveal delay={140} className="relative z-10">
             <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[850px] text-left text-sm">
+                <table className="w-full min-w-[720px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface-alt/70 text-xs font-semibold uppercase tracking-wider text-muted">
                       <th className="px-4 py-3.5 w-14">No</th>
@@ -417,7 +417,6 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                       <th className="px-4 py-3.5">Kategori</th>
                       <th className="px-4 py-3.5">Satuan</th>
                       <th className="px-4 py-3.5 text-right">Stok Fisik</th>
-                      <th className="px-4 py-3.5 text-center">Kecukupan Stok</th>
                       <th className="px-4 py-3.5 text-center">Status</th>
                     </tr>
                   </thead>
@@ -459,11 +458,11 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           {(() => {
-                            const mosInfo = getMosBadgeInfo(item.quantity, item.mos);
+                            const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
                             return (
                               <span
                                 className={cn(
-                                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium border",
+                                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border",
                                   mosInfo.badgeClass
                                 )}
                               >
@@ -472,31 +471,6 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                               </span>
                             );
                           })()}
-                        </td>
-                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                          <span
-                            className={cn(
-                              "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
-                              item.status === "AVAILABLE" &&
-                                "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700",
-                              item.status === "LOW" &&
-                                "border border-amber-500/20 bg-amber-500/10 text-amber-700",
-                              item.status === "EMPTY" &&
-                                "border border-rose-500/20 bg-rose-500/10 text-rose-700"
-                            )}
-                          >
-                            <span
-                              className={cn(
-                                "h-1.5 w-1.5 rounded-full",
-                                item.status === "AVAILABLE" && "bg-emerald-500",
-                                item.status === "LOW" && "bg-amber-500",
-                                item.status === "EMPTY" && "bg-rose-500"
-                              )}
-                            />
-                            {item.status === "AVAILABLE" && "Tersedia"}
-                            {item.status === "LOW" && "Menipis"}
-                            {item.status === "EMPTY" && "Kosong"}
-                          </span>
                         </td>
                       </tr>
                     ))}
