@@ -21,6 +21,7 @@ export interface PublicStockFilterProps {
   className?: string;
   singleSelect?: boolean;
   icon?: React.ReactNode;
+  align?: "right" | "left" | "full-mobile";
 }
 
 export function PublicStockFilter({
@@ -33,6 +34,7 @@ export function PublicStockFilter({
   className = "",
   singleSelect = false,
   icon,
+  align = "right",
 }: PublicStockFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -230,7 +232,14 @@ export function PublicStockFilter({
           role="listbox"
           id={listboxId}
           aria-multiselectable={!singleSelect}
-          className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] origin-top-right rounded-2xl border border-border bg-surface p-2.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+          className={cn(
+            "absolute top-full z-50 mt-2 rounded-2xl border border-border bg-surface p-2.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95",
+            align === "full-mobile"
+              ? "left-0 right-0 w-full sm:left-auto sm:right-0 sm:w-72 origin-top sm:origin-top-right"
+              : align === "left"
+              ? "left-0 w-72 max-w-[calc(100vw-2rem)] origin-top-left"
+              : "right-0 w-72 max-w-[calc(100vw-2rem)] origin-top-right"
+          )}
         >
           {/* Mini Search Input */}
           {enableSearch && (

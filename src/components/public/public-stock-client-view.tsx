@@ -257,7 +257,7 @@ export function PublicStockClientView({
 
               {/* Selector Periode Multi-Bulan */}
               {availablePeriods.length > 1 && (
-                <div className="flex items-center gap-2 self-start sm:self-auto">
+                <div className="w-full sm:w-auto">
                   <PublicStockFilter
                     title="Periode"
                     options={periodOptions}
@@ -269,6 +269,7 @@ export function PublicStockClientView({
                     }}
                     enableSearch={true}
                     singleSelect={true}
+                    align="full-mobile"
                     icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-600" />}
                   />
                 </div>
