@@ -17,7 +17,7 @@ import {
   DialogDescription 
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
-import { batchImportStockAction, type StockItemInput } from "@/actions/stock";
+import { importStockFileAction } from "@/actions/stock";
 
 interface StockFormProps {
   open: boolean;
@@ -33,10 +33,10 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
 
   const handleDownloadTemplate = () => {
     const csvContent =
-      "data:text/csv;charset=utf-8,Kode,Nama Obat,Kategori,Satuan,Jumlah Stok\n" +
-      "OBG-001,Paracetamol 500 mg,Obat Generik,Tablet,15000\n" +
-      "OBG-002,Amoxicillin 500 mg,Obat Generik,Kaplet,12000\n" +
-      "BMH-001,Infus Cairan Ringer Laktat (RL) 500 ml,BMHP / Alkes,Botol,4500\n";
+      "data:text/csv;charset=utf-8,Kode,Nama Obat,Kategori,Satuan,Jumlah Stok,Pemakaian Rata-Rata,MOS,ED,Nomenklatur\n" +
+      "OBG-001,Paracetamol 500 mg,Obat Generik,Tablet,15000,1200,12.5,2028-06,Analgesik & Antipiretik\n" +
+      "OBG-002,Amoxicillin 500 mg,Obat Generik,Kaplet,12000,2500,4.8,2027-12,Antibakteri Beta-Laktam\n" +
+      "BMH-001,Infus Cairan Ringer Laktat (RL) 500 ml,BMHP / Alkes,Botol,4500,800,5.6,2028-01,Larutan Elektrolit Intravena\n";
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -50,52 +50,27 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (!file.name.toLowerCase().endsWith(".csv")) {
-        toast.error("Format file saat ini hanya mendukung .csv.");
+      const name = file.name.toLowerCase();
+      if (!name.endsWith(".xlsx") && !name.endsWith(".xls") && !name.endsWith(".csv")) {
+        toast.error("Format file harus berupa Excel (.xlsx, .xls) atau CSV (.csv).");
         return;
       }
       setSelectedFile(file);
     }
   };
 
-  const parseAndImportCSV = () => {
+  const handleImportFile = () => {
     if (!selectedFile) {
-      toast.error("Silakan pilih file CSV terlebih dahulu.");
+      toast.error("Silakan pilih file Excel atau CSV terlebih dahulu.");
       return;
     }
 
     startTransition(async () => {
       try {
-        const text = await selectedFile.text();
-        const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-        if (lines.length <= 1) {
-          toast.error("File CSV kosong atau tidak memiliki data obat.");
-          return;
-        }
+        const formData = new FormData();
+        formData.append("file", selectedFile);
 
-        // Header: Kode,Nama Obat,Kategori,Satuan,Jumlah Stok
-        const items: StockItemInput[] = [];
-        for (let i = 1; i < lines.length; i++) {
-          const parts = lines[i].split(",").map((p) => p.trim().replace(/^["']|["']$/g, ""));
-          if (parts.length >= 2) {
-            const code = parts[0];
-            const name = parts[1];
-            const category = parts[2] || "Obat Generik";
-            const unit = parts[3] || "Tablet";
-            const quantity = parseInt(parts[4], 10) || 0;
-
-            if (code && name) {
-              items.push({ code, name, category, unit, quantity });
-            }
-          }
-        }
-
-        if (items.length === 0) {
-          toast.error("Tidak ada baris data yang valid dalam file CSV.");
-          return;
-        }
-
-        const res = await batchImportStockAction(items);
+        const res = await importStockFileAction(formData);
         if (!res.success) {
           toast.error(res.error || "Gagal mengimpor data stok.");
           return;
@@ -111,8 +86,8 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
           onImportSuccess();
         }
       } catch (err: unknown) {
-        console.error("Error import CSV:", err);
-        toast.error("Gagal memproses file CSV.");
+        console.error("Error import stock file:", err);
+        toast.error("Gagal memproses berkas impor.");
       }
     });
   };
@@ -126,14 +101,14 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
             Import Data Stok Bulanan
           </DialogTitle>
           <DialogDescription className="text-zinc-400">
-            Unggah file spreadsheet CSV berisi data stok fisik per akhir bulan.
+            Unggah file spreadsheet Excel (.xlsx, .xls) atau CSV (.csv) data stok fisik per akhir bulan.
           </DialogDescription>
         </DialogHeader>
 
         <input
           type="file"
           ref={fileInputRef}
-          accept=".csv,text/csv,application/vnd.ms-excel,text/comma-separated-values,text/plain"
+          accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
           onChange={handleFileChange}
           className="hidden"
         />
@@ -157,8 +132,9 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
               setIsDragging(false);
               const file = e.dataTransfer.files?.[0];
               if (file) {
-                if (!file.name.endsWith(".csv")) {
-                  toast.error("Format file harus berupa .csv.");
+                const name = file.name.toLowerCase();
+                if (!name.endsWith(".xlsx") && !name.endsWith(".xls") && !name.endsWith(".csv")) {
+                  toast.error("Format file harus berupa Excel (.xlsx, .xls) atau CSV (.csv).");
                   return;
                 }
                 setSelectedFile(file);
@@ -182,7 +158,7 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
                 <p className="mb-2 text-sm text-zinc-300">
                   <span className="font-semibold text-brand-400">Klik untuk unggah</span> atau seret dan lepas
                 </p>
-                <p className="text-xs text-zinc-500">File format .csv (Maks. 5MB)</p>
+                <p className="text-xs text-zinc-500">File format Excel (.xlsx, .xls) atau CSV (Maks. 5MB)</p>
               </>
             )}
           </div>
@@ -190,7 +166,7 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
           <div className="mt-4 flex items-start gap-2 rounded-lg bg-zinc-800/50 p-3 text-sm text-zinc-400">
             <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-400" />
             <p>
-              Format kolom yang dibutuhkan: <span className="font-medium text-zinc-300">Kode, Nama Obat, Kategori, Satuan, Jumlah Stok.</span>
+              Format kolom yang didukung: <span className="font-medium text-zinc-300">Kode, Nama Obat, Kategori, Satuan, Jumlah Stok/Sisa, Pemakaian Rata-Rata, MOS, ED, Nomenklatur.</span>
             </p>
           </div>
         </div>
@@ -206,7 +182,7 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
           </button>
           <button 
             type="button"
-            onClick={parseAndImportCSV}
+            onClick={handleImportFile}
             disabled={isPending || !selectedFile}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
           >

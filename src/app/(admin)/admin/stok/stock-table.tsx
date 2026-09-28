@@ -13,7 +13,8 @@ import {
   Pencil,
   Trash2,
   Save,
-  Loader2
+  Loader2,
+  Calendar
 } from "lucide-react";
 import { 
   Dialog, 
@@ -28,6 +29,9 @@ import { toast } from "@/components/ui/toast";
 import { StockMultiSelectFilter } from "@/components/admin/stock-multi-select-filter";
 import { 
   getStockSummary, 
+  getMosBadgeInfo,
+  getItemEffectiveStatus,
+  formatStockPeriodLabel,
   type MedicineStockItem,
   type StockStatus,
   type MedicineCategory 
@@ -42,12 +46,20 @@ import { StockForm } from "./stock-form";
 
 interface StockTableProps {
   initialItems: MedicineStockItem[];
+  activePeriod?: string;
+  availablePeriods?: string[];
 }
 
-export function StockTable({ initialItems }: StockTableProps) {
+export function StockTable({
+  initialItems,
+  activePeriod = "2026-08",
+  availablePeriods = ["2026-08", "2026-07", "2026-06"],
+}: StockTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+
+  const selectedPeriod = searchParams.get("periode") || activePeriod;
 
   const [items, setItems] = useState<MedicineStockItem[]>(initialItems);
   const [prevInitialItems, setPrevInitialItems] = useState(initialItems);
@@ -154,6 +166,10 @@ export function StockTable({ initialItems }: StockTableProps) {
     unit: string;
     quantity: number | string;
     status: StockStatus;
+    avgUsage: number | string;
+    mos: number | string;
+    expiryDate: string;
+    nomenklatur: string;
   }>({
     code: "",
     name: "",
@@ -161,6 +177,10 @@ export function StockTable({ initialItems }: StockTableProps) {
     unit: "Tablet",
     quantity: "",
     status: "AVAILABLE",
+    avgUsage: "",
+    mos: "",
+    expiryDate: "",
+    nomenklatur: "",
   });
 
   // Form State for Edit
@@ -171,6 +191,10 @@ export function StockTable({ initialItems }: StockTableProps) {
     unit: string;
     quantity: number | string;
     status: StockStatus;
+    avgUsage: number | string;
+    mos: number | string;
+    expiryDate: string;
+    nomenklatur: string;
   }>({
     code: "",
     name: "",
@@ -178,6 +202,10 @@ export function StockTable({ initialItems }: StockTableProps) {
     unit: "Tablet",
     quantity: 0,
     status: "AVAILABLE",
+    avgUsage: "",
+    mos: "",
+    expiryDate: "",
+    nomenklatur: "",
   });
 
   const summary = useMemo(() => getStockSummary(items), [items]);
@@ -218,6 +246,13 @@ export function StockTable({ initialItems }: StockTableProps) {
     },
   ], [summary]);
 
+  const periodOptions = useMemo(() => {
+    return (availablePeriods || []).map((p, idx) => ({
+      value: p,
+      label: `${formatStockPeriodLabel(p)}${idx === 0 ? " (Terkini)" : ""}`,
+    }));
+  }, [availablePeriods]);
+
   const filtered = useMemo(() => {
     return items
       .filter(
@@ -228,14 +263,15 @@ export function StockTable({ initialItems }: StockTableProps) {
       .filter(
         (item) =>
           selectedStatuses.length === 0 ||
-          selectedStatuses.includes(item.status)
+          selectedStatuses.includes(getItemEffectiveStatus(item))
       )
       .filter((item) => {
         const query = search.toLowerCase();
         return (
           item.name.toLowerCase().includes(query) ||
           item.code.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query)
+          item.category.toLowerCase().includes(query) ||
+          (item.nomenklatur && item.nomenklatur.toLowerCase().includes(query))
         );
       });
   }, [items, search, selectedCategories, selectedStatuses]);
@@ -256,6 +292,10 @@ export function StockTable({ initialItems }: StockTableProps) {
       unit: "Tablet",
       quantity: "",
       status: "AVAILABLE",
+      avgUsage: "",
+      mos: "",
+      expiryDate: "",
+      nomenklatur: "",
     });
     setIsAddOpen(true);
   };
@@ -280,6 +320,10 @@ export function StockTable({ initialItems }: StockTableProps) {
         unit: addForm.unit.trim() || "Tablet",
         quantity: Number(addForm.quantity),
         status: addForm.status,
+        avgUsage: addForm.avgUsage !== "" ? Number(addForm.avgUsage) : null,
+        mos: addForm.mos !== "" ? Number(addForm.mos) : null,
+        expiryDate: addForm.expiryDate.trim() || null,
+        nomenklatur: addForm.nomenklatur.trim() || null,
       });
 
       if (!res.success || !res.data) {
@@ -296,6 +340,11 @@ export function StockTable({ initialItems }: StockTableProps) {
         quantity: res.data.quantity,
         status: res.data.status as StockStatus,
         updatedAt: res.data.updatedAt.toISOString(),
+        avgUsage: res.data.avgUsage,
+        mos: res.data.mos,
+        expiryDate: res.data.expiryDate,
+        nomenklatur: res.data.nomenklatur,
+        source: res.data.source,
       };
 
       setItems((prev) => [newItem, ...prev]);
@@ -313,6 +362,10 @@ export function StockTable({ initialItems }: StockTableProps) {
       unit: item.unit,
       quantity: item.quantity,
       status: item.status,
+      avgUsage: item.avgUsage !== null && item.avgUsage !== undefined ? item.avgUsage : "",
+      mos: item.mos !== null && item.mos !== undefined ? item.mos : "",
+      expiryDate: item.expiryDate || "",
+      nomenklatur: item.nomenklatur || "",
     });
   };
 
@@ -337,6 +390,10 @@ export function StockTable({ initialItems }: StockTableProps) {
         unit: editForm.unit.trim() || editItem.unit,
         quantity: Number(editForm.quantity),
         status: editForm.status,
+        avgUsage: editForm.avgUsage !== "" ? Number(editForm.avgUsage) : null,
+        mos: editForm.mos !== "" ? Number(editForm.mos) : null,
+        expiryDate: editForm.expiryDate.trim() || null,
+        nomenklatur: editForm.nomenklatur.trim() || null,
       });
 
       if (!res.success || !res.data) {
@@ -356,6 +413,11 @@ export function StockTable({ initialItems }: StockTableProps) {
                 quantity: res.data!.quantity,
                 status: res.data!.status as StockStatus,
                 updatedAt: res.data!.updatedAt.toISOString(),
+                avgUsage: res.data!.avgUsage,
+                mos: res.data!.mos,
+                expiryDate: res.data!.expiryDate,
+                nomenklatur: res.data!.nomenklatur,
+                source: res.data!.source,
               }
             : item
         )
@@ -582,8 +644,24 @@ export function StockTable({ initialItems }: StockTableProps) {
           />
         </div>
 
-        {/* Filter Dropdowns (Kategori & Status) */}
+        {/* Filter Dropdowns (Periode, Kategori & Status) */}
         <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+          {availablePeriods && availablePeriods.length > 1 && (
+            <StockMultiSelectFilter
+              title="Periode"
+              options={periodOptions}
+              selectedValues={[selectedPeriod]}
+              onChange={(vals) => {
+                if (vals[0]) {
+                  updateUrl({ periode: vals[0], page: null });
+                }
+              }}
+              enableSearch={true}
+              singleSelect={true}
+              icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-400" />}
+            />
+          )}
+
           <StockMultiSelectFilter
             title="Kategori"
             allLabel="Semua Kategori"
@@ -617,52 +695,99 @@ export function StockTable({ initialItems }: StockTableProps) {
       {/* ── Tabel Stok ──────────────────────────────────────────────────── */}
       <div className="relative z-10 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px] text-left text-sm text-zinc-300">
+          <table className="w-full min-w-[980px] text-left text-sm text-zinc-300">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-900">
-                <th className="px-4 py-3 font-medium text-zinc-400">No</th>
+                <th className="px-4 py-3 font-medium text-zinc-400 w-12">No</th>
                 <th className="px-4 py-3 font-medium text-zinc-400">Nama Obat / Kode</th>
                 <th className="px-4 py-3 font-medium text-zinc-400">Kategori</th>
                 <th className="px-4 py-3 font-medium text-zinc-400">Satuan</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Stok Fisik</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Status</th>
+                <th className="px-4 py-3 font-medium text-zinc-400 text-right">Stok Fisik</th>
+                <th className="px-4 py-3 font-medium text-zinc-400 text-right">
+                  <div>Rata-rata Pemakaian</div>
+                  <div className="text-[10px] font-normal normal-case text-zinc-500">RPB (Tren 12 Bln)</div>
+                </th>
+                <th className="px-4 py-3 font-medium text-zinc-400 text-center">Status</th>
                 <th className="px-4 py-3 font-medium text-zinc-400 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800">
               {paginatedItems.map((item, index) => (
                 <tr key={item.id} className="transition-colors hover:bg-zinc-800/30">
-                  <td className="px-4 py-3 text-zinc-500">
+                  <td className="px-4 py-3 text-zinc-500 font-mono text-xs">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-medium text-zinc-100">{item.name}</div>
-                    <div className="text-xs text-zinc-500 font-mono">{item.code}</div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-zinc-400">
+                      <span className="font-mono text-zinc-500">{item.code}</span>
+                      {item.nomenklatur && (
+                        <>
+                          <span className="text-zinc-600">•</span>
+                          <span className="inline-block truncate max-w-[180px] text-zinc-400" title={item.nomenklatur}>
+                            {item.nomenklatur}
+                          </span>
+                        </>
+                      )}
+                      {item.expiryDate && (
+                        <>
+                          <span className="text-zinc-600">•</span>
+                          <span className="text-amber-400/90 font-medium">
+                            ED: {item.expiryDate}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3">{item.category}</td>
                   <td className="px-4 py-3">{item.unit}</td>
-                  <td className="px-4 py-3 font-medium text-zinc-100">
+                  <td className="px-4 py-3 text-right font-mono font-semibold text-zinc-100">
                     {item.quantity.toLocaleString("id-ID")}
                   </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium",
-                        item.status === "AVAILABLE" && "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
-                        item.status === "LOW" && "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-                        item.status === "EMPTY" && "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                      )}
-                    >
-                      <span className={cn(
-                        "h-1.5 w-1.5 rounded-full",
-                        item.status === "AVAILABLE" && "bg-emerald-400",
-                        item.status === "LOW" && "bg-amber-400",
-                        item.status === "EMPTY" && "bg-rose-400"
-                      )} />
-                      {item.status === "AVAILABLE" && "Tersedia"}
-                      {item.status === "LOW" && "Menipis"}
-                      {item.status === "EMPTY" && "Kosong"}
-                    </span>
+                  <td className="px-4 py-3 text-right font-mono text-zinc-400 text-xs">
+                    {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
+                      ? item.avgUsage.toLocaleString("id-ID", {
+                          minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
+                          maximumFractionDigits: 2,
+                        })
+                      : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-center whitespace-nowrap">
+                    {(() => {
+                      const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
+                      const badgeClasses: Record<string, string> = {
+                        empty: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+                        critical: "bg-rose-500/10 text-rose-400 border-rose-500/20",
+                        low: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                        safe: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+                        abundant: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+                        unknown: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+                      };
+                      const dotClasses: Record<string, string> = {
+                        empty: "bg-rose-400",
+                        critical: "bg-rose-400",
+                        low: "bg-amber-400",
+                        safe: "bg-emerald-400",
+                        abundant: "bg-sky-400",
+                        unknown: "bg-zinc-400",
+                      };
+                      return (
+                        <span
+                          className={cn(
+                            "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium border",
+                            badgeClasses[mosInfo.variant] || badgeClasses.unknown
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "h-1.5 w-1.5 rounded-full",
+                              dotClasses[mosInfo.variant] || dotClasses.unknown
+                            )}
+                          />
+                          {mosInfo.label}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
                     <div className="inline-flex items-center gap-1 justify-end">
@@ -741,7 +866,7 @@ export function StockTable({ initialItems }: StockTableProps) {
 
       {/* ── Modal Tambah Item Baru ─────────────────────────────────────── */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg shadow-2xl rounded-2xl p-6">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl rounded-2xl p-6">
           <DialogHeader className="space-y-1.5">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
@@ -866,6 +991,83 @@ export function StockTable({ initialItems }: StockTableProps) {
                   <option value="EMPTY">Kosong (Habis)</option>
                 </select>
               </div>
+
+              {/* Seksi Logistik & MOS Opsional */}
+              <div className="pt-2 border-t border-white/10 sm:col-span-2">
+                <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">
+                  Logistik & Perencanaan (Opsional)
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="add-avg-usage" className="text-xs font-medium text-zinc-300">
+                      Rata-rata Pemakaian / Bln
+                    </Label>
+                    <Input
+                      id="add-avg-usage"
+                      type="number"
+                      min="0"
+                      placeholder="Contoh: 1200"
+                      value={addForm.avgUsage}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAddForm((f) => {
+                          const qty = Number(f.quantity) || 0;
+                          const usage = Number(val) || 0;
+                          const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
+                          return {
+                            ...f,
+                            avgUsage: val,
+                            mos: f.mos === "" ? autoMos : f.mos,
+                          };
+                        });
+                      }}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="add-mos" className="text-xs font-medium text-zinc-300">
+                      Tingkat Ketersediaan (MOS - Bulan)
+                    </Label>
+                    <Input
+                      id="add-mos"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      placeholder="Contoh: 12.5"
+                      value={addForm.mos}
+                      onChange={(e) => setAddForm((f) => ({ ...f, mos: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="add-ed" className="text-xs font-medium text-zinc-300">
+                      Tanggal Kedaluwarsa (ED)
+                    </Label>
+                    <Input
+                      id="add-ed"
+                      placeholder="Contoh: 2028-06"
+                      value={addForm.expiryDate}
+                      onChange={(e) => setAddForm((f) => ({ ...f, expiryDate: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="add-nomenklatur" className="text-xs font-medium text-zinc-300">
+                      Nomenklatur / Sub-Kelas Terapi
+                    </Label>
+                    <Input
+                      id="add-nomenklatur"
+                      placeholder="Contoh: Analgesik & Antipiretik"
+                      value={addForm.nomenklatur}
+                      onChange={(e) => setAddForm((f) => ({ ...f, nomenklatur: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
@@ -900,7 +1102,7 @@ export function StockTable({ initialItems }: StockTableProps) {
 
       {/* ── Modal Edit Item ────────────────────────────────────────────── */}
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg shadow-2xl rounded-2xl p-6">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl rounded-2xl p-6">
           <DialogHeader className="space-y-1.5">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
@@ -1024,6 +1226,83 @@ export function StockTable({ initialItems }: StockTableProps) {
                   <option value="LOW">Menipis (Perlu Pengadaan)</option>
                   <option value="EMPTY">Kosong (Habis)</option>
                 </select>
+              </div>
+
+              {/* Seksi Logistik & MOS Opsional */}
+              <div className="pt-2 border-t border-white/10 sm:col-span-2">
+                <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">
+                  Logistik & Perencanaan (Opsional)
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
+                      Rata-rata Pemakaian / Bln
+                    </Label>
+                    <Input
+                      id="edit-avg-usage"
+                      type="number"
+                      min="0"
+                      placeholder="Contoh: 1200"
+                      value={editForm.avgUsage}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setEditForm((f) => {
+                          const qty = Number(f.quantity) || 0;
+                          const usage = Number(val) || 0;
+                          const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
+                          return {
+                            ...f,
+                            avgUsage: val,
+                            mos: f.mos === "" ? autoMos : f.mos,
+                          };
+                        });
+                      }}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="edit-mos" className="text-xs font-medium text-zinc-300">
+                      Tingkat Ketersediaan (MOS - Bulan)
+                    </Label>
+                    <Input
+                      id="edit-mos"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      placeholder="Contoh: 12.5"
+                      value={editForm.mos}
+                      onChange={(e) => setEditForm((f) => ({ ...f, mos: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="edit-ed" className="text-xs font-medium text-zinc-300">
+                      Tanggal Kedaluwarsa (ED)
+                    </Label>
+                    <Input
+                      id="edit-ed"
+                      placeholder="Contoh: 2028-06"
+                      value={editForm.expiryDate}
+                      onChange={(e) => setEditForm((f) => ({ ...f, expiryDate: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="edit-nomenklatur" className="text-xs font-medium text-zinc-300">
+                      Nomenklatur / Sub-Kelas Terapi
+                    </Label>
+                    <Input
+                      id="edit-nomenklatur"
+                      placeholder="Contoh: Analgesik & Antipiretik"
+                      value={editForm.nomenklatur}
+                      onChange={(e) => setEditForm((f) => ({ ...f, nomenklatur: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 

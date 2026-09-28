@@ -72,10 +72,10 @@ async function runTests() {
   const totalStocks = await db.medicineStock.count();
   assert(totalStocks >= 224, `Jumlah stok di database (${totalStocks}) terverifikasi >= 224 item`);
 
-  const sampleStock = await db.medicineStock.findUnique({
-    where: { code: "OBG-001" },
+  const sampleStock = await db.medicineStock.findFirst({
+    where: { name: { contains: "Parasetamol" } },
   });
-  assert(sampleStock !== null, "Item OBG-001 (Paracetamol 500 mg) ditemukan di basis data");
+  assert(sampleStock !== null, "Item Parasetamol ditemukan di basis data");
   assert(sampleStock?.unit === "Tablet", "Satuan OBG-001 sesuai ('Tablet')");
 
   // 3. Pengujian kalkulasi otomatis status ketersediaan

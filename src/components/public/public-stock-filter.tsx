@@ -19,6 +19,9 @@ export interface PublicStockFilterProps {
   onChange: (selected: string[]) => void;
   enableSearch?: boolean;
   className?: string;
+  singleSelect?: boolean;
+  icon?: React.ReactNode;
+  align?: "right" | "left" | "full-mobile";
 }
 
 export function PublicStockFilter({
@@ -29,6 +32,9 @@ export function PublicStockFilter({
   onChange,
   enableSearch = false,
   className = "",
+  singleSelect = false,
+  icon,
+  align = "right",
 }: PublicStockFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,6 +92,12 @@ export function PublicStockFilter({
   }, [isOpen, enableSearch]);
 
   const handleToggleOption = (val: string) => {
+    if (singleSelect) {
+      onChange([val]);
+      closeDropdown();
+      triggerRef.current?.focus();
+      return;
+    }
     if (selectedValues.includes(val)) {
       onChange(selectedValues.filter((v) => v !== val));
     } else {
@@ -186,17 +198,21 @@ export function PublicStockFilter({
         )}
       >
         <div className="flex items-center gap-2 truncate">
-          <SlidersHorizontal
-            className={cn(
-              "h-3.5 w-3.5 shrink-0 transition-colors",
-              selectedValues.length > 0 ? "text-brand-600" : "text-muted"
-            )}
-          />
+          {icon ? (
+            icon
+          ) : (
+            <SlidersHorizontal
+              className={cn(
+                "h-3.5 w-3.5 shrink-0 transition-colors",
+                selectedValues.length > 0 ? "text-brand-600" : "text-muted"
+              )}
+            />
+          )}
           {renderTriggerLabel()}
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          {selectedValues.length > 0 && (
+          {!singleSelect && selectedValues.length > 0 && (
             <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-brand-600/15 px-1.5 text-[10px] font-semibold text-brand-700">
               {selectedValues.length}
             </span>
@@ -215,8 +231,15 @@ export function PublicStockFilter({
         <div
           role="listbox"
           id={listboxId}
-          aria-multiselectable="true"
-          className="absolute right-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] origin-top-right rounded-2xl border border-border bg-surface/95 p-2.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+          aria-multiselectable={!singleSelect}
+          className={cn(
+            "absolute top-full z-50 mt-2 rounded-2xl border border-border bg-surface p-2.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95",
+            align === "full-mobile"
+              ? "left-0 right-0 w-full sm:left-auto sm:right-0 sm:w-72 origin-top sm:origin-top-right"
+              : align === "left"
+              ? "left-0 w-72 max-w-[calc(100vw-2rem)] origin-top-left"
+              : "right-0 w-72 max-w-[calc(100vw-2rem)] origin-top-right"
+          )}
         >
           {/* Mini Search Input */}
           {enableSearch && (
@@ -236,24 +259,26 @@ export function PublicStockFilter({
             </div>
           )}
 
-          {/* Quick Actions Bar */}
-          <div className="mb-2 flex items-center justify-between border-b border-border px-1 pb-2 text-xs">
-            <button
-              type="button"
-              onClick={handleSelectAll}
-              className="cursor-pointer text-[11px] font-medium text-brand-600 transition-colors hover:text-brand-700 hover:underline"
-            >
-              Pilih Semua
-            </button>
-            <button
-              type="button"
-              onClick={handleResetFilter}
-              disabled={selectedValues.length === 0}
-              className="cursor-pointer text-[11px] font-medium text-muted transition-colors hover:text-heading disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Reset Filter
-            </button>
-          </div>
+          {/* Quick Actions Bar (Hanya tampil untuk multi-select) */}
+          {!singleSelect && (
+            <div className="mb-2 flex items-center justify-between border-b border-border px-1 pb-2 text-xs">
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="cursor-pointer text-[11px] font-medium text-brand-600 transition-colors hover:text-brand-700 hover:underline"
+              >
+                Pilih Semua
+              </button>
+              <button
+                type="button"
+                onClick={handleResetFilter}
+                disabled={selectedValues.length === 0}
+                className="cursor-pointer text-[11px] font-medium text-muted transition-colors hover:text-heading disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Reset Filter
+              </button>
+            </div>
+          )}
 
           {/* Options List */}
           <div
@@ -286,16 +311,17 @@ export function PublicStockFilter({
                     )}
                   >
                     <div className="flex items-center gap-2 truncate">
-                      {/* Checkbox Icon */}
+                      {/* Checkbox / Radio Icon */}
                       <div
                         className={cn(
-                          "flex h-4 w-4 shrink-0 items-center justify-center rounded-md border transition-colors",
+                          "flex h-4 w-4 shrink-0 items-center justify-center border transition-colors",
+                          singleSelect ? "rounded-full" : "rounded-md",
                           isSelected
                             ? "border-zinc-950 bg-zinc-950 text-white"
                             : "border-border bg-surface"
                         )}
                       >
-                        {isSelected && <Check className="h-3 w-3 stroke-[2.5]" />}
+                        {isSelected && <Check className="h-2.5 w-2.5 stroke-[3]" />}
                       </div>
 
                       {/* Optional Indicator Dot */}

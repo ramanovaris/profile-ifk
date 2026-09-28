@@ -11,12 +11,18 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  X,
+  Info,
 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
 import { PublicStockFilter } from "@/components/public/public-stock-filter";
 import {
   getStockSummary,
+  getMosBadgeInfo,
+  getItemEffectiveStatus,
+  formatStockPeriodLabel,
+  formatStockCutoffDate,
   type MedicineStockItem,
   type MedicineCategory,
   type StockStatus,
@@ -25,12 +31,20 @@ import { cn } from "@/lib/utils";
 
 interface PublicStockClientViewProps {
   initialItems: MedicineStockItem[];
+  activePeriod?: string;
+  availablePeriods?: string[];
 }
 
-export function PublicStockClientView({ initialItems }: PublicStockClientViewProps) {
+export function PublicStockClientView({
+  initialItems,
+  activePeriod = "2026-08",
+  availablePeriods = ["2026-08", "2026-07", "2026-06"],
+}: PublicStockClientViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const selectedPeriod = searchParams.get("periode") || activePeriod;
 
   // URL query search
   const urlQ = searchParams.get("q") || "";
@@ -113,6 +127,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
     return () => clearTimeout(timer);
   }, [search, searchParams, updateUrl]);
 
+  // Hapus pencarian seketika
+  const handleClearSearch = () => {
+    setSearch("");
+    updateUrl({ q: null, page: null }, "replace");
+  };
+
   const summary = useMemo(() => getStockSummary(initialItems), [initialItems]);
 
   const categoryOptions = useMemo(() => {
@@ -151,6 +171,13 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
     },
   ], [summary]);
 
+  const periodOptions = useMemo(() => {
+    return (availablePeriods || []).map((p, idx) => ({
+      value: p,
+      label: `${formatStockPeriodLabel(p)}${idx === 0 ? " (Terkini)" : ""}`,
+    }));
+  }, [availablePeriods]);
+
   const filtered = useMemo(() => {
     return initialItems
       .filter(
@@ -161,7 +188,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
       .filter(
         (item) =>
           selectedStatuses.length === 0 ||
-          selectedStatuses.includes(item.status)
+          selectedStatuses.includes(getItemEffectiveStatus(item))
       )
       .filter((item) => {
         const query = search.toLowerCase();
@@ -211,33 +238,55 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
 
       <section className="border-t border-border bg-surface py-16 md:py-24">
         <div className="section-container">
-          {/* ── Info Bar Pembaruan Cut-off ──────────────────────────── */}
-          <Reveal>
-            <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:px-6">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
-                <Calendar className="h-5 w-5" />
+          {/* ── Info Bar Pembaruan Cut-off & Pemilih Periode ────────── */}
+          <Reveal className="relative z-40">
+            <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+                    Periode Data Stok
+                  </p>
+                  <p className="text-sm font-semibold text-heading">
+                    {formatStockCutoffDate(selectedPeriod)}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-                  Periode Data Stok
-                </p>
-                <p className="text-sm font-medium text-heading">
-                  Cut-off 31 Agustus 2026
-                </p>
-              </div>
+
+              {/* Selector Periode Multi-Bulan */}
+              {availablePeriods.length > 1 && (
+                <div className="w-full sm:w-auto">
+                  <PublicStockFilter
+                    title="Periode"
+                    options={periodOptions}
+                    selectedValues={[selectedPeriod]}
+                    onChange={(vals) => {
+                      if (vals[0]) {
+                        updateUrl({ periode: vals[0], page: null });
+                      }
+                    }}
+                    enableSearch={true}
+                    singleSelect={true}
+                    align="full-mobile"
+                    icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-600" />}
+                  />
+                </div>
+              )}
             </div>
           </Reveal>
 
           {/* ── Kartu Metrik Ringkasan Interaktif ─────────────────── */}
-          <Reveal delay={60}>
-            <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <Reveal delay={60} className="relative z-10">
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
               {/* Total Item */}
               <button
                 type="button"
                 onClick={() => handleCardStatusClick()}
                 aria-pressed={isAllActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isAllActive
                     ? "border-brand-500/60 bg-brand-500/10 ring-2 ring-brand-500/30"
                     : "border-border bg-surface-alt/50 hover:border-brand-500/40"
@@ -247,12 +296,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <Package className="h-4 w-4 text-brand-600" />
                   <span className="text-xs font-medium">Total Perbekalan</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-heading">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-heading">
                     {summary.totalItems}
                   </p>
                   {isAllActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-2 py-0.5 text-[10px] font-semibold text-brand-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-brand-600" />
                       Aktif
                     </span>
@@ -267,7 +316,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("AVAILABLE")}
                 aria-pressed={isAvailableActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isAvailableActive
                     ? "border-emerald-500/60 bg-emerald-500/15 ring-2 ring-emerald-500/30"
                     : "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10"
@@ -277,12 +326,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <CheckCircle2 className="h-4 w-4" />
                   <span className="text-xs font-medium">Stok Aman</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-emerald-800">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-800">
                     {summary.availableItems}
                   </p>
                   {isAvailableActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       Aktif
                     </span>
@@ -297,7 +346,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("LOW")}
                 aria-pressed={isLowActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isLowActive
                     ? "border-amber-500/60 bg-amber-500/15 ring-2 ring-amber-500/30"
                     : "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/10"
@@ -307,12 +356,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <AlertTriangle className="h-4 w-4" />
                   <span className="text-xs font-medium">Stok Menipis</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-amber-800">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-amber-800">
                     {summary.lowItems}
                   </p>
                   {isLowActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                       Aktif
                     </span>
@@ -327,7 +376,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                 onClick={() => handleCardStatusClick("EMPTY")}
                 aria-pressed={isEmptyActive}
                 className={cn(
-                  "group relative w-full text-left rounded-2xl border p-4 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
+                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
                   isEmptyActive
                     ? "border-rose-500/60 bg-rose-500/15 ring-2 ring-rose-500/30"
                     : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
@@ -337,12 +386,12 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   <XCircle className="h-4 w-4" />
                   <span className="text-xs font-medium">Stok Kosong</span>
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <p className="text-3xl font-bold tracking-tight text-rose-800">
+                <div className="mt-2 flex items-center justify-between gap-1.5">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-rose-800">
                     {summary.emptyItems}
                   </p>
                   {isEmptyActive && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-700">
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                       Aktif
                     </span>
@@ -367,8 +416,18 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   placeholder="Cari nama obat (contoh: Paracetamol, Amoxicillin, Infus)..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full rounded-full border border-border bg-surface py-2 pl-10 pr-4 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
+                  className="w-full rounded-full border border-border bg-surface py-2 pl-10 pr-10 text-sm text-heading placeholder:text-muted outline-none transition-colors focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20"
                 />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    aria-label="Bersihkan pencarian"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-alt hover:text-heading cursor-pointer"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
 
               {/* Filter Dropdowns (Kategori & Status) */}
@@ -408,15 +467,19 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
           <Reveal delay={140} className="relative z-10">
             <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[768px] text-left text-sm">
+                <table className="w-full min-w-[840px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface-alt/70 text-xs font-semibold uppercase tracking-wider text-muted">
-                      <th className="px-5 py-3.5 w-16">No</th>
-                      <th className="px-5 py-3.5">Nama Obat / Barang</th>
-                      <th className="px-5 py-3.5">Kategori</th>
-                      <th className="px-5 py-3.5">Satuan</th>
-                      <th className="px-5 py-3.5 text-right">Stok Fisik</th>
-                      <th className="px-5 py-3.5 text-center">Status</th>
+                      <th className="px-4 py-3.5 w-14">No</th>
+                      <th className="px-4 py-3.5">Nama Perbekalan / Kode</th>
+                      <th className="px-4 py-3.5">Kategori</th>
+                      <th className="px-4 py-3.5">Satuan</th>
+                      <th className="px-4 py-3.5 text-right">Stok Fisik</th>
+                      <th className="px-4 py-3.5 text-right">
+                        <div>Rata-rata Pemakaian</div>
+                        <div className="text-[10px] font-normal normal-case text-muted/80">RPB (Tren 12 Bln)</div>
+                      </th>
+                      <th className="px-4 py-3.5 text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -425,42 +488,59 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                         key={item.id}
                         className="transition-colors duration-150 hover:bg-surface-alt/40"
                       >
-                        <td className="px-5 py-3.5 font-mono text-xs text-muted">
+                        <td className="px-4 py-3.5 font-mono text-xs text-muted">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
-                        <td className="px-5 py-3.5">
+                        <td className="px-4 py-3.5">
                           <div className="font-semibold text-heading">{item.name}</div>
-                          <div className="font-mono text-xs text-muted">{item.code}</div>
+                          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+                            <span className="font-mono">{item.code}</span>
+                            {item.nomenklatur && (
+                              <>
+                                <span>•</span>
+                                <span className="inline-block truncate max-w-[180px] text-zinc-500" title={item.nomenklatur}>
+                                  {item.nomenklatur}
+                                </span>
+                              </>
+                            )}
+                            {item.expiryDate && (
+                              <>
+                                <span>•</span>
+                                <span className="text-amber-700/90 font-medium">
+                                  ED: {item.expiryDate}
+                                </span>
+                              </>
+                            )}
+                          </div>
                         </td>
-                        <td className="px-5 py-3.5 text-muted">{item.category}</td>
-                        <td className="px-5 py-3.5 text-muted">{item.unit}</td>
-                        <td className="px-5 py-3.5 text-right font-mono font-semibold text-heading">
+                        <td className="px-4 py-3.5 text-muted">{item.category}</td>
+                        <td className="px-4 py-3.5 text-muted">{item.unit}</td>
+                        <td className="px-4 py-3.5 text-right font-mono font-semibold text-heading">
                           {item.quantity.toLocaleString("id-ID")}
                         </td>
-                        <td className="px-5 py-3.5 text-center">
-                          <span
-                            className={cn(
-                              "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
-                              item.status === "AVAILABLE" &&
-                                "border border-emerald-500/20 bg-emerald-500/10 text-emerald-700",
-                              item.status === "LOW" &&
-                                "border border-amber-500/20 bg-amber-500/10 text-amber-700",
-                              item.status === "EMPTY" &&
-                                "border border-rose-500/20 bg-rose-500/10 text-rose-700"
-                            )}
-                          >
-                            <span
-                              className={cn(
-                                "h-1.5 w-1.5 rounded-full",
-                                item.status === "AVAILABLE" && "bg-emerald-500",
-                                item.status === "LOW" && "bg-amber-500",
-                                item.status === "EMPTY" && "bg-rose-500"
-                              )}
-                            />
-                            {item.status === "AVAILABLE" && "Tersedia"}
-                            {item.status === "LOW" && "Menipis"}
-                            {item.status === "EMPTY" && "Kosong"}
-                          </span>
+                        <td className="px-4 py-3.5 text-right font-mono text-muted text-xs">
+                          {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
+                            ? item.avgUsage.toLocaleString("id-ID", {
+                                minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
+                                maximumFractionDigits: 2,
+                              })
+                            : "-"}
+                        </td>
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                          {(() => {
+                            const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
+                            return (
+                              <span
+                                className={cn(
+                                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border",
+                                  mosInfo.badgeClass
+                                )}
+                              >
+                                <span className={cn("h-1.5 w-1.5 rounded-full", mosInfo.dotClass)} />
+                                {mosInfo.label}
+                              </span>
+                            );
+                          })()}
                         </td>
                       </tr>
                     ))}
@@ -546,6 +626,87 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                   </div>
                 </div>
               )}
+            </div>
+          </Reveal>
+
+          {/* ── Panduan Indikator Status & Tingkat Ketersediaan ── */}
+          <Reveal delay={160} className="relative z-10">
+            <div className="mt-8 rounded-2xl border border-border bg-surface-alt/40 p-4 sm:p-5 backdrop-blur-xs">
+              <div className="flex items-start gap-3">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 text-brand-600 dark:bg-brand-500/20">
+                  <Info className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-sm font-semibold text-heading">
+                    Panduan Indikator Status & Tingkat Ketersediaan
+                  </h2>
+                  <p className="mt-0.5 text-xs text-muted leading-relaxed">
+                    Status ketersediaan dihitung berdasarkan metode standar logistik farmasi (<em>Months of Supply / MOS</em>): sisa stok fisik dibagi rata-rata pemakaian per bulan (tren 12 bulan).
+                  </p>
+
+                  <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 text-[11px] font-medium text-sky-700 dark:text-sky-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-sky-500" />
+                        Melimpah
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Stok melebihi estimasi pemakaian 18 bulan (&gt; 18 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        Aman
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Rentang ideal ketersediaan logistik farmasi (3 – 18 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                        Menipis
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Perbekalan terbatas, dalam prioritas pemantauan (1 – 3 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-700 dark:text-rose-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        Kritis
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Stok sangat minim di bawah 1 bulan pemakaian (&lt; 1 bln).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-700 dark:text-rose-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+                        Kosong
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Sisa stok fisik di gudang 0 (dalam proses pengadaan).
+                      </p>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
+                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        Tersedia
+                      </span>
+                      <p className="text-xs text-muted leading-snug">
+                        Stok siap salur (riwayat rata-rata pemakaian belum tercatat).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </Reveal>
         </div>

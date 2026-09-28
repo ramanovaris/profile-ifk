@@ -17,11 +17,39 @@ export const metadata: Metadata = {
     "Informasi transparansi ketersediaan stok fisik perbekalan farmasi pada UPTD Instalasi Farmasi Kab. Kotabaru per akhir bulan.",
 };
 
-export default async function StokPublikPage() {
+interface StokPublikPageProps {
+  searchParams: Promise<{
+    periode?: string;
+    [key: string]: string | string[] | undefined;
+  }>;
+}
+
+export default async function StokPublikPage({ searchParams }: StokPublikPageProps) {
+  const resolvedParams = await searchParams;
+  const requestedPeriod = resolvedParams?.periode;
+
   let items: MedicineStockItem[] = [];
+  let availablePeriods: string[] = [];
+  let activePeriod = "2026-08";
 
   try {
+    const periodsRaw = await db.medicineStock.findMany({
+      select: { period: true },
+      distinct: ["period"],
+      orderBy: { period: "desc" },
+    });
+    availablePeriods = periodsRaw.map((p) => p.period);
+    if (availablePeriods.length === 0) {
+      availablePeriods = ["2026-08", "2026-07", "2026-06"];
+    }
+
+    activePeriod =
+      requestedPeriod && availablePeriods.includes(requestedPeriod)
+        ? requestedPeriod
+        : availablePeriods[0];
+
     const dbStocks = await db.medicineStock.findMany({
+      where: { period: activePeriod },
       orderBy: {
         name: "asc",
       },
@@ -30,6 +58,7 @@ export default async function StokPublikPage() {
     if (dbStocks.length > 0) {
       items = dbStocks.map((s) => ({
         id: s.id,
+        period: s.period,
         code: s.code,
         name: s.name,
         category: s.category as MedicineCategory,
@@ -37,6 +66,11 @@ export default async function StokPublikPage() {
         quantity: s.quantity,
         status: s.status as StockStatus,
         updatedAt: s.updatedAt.toISOString(),
+        avgUsage: s.avgUsage,
+        mos: s.mos,
+        expiryDate: s.expiryDate,
+        nomenklatur: s.nomenklatur,
+        source: s.source,
       }));
     }
   } catch (err) {
@@ -50,7 +84,11 @@ export default async function StokPublikPage() {
 
   return (
     <Suspense fallback={null}>
-      <PublicStockClientView initialItems={items} />
+      <PublicStockClientView
+        initialItems={items}
+        activePeriod={activePeriod}
+        availablePeriods={availablePeriods}
+      />
     </Suspense>
   );
 }
