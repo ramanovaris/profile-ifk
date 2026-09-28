@@ -14,7 +14,8 @@ import {
   Trash2,
   Save,
   Loader2,
-  Calendar
+  Calendar,
+  FileSpreadsheet
 } from "lucide-react";
 import { 
   Dialog, 
@@ -42,6 +43,7 @@ import {
   updateStockAction, 
   deleteStockAction 
 } from "@/actions/stock";
+import { exportStockToExcel } from "@/lib/stock-exporter";
 import { StockForm } from "./stock-form";
 
 interface StockTableProps {
@@ -461,6 +463,36 @@ export function StockTable({
     toast.success("Template format CSV berhasil diunduh");
   };
 
+  const handleExportExcel = () => {
+    const activeFilters: string[] = [];
+    if (selectedCategories.length > 0) {
+      activeFilters.push(`Kategori: ${selectedCategories.join(", ")}`);
+    }
+    if (selectedStatuses.length > 0) {
+      const statusNames = selectedStatuses.map((s) =>
+        s === "AVAILABLE" ? "Aman" : s === "LOW" ? "Menipis" : "Kosong"
+      );
+      activeFilters.push(`Status: ${statusNames.join(", ")}`);
+    }
+    if (search.trim()) {
+      activeFilters.push(`Pencarian: "${search.trim()}"`);
+    }
+
+    const filterSummary =
+      activeFilters.length > 0
+        ? activeFilters.join(" | ")
+        : "Semua Data (Tanpa Filter)";
+
+    try {
+      exportStockToExcel(filtered, selectedPeriod, {
+        filterSummary,
+      });
+      toast.success("Data rekap stok berhasil diekspor ke Excel");
+    } catch {
+      toast.error("Gagal mengekspor data stok ke Excel");
+    }
+  };
+
   // Status kartu aktif
   const isAllActive = selectedStatuses.length === 0;
   const isAvailableActive = selectedStatuses.includes("AVAILABLE");
@@ -492,6 +524,15 @@ export function StockTable({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 sm:flex-nowrap">
+          <button 
+            type="button"
+            onClick={handleExportExcel}
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 text-sm font-medium text-emerald-300 shadow-sm transition-all hover:bg-emerald-500/20 hover:text-white active:scale-95 cursor-pointer"
+            title="Ekspor rekap data ketersediaan obat ke format Excel (.xlsx)"
+          >
+            <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
+            <span>Ekspor Excel</span>
+          </button>
           <button 
             type="button"
             onClick={handleDownloadTemplate}
