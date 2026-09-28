@@ -18,6 +18,8 @@ export interface StockMultiSelectFilterProps {
   onChange: (selected: string[]) => void;
   enableSearch?: boolean;
   className?: string;
+  singleSelect?: boolean;
+  icon?: React.ReactNode;
 }
 
 export function StockMultiSelectFilter({
@@ -28,6 +30,8 @@ export function StockMultiSelectFilter({
   onChange,
   enableSearch = false,
   className = "",
+  singleSelect = false,
+  icon,
 }: StockMultiSelectFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -85,6 +89,12 @@ export function StockMultiSelectFilter({
   }, [isOpen, enableSearch]);
 
   const handleToggleOption = (val: string) => {
+    if (singleSelect) {
+      onChange([val]);
+      closeDropdown();
+      triggerRef.current?.focus();
+      return;
+    }
     if (selectedValues.includes(val)) {
       onChange(selectedValues.filter((v) => v !== val));
     } else {
@@ -184,16 +194,20 @@ export function StockMultiSelectFilter({
         }`}
       >
         <div className="flex items-center gap-2 truncate">
-          <SlidersHorizontal
-            className={`h-3.5 w-3.5 shrink-0 transition-colors ${
-              selectedValues.length > 0 ? "text-brand-400" : "text-zinc-400"
-            }`}
-          />
+          {icon ? (
+            icon
+          ) : (
+            <SlidersHorizontal
+              className={`h-3.5 w-3.5 shrink-0 transition-colors ${
+                selectedValues.length > 0 ? "text-brand-400" : "text-zinc-400"
+              }`}
+            />
+          )}
           {renderTriggerLabel()}
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          {selectedValues.length > 0 && (
+          {!singleSelect && selectedValues.length > 0 && (
             <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-brand-500/20 px-1.5 text-[10px] font-semibold text-brand-300">
               {selectedValues.length}
             </span>
@@ -211,8 +225,8 @@ export function StockMultiSelectFilter({
         <div
           role="listbox"
           id={listboxId}
-          aria-multiselectable="true"
-          className="absolute right-0 top-full z-50 mt-1.5 w-72 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-white/10 bg-zinc-900/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+          aria-multiselectable={!singleSelect}
+          className="absolute right-0 top-full z-50 mt-1.5 w-72 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-white/10 bg-zinc-900 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
         >
           {/* Mini Search Input if enabled */}
           {enableSearch && (
@@ -232,24 +246,26 @@ export function StockMultiSelectFilter({
             </div>
           )}
 
-          {/* Quick Actions Bar */}
-          <div className="mb-1.5 flex items-center justify-between border-b border-white/5 px-1 pb-1.5 text-xs">
-            <button
-              type="button"
-              onClick={handleSelectAll}
-              className="cursor-pointer text-[11px] font-medium text-brand-400 transition-colors hover:text-brand-300"
-            >
-              Pilih Semua
-            </button>
-            <button
-              type="button"
-              onClick={handleResetFilter}
-              disabled={selectedValues.length === 0}
-              className="cursor-pointer text-[11px] font-medium text-zinc-400 transition-colors hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Reset Filter
-            </button>
-          </div>
+          {/* Quick Actions Bar (Hanya tampil untuk multi-select) */}
+          {!singleSelect && (
+            <div className="mb-1.5 flex items-center justify-between border-b border-white/5 px-1 pb-1.5 text-xs">
+              <button
+                type="button"
+                onClick={handleSelectAll}
+                className="cursor-pointer text-[11px] font-medium text-brand-400 transition-colors hover:text-brand-300"
+              >
+                Pilih Semua
+              </button>
+              <button
+                type="button"
+                onClick={handleResetFilter}
+                disabled={selectedValues.length === 0}
+                className="cursor-pointer text-[11px] font-medium text-zinc-400 transition-colors hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Reset Filter
+              </button>
+            </div>
+          )}
 
           {/* Options List */}
           <div
@@ -281,15 +297,17 @@ export function StockMultiSelectFilter({
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
-                      {/* Checkbox Icon */}
+                      {/* Checkbox / Radio Icon */}
                       <div
-                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center border transition-colors ${
+                          singleSelect ? "rounded-full" : "rounded"
+                        } ${
                           isSelected
                             ? "border-brand-500 bg-brand-600 text-white"
                             : "border-zinc-700 bg-zinc-950/50"
                         }`}
                       >
-                        {isSelected && <Check className="h-3 w-3 stroke-[2.5]" />}
+                        {isSelected && <Check className="h-2.5 w-2.5 stroke-[3]" />}
                       </div>
 
                       {/* Optional Indicator Dot */}

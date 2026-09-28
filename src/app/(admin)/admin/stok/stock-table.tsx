@@ -13,7 +13,8 @@ import {
   Pencil,
   Trash2,
   Save,
-  Loader2
+  Loader2,
+  Calendar
 } from "lucide-react";
 import { 
   Dialog, 
@@ -29,6 +30,8 @@ import { StockMultiSelectFilter } from "@/components/admin/stock-multi-select-fi
 import { 
   getStockSummary, 
   getMosBadgeInfo,
+  getItemEffectiveStatus,
+  formatStockPeriodLabel,
   type MedicineStockItem,
   type StockStatus,
   type MedicineCategory 
@@ -43,12 +46,20 @@ import { StockForm } from "./stock-form";
 
 interface StockTableProps {
   initialItems: MedicineStockItem[];
+  activePeriod?: string;
+  availablePeriods?: string[];
 }
 
-export function StockTable({ initialItems }: StockTableProps) {
+export function StockTable({
+  initialItems,
+  activePeriod = "2026-08",
+  availablePeriods = ["2026-08", "2026-07", "2026-06"],
+}: StockTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+
+  const selectedPeriod = searchParams.get("periode") || activePeriod;
 
   const [items, setItems] = useState<MedicineStockItem[]>(initialItems);
   const [prevInitialItems, setPrevInitialItems] = useState(initialItems);
@@ -235,6 +246,13 @@ export function StockTable({ initialItems }: StockTableProps) {
     },
   ], [summary]);
 
+  const periodOptions = useMemo(() => {
+    return (availablePeriods || []).map((p, idx) => ({
+      value: p,
+      label: `${formatStockPeriodLabel(p)}${idx === 0 ? " (Terkini)" : ""}`,
+    }));
+  }, [availablePeriods]);
+
   const filtered = useMemo(() => {
     return items
       .filter(
@@ -245,7 +263,7 @@ export function StockTable({ initialItems }: StockTableProps) {
       .filter(
         (item) =>
           selectedStatuses.length === 0 ||
-          selectedStatuses.includes(item.status)
+          selectedStatuses.includes(getItemEffectiveStatus(item))
       )
       .filter((item) => {
         const query = search.toLowerCase();
@@ -626,8 +644,24 @@ export function StockTable({ initialItems }: StockTableProps) {
           />
         </div>
 
-        {/* Filter Dropdowns (Kategori & Status) */}
+        {/* Filter Dropdowns (Periode, Kategori & Status) */}
         <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+          {availablePeriods && availablePeriods.length > 1 && (
+            <StockMultiSelectFilter
+              title="Periode"
+              options={periodOptions}
+              selectedValues={[selectedPeriod]}
+              onChange={(vals) => {
+                if (vals[0]) {
+                  updateUrl({ periode: vals[0], page: null });
+                }
+              }}
+              enableSearch={true}
+              singleSelect={true}
+              icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-400" />}
+            />
+          )}
+
           <StockMultiSelectFilter
             title="Kategori"
             allLabel="Semua Kategori"
@@ -661,7 +695,7 @@ export function StockTable({ initialItems }: StockTableProps) {
       {/* ── Tabel Stok ──────────────────────────────────────────────────── */}
       <div className="relative z-10 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[920px] text-left text-sm text-zinc-300">
+          <table className="w-full min-w-[980px] text-left text-sm text-zinc-300">
             <thead>
               <tr className="border-b border-zinc-800 bg-zinc-900">
                 <th className="px-4 py-3 font-medium text-zinc-400 w-12">No</th>
@@ -669,6 +703,10 @@ export function StockTable({ initialItems }: StockTableProps) {
                 <th className="px-4 py-3 font-medium text-zinc-400">Kategori</th>
                 <th className="px-4 py-3 font-medium text-zinc-400">Satuan</th>
                 <th className="px-4 py-3 font-medium text-zinc-400 text-right">Stok Fisik</th>
+                <th className="px-4 py-3 font-medium text-zinc-400 text-right">
+                  <div>Rata-rata Pemakaian</div>
+                  <div className="text-[10px] font-normal normal-case text-zinc-500">RPB (Tren 12 Bln)</div>
+                </th>
                 <th className="px-4 py-3 font-medium text-zinc-400 text-center">Status</th>
                 <th className="px-4 py-3 font-medium text-zinc-400 text-right">Aksi</th>
               </tr>
@@ -705,6 +743,14 @@ export function StockTable({ initialItems }: StockTableProps) {
                   <td className="px-4 py-3">{item.unit}</td>
                   <td className="px-4 py-3 text-right font-mono font-semibold text-zinc-100">
                     {item.quantity.toLocaleString("id-ID")}
+                  </td>
+                  <td className="px-4 py-3 text-right font-mono text-zinc-400 text-xs">
+                    {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
+                      ? item.avgUsage.toLocaleString("id-ID", {
+                          minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
+                          maximumFractionDigits: 2,
+                        })
+                      : "-"}
                   </td>
                   <td className="px-4 py-3 text-center whitespace-nowrap">
                     {(() => {

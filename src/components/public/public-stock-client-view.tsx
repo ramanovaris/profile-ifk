@@ -20,6 +20,9 @@ import { PublicStockFilter } from "@/components/public/public-stock-filter";
 import {
   getStockSummary,
   getMosBadgeInfo,
+  getItemEffectiveStatus,
+  formatStockPeriodLabel,
+  formatStockCutoffDate,
   type MedicineStockItem,
   type MedicineCategory,
   type StockStatus,
@@ -28,12 +31,20 @@ import { cn } from "@/lib/utils";
 
 interface PublicStockClientViewProps {
   initialItems: MedicineStockItem[];
+  activePeriod?: string;
+  availablePeriods?: string[];
 }
 
-export function PublicStockClientView({ initialItems }: PublicStockClientViewProps) {
+export function PublicStockClientView({
+  initialItems,
+  activePeriod = "2026-08",
+  availablePeriods = ["2026-08", "2026-07", "2026-06"],
+}: PublicStockClientViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const selectedPeriod = searchParams.get("periode") || activePeriod;
 
   // URL query search
   const urlQ = searchParams.get("q") || "";
@@ -160,6 +171,13 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
     },
   ], [summary]);
 
+  const periodOptions = useMemo(() => {
+    return (availablePeriods || []).map((p, idx) => ({
+      value: p,
+      label: `${formatStockPeriodLabel(p)}${idx === 0 ? " (Terkini)" : ""}`,
+    }));
+  }, [availablePeriods]);
+
   const filtered = useMemo(() => {
     return initialItems
       .filter(
@@ -170,7 +188,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
       .filter(
         (item) =>
           selectedStatuses.length === 0 ||
-          selectedStatuses.includes(item.status)
+          selectedStatuses.includes(getItemEffectiveStatus(item))
       )
       .filter((item) => {
         const query = search.toLowerCase();
@@ -220,25 +238,46 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
 
       <section className="border-t border-border bg-surface py-16 md:py-24">
         <div className="section-container">
-          {/* ── Info Bar Pembaruan Cut-off ──────────────────────────── */}
-          <Reveal>
-            <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:px-6">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
-                <Calendar className="h-5 w-5" />
+          {/* ── Info Bar Pembaruan Cut-off & Pemilih Periode ────────── */}
+          <Reveal className="relative z-40">
+            <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+                    Periode Data Stok
+                  </p>
+                  <p className="text-sm font-semibold text-heading">
+                    {formatStockCutoffDate(selectedPeriod)}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-                  Periode Data Stok
-                </p>
-                <p className="text-sm font-medium text-heading">
-                  Cut-off 30 Juni 2026
-                </p>
-              </div>
+
+              {/* Selector Periode Multi-Bulan */}
+              {availablePeriods.length > 1 && (
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <PublicStockFilter
+                    title="Periode"
+                    options={periodOptions}
+                    selectedValues={[selectedPeriod]}
+                    onChange={(vals) => {
+                      if (vals[0]) {
+                        updateUrl({ periode: vals[0], page: null });
+                      }
+                    }}
+                    enableSearch={true}
+                    singleSelect={true}
+                    icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-600" />}
+                  />
+                </div>
+              )}
             </div>
           </Reveal>
 
           {/* ── Kartu Metrik Ringkasan Interaktif ─────────────────── */}
-          <Reveal delay={60}>
+          <Reveal delay={60} className="relative z-10">
             <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
               {/* Total Item */}
               <button
@@ -427,7 +466,7 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
           <Reveal delay={140} className="relative z-10">
             <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-surface shadow-xs">
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[720px] text-left text-sm">
+                <table className="w-full min-w-[840px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface-alt/70 text-xs font-semibold uppercase tracking-wider text-muted">
                       <th className="px-4 py-3.5 w-14">No</th>
@@ -435,6 +474,10 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                       <th className="px-4 py-3.5">Kategori</th>
                       <th className="px-4 py-3.5">Satuan</th>
                       <th className="px-4 py-3.5 text-right">Stok Fisik</th>
+                      <th className="px-4 py-3.5 text-right">
+                        <div>Rata-rata Pemakaian</div>
+                        <div className="text-[10px] font-normal normal-case text-muted/80">RPB (Tren 12 Bln)</div>
+                      </th>
                       <th className="px-4 py-3.5 text-center">Status</th>
                     </tr>
                   </thead>
@@ -473,6 +516,14 @@ export function PublicStockClientView({ initialItems }: PublicStockClientViewPro
                         <td className="px-4 py-3.5 text-muted">{item.unit}</td>
                         <td className="px-4 py-3.5 text-right font-mono font-semibold text-heading">
                           {item.quantity.toLocaleString("id-ID")}
+                        </td>
+                        <td className="px-4 py-3.5 text-right font-mono text-muted text-xs">
+                          {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
+                            ? item.avgUsage.toLocaleString("id-ID", {
+                                minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
+                                maximumFractionDigits: 2,
+                              })
+                            : "-"}
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           {(() => {

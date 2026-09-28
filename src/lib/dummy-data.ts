@@ -235,7 +235,50 @@ export type MedicineStockItem = {
   expiryDate?: string | null;
   nomenklatur?: string | null;
   source?: string | null;
+  period?: string;
 };
+
+export function formatStockPeriodLabel(period: string): string {
+  const [year, month] = period.split("-");
+  const monthNames: Record<string, string> = {
+    "01": "Januari",
+    "02": "Februari",
+    "03": "Maret",
+    "04": "April",
+    "05": "Mei",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "Agustus",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Desember",
+  };
+  const mName = monthNames[month] || month;
+  return `${mName} ${year}`;
+}
+
+export function formatStockCutoffDate(period: string): string {
+  const [year, month] = period.split("-");
+  const y = parseInt(year, 10);
+  const m = parseInt(month, 10);
+  const lastDay = new Date(y, m, 0).getDate();
+  const monthNames: Record<string, string> = {
+    "01": "Januari",
+    "02": "Februari",
+    "03": "Maret",
+    "04": "April",
+    "05": "Mei",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "Agustus",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Desember",
+  };
+  return `Cut-off ${lastDay} ${monthNames[month] || month} ${year}`;
+}
 
 export type MosBadgeVariant = "empty" | "critical" | "low" | "safe" | "abundant" | "unknown";
 
@@ -323,12 +366,27 @@ export type StockSummary = {
   lastUpdated: string;
 };
 
+export function getItemEffectiveStatus(item: {
+  quantity: number;
+  mos?: number | null;
+  status?: StockStatus | string;
+}): StockStatus {
+  if (item.quantity <= 0 || item.status === "EMPTY") return "EMPTY";
+  if (item.mos !== undefined && item.mos !== null && !isNaN(item.mos)) {
+    return item.mos < 3 ? "LOW" : "AVAILABLE";
+  }
+  if (item.status === "AVAILABLE" || item.status === "LOW") {
+    return item.status as StockStatus;
+  }
+  return item.quantity < 500 ? "LOW" : "AVAILABLE";
+}
+
 export function getStockSummary(items: MedicineStockItem[]): StockSummary {
   return {
     totalItems: items.length,
-    availableItems: items.filter((i) => i.status === "AVAILABLE").length,
-    lowItems: items.filter((i) => i.status === "LOW").length,
-    emptyItems: items.filter((i) => i.status === "EMPTY").length,
+    availableItems: items.filter((i) => getItemEffectiveStatus(i) === "AVAILABLE").length,
+    lowItems: items.filter((i) => getItemEffectiveStatus(i) === "LOW").length,
+    emptyItems: items.filter((i) => getItemEffectiveStatus(i) === "EMPTY").length,
     lastUpdated: items.length > 0 ? items[0].updatedAt : "-",
   };
 }
@@ -336,8 +394,8 @@ export function getStockSummary(items: MedicineStockItem[]): StockSummary {
 /**
  * Kalkulasi otomatis status stok berdasarkan jumlah fisik atau MOS:
  * - quantity <= 0 => EMPTY
- * - manualStatus dihormati jika ada
- * - mos < 3 => LOW (sesuai kaidah buffer stock farmasi)
+ * - mos < 3 => LOW, mos >= 3 => AVAILABLE (kaidah logistik buffer stock farmasi)
+ * - manualStatus dihormati jika tidak ada nilai MOS
  * - quantity < 500 => LOW
  * - lainnya => AVAILABLE
  */
@@ -347,11 +405,10 @@ export function calculateStockStatus(
   mos?: number | null
 ): StockStatus {
   if (quantity <= 0) return "EMPTY";
-  if (manualStatus && manualStatus !== "EMPTY") return manualStatus;
   if (mos !== undefined && mos !== null && !isNaN(mos)) {
-    if (mos < 3) return "LOW";
-    return "AVAILABLE";
+    return mos < 3 ? "LOW" : "AVAILABLE";
   }
+  if (manualStatus && manualStatus !== "EMPTY") return manualStatus;
   if (quantity < 500) return "LOW";
   return "AVAILABLE";
 }

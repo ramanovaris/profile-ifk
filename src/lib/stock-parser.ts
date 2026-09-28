@@ -13,8 +13,51 @@ export type StockItemInput = {
   expiryDate?: string | null;
   nomenklatur?: string | null;
   source?: string | null;
+  period?: string;
   _testUserId?: string;
 };
+
+export function detectPeriodFromWorkbook(wb: XLSX.WorkBook): string | null {
+  const monthMap: Record<string, string> = {
+    january: "01", januari: "01", jan: "01",
+    february: "02", februari: "02", feb: "02",
+    march: "03", maret: "03", mar: "03",
+    april: "04", apr: "04",
+    may: "05", mei: "05",
+    june: "06", juni: "06", jun: "06",
+    july: "07", juli: "07", jul: "07",
+    august: "08", agustus: "08", aug: "08", agt: "08",
+    september: "09", sep: "09",
+    october: "10", oktober: "10", okt: "10",
+    november: "11", nopember: "11", nov: "11",
+    december: "12", desember: "12", des: "12",
+  };
+
+  for (const sheetName of wb.SheetNames) {
+    const ws = wb.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1 });
+    for (let r = 0; r < Math.min(5, rows.length); r++) {
+      const row = rows[r] || [];
+      for (const cell of row) {
+        if (typeof cell !== "string") continue;
+        const text = cell.toLowerCase();
+
+        const matchIso = text.match(/\b(20\d{2})[-_/\s](0[1-9]|1[0-2])\b/);
+        if (matchIso) return `${matchIso[1]}-${matchIso[2]}`;
+
+        const matchYearMonth = text.match(/\b(20\d{2})\s+([a-z]+)\b/);
+        if (matchYearMonth && monthMap[matchYearMonth[2]]) {
+          return `${matchYearMonth[1]}-${monthMap[matchYearMonth[2]]}`;
+        }
+        const matchMonthYear = text.match(/\b([a-z]+)\s+(20\d{2})\b/);
+        if (matchMonthYear && monthMap[matchMonthYear[1]]) {
+          return `${matchMonthYear[2]}-${monthMap[matchMonthYear[1]]}`;
+        }
+      }
+    }
+  }
+  return null;
+}
 
 /**
  * Parser pintar untuk file Excel (.xlsx, .xls) / CSV (.csv).
@@ -23,9 +66,10 @@ export type StockItemInput = {
  * 2. Format Laporan Obat Program (Kemenkes dengan sheet Detil Stok)
  * 3. Format CSV/Excel Standar (Kode, Nama, Kategori, Satuan, Stok, dll.)
  */
-export function parseStockWorkbook(buffer: Buffer): StockItemInput[] {
+export function parseStockWorkbook(buffer: Buffer, defaultPeriod?: string): StockItemInput[] {
   const wb = XLSX.read(buffer, { type: "buffer" });
   const sheetNames = wb.SheetNames;
+  const detectedPeriod = detectPeriodFromWorkbook(wb) || defaultPeriod || "2026-06";
 
   // 1. Format: Obat Indikator
   if (sheetNames.includes("Obat Indikator")) {
@@ -94,6 +138,7 @@ export function parseStockWorkbook(buffer: Buffer): StockItemInput[] {
           mos: mos !== null && !isNaN(mos) ? Number(mos.toFixed(2)) : null,
           nomenklatur,
           source: "INDIKATOR",
+          period: detectedPeriod,
         });
       }
       return items;
@@ -213,6 +258,7 @@ export function parseStockWorkbook(buffer: Buffer): StockItemInput[] {
           expiryDate,
           nomenklatur: nom,
           source: "PROGRAM",
+          period: detectedPeriod,
         });
       }
       return items;
@@ -284,6 +330,7 @@ export function parseStockWorkbook(buffer: Buffer): StockItemInput[] {
       mos: mos !== null && !isNaN(mos) ? Number(mos.toFixed(2)) : null,
       expiryDate,
       source: "MANUAL",
+      period: detectedPeriod,
     });
   }
 

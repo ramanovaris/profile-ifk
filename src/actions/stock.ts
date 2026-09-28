@@ -44,14 +44,15 @@ export async function createStockAction(data: StockItemInput): Promise<StockActi
   }
 
   try {
-    const existing = await db.medicineStock.findUnique({
-      where: { code: trimmedCode },
+    const period = data.period?.trim() || "2026-06";
+    const existing = await db.medicineStock.findFirst({
+      where: { period, code: trimmedCode },
     });
 
     if (existing) {
       return {
         success: false,
-        error: `Kode obat '${trimmedCode}' sudah digunakan oleh '${existing.name}'. Gunakan kode lain.`,
+        error: `Kode obat '${trimmedCode}' sudah digunakan oleh '${existing.name}' pada periode ${period}. Gunakan kode lain.`,
       };
     }
 
@@ -69,6 +70,7 @@ export async function createStockAction(data: StockItemInput): Promise<StockActi
 
     const created = await db.medicineStock.create({
       data: {
+        period,
         code: trimmedCode,
         name: trimmedName,
         category: trimmedCategory,
@@ -150,13 +152,13 @@ export async function updateStockAction(
     }
 
     if (trimmedCode !== existing.code) {
-      const codeDuplicate = await db.medicineStock.findUnique({
-        where: { code: trimmedCode },
+      const codeDuplicate = await db.medicineStock.findFirst({
+        where: { period: existing.period, code: trimmedCode },
       });
       if (codeDuplicate && codeDuplicate.id !== id) {
         return {
           success: false,
-          error: `Kode obat '${trimmedCode}' sudah digunakan oleh obat lain.`,
+          error: `Kode obat '${trimmedCode}' sudah digunakan oleh obat lain pada periode ${existing.period}.`,
         };
       }
     }
@@ -282,8 +284,8 @@ export async function deleteStockAction(
  */
 export async function batchImportStockAction(
   items: StockItemInput[],
-  options?: { _testUserId?: string }
-): Promise<StockActionResult<{ inserted: number; updated: number }>> {
+  options?: { _testUserId?: string; defaultPeriod?: string }
+): Promise<StockActionResult<{ inserted: number; updated: number; period: string }>> {
   if (!options?._testUserId) {
     const session = await getCurrentSession();
     if (!session) {
@@ -309,58 +311,87 @@ export async function batchImportStockAction(
     const existingRecords = await db.medicineStock.findMany();
 
     const normalizeName = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
-    const byName = new Map<string, (typeof existingRecords)[number]>();
-    const byCode = new Map<string, (typeof existingRecords)[number]>();
 
-    let maxInd = 0;
-    let maxPrg = 0;
-    let maxStk = 0;
+    // Peta nama obat -> kode yang pernah dipakai di periode mana pun (agar kodenya konsisten antar periode)
+    const globalCodeByName = new Map<string, string>();
+    for (const record of existingRecords) {
+      const norm = normalizeName(record.name);
+      if (!globalCodeByName.has(norm)) {
+        globalCodeByName.set(norm, record.code);
+      }
+    }
+
+    // Peta per periode:
+    const byPeriodAndName = new Map<string, (typeof existingRecords)[number]>();
+    const byPeriodAndCode = new Map<string, (typeof existingRecords)[number]>();
+    const periodCounters = new Map<string, { ind: number; prg: number; stk: number }>();
 
     for (const record of existingRecords) {
-      byName.set(normalizeName(record.name), record);
-      byCode.set(record.code.trim().toLowerCase(), record);
+      const p = record.period;
+      byPeriodAndName.set(`${p}::${normalizeName(record.name)}`, record);
+      byPeriodAndCode.set(`${p}::${record.code.trim().toLowerCase()}`, record);
 
+      if (!periodCounters.has(p)) {
+        periodCounters.set(p, { ind: 0, prg: 0, stk: 0 });
+      }
+      const c = periodCounters.get(p)!;
       const indMatch = record.code.match(/^IND-(\d+)$/i);
-      if (indMatch) maxInd = Math.max(maxInd, parseInt(indMatch[1], 10));
-
+      if (indMatch) c.ind = Math.max(c.ind, parseInt(indMatch[1], 10));
       const prgMatch = record.code.match(/^PRG-(\d+)$/i);
-      if (prgMatch) maxPrg = Math.max(maxPrg, parseInt(prgMatch[1], 10));
-
+      if (prgMatch) c.prg = Math.max(c.prg, parseInt(prgMatch[1], 10));
       const stkMatch = record.code.match(/^STK-(\d+)$/i);
-      if (stkMatch) maxStk = Math.max(maxStk, parseInt(stkMatch[1], 10));
+      if (stkMatch) c.stk = Math.max(c.stk, parseInt(stkMatch[1], 10));
     }
+
+    let primaryPeriod = options?.defaultPeriod || "2026-06";
 
     for (const item of items) {
       const name = item.name?.trim();
       const code = item.code?.trim();
       if (!name) continue;
 
+      const targetPeriod = item.period || options?.defaultPeriod || "2026-06";
+      primaryPeriod = targetPeriod;
+
+      if (!periodCounters.has(targetPeriod)) {
+        periodCounters.set(targetPeriod, { ind: 0, prg: 0, stk: 0 });
+      }
+      const counters = periodCounters.get(targetPeriod)!;
+
       const normName = normalizeName(name);
-      const matchedByName = byName.get(normName);
+      const matchedInPeriod = byPeriodAndName.get(`${targetPeriod}::${normName}`);
 
       let targetId: string | null = null;
       let finalCode = code || "";
 
-      if (matchedByName) {
-        // Obat dengan nama yang sama sudah ada: update data dan pertahankan kode tetap
-        targetId = matchedByName.id;
-        finalCode = matchedByName.code;
+      if (matchedInPeriod) {
+        // Obat dengan nama yang sama sudah ada di periode ini: perbarui data dan pertahankan kode
+        targetId = matchedInPeriod.id;
+        finalCode = matchedInPeriod.code;
       } else {
-        // Obat baru: jika kodenya sudah terpakai oleh obat lain, buatkan nomor kode baru
-        if (code && byCode.has(code.toLowerCase())) {
-          if (code.toUpperCase().startsWith("IND-")) {
-            maxInd++;
-            finalCode = `IND-${String(maxInd).padStart(3, "0")}`;
-          } else if (code.toUpperCase().startsWith("PRG-")) {
-            maxPrg++;
-            finalCode = `PRG-${String(maxPrg).padStart(3, "0")}`;
-          } else {
-            maxStk++;
-            finalCode = `STK-${String(maxStk).padStart(3, "0")}`;
-          }
+        // Obat baru di periode ini:
+        // Cek apakah obat ini pernah punya kode di periode lain agar konsisten
+        const existingCode = globalCodeByName.get(normName);
+        if (existingCode) {
+          finalCode = existingCode;
         } else if (!code) {
-          maxStk++;
-          finalCode = `STK-${String(maxStk).padStart(3, "0")}`;
+          counters.stk++;
+          finalCode = `STK-${String(counters.stk).padStart(3, "0")}`;
+        }
+
+        // Pastikan finalCode belum terpakai oleh obat LAIN di periode ini
+        const codeTaken = byPeriodAndCode.get(`${targetPeriod}::${finalCode.toLowerCase()}`);
+        if (codeTaken && normalizeName(codeTaken.name) !== normName) {
+          if (finalCode.toUpperCase().startsWith("IND-")) {
+            counters.ind++;
+            finalCode = `IND-${String(counters.ind).padStart(3, "0")}`;
+          } else if (finalCode.toUpperCase().startsWith("PRG-")) {
+            counters.prg++;
+            finalCode = `PRG-${String(counters.prg).padStart(3, "0")}`;
+          } else {
+            counters.stk++;
+            finalCode = `STK-${String(counters.stk).padStart(3, "0")}`;
+          }
         }
       }
 
@@ -395,12 +426,14 @@ export async function batchImportStockAction(
             source,
           },
         });
-        byName.set(normName, updatedRecord);
-        byCode.set(updatedRecord.code.toLowerCase(), updatedRecord);
+        byPeriodAndName.set(`${targetPeriod}::${normName}`, updatedRecord);
+        byPeriodAndCode.set(`${targetPeriod}::${updatedRecord.code.toLowerCase()}`, updatedRecord);
+        globalCodeByName.set(normName, updatedRecord.code);
         updated++;
       } else {
         const createdRecord = await db.medicineStock.create({
           data: {
+            period: targetPeriod,
             code: finalCode,
             name,
             category,
@@ -414,8 +447,9 @@ export async function batchImportStockAction(
             source,
           },
         });
-        byName.set(normName, createdRecord);
-        byCode.set(createdRecord.code.toLowerCase(), createdRecord);
+        byPeriodAndName.set(`${targetPeriod}::${normName}`, createdRecord);
+        byPeriodAndCode.set(`${targetPeriod}::${createdRecord.code.toLowerCase()}`, createdRecord);
+        globalCodeByName.set(normName, createdRecord.code);
         inserted++;
       }
     }
@@ -429,7 +463,7 @@ export async function batchImportStockAction(
 
     return {
       success: true,
-      data: { inserted, updated },
+      data: { inserted, updated, period: primaryPeriod },
       count: inserted + updated,
     };
   } catch (err: unknown) {
@@ -446,8 +480,8 @@ export async function batchImportStockAction(
  */
 export async function importStockFileAction(
   formData: FormData,
-  options?: { _testUserId?: string }
-): Promise<StockActionResult<{ inserted: number; updated: number; total: number }>> {
+  options?: { _testUserId?: string; defaultPeriod?: string }
+): Promise<StockActionResult<{ inserted: number; updated: number; total: number; period: string }>> {
   if (!options?._testUserId) {
     const session = await getCurrentSession();
     if (!session) {
@@ -476,7 +510,9 @@ export async function importStockFileAction(
 
   try {
     const buffer = Buffer.from(await file.arrayBuffer());
-    const items = parseStockWorkbook(buffer);
+    const periodFromForm = formData.get("period") as string | null;
+    const defaultPeriod = periodFromForm?.trim() || options?.defaultPeriod;
+    const items = parseStockWorkbook(buffer, defaultPeriod);
 
     if (items.length === 0) {
       return {
@@ -485,7 +521,7 @@ export async function importStockFileAction(
       };
     }
 
-    const res = await batchImportStockAction(items, options);
+    const res = await batchImportStockAction(items, { ...options, defaultPeriod });
     if (!res.success) {
       return {
         success: false,
@@ -499,6 +535,7 @@ export async function importStockFileAction(
         inserted: res.data?.inserted || 0,
         updated: res.data?.updated || 0,
         total: (res.data?.inserted || 0) + (res.data?.updated || 0),
+        period: res.data?.period || "2026-06",
       },
       count: (res.data?.inserted || 0) + (res.data?.updated || 0),
     };
@@ -508,5 +545,23 @@ export async function importStockFileAction(
       success: false,
       error: "Terjadi kesalahan saat memproses berkas impor.",
     };
+  }
+}
+
+/**
+ * Server Action: Mengambil daftar periode pelaporan unik yang tersedia di basis data.
+ */
+export async function getStockPeriodsAction(): Promise<string[]> {
+  try {
+    const raw = await db.medicineStock.findMany({
+      select: { period: true },
+      distinct: ["period"],
+      orderBy: { period: "desc" },
+    });
+    const periods = raw.map((r) => r.period);
+    return periods.length > 0 ? periods : ["2026-06"];
+  } catch (err) {
+    console.error("[getStockPeriodsAction] Error:", err);
+    return ["2026-06"];
   }
 }
