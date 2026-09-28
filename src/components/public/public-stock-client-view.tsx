@@ -13,10 +13,12 @@ import {
   ChevronRight,
   X,
   Info,
+  FileSpreadsheet,
 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { Reveal } from "@/components/public/reveal";
 import { PublicStockFilter } from "@/components/public/public-stock-filter";
+import { exportStockToExcel } from "@/lib/stock-exporter";
 import {
   getStockSummary,
   getMosBadgeInfo,
@@ -227,6 +229,32 @@ export function PublicStockClientView({
     }
   };
 
+  // Handler ekspor Excel sesuai filter aktif
+  const handleExportExcel = () => {
+    const activeFilters: string[] = [];
+    if (selectedCategories.length > 0) {
+      activeFilters.push(`Kategori: ${selectedCategories.join(", ")}`);
+    }
+    if (selectedStatuses.length > 0) {
+      const statusNames = selectedStatuses.map((s) =>
+        s === "AVAILABLE" ? "Aman" : s === "LOW" ? "Menipis" : "Kosong"
+      );
+      activeFilters.push(`Status: ${statusNames.join(", ")}`);
+    }
+    if (search.trim()) {
+      activeFilters.push(`Pencarian: "${search.trim()}"`);
+    }
+
+    const filterSummary =
+      activeFilters.length > 0
+        ? activeFilters.join(" | ")
+        : "Semua Data (Tanpa Filter)";
+
+    exportStockToExcel(filtered, selectedPeriod, {
+      filterSummary,
+    });
+  };
+
   return (
     <>
       <PageHero
@@ -255,25 +283,37 @@ export function PublicStockClientView({
                 </div>
               </div>
 
-              {/* Selector Periode Multi-Bulan */}
-              {availablePeriods.length > 1 && (
-                <div className="w-full sm:w-auto">
-                  <PublicStockFilter
-                    title="Periode"
-                    options={periodOptions}
-                    selectedValues={[selectedPeriod]}
-                    onChange={(vals) => {
-                      if (vals[0]) {
-                        updateUrl({ periode: vals[0], page: null });
-                      }
-                    }}
-                    enableSearch={true}
-                    singleSelect={true}
-                    align="full-mobile"
-                    icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-600" />}
-                  />
-                </div>
-              )}
+              {/* Selector Periode Multi-Bulan & Aksi Ekspor */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handleExportExcel}
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-emerald-600/25 bg-emerald-50/90 px-3.5 text-xs font-semibold text-emerald-800 shadow-xs transition-all hover:bg-emerald-100 hover:border-emerald-600/40 active:scale-95 cursor-pointer dark:bg-emerald-950/40 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
+                  title="Unduh rekap ketersediaan obat ke format Excel (.xlsx)"
+                >
+                  <FileSpreadsheet className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>Unduh Excel</span>
+                </button>
+
+                {availablePeriods.length > 1 && (
+                  <div className="w-full sm:w-auto">
+                    <PublicStockFilter
+                      title="Periode"
+                      options={periodOptions}
+                      selectedValues={[selectedPeriod]}
+                      onChange={(vals) => {
+                        if (vals[0]) {
+                          updateUrl({ periode: vals[0], page: null });
+                        }
+                      }}
+                      enableSearch={true}
+                      singleSelect={true}
+                      align="full-mobile"
+                      icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-600" />}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </Reveal>
 
