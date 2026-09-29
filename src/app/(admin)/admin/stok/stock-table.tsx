@@ -545,26 +545,26 @@ export function StockTable({
             Manajemen dan pembaruan data stok fisik IFK per akhir bulan
           </p>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-2.5 w-full sm:w-auto">
           {/* Kelola Berkas Dropdown */}
-          <div ref={fileMenuRef} className="relative inline-block">
+          <div ref={fileMenuRef} className="relative w-full sm:w-auto">
             <button
               type="button"
               onClick={() => setIsFileMenuOpen((prev) => !prev)}
               aria-expanded={isFileMenuOpen}
               aria-haspopup="menu"
               className={cn(
-                "inline-flex h-9 items-center gap-2 rounded-lg border px-3.5 text-sm font-medium transition-all active:scale-95 cursor-pointer whitespace-nowrap",
+                "inline-flex h-9 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border px-3.5 text-sm font-medium transition-all active:scale-95 cursor-pointer whitespace-nowrap",
                 isFileMenuOpen
                   ? "border-emerald-500/50 bg-white/10 text-white shadow-sm"
                   : "border-white/10 bg-white/5 text-zinc-300 shadow-sm hover:border-white/20 hover:bg-white/10 hover:text-white"
               )}
             >
-              <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
+              <FileSpreadsheet className="h-4 w-4 text-emerald-400 shrink-0" />
               <span>Kelola Berkas</span>
               <ChevronDown
                 className={cn(
-                  "h-3.5 w-3.5 text-zinc-400 transition-transform duration-200",
+                  "h-3.5 w-3.5 text-zinc-400 transition-transform duration-200 shrink-0",
                   isFileMenuOpen && "rotate-180"
                 )}
               />
@@ -573,7 +573,7 @@ export function StockTable({
             {isFileMenuOpen && (
               <div
                 role="menu"
-                className="absolute right-0 top-full z-50 mt-2 w-60 rounded-xl border border-white/10 bg-zinc-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+                className="absolute left-0 sm:left-auto sm:right-0 top-full z-50 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-white/10 bg-zinc-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
               >
                 <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   Aksi Impor &amp; Ekspor
@@ -638,9 +638,9 @@ export function StockTable({
           <button 
             type="button"
             onClick={handleOpenAdd}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95 cursor-pointer whitespace-nowrap"
+            className="inline-flex h-9 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95 cursor-pointer whitespace-nowrap"
           >
-            <Plus className="h-4 w-4" />
+            <Plus className="h-4 w-4 shrink-0" />
             <span>Tambah Obat</span>
           </button>
         </div>
