@@ -11,6 +11,7 @@ import {
   AlertTriangle, 
   CheckCircle, 
   XCircle,
+  X,
   Pencil,
   Trash2,
   Save,
@@ -152,6 +153,12 @@ export function StockTable({
 
     return () => clearTimeout(timer);
   }, [search, searchParams, updateUrl]);
+
+  // Hapus pencarian seketika
+  const handleClearSearch = () => {
+    setSearch("");
+    updateUrl({ q: null, page: null }, "replace");
+  };
 
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -767,8 +774,18 @@ export function StockTable({
             placeholder="Cari nama obat, kode barang, atau kategori..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-4 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-9 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              aria-label="Bersihkan pencarian"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Filter Dropdowns (Periode, Kategori & Status) */}
