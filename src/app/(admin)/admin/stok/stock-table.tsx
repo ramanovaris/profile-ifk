@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, useTransition, useCallback, useEffect } from "react";
+import { useState, useMemo, useTransition, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { 
   Search, 
   Package, 
   Plus, 
   Download, 
+  Upload,
   AlertTriangle, 
   CheckCircle, 
   XCircle,
@@ -15,7 +16,8 @@ import {
   Save,
   Loader2,
   Calendar,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ChevronDown
 } from "lucide-react";
 import { 
   Dialog, 
@@ -153,6 +155,26 @@ export function StockTable({
 
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isFileMenuOpen, setIsFileMenuOpen] = useState(false);
+  const fileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        fileMenuRef.current &&
+        !fileMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsFileMenuOpen(false);
+      }
+    }
+    if (isFileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFileMenuOpen]);
+
   const [isPending, startTransition] = useTransition();
   const itemsPerPage = 10;
 
@@ -523,36 +545,100 @@ export function StockTable({
             Manajemen dan pembaruan data stok fisik IFK per akhir bulan
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2.5 sm:flex-nowrap">
-          <button 
-            type="button"
-            onClick={handleExportExcel}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 text-sm font-medium text-emerald-300 shadow-sm transition-all hover:bg-emerald-500/20 hover:text-white active:scale-95 cursor-pointer"
-            title="Ekspor rekap data ketersediaan obat ke format Excel (.xlsx)"
-          >
-            <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
-            <span>Ekspor Excel</span>
-          </button>
-          <button 
-            type="button"
-            onClick={handleDownloadTemplate}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3.5 text-sm font-medium text-zinc-300 shadow-sm transition-all hover:bg-white/10 hover:text-white active:scale-95 cursor-pointer"
-          >
-            <Download className="h-4 w-4 text-zinc-400" />
-            <span>Unduh Template</span>
-          </button>
-          <button 
-            type="button"
-            onClick={() => setIsImportOpen(true)}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3.5 text-sm font-medium text-zinc-300 shadow-sm transition-all hover:bg-white/10 hover:text-white active:scale-95 cursor-pointer"
-          >
-            <Plus className="h-4 w-4 text-zinc-400" />
-            <span>Import CSV</span>
-          </button>
+        <div className="flex items-center gap-2.5">
+          {/* Kelola Berkas Dropdown */}
+          <div ref={fileMenuRef} className="relative inline-block">
+            <button
+              type="button"
+              onClick={() => setIsFileMenuOpen((prev) => !prev)}
+              aria-expanded={isFileMenuOpen}
+              aria-haspopup="menu"
+              className={cn(
+                "inline-flex h-9 items-center gap-2 rounded-lg border px-3.5 text-sm font-medium transition-all active:scale-95 cursor-pointer whitespace-nowrap",
+                isFileMenuOpen
+                  ? "border-emerald-500/50 bg-white/10 text-white shadow-sm"
+                  : "border-white/10 bg-white/5 text-zinc-300 shadow-sm hover:border-white/20 hover:bg-white/10 hover:text-white"
+              )}
+            >
+              <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
+              <span>Kelola Berkas</span>
+              <ChevronDown
+                className={cn(
+                  "h-3.5 w-3.5 text-zinc-400 transition-transform duration-200",
+                  isFileMenuOpen && "rotate-180"
+                )}
+              />
+            </button>
+
+            {isFileMenuOpen && (
+              <div
+                role="menu"
+                className="absolute right-0 top-full z-50 mt-2 w-60 rounded-xl border border-white/10 bg-zinc-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+              >
+                <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Aksi Impor &amp; Ekspor
+                </div>
+
+                {/* Ekspor Excel */}
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsFileMenuOpen(false);
+                    handleExportExcel();
+                  }}
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                >
+                  <FileSpreadsheet className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="text-zinc-200 font-medium">Ekspor Data Excel</span>
+                    <span className="text-[10px] text-zinc-400">Unduh data (.xlsx)</span>
+                  </div>
+                </button>
+
+                {/* Import CSV / Excel */}
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsFileMenuOpen(false);
+                    setIsImportOpen(true);
+                  }}
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                >
+                  <Upload className="h-4 w-4 text-sky-400 shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="text-zinc-200 font-medium">Import CSV / Excel</span>
+                    <span className="text-[10px] text-zinc-400">Unggah berkas logistik</span>
+                  </div>
+                </button>
+
+                <div className="my-1 border-t border-white/5" />
+
+                {/* Unduh Template */}
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setIsFileMenuOpen(false);
+                    handleDownloadTemplate();
+                  }}
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                >
+                  <Download className="h-4 w-4 text-zinc-400 shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="text-zinc-200 font-medium">Unduh Template CSV</span>
+                    <span className="text-[10px] text-zinc-400">Format standar impor</span>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
           <button 
             type="button"
             onClick={handleOpenAdd}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95 cursor-pointer"
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-95 cursor-pointer whitespace-nowrap"
           >
             <Plus className="h-4 w-4" />
             <span>Tambah Obat</span>
