@@ -288,10 +288,10 @@ export function PublicStockClientView({
                 <button
                   type="button"
                   onClick={handleExportExcel}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-emerald-600/25 bg-emerald-50/90 px-3.5 text-xs font-semibold text-emerald-800 shadow-xs transition-all hover:bg-emerald-100 hover:border-emerald-600/40 active:scale-95 cursor-pointer dark:bg-emerald-950/40 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-emerald-600 px-4 text-xs font-semibold text-white shadow-xs transition-all hover:bg-emerald-700 active:scale-95 cursor-pointer"
                   title="Unduh rekap ketersediaan obat ke format Excel (.xlsx)"
                 >
-                  <FileSpreadsheet className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <FileSpreadsheet className="h-4 w-4 shrink-0 text-white" />
                   <span>Unduh Excel</span>
                 </button>
 
