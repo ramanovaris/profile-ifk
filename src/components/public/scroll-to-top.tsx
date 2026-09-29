@@ -36,7 +36,7 @@ export function ScrollToTop() {
       aria-label="Kembali ke atas"
       title="Kembali ke atas"
       className={cn(
-        "group fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full",
+        "group fixed bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-full",
         "border border-slate-200/80 bg-white/85 text-slate-600 shadow-md backdrop-blur-md",
         "transition-all duration-300 ease-out",
         "hover:border-emerald-300 hover:bg-white hover:text-emerald-700 hover:shadow-lg",

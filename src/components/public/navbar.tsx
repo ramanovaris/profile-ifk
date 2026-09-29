@@ -106,7 +106,7 @@ export function Navbar({ settings }: NavbarProps = {}) {
       {open && (
         <div
           className={cn(
-            "fixed inset-0 z-40 bg-white/90 backdrop-blur-xl md:hidden",
+            "fixed inset-0 z-[45] bg-white/90 backdrop-blur-xl md:hidden",
             hasAnnouncement ? "pt-28" : "pt-20"
           )}
         >

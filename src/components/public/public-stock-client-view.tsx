@@ -267,7 +267,7 @@ export function PublicStockClientView({
       <section className="border-t border-border bg-surface py-16 md:py-24">
         <div className="section-container">
           {/* ── Info Bar Pembaruan Cut-off & Pemilih Periode ────────── */}
-          <Reveal className="relative z-40">
+          <Reveal className="relative z-20">
             <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
@@ -443,8 +443,8 @@ export function PublicStockClientView({
           </Reveal>
 
           {/* ── Toolbar Pencarian & Filter ─────────────────────────── */}
-          <Reveal delay={100} className="relative z-30">
-            <div className="relative z-30 mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
+          <Reveal delay={100} className="relative z-20">
+            <div className="relative z-20 mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
               {/* Search input */}
               <div className="relative flex-1">
                 <Search
