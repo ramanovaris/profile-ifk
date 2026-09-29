@@ -1010,8 +1010,8 @@ export function StockTable({
 
       {/* ── Modal Tambah Item Baru ─────────────────────────────────────── */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-1.5">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] overflow-y-auto shadow-2xl rounded-2xl p-5 sm:p-6">
+          <DialogHeader className="space-y-1.5 pr-8">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
                 <Plus className="h-4 w-4" />
@@ -1246,8 +1246,8 @@ export function StockTable({
 
       {/* ── Modal Edit Item ────────────────────────────────────────────── */}
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-1.5">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] overflow-y-auto shadow-2xl rounded-2xl p-5 sm:p-6">
+          <DialogHeader className="space-y-1.5 pr-8">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
                 <Pencil className="h-4 w-4" />
