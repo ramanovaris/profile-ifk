@@ -937,11 +937,11 @@ export function ArticleForm({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/5">
+        <div className="flex flex-col gap-3 pt-4 border-t border-white/5 sm:flex-row sm:items-center">
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
+            className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
           >
             {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
             <span>
@@ -952,23 +952,25 @@ export function ArticleForm({
                 : "Publikasikan Artikel"}
             </span>
           </button>
-          <button
-            type="button"
-            onClick={() => setIsPreviewOpen(true)}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 text-sm font-medium text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-colors outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/40"
-            title="Lihat Pratinjau Tampilan Artikel"
-          >
-            <Eye className="h-4 w-4" />
-            <span>Pratinjau</span>
-          </button>
-          <button
-            type="button"
-            disabled={isPending}
-            onClick={() => router.push("/admin/berita/")}
-            className="inline-flex h-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
-          >
-            Batal
-          </button>
+          <div className="grid grid-cols-2 gap-3 w-full sm:flex sm:w-auto sm:items-center">
+            <button
+              type="button"
+              onClick={() => setIsPreviewOpen(true)}
+              className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 text-sm font-medium text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-colors outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/40"
+              title="Lihat Pratinjau Tampilan Artikel"
+            >
+              <Eye className="h-4 w-4" />
+              <span>Pratinjau</span>
+            </button>
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={() => router.push("/admin/berita/")}
+              className="inline-flex h-10 w-full sm:w-auto items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
+            >
+              Batal
+            </button>
+          </div>
         </div>
       </div>
 

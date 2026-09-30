@@ -37,6 +37,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
+import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
 import {
   createUserAction,
   updateUserAction,
@@ -791,8 +792,8 @@ export function UserTable({
 
       {/* Modal Tambah / Edit Pengguna */}
       <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-3">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md max-h-[80dvh] sm:max-h-[85vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
+          <DialogHeader className="space-y-1.5 px-5 pt-5 pb-3.5 sm:px-6 sm:pt-6 sm:pb-3.5 shrink-0 pr-12">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
                 {editUser ? (
@@ -814,7 +815,8 @@ export function UserTable({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSubmitUser} className="space-y-4 mt-2">
+          <ModalScrollArea className="px-5 pb-5 pt-1.5 sm:px-6 sm:pb-6">
+            <form onSubmit={handleSubmitUser} className="space-y-4">
             {/* Field Nama Lengkap */}
             <div className="space-y-1.5">
               <Label
@@ -1033,6 +1035,7 @@ export function UserTable({
               </button>
             </div>
           </form>
+          </ModalScrollArea>
         </DialogContent>
       </Dialog>
 

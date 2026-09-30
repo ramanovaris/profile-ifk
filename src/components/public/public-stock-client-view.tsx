@@ -267,7 +267,7 @@ export function PublicStockClientView({
       <section className="border-t border-border bg-surface py-16 md:py-24">
         <div className="section-container">
           {/* ── Info Bar Pembaruan Cut-off & Pemilih Periode ────────── */}
-          <Reveal className="relative z-40">
+          <Reveal className="relative z-20">
             <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface-alt/70 p-4 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
@@ -288,10 +288,10 @@ export function PublicStockClientView({
                 <button
                   type="button"
                   onClick={handleExportExcel}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-emerald-600/25 bg-emerald-50/90 px-3.5 text-xs font-semibold text-emerald-800 shadow-xs transition-all hover:bg-emerald-100 hover:border-emerald-600/40 active:scale-95 cursor-pointer dark:bg-emerald-950/40 dark:border-emerald-500/30 dark:text-emerald-300 dark:hover:bg-emerald-900/50"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-emerald-600 px-4 text-xs font-semibold text-white shadow-xs transition-all hover:bg-emerald-700 active:scale-95 cursor-pointer"
                   title="Unduh rekap ketersediaan obat ke format Excel (.xlsx)"
                 >
-                  <FileSpreadsheet className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <FileSpreadsheet className="h-4 w-4 shrink-0 text-white" />
                   <span>Unduh Excel</span>
                 </button>
 
@@ -443,8 +443,8 @@ export function PublicStockClientView({
           </Reveal>
 
           {/* ── Toolbar Pencarian & Filter ─────────────────────────── */}
-          <Reveal delay={100} className="relative z-30">
-            <div className="relative z-30 mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
+          <Reveal delay={100} className="relative z-20">
+            <div className="relative z-20 mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 sm:p-4 backdrop-blur-md">
               {/* Search input */}
               <div className="relative flex-1">
                 <Search
