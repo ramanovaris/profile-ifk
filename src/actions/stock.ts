@@ -280,6 +280,60 @@ export async function deleteStockAction(
 }
 
 /**
+ * Server Action: Menghapus atau mereset seluruh data stok obat pada satu periode tertentu (Issue #111).
+ */
+export async function deleteStockPeriodAction(
+  period: string,
+  options?: { _testUserId?: string }
+): Promise<StockActionResult<{ period: string; count: number }>> {
+  if (!options?._testUserId) {
+    const session = await getCurrentSession();
+    if (!session) {
+      return {
+        success: false,
+        error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
+      };
+    }
+  }
+
+  const trimmed = period?.trim();
+  if (!trimmed || !/^\d{4}-\d{2}$/.test(trimmed)) {
+    return {
+      success: false,
+      error: "Format periode tidak valid (harus YYYY-MM).",
+    };
+  }
+
+  try {
+    const result = await db.medicineStock.deleteMany({
+      where: { period: trimmed },
+    });
+
+    try {
+      revalidatePath("/admin/stok");
+      revalidatePath("/stok");
+    } catch {
+      // Safe fallback di luar request context
+    }
+
+    return {
+      success: true,
+      data: {
+        period: trimmed,
+        count: result.count,
+      },
+      count: result.count,
+    };
+  } catch (err: unknown) {
+    console.error("[deleteStockPeriodAction] Error:", err);
+    return {
+      success: false,
+      error: "Gagal menghapus data periode obat.",
+    };
+  }
+}
+
+/**
  * Server Action: Batch import atau sinkronisasi massal data stok obat.
  */
 export async function batchImportStockAction(
