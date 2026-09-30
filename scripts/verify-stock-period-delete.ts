@@ -46,7 +46,7 @@ async function runTests() {
   console.log("2. Uji validasi format periode...");
   const invalidFormat1 = await deleteStockPeriodAction("invalid-period", { _testUserId: "tester" });
   assert(
-    invalidFormat1.success === false && invalidFormat1.error?.includes("Format periode tidak valid"),
+    invalidFormat1.success === false && Boolean(invalidFormat1.error?.includes("Format periode tidak valid")),
     "deleteStockPeriodAction menolak format periode 'invalid-period'"
   );
 
