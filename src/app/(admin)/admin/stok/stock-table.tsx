@@ -49,6 +49,73 @@ import {
 import { exportStockToExcel } from "@/lib/stock-exporter";
 import { StockForm } from "./stock-form";
 
+interface ModalScrollAreaProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+function ModalScrollArea({ children, className }: ModalScrollAreaProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const hasOverflow = el.scrollHeight > el.clientHeight + 2;
+    setCanScrollUp(el.scrollTop > 8);
+    setCanScrollDown(hasOverflow && el.scrollTop + el.clientHeight < el.scrollHeight - 8);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    const rafId = requestAnimationFrame(checkScroll);
+    const timer = setTimeout(checkScroll, 120);
+
+    const observer = new ResizeObserver(checkScroll);
+    observer.observe(el);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [checkScroll]);
+
+  return (
+    <div className="relative flex flex-col flex-1 min-h-0 overflow-hidden">
+      {/* Top scroll hairline & shadow indicator */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 z-20 h-5 border-t border-white/10 bg-gradient-to-b from-zinc-950 via-zinc-950/70 to-transparent transition-opacity duration-200",
+          canScrollUp ? "opacity-100" : "opacity-0"
+        )}
+      />
+
+      {/* Scrollable form container */}
+      <div
+        ref={scrollRef}
+        onScroll={checkScroll}
+        className={cn("flex-1 overflow-y-auto overscroll-contain", className)}
+      >
+        {children}
+      </div>
+
+      {/* Bottom scroll shadow & gradient fade */}
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-x-0 bottom-0 z-20 h-10 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent transition-opacity duration-200",
+          canScrollDown ? "opacity-100" : "opacity-0"
+        )}
+      />
+    </div>
+  );
+}
+
 interface StockTableProps {
   initialItems: MedicineStockItem[];
   activePeriod?: string;
@@ -1010,8 +1077,8 @@ export function StockTable({
 
       {/* ── Modal Tambah Item Baru ─────────────────────────────────────── */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] overflow-y-auto shadow-2xl rounded-2xl p-5 sm:p-6">
-          <DialogHeader className="space-y-1.5 pr-8">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
+          <DialogHeader className="space-y-1.5 px-5 pt-5 pb-3.5 sm:px-6 sm:pt-6 sm:pb-3.5 shrink-0 pr-12">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
                 <Plus className="h-4 w-4" />
@@ -1027,7 +1094,8 @@ export function StockTable({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSaveAdd} className="space-y-4 pt-2">
+          <ModalScrollArea className="px-5 pb-5 pt-1.5 sm:px-6 sm:pb-6">
+            <form onSubmit={handleSaveAdd} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
@@ -1241,13 +1309,14 @@ export function StockTable({
               </button>
             </div>
           </form>
+          </ModalScrollArea>
         </DialogContent>
       </Dialog>
 
       {/* ── Modal Edit Item ────────────────────────────────────────────── */}
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] overflow-y-auto shadow-2xl rounded-2xl p-5 sm:p-6">
-          <DialogHeader className="space-y-1.5 pr-8">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
+          <DialogHeader className="space-y-1.5 px-5 pt-5 pb-3.5 sm:px-6 sm:pt-6 sm:pb-3.5 shrink-0 pr-12">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
                 <Pencil className="h-4 w-4" />
@@ -1263,7 +1332,8 @@ export function StockTable({
             </div>
           </DialogHeader>
 
-          <form onSubmit={handleSaveEdit} className="space-y-4 pt-2">
+          <ModalScrollArea className="px-5 pb-5 pt-1.5 sm:px-6 sm:pb-6">
+            <form onSubmit={handleSaveEdit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="edit-name" className="text-xs font-medium text-zinc-300">
@@ -1477,6 +1547,7 @@ export function StockTable({
               </button>
             </div>
           </form>
+          </ModalScrollArea>
         </DialogContent>
       </Dialog>
 
