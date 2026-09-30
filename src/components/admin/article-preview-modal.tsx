@@ -6,6 +6,7 @@ import Image from "next/image";
 import { X, Monitor, Smartphone, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/public/breadcrumb";
+import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
 
 export interface ArticlePreviewData {
   title: string;
@@ -158,7 +159,7 @@ export function ArticlePreviewModal({
         </div>
 
         {/* ── Scrollable Preview Area ─────────────────────────────────── */}
-        <div className="flex-1 overflow-y-auto bg-zinc-900/50 p-3 sm:p-6">
+        <ModalScrollArea className="bg-zinc-900/50 p-3 sm:p-6">
           <div
             className={`mx-auto transition-all duration-300 ${
               viewportMode === "desktop"
@@ -251,7 +252,7 @@ export function ArticlePreviewModal({
               </div>
             </div>
           </div>
-        </div>
+        </ModalScrollArea>
 
         {/* ── Footer Modal ────────────────────────────────────────────── */}
         <div className="flex shrink-0 items-center justify-between border-t border-white/10 bg-zinc-900/80 px-4 py-2.5 text-xs text-zinc-400 sm:px-6">
