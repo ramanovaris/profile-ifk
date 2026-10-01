@@ -69,7 +69,7 @@ export function detectPeriodFromWorkbook(wb: XLSX.WorkBook): string | null {
 export function parseStockWorkbook(buffer: Buffer, defaultPeriod?: string): StockItemInput[] {
   const wb = XLSX.read(buffer, { type: "buffer" });
   const sheetNames = wb.SheetNames;
-  const detectedPeriod = detectPeriodFromWorkbook(wb) || defaultPeriod || "2026-06";
+  const detectedPeriod = defaultPeriod || detectPeriodFromWorkbook(wb) || "2026-06";
 
   // 1. Format: Obat Indikator
   if (sheetNames.includes("Obat Indikator")) {

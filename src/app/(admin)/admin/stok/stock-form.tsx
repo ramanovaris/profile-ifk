@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useRef, useTransition } from "react";
+import { useState, useRef, useTransition, useEffect } from "react";
 import { 
   Upload, 
   Download, 
   FileSpreadsheet, 
   AlertCircle,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  Calendar
 } from "lucide-react";
 import { 
   Dialog, 
@@ -18,18 +19,35 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
 import { importStockFileAction } from "@/actions/stock";
+import { formatStockPeriodLabel } from "@/lib/dummy-data";
 
 interface StockFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onImportSuccess?: () => void;
+  onImportSuccess?: (importedPeriod: string) => void;
+  defaultPeriod?: string;
+  availablePeriods?: string[];
 }
 
-export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProps) {
+export function StockForm({ 
+  open, 
+  onOpenChange, 
+  onImportSuccess,
+  defaultPeriod = "2026-08",
+  availablePeriods = ["2026-08", "2026-07", "2026-06"],
+}: StockFormProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [targetPeriod, setTargetPeriod] = useState<string>(defaultPeriod);
+  const [customPeriod, setCustomPeriod] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (defaultPeriod) {
+      setTargetPeriod(defaultPeriod);
+    }
+  }, [defaultPeriod, open]);
 
   const handleDownloadTemplate = () => {
     const csvContent =
@@ -65,10 +83,17 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
       return;
     }
 
+    const effectivePeriod = (targetPeriod === "custom" ? customPeriod : targetPeriod).trim();
+    if (!effectivePeriod || !/^\d{4}-\d{2}$/.test(effectivePeriod)) {
+      toast.error("Format periode tidak valid. Gunakan format YYYY-MM (contoh: 2026-09).");
+      return;
+    }
+
     startTransition(async () => {
       try {
         const formData = new FormData();
         formData.append("file", selectedFile);
+        formData.append("period", effectivePeriod);
 
         const res = await importStockFileAction(formData);
         if (!res.success) {
@@ -76,14 +101,15 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
           return;
         }
 
+        const resolvedPeriod = res.data?.period || effectivePeriod;
         toast.success(
-          `Impor berhasil: ${res.data?.inserted || 0} obat baru ditambahkan, ${res.data?.updated || 0} obat diperbarui.`
+          `Impor berhasil: ${res.data?.inserted || 0} obat baru ditambahkan, ${res.data?.updated || 0} obat diperbarui pada periode ${formatStockPeriodLabel(resolvedPeriod)}.`
         );
 
         setSelectedFile(null);
         onOpenChange(false);
         if (onImportSuccess) {
-          onImportSuccess();
+          onImportSuccess(resolvedPeriod);
         }
       } catch (err: unknown) {
         console.error("Error import stock file:", err);
@@ -113,7 +139,42 @@ export function StockForm({ open, onOpenChange, onImportSuccess }: StockFormProp
           className="hidden"
         />
 
-        <div className="py-4">
+        <div className="pt-3 pb-1 space-y-2">
+          <label className="text-xs font-medium text-zinc-300 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5 text-brand-400" />
+              <span>Periode Target Impor</span>
+            </span>
+            <span className="text-[10px] text-zinc-400 font-normal">Otomatis sinkron ke tabel</span>
+          </label>
+          <div className="grid grid-cols-1 gap-2">
+            <select
+              value={targetPeriod}
+              onChange={(e) => setTargetPeriod(e.target.value)}
+              className="w-full h-9.5 rounded-xl border border-white/10 bg-zinc-950/80 px-3 text-xs text-white outline-none focus:border-brand-500/60 focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
+            >
+              {availablePeriods.map((p) => (
+                <option key={p} value={p} className="bg-zinc-900 text-white">
+                  {formatStockPeriodLabel(p)} ({p})
+                </option>
+              ))}
+              <option value="custom" className="bg-zinc-900 text-brand-300">
+                + Masukkan Periode Baru...
+              </option>
+            </select>
+            {targetPeriod === "custom" && (
+              <input
+                type="text"
+                placeholder="Format YYYY-MM (contoh: 2026-09)"
+                value={customPeriod}
+                onChange={(e) => setCustomPeriod(e.target.value)}
+                className="w-full h-9 rounded-xl border border-brand-500/40 bg-zinc-950/80 px-3 text-xs text-white outline-none focus:ring-1 focus:ring-brand-500/40 font-mono"
+              />
+            )}
+          </div>
+        </div>
+
+        <div className="py-3">
           <div 
             className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors cursor-pointer ${
               isDragging 

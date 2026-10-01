@@ -1669,7 +1669,13 @@ export function StockTable({
       <StockForm 
         open={isImportOpen} 
         onOpenChange={setIsImportOpen} 
-        onImportSuccess={() => {
+        defaultPeriod={selectedPeriod}
+        availablePeriods={periodsList}
+        onImportSuccess={(period) => {
+          if (!periodsList.includes(period)) {
+            setPeriodsList((prev) => [period, ...prev]);
+          }
+          updateUrl({ periode: period, page: null });
           router.refresh();
         }}
       />
