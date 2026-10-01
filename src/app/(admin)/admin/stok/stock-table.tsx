@@ -1062,7 +1062,7 @@ export function StockTable({
 
       {/* ── Modal Tambah Item Baru ─────────────────────────────────────── */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[85dvh] md:max-h-[90vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
           <DialogHeader className="space-y-1.5 px-5 pt-5 pb-3.5 sm:px-6 sm:pt-6 sm:pb-3.5 shrink-0 pr-12">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
@@ -1081,226 +1081,258 @@ export function StockTable({
 
           <ModalScrollArea className="px-5 pb-5 pt-1.5 sm:px-6 sm:pb-6">
             <form onSubmit={handleSaveAdd} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
-                  Nama Obat / Barang
-                </Label>
-                <Input
-                  id="add-name"
-                  value={addForm.name}
-                  onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  placeholder="Contoh: Paracetamol 500mg Tablet"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="add-code" className="text-xs font-medium text-zinc-300">
-                  Kode Barang / Barcode
-                </Label>
-                <Input
-                  id="add-code"
-                  value={addForm.code}
-                  onChange={(e) => setAddForm((f) => ({ ...f, code: e.target.value }))}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  placeholder="Contoh: OBG-999"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="add-category" className="text-xs font-medium text-zinc-300">
-                  Kategori
-                </Label>
-                <select
-                  id="add-category"
-                  value={addForm.category}
-                  onChange={(e) =>
-                    setAddForm((f) => ({ ...f, category: e.target.value as MedicineCategory }))
-                  }
-                  className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-                >
-                  <option value="Obat Generik">Obat Generik</option>
-                  <option value="Obat Program">Obat Program</option>
-                  <option value="Obat Emergensi">Obat Emergensi</option>
-                  <option value="BMHP / Alkes">BMHP / Alkes</option>
-                  <option value="Vaksin & Serum">Vaksin & Serum</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="add-unit" className="text-xs font-medium text-zinc-300">
-                  Satuan Kemasan
-                </Label>
-                <Input
-                  id="add-unit"
-                  value={addForm.unit}
-                  onChange={(e) => setAddForm((f) => ({ ...f, unit: e.target.value }))}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  placeholder="Tablet / Botol / Vial / Box"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="add-quantity" className="text-xs font-medium text-zinc-300">
-                  Jumlah Stok Fisik
-                </Label>
-                <Input
-                  id="add-quantity"
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={addForm.quantity}
-                  onFocus={(e) => {
-                    if (e.target.value === "0") e.target.select();
-                  }}
-                  onChange={(e) => {
-                    const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
-                    const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
-                    setAddForm((f) => ({
-                      ...f,
-                      quantity: cleaned,
-                      status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
-                    }));
-                  }}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="add-status" className="text-xs font-medium text-zinc-300">
-                  Status Ketersediaan
-                </Label>
-                <select
-                  id="add-status"
-                  value={addForm.status}
-                  onChange={(e) =>
-                    setAddForm((f) => ({ ...f, status: e.target.value as StockStatus }))
-                  }
-                  className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-                >
-                  <option value="AVAILABLE">Tersedia (Aman)</option>
-                  <option value="LOW">Menipis (Perlu Pengadaan)</option>
-                  <option value="EMPTY">Kosong (Habis)</option>
-                </select>
-              </div>
-
-              {/* Seksi Logistik & MOS Opsional */}
-              <div className="pt-2 border-t border-white/10 sm:col-span-2">
-                <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">
-                  Logistik & Perencanaan (Opsional)
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                {/* ── Kolom Kiri (50%): Data Master & Kuantitas Fisik ── */}
+                <div className="space-y-3.5">
                   <div className="space-y-1.5">
-                    <Label htmlFor="add-avg-usage" className="text-xs font-medium text-zinc-300">
-                      Rata-rata Pemakaian / Bln
+                    <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
+                      Nama Obat / Barang
                     </Label>
                     <Input
-                      id="add-avg-usage"
-                      type="number"
-                      min="0"
-                      placeholder="Contoh: 1200"
-                      value={addForm.avgUsage}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setAddForm((f) => {
-                          const qty = Number(f.quantity) || 0;
-                          const usage = Number(val) || 0;
-                          const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
-                          return {
+                      id="add-name"
+                      value={addForm.name}
+                      onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                      placeholder="Contoh: Paracetamol 500mg Tablet"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="add-code" className="text-xs font-medium text-zinc-300">
+                        Kode Barang / Barcode
+                      </Label>
+                      <Input
+                        id="add-code"
+                        value={addForm.code}
+                        onChange={(e) => setAddForm((f) => ({ ...f, code: e.target.value }))}
+                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        placeholder="Contoh: OBG-999"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="add-category" className="text-xs font-medium text-zinc-300">
+                        Kategori
+                      </Label>
+                      <select
+                        id="add-category"
+                        value={addForm.category}
+                        onChange={(e) =>
+                          setAddForm((f) => ({ ...f, category: e.target.value as MedicineCategory }))
+                        }
+                        className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                      >
+                        <option value="Obat Generik">Obat Generik</option>
+                        <option value="Obat Program">Obat Program</option>
+                        <option value="Obat Emergensi">Obat Emergensi</option>
+                        <option value="BMHP / Alkes">BMHP / Alkes</option>
+                        <option value="Vaksin & Serum">Vaksin & Serum</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="add-unit" className="text-xs font-medium text-zinc-300">
+                        Satuan Kemasan
+                      </Label>
+                      <Input
+                        id="add-unit"
+                        value={addForm.unit}
+                        onChange={(e) => setAddForm((f) => ({ ...f, unit: e.target.value }))}
+                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        placeholder="Tablet / Botol / Box"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="add-quantity" className="text-xs font-medium text-zinc-300">
+                        Jumlah Stok Fisik
+                      </Label>
+                      <Input
+                        id="add-quantity"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        value={addForm.quantity}
+                        onFocus={(e) => {
+                          if (e.target.value === "0") e.target.select();
+                        }}
+                        onChange={(e) => {
+                          const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                          const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
+                          setAddForm((f) => ({
                             ...f,
-                            avgUsage: val,
-                            mos: f.mos === "" ? autoMos : f.mos,
-                          };
-                        });
-                      }}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
+                            quantity: cleaned,
+                            status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
+                          }));
+                        }}
+                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="add-mos" className="text-xs font-medium text-zinc-300">
-                      Kecukupan Stok (Bulan)
+                    <Label htmlFor="add-status" className="text-xs font-medium text-zinc-300">
+                      Status Ketersediaan
                     </Label>
-                    <Input
-                      id="add-mos"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      placeholder="Contoh: 12.5"
-                      value={addForm.mos}
-                      onChange={(e) => setAddForm((f) => ({ ...f, mos: e.target.value }))}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
+                    <select
+                      id="add-status"
+                      value={addForm.status}
+                      onChange={(e) =>
+                        setAddForm((f) => ({ ...f, status: e.target.value as StockStatus }))
+                      }
+                      className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                    >
+                      <option value="AVAILABLE">Tersedia (Aman)</option>
+                      <option value="LOW">Menipis (Perlu Pengadaan)</option>
+                      <option value="EMPTY">Kosong (Habis)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* ── Kolom Kanan (50%): Logistik & Perencanaan (Opsional) ── */}
+                <div className="flex flex-col justify-between space-y-3.5 pt-3 border-t border-white/10 md:pt-0 md:border-t-0 md:border-l md:border-white/10 md:pl-6">
+                  <div className="space-y-3.5">
+                    <div className="flex items-center justify-between pb-1">
+                      <p className="text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-brand-400" />
+                        <span>Logistik & Perencanaan</span>
+                      </p>
+                      <span className="text-[10px] text-zinc-400 font-normal">Opsional</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="add-avg-usage" className="text-xs font-medium text-zinc-300">
+                          Rata-rata Pemakaian / Bln
+                        </Label>
+                        <Input
+                          id="add-avg-usage"
+                          type="number"
+                          min="0"
+                          placeholder="Contoh: 1200"
+                          value={addForm.avgUsage}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setAddForm((f) => {
+                              const qty = Number(f.quantity) || 0;
+                              const usage = Number(val) || 0;
+                              const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
+                              return {
+                                ...f,
+                                avgUsage: val,
+                                mos: f.mos === "" ? autoMos : f.mos,
+                              };
+                            });
+                          }}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="add-mos" className="text-xs font-medium text-zinc-300">
+                          Kecukupan Stok (Bulan)
+                        </Label>
+                        <Input
+                          id="add-mos"
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          placeholder="Contoh: 12.5"
+                          value={addForm.mos}
+                          onChange={(e) => setAddForm((f) => ({ ...f, mos: e.target.value }))}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="add-ed" className="text-xs font-medium text-zinc-300">
+                          Tanggal Kedaluwarsa (ED)
+                        </Label>
+                        <Input
+                          id="add-ed"
+                          placeholder="Contoh: 2028-06"
+                          value={addForm.expiryDate}
+                          onChange={(e) => setAddForm((f) => ({ ...f, expiryDate: e.target.value }))}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="add-nomenklatur" className="text-xs font-medium text-zinc-300">
+                          Nomenklatur / Sub-Kelas
+                        </Label>
+                        <Input
+                          id="add-nomenklatur"
+                          placeholder="Contoh: Analgesik & Antipiretik"
+                          value={addForm.nomenklatur}
+                          onChange={(e) => setAddForm((f) => ({ ...f, nomenklatur: e.target.value }))}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="add-ed" className="text-xs font-medium text-zinc-300">
-                      Tanggal Kedaluwarsa (ED)
-                    </Label>
-                    <Input
-                      id="add-ed"
-                      placeholder="Contoh: 2028-06"
-                      value={addForm.expiryDate}
-                      onChange={(e) => setAddForm((f) => ({ ...f, expiryDate: e.target.value }))}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="add-nomenklatur" className="text-xs font-medium text-zinc-300">
-                      Nomenklatur / Sub-Kelas Terapi
-                    </Label>
-                    <Input
-                      id="add-nomenklatur"
-                      placeholder="Contoh: Analgesik & Antipiretik"
-                      value={addForm.nomenklatur}
-                      onChange={(e) => setAddForm((f) => ({ ...f, nomenklatur: e.target.value }))}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
+                  {/* Quick Insight Box */}
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-1.5 mt-2">
+                    <div className="flex items-center justify-between text-zinc-400">
+                      <span className="font-medium text-[11px]">Pratinjau Status Logistik</span>
+                      <span className="text-[10px] text-zinc-400">Kalkulasi Cepat</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-0.5">
+                      <span className="text-zinc-200">
+                        Kuantitas: <strong className="text-white font-mono">{addForm.quantity ? Number(addForm.quantity).toLocaleString("id-ID") : "0"}</strong> {addForm.unit || "unit"}
+                      </span>
+                      <span className="text-zinc-200">
+                        Kecukupan: <strong className="text-brand-400 font-mono">{addForm.mos || (addForm.avgUsage && Number(addForm.avgUsage) > 0 ? (Number(addForm.quantity || 0) / Number(addForm.avgUsage)).toFixed(1) : "-")}</strong> bln
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setIsAddOpen(false)}
-                className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                disabled={isPending}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Menyimpan...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    <span>Simpan Obat</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+              <div className="mt-6 grid grid-cols-2 md:flex md:justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setIsAddOpen(false)}
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Menyimpan...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      <span>Simpan Obat</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </ModalScrollArea>
         </DialogContent>
       </Dialog>
 
       {/* ── Modal Edit Item ────────────────────────────────────────────── */}
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg max-h-[80dvh] sm:max-h-[85vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[85dvh] md:max-h-[90vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
           <DialogHeader className="space-y-1.5 px-5 pt-5 pb-3.5 sm:px-6 sm:pt-6 sm:pb-3.5 shrink-0 pr-12">
             <div className="flex items-center gap-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
@@ -1319,219 +1351,251 @@ export function StockTable({
 
           <ModalScrollArea className="px-5 pb-5 pt-1.5 sm:px-6 sm:pb-6">
             <form onSubmit={handleSaveEdit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="edit-name" className="text-xs font-medium text-zinc-300">
-                  Nama Obat / Barang
-                </Label>
-                <Input
-                  id="edit-name"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  placeholder="Contoh: Paracetamol 500mg Tablet"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-code" className="text-xs font-medium text-zinc-300">
-                  Kode Barang / Barcode
-                </Label>
-                <Input
-                  id="edit-code"
-                  value={editForm.code}
-                  onChange={(e) => setEditForm((f) => ({ ...f, code: e.target.value }))}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  placeholder="Contoh: OBT-001"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-category" className="text-xs font-medium text-zinc-300">
-                  Kategori
-                </Label>
-                <select
-                  id="edit-category"
-                  value={editForm.category}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, category: e.target.value as MedicineCategory }))
-                  }
-                  className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-                >
-                  <option value="Obat Generik">Obat Generik</option>
-                  <option value="Obat Program">Obat Program</option>
-                  <option value="Obat Emergensi">Obat Emergensi</option>
-                  <option value="BMHP / Alkes">BMHP / Alkes</option>
-                  <option value="Vaksin & Serum">Vaksin & Serum</option>
-                </select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-unit" className="text-xs font-medium text-zinc-300">
-                  Satuan Kemasan
-                </Label>
-                <Input
-                  id="edit-unit"
-                  value={editForm.unit}
-                  onChange={(e) => setEditForm((f) => ({ ...f, unit: e.target.value }))}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  placeholder="Tablet / Botol / Vial / Box"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-quantity" className="text-xs font-medium text-zinc-300">
-                  Jumlah Stok Fisik
-                </Label>
-                <Input
-                  id="edit-quantity"
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  value={editForm.quantity}
-                  onFocus={(e) => {
-                    if (e.target.value === "0") e.target.select();
-                  }}
-                  onChange={(e) => {
-                    const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
-                    const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
-                    setEditForm((f) => ({
-                      ...f,
-                      quantity: cleaned,
-                      status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
-                    }));
-                  }}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                  required
-                />
-              </div>
-
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label htmlFor="edit-status" className="text-xs font-medium text-zinc-300">
-                  Status Ketersediaan
-                </Label>
-                <select
-                  id="edit-status"
-                  value={editForm.status}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, status: e.target.value as StockStatus }))
-                  }
-                  className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-                >
-                  <option value="AVAILABLE">Tersedia (Aman)</option>
-                  <option value="LOW">Menipis (Perlu Pengadaan)</option>
-                  <option value="EMPTY">Kosong (Habis)</option>
-                </select>
-              </div>
-
-              {/* Seksi Logistik & MOS Opsional */}
-              <div className="pt-2 border-t border-white/10 sm:col-span-2">
-                <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2.5">
-                  Logistik & Perencanaan (Opsional)
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                {/* ── Kolom Kiri (50%): Data Master & Kuantitas Fisik ── */}
+                <div className="space-y-3.5">
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
-                      Rata-rata Pemakaian / Bln
+                    <Label htmlFor="edit-name" className="text-xs font-medium text-zinc-300">
+                      Nama Obat / Barang
                     </Label>
                     <Input
-                      id="edit-avg-usage"
-                      type="number"
-                      min="0"
-                      placeholder="Contoh: 1200"
-                      value={editForm.avgUsage}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setEditForm((f) => {
-                          const qty = Number(f.quantity) || 0;
-                          const usage = Number(val) || 0;
-                          const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
-                          return {
+                      id="edit-name"
+                      value={editForm.name}
+                      onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                      placeholder="Contoh: Paracetamol 500mg Tablet"
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-code" className="text-xs font-medium text-zinc-300">
+                        Kode Barang / Barcode
+                      </Label>
+                      <Input
+                        id="edit-code"
+                        value={editForm.code}
+                        onChange={(e) => setEditForm((f) => ({ ...f, code: e.target.value }))}
+                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        placeholder="Contoh: OBT-001"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-category" className="text-xs font-medium text-zinc-300">
+                        Kategori
+                      </Label>
+                      <select
+                        id="edit-category"
+                        value={editForm.category}
+                        onChange={(e) =>
+                          setEditForm((f) => ({ ...f, category: e.target.value as MedicineCategory }))
+                        }
+                        className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                      >
+                        <option value="Obat Generik">Obat Generik</option>
+                        <option value="Obat Program">Obat Program</option>
+                        <option value="Obat Emergensi">Obat Emergensi</option>
+                        <option value="BMHP / Alkes">BMHP / Alkes</option>
+                        <option value="Vaksin & Serum">Vaksin & Serum</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-unit" className="text-xs font-medium text-zinc-300">
+                        Satuan Kemasan
+                      </Label>
+                      <Input
+                        id="edit-unit"
+                        value={editForm.unit}
+                        onChange={(e) => setEditForm((f) => ({ ...f, unit: e.target.value }))}
+                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        placeholder="Tablet / Botol / Vial / Box"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-quantity" className="text-xs font-medium text-zinc-300">
+                        Jumlah Stok Fisik
+                      </Label>
+                      <Input
+                        id="edit-quantity"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        value={editForm.quantity}
+                        onFocus={(e) => {
+                          if (e.target.value === "0") e.target.select();
+                        }}
+                        onChange={(e) => {
+                          const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                          const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
+                          setEditForm((f) => ({
                             ...f,
-                            avgUsage: val,
-                            mos: f.mos === "" ? autoMos : f.mos,
-                          };
-                        });
-                      }}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
+                            quantity: cleaned,
+                            status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
+                          }));
+                        }}
+                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-mos" className="text-xs font-medium text-zinc-300">
-                      Kecukupan Stok (Bulan)
+                    <Label htmlFor="edit-status" className="text-xs font-medium text-zinc-300">
+                      Status Ketersediaan
                     </Label>
-                    <Input
-                      id="edit-mos"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      placeholder="Contoh: 12.5"
-                      value={editForm.mos}
-                      onChange={(e) => setEditForm((f) => ({ ...f, mos: e.target.value }))}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
+                    <select
+                      id="edit-status"
+                      value={editForm.status}
+                      onChange={(e) =>
+                        setEditForm((f) => ({ ...f, status: e.target.value as StockStatus }))
+                      }
+                      className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                    >
+                      <option value="AVAILABLE">Tersedia (Aman)</option>
+                      <option value="LOW">Menipis (Perlu Pengadaan)</option>
+                      <option value="EMPTY">Kosong (Habis)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* ── Kolom Kanan (50%): Logistik & Perencanaan (Opsional) ── */}
+                <div className="flex flex-col justify-between space-y-3.5 pt-3 border-t border-white/10 md:pt-0 md:border-t-0 md:border-l md:border-white/10 md:pl-6">
+                  <div className="space-y-3.5">
+                    <div className="flex items-center justify-between pb-1">
+                      <p className="text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-brand-400" />
+                        <span>Logistik & Perencanaan</span>
+                      </p>
+                      <span className="text-[10px] text-zinc-400 font-normal">Opsional</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
+                          Rata-rata Pemakaian / Bln
+                        </Label>
+                        <Input
+                          id="edit-avg-usage"
+                          type="number"
+                          min="0"
+                          placeholder="Contoh: 1200"
+                          value={editForm.avgUsage}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setEditForm((f) => {
+                              const qty = Number(f.quantity) || 0;
+                              const usage = Number(val) || 0;
+                              const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
+                              return {
+                                ...f,
+                                avgUsage: val,
+                                mos: f.mos === "" ? autoMos : f.mos,
+                              };
+                            });
+                          }}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="edit-mos" className="text-xs font-medium text-zinc-300">
+                          Kecukupan Stok (Bulan)
+                        </Label>
+                        <Input
+                          id="edit-mos"
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          placeholder="Contoh: 12.5"
+                          value={editForm.mos}
+                          onChange={(e) => setEditForm((f) => ({ ...f, mos: e.target.value }))}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="edit-ed" className="text-xs font-medium text-zinc-300">
+                          Tanggal Kedaluwarsa (ED)
+                        </Label>
+                        <Input
+                          id="edit-ed"
+                          placeholder="Contoh: 2028-06"
+                          value={editForm.expiryDate}
+                          onChange={(e) => setEditForm((f) => ({ ...f, expiryDate: e.target.value }))}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label htmlFor="edit-nomenklatur" className="text-xs font-medium text-zinc-300">
+                          Nomenklatur / Sub-Kelas
+                        </Label>
+                        <Input
+                          id="edit-nomenklatur"
+                          placeholder="Contoh: Analgesik & Antipiretik"
+                          value={editForm.nomenklatur}
+                          onChange={(e) => setEditForm((f) => ({ ...f, nomenklatur: e.target.value }))}
+                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <Label htmlFor="edit-ed" className="text-xs font-medium text-zinc-300">
-                      Tanggal Kedaluwarsa (ED)
-                    </Label>
-                    <Input
-                      id="edit-ed"
-                      placeholder="Contoh: 2028-06"
-                      value={editForm.expiryDate}
-                      onChange={(e) => setEditForm((f) => ({ ...f, expiryDate: e.target.value }))}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="edit-nomenklatur" className="text-xs font-medium text-zinc-300">
-                      Nomenklatur / Sub-Kelas Terapi
-                    </Label>
-                    <Input
-                      id="edit-nomenklatur"
-                      placeholder="Contoh: Analgesik & Antipiretik"
-                      value={editForm.nomenklatur}
-                      onChange={(e) => setEditForm((f) => ({ ...f, nomenklatur: e.target.value }))}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                    />
+                  {/* Quick Insight Box */}
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-1.5 mt-2">
+                    <div className="flex items-center justify-between text-zinc-400">
+                      <span className="font-medium text-[11px]">Pratinjau Status Logistik</span>
+                      <span className="text-[10px] text-zinc-400">Kalkulasi Cepat</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-0.5">
+                      <span className="text-zinc-200">
+                        Kuantitas: <strong className="text-white font-mono">{editForm.quantity ? Number(editForm.quantity).toLocaleString("id-ID") : "0"}</strong> {editForm.unit || "unit"}
+                      </span>
+                      <span className="text-zinc-200">
+                        Kecukupan: <strong className="text-brand-400 font-mono">{editForm.mos || (editForm.avgUsage && Number(editForm.avgUsage) > 0 ? (Number(editForm.quantity || 0) / Number(editForm.avgUsage)).toFixed(1) : "-")}</strong> bln
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setEditItem(null)}
-                className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                disabled={isPending}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>Menyimpan...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4" />
-                    <span>Simpan Perubahan</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+              <div className="mt-6 grid grid-cols-2 md:flex md:justify-end gap-3 pt-3 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setEditItem(null)}
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Menyimpan...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      <span>Simpan Perubahan</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </ModalScrollArea>
         </DialogContent>
       </Dialog>
