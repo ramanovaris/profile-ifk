@@ -5,7 +5,7 @@ import { db } from "../lib/db";
 import { getCurrentSession } from "../lib/auth";
 import { calculateStockStatus } from "../lib/dummy-data";
 import { parseStockWorkbook, type StockItemInput } from "../lib/stock-parser";
-import type { MedicineStock, StockStatus } from "@prisma/client";
+import type { MedicineStock } from "@prisma/client";
 
 export type { StockItemInput };
 

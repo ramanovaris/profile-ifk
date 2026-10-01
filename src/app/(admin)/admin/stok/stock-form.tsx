@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useTransition, useEffect } from "react";
+import { useState, useRef, useTransition } from "react";
 import { 
   Upload, 
   Download, 
@@ -39,15 +39,15 @@ export function StockForm({
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [targetPeriod, setTargetPeriod] = useState<string>(defaultPeriod);
+  const [prevDefaultPeriod, setPrevDefaultPeriod] = useState<string>(defaultPeriod);
   const [customPeriod, setCustomPeriod] = useState<string>("");
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (defaultPeriod) {
-      setTargetPeriod(defaultPeriod);
-    }
-  }, [defaultPeriod, open]);
+  if (defaultPeriod !== prevDefaultPeriod) {
+    setPrevDefaultPeriod(defaultPeriod);
+    setTargetPeriod(defaultPeriod);
+  }
 
   const handleDownloadTemplate = () => {
     const csvContent =
