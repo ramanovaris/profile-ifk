@@ -524,7 +524,7 @@ export function StockTable({
 
   const handleDownloadTemplate = () => {
     const csvContent =
-      "data:text/csv;charset=utf-8,Kode,Nama Obat,Kategori,Satuan,Jumlah Stok,Pemakaian Rata-Rata,MOS,ED,Nomenklatur\n" +
+      "data:text/csv;charset=utf-8,Kode,Nama Obat,Kategori,Satuan,Jumlah Stok,Pemakaian Rata-Rata,Kecukupan Stok (Bulan),ED,Nomenklatur\n" +
       "OBG-001,Paracetamol 500 mg,Obat Generik,Tablet,15000,1200,12.5,2028-06,Analgesik & Antipiretik\n" +
       "OBG-002,Amoxicillin 500 mg,Obat Generik,Kaplet,12000,2500,4.8,2027-12,Antibakteri Beta-Laktam\n" +
       "BMH-001,Infus Cairan Ringer Laktat (RL) 500 ml,BMHP / Alkes,Botol,4500,800,5.6,2028-01,Larutan Elektrolit Intravena\n";
@@ -1224,7 +1224,7 @@ export function StockTable({
 
                   <div className="space-y-1.5">
                     <Label htmlFor="add-mos" className="text-xs font-medium text-zinc-300">
-                      Tingkat Ketersediaan (MOS - Bulan)
+                      Kecukupan Stok (Bulan)
                     </Label>
                     <Input
                       id="add-mos"
@@ -1462,7 +1462,7 @@ export function StockTable({
 
                   <div className="space-y-1.5">
                     <Label htmlFor="edit-mos" className="text-xs font-medium text-zinc-300">
-                      Tingkat Ketersediaan (MOS - Bulan)
+                      Kecukupan Stok (Bulan)
                     </Label>
                     <Input
                       id="edit-mos"

@@ -72,7 +72,7 @@ export function buildStockExcelWorkbook(
       "Kategori",
       "Sisa Stok Fisik",
       "Rata-rata Pemakaian (RPB)",
-      "Kecukupan (MOS)",
+      "Kecukupan Stok (Bulan)",
       "Status Ketersediaan",
     ],
   ];
