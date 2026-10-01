@@ -44,7 +44,8 @@ import { cn } from "@/lib/utils";
 import { 
   createStockAction, 
   updateStockAction, 
-  deleteStockAction 
+  deleteStockAction,
+  deleteStockPeriodAction 
 } from "@/actions/stock";
 import { exportStockToExcel } from "@/lib/stock-exporter";
 import { StockForm } from "./stock-form";
@@ -73,6 +74,14 @@ export function StockTable({
   if (initialItems !== prevInitialItems) {
     setPrevInitialItems(initialItems);
     setItems(initialItems);
+  }
+
+  const [periodsList, setPeriodsList] = useState<string[]>(availablePeriods);
+  const [prevAvailablePeriods, setPrevAvailablePeriods] = useState(availablePeriods);
+
+  if (availablePeriods !== prevAvailablePeriods) {
+    setPrevAvailablePeriods(availablePeriods);
+    setPeriodsList(availablePeriods);
   }
 
   // URL query search
@@ -189,6 +198,8 @@ export function StockTable({
   // Edit & Delete Dialog State
   const [editItem, setEditItem] = useState<MedicineStockItem | null>(null);
   const [deleteItem, setDeleteItem] = useState<MedicineStockItem | null>(null);
+  const [isDeletePeriodOpen, setIsDeletePeriodOpen] = useState(false);
+  const [isDeletingPeriod, setIsDeletingPeriod] = useState(false);
 
   // Form State for Add / Create
   const [addForm, setAddForm] = useState<{
@@ -279,11 +290,11 @@ export function StockTable({
   ], [summary]);
 
   const periodOptions = useMemo(() => {
-    return (availablePeriods || []).map((p, idx) => ({
+    return (periodsList || []).map((p, idx) => ({
       value: p,
       label: `${formatStockPeriodLabel(p)}${idx === 0 ? " (Terkini)" : ""}`,
     }));
-  }, [availablePeriods]);
+  }, [periodsList]);
 
   const filtered = useMemo(() => {
     return items
@@ -477,12 +488,46 @@ export function StockTable({
     });
   };
 
+  const handleConfirmDeletePeriod = () => {
+    if (!selectedPeriod) return;
+    setIsDeletingPeriod(true);
+
+    startTransition(async () => {
+      try {
+        const res = await deleteStockPeriodAction(selectedPeriod);
+        if (res.success) {
+          toast.success(
+            `Berhasil menghapus ${res.count ?? 0} data obat pada periode ${formatStockPeriodLabel(selectedPeriod)}`
+          );
+
+          const remainingPeriods = periodsList.filter((p) => p !== selectedPeriod);
+          setPeriodsList(remainingPeriods);
+          setIsDeletePeriodOpen(false);
+
+          if (remainingPeriods.length > 0) {
+            updateUrl({ periode: remainingPeriods[0], page: null });
+          } else {
+            setItems([]);
+            updateUrl({ periode: null, page: null });
+          }
+        } else {
+          toast.error(res.error || "Gagal menghapus data periode obat");
+        }
+      } catch (err: unknown) {
+        console.error("[handleConfirmDeletePeriod] Error:", err);
+        toast.error("Terjadi kesalahan saat menghapus data periode");
+      } finally {
+        setIsDeletingPeriod(false);
+      }
+    });
+  };
+
   const handleDownloadTemplate = () => {
     const csvContent =
-      "data:text/csv;charset=utf-8,Kode,Nama Obat,Kategori,Satuan,Jumlah Stok\n" +
-      "OBG-001,Paracetamol 500 mg,Obat Generik,Tablet,15000\n" +
-      "OBG-002,Amoxicillin 500 mg,Obat Generik,Kaplet,12000\n" +
-      "BMH-001,Infus Cairan Ringer Laktat (RL) 500 ml,BMHP / Alkes,Botol,4500\n";
+      "data:text/csv;charset=utf-8,Kode,Nama Obat,Kategori,Satuan,Jumlah Stok,Pemakaian Rata-Rata,Kecukupan Stok (Bulan),ED,Nomenklatur\n" +
+      "OBG-001,Paracetamol 500 mg,Obat Generik,Tablet,15000,1200,12.5,2028-06,Analgesik & Antipiretik\n" +
+      "OBG-002,Amoxicillin 500 mg,Obat Generik,Kaplet,12000,2500,4.8,2027-12,Antibakteri Beta-Laktam\n" +
+      "BMH-001,Infus Cairan Ringer Laktat (RL) 500 ml,BMHP / Alkes,Botol,4500,800,5.6,2028-01,Larutan Elektrolit Intravena\n";
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -791,7 +836,7 @@ export function StockTable({
 
         {/* Filter Dropdowns (Periode, Kategori & Status) */}
         <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
-          {availablePeriods && availablePeriods.length > 1 && (
+          {periodsList && periodsList.length >= 1 && (
             <StockMultiSelectFilter
               title="Periode"
               options={periodOptions}
@@ -804,6 +849,12 @@ export function StockTable({
               enableSearch={true}
               singleSelect={true}
               icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-400" />}
+              footerAction={{
+                label: "Hapus Periode Ini",
+                icon: <Trash2 className="h-3.5 w-3.5 text-rose-400 shrink-0" />,
+                variant: "danger",
+                onClick: () => setIsDeletePeriodOpen(true),
+              }}
             />
           )}
 
@@ -1173,7 +1224,7 @@ export function StockTable({
 
                   <div className="space-y-1.5">
                     <Label htmlFor="add-mos" className="text-xs font-medium text-zinc-300">
-                      Tingkat Ketersediaan (MOS - Bulan)
+                      Kecukupan Stok (Bulan)
                     </Label>
                     <Input
                       id="add-mos"
@@ -1411,7 +1462,7 @@ export function StockTable({
 
                   <div className="space-y-1.5">
                     <Label htmlFor="edit-mos" className="text-xs font-medium text-zinc-300">
-                      Tingkat Ketersediaan (MOS - Bulan)
+                      Kecukupan Stok (Bulan)
                     </Label>
                     <Input
                       id="edit-mos"
@@ -1549,10 +1600,82 @@ export function StockTable({
         </DialogContent>
       </Dialog>
 
+      {/* ── Modal Konfirmasi Hapus Periode ────────────────────────────── */}
+      <Dialog
+        open={isDeletePeriodOpen}
+        onOpenChange={(open) => !open && !isDeletingPeriod && setIsDeletePeriodOpen(false)}
+      >
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                  Hapus Data Periode?
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                  Tindakan ini permanen. Seluruh data stok obat pada periode ini akan dihapus dari sistem.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="mt-3 rounded-lg border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-zinc-400">Periode Data:</span>
+              <span className="font-semibold text-zinc-100 text-sm">
+                {formatStockPeriodLabel(selectedPeriod)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5">
+              <span>Total Obat Terpengaruh:</span>
+              <span className="font-semibold text-rose-400">
+                {items.length.toLocaleString("id-ID")} item
+              </span>
+            </div>
+            <div className="text-[11px] text-zinc-400 pt-1 leading-relaxed">
+              Catatan: Data arsip periode lainnya tetap aman dan tidak berubah.
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              disabled={isDeletingPeriod}
+              onClick={() => setIsDeletePeriodOpen(false)}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:opacity-50"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDeletePeriod}
+              disabled={isDeletingPeriod}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-gradient-to-r from-red-600 to-rose-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+            >
+              {isDeletingPeriod ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              <span>{isDeletingPeriod ? "Menghapus..." : "Hapus Periode"}</span>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <StockForm 
         open={isImportOpen} 
         onOpenChange={setIsImportOpen} 
-        onImportSuccess={() => {
+        defaultPeriod={selectedPeriod}
+        availablePeriods={periodsList}
+        onImportSuccess={(period) => {
+          if (!periodsList.includes(period)) {
+            setPeriodsList((prev) => [period, ...prev]);
+          }
+          updateUrl({ periode: period, page: null });
           router.refresh();
         }}
       />

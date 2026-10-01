@@ -11,6 +11,14 @@ export interface FilterOption {
   indicatorColor?: string; // e.g., 'bg-emerald-400'
 }
 
+export interface FilterFooterAction {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+  variant?: "danger" | "default";
+  disabled?: boolean;
+}
+
 export interface StockMultiSelectFilterProps {
   title: string; // e.g. "Kategori" or "Status"
   allLabel?: string; // e.g. "Semua Kategori"
@@ -22,6 +30,7 @@ export interface StockMultiSelectFilterProps {
   singleSelect?: boolean;
   icon?: React.ReactNode;
   align?: "right" | "left" | "full-mobile";
+  footerAction?: FilterFooterAction;
 }
 
 export function StockMultiSelectFilter({
@@ -35,6 +44,7 @@ export function StockMultiSelectFilter({
   singleSelect = false,
   icon,
   align = "right",
+  footerAction,
 }: StockMultiSelectFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -341,6 +351,32 @@ export function StockMultiSelectFilter({
               })
             )}
           </div>
+
+          {footerAction && (
+            <div className="mt-1 border-t border-white/5 p-1">
+              <button
+                type="button"
+                disabled={footerAction.disabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeDropdown();
+                  footerAction.onClick();
+                }}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer",
+                  footerAction.variant === "danger"
+                    ? "text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                    : "text-zinc-300 hover:bg-white/10 hover:text-white",
+                  footerAction.disabled && "cursor-not-allowed opacity-50"
+                )}
+              >
+                {footerAction.icon && (
+                  <span className="shrink-0">{footerAction.icon}</span>
+                )}
+                <span className="truncate">{footerAction.label}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

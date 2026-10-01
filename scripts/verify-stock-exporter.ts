@@ -84,7 +84,7 @@ assert.strictEqual(tableHeader[3], "Satuan");
 assert.strictEqual(tableHeader[4], "Kategori");
 assert.strictEqual(tableHeader[5], "Sisa Stok Fisik");
 assert.strictEqual(tableHeader[6], "Rata-rata Pemakaian (RPB)");
-assert.strictEqual(tableHeader[7], "Kecukupan (MOS)");
+assert.strictEqual(tableHeader[7], "Kecukupan Stok (Bulan)");
 assert.strictEqual(tableHeader[8], "Status Ketersediaan");
 
 // Baris data (8, 9, 10)

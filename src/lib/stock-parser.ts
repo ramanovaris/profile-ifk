@@ -69,7 +69,7 @@ export function detectPeriodFromWorkbook(wb: XLSX.WorkBook): string | null {
 export function parseStockWorkbook(buffer: Buffer, defaultPeriod?: string): StockItemInput[] {
   const wb = XLSX.read(buffer, { type: "buffer" });
   const sheetNames = wb.SheetNames;
-  const detectedPeriod = detectPeriodFromWorkbook(wb) || defaultPeriod || "2026-06";
+  const detectedPeriod = defaultPeriod || detectPeriodFromWorkbook(wb) || "2026-06";
 
   // 1. Format: Obat Indikator
   if (sheetNames.includes("Obat Indikator")) {
@@ -95,7 +95,7 @@ export function parseStockWorkbook(buffer: Buffer, defaultPeriod?: string): Stoc
       const nameCol = header.findIndex((h) => h.includes("nama obat"));
       const stockCol = header.findIndex((h) => h.includes("sisa stok") || h.includes("stok"));
       const avgCol = header.findIndex((h) => h.includes("rata-rata") || h.includes("pemakaian"));
-      const mosCol = header.findIndex((h) => h.includes("tingkat ketersediaan") || h.includes("mos"));
+      const mosCol = header.findIndex((h) => h.includes("tingkat ketersediaan") || h.includes("mos") || h.includes("kecukupan"));
 
       const items: StockItemInput[] = [];
       for (let i = headerIdx + 1; i < rows.length; i++) {
@@ -293,7 +293,7 @@ export function parseStockWorkbook(buffer: Buffer, defaultPeriod?: string): Stoc
     (h) => h.includes("stok") || h.includes("jumlah") || h.includes("quantity")
   );
   const avgCol = header.findIndex((h) => h.includes("rata") || h.includes("avg"));
-  const mosCol = header.findIndex((h) => h.includes("tingkat") || h.includes("mos"));
+  const mosCol = header.findIndex((h) => h.includes("tingkat") || h.includes("mos") || h.includes("kecukupan"));
   const expCol = header.findIndex((h) => h.includes("ed") || h.includes("kedaluwarsa") || h.includes("exp"));
 
   const items: StockItemInput[] = [];

@@ -681,7 +681,7 @@ export function PublicStockClientView({
                     Panduan Indikator Status & Tingkat Ketersediaan
                   </h2>
                   <p className="mt-0.5 text-xs text-muted leading-relaxed">
-                    Status ketersediaan dihitung berdasarkan metode standar logistik farmasi (<em>Months of Supply / MOS</em>): sisa stok fisik dibagi rata-rata pemakaian per bulan (tren 12 bulan).
+                    Status ketersediaan dihitung berdasarkan metode standar kecukupan logistik farmasi (sisa stok fisik dibagi rata-rata pemakaian per bulan):
                   </p>
 
                   <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
