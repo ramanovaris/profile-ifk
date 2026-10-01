@@ -21,6 +21,23 @@ import { toast } from "@/components/ui/toast";
 import { importStockFileAction } from "@/actions/stock";
 import { formatStockPeriodLabel } from "@/lib/dummy-data";
 
+const MONTH_OPTIONS = [
+  { value: "01", label: "Januari" },
+  { value: "02", label: "Februari" },
+  { value: "03", label: "Maret" },
+  { value: "04", label: "April" },
+  { value: "05", label: "Mei" },
+  { value: "06", label: "Juni" },
+  { value: "07", label: "Juli" },
+  { value: "08", label: "Agustus" },
+  { value: "09", label: "September" },
+  { value: "10", label: "Oktober" },
+  { value: "11", label: "November" },
+  { value: "12", label: "Desember" },
+];
+
+const YEAR_OPTIONS = ["2024", "2025", "2026", "2027", "2028", "2029", "2030"];
+
 interface StockFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -40,7 +57,14 @@ export function StockForm({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [targetPeriod, setTargetPeriod] = useState<string>(defaultPeriod);
   const [prevDefaultPeriod, setPrevDefaultPeriod] = useState<string>(defaultPeriod);
-  const [customPeriod, setCustomPeriod] = useState<string>("");
+  const [customMonth, setCustomMonth] = useState<string>(() => {
+    const parts = defaultPeriod.split("-");
+    return parts[1] || "09";
+  });
+  const [customYear, setCustomYear] = useState<string>(() => {
+    const parts = defaultPeriod.split("-");
+    return parts[0] || "2026";
+  });
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,9 +107,11 @@ export function StockForm({
       return;
     }
 
-    const effectivePeriod = (targetPeriod === "custom" ? customPeriod : targetPeriod).trim();
+    const effectivePeriod = (
+      targetPeriod === "custom" ? `${customYear}-${customMonth}` : targetPeriod
+    ).trim();
     if (!effectivePeriod || !/^\d{4}-\d{2}$/.test(effectivePeriod)) {
-      toast.error("Format periode tidak valid. Gunakan format YYYY-MM (contoh: 2026-09).");
+      toast.error("Format periode tidak valid.");
       return;
     }
 
@@ -159,17 +185,49 @@ export function StockForm({
                 </option>
               ))}
               <option value="custom" className="bg-zinc-900 text-brand-300">
-                + Masukkan Periode Baru...
+                + Pilih Periode Baru...
               </option>
             </select>
             {targetPeriod === "custom" && (
-              <input
-                type="text"
-                placeholder="Format YYYY-MM (contoh: 2026-09)"
-                value={customPeriod}
-                onChange={(e) => setCustomPeriod(e.target.value)}
-                className="w-full h-9 rounded-xl border border-brand-500/40 bg-zinc-950/80 px-3 text-xs text-white outline-none focus:ring-1 focus:ring-brand-500/40 font-mono"
-              />
+              <div className="space-y-1.5 rounded-xl border border-white/10 bg-zinc-950/60 p-2.5">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] text-zinc-400 mb-1 block font-medium">Bulan</label>
+                    <select
+                      value={customMonth}
+                      onChange={(e) => setCustomMonth(e.target.value)}
+                      className="w-full h-9 rounded-xl border border-brand-500/40 bg-zinc-900 px-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
+                    >
+                      {MONTH_OPTIONS.map((m) => (
+                        <option key={m.value} value={m.value} className="bg-zinc-900 text-white">
+                          {m.label} ({m.value})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] text-zinc-400 mb-1 block font-medium">Tahun</label>
+                    <select
+                      value={customYear}
+                      onChange={(e) => setCustomYear(e.target.value)}
+                      className="w-full h-9 rounded-xl border border-brand-500/40 bg-zinc-900 px-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
+                    >
+                      {YEAR_OPTIONS.map((y) => (
+                        <option key={y} value={y} className="bg-zinc-900 text-white">
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[11px] pt-0.5">
+                  <span className="text-zinc-400">Periode target:</span>
+                  <span className="font-medium text-brand-300">
+                    {MONTH_OPTIONS.find((m) => m.value === customMonth)?.label} {customYear}{" "}
+                    <span className="font-mono text-[10px] text-zinc-500">({customYear}-{customMonth})</span>
+                  </span>
+                </div>
+              </div>
             )}
           </div>
         </div>
