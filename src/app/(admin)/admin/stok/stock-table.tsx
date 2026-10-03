@@ -18,7 +18,8 @@ import {
   Loader2,
   Calendar,
   FileSpreadsheet,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from "lucide-react";
 import { 
   Dialog, 
@@ -45,8 +46,11 @@ import {
   createStockAction, 
   updateStockAction, 
   deleteStockAction,
-  deleteStockPeriodAction 
+  deleteStockPeriodAction,
+  searchMedicineHistoryAction,
+  type MedicineHistoryItem 
 } from "@/actions/stock";
+import { calculateMos, determineStockStatus } from "@/lib/stock-calc";
 import { exportStockToExcel } from "@/lib/stock-exporter";
 import { StockForm } from "./stock-form";
 import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
@@ -251,6 +255,14 @@ export function StockTable({
     nomenklatur: "",
   });
 
+  // State Autocomplete & Riwayat Obat (Issue #118)
+  const [historySuggestions, setHistorySuggestions] = useState<MedicineHistoryItem[]>([]);
+  const [isSearchingHistory, setIsSearchingHistory] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSearchField, setActiveSearchField] = useState<"name" | "code" | null>(null);
+  const [historyHint, setHistoryHint] = useState<{ message: string; type: "match" | "new" } | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const summary = useMemo(() => getStockSummary(items), [items]);
 
   const categoryOptions = useMemo(() => {
@@ -327,6 +339,143 @@ export function StockTable({
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
+  // Handler pencarian riwayat obat (debounced)
+  const triggerHistorySearch = (query: string, field: "name" | "code") => {
+    setActiveSearchField(field);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setHistorySuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearchingHistory(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await searchMedicineHistoryAction({
+          query: trimmed,
+          currentPeriod: activePeriod,
+        });
+        if (res.success && res.data && res.data.length > 0) {
+          setHistorySuggestions(res.data);
+          setShowSuggestions(true);
+        } else {
+          setHistorySuggestions([]);
+          setShowSuggestions(false);
+        }
+      } catch (err) {
+        console.error("Error searching medicine history:", err);
+      } finally {
+        setIsSearchingHistory(false);
+      }
+    }, 250);
+  };
+
+  const handleSelectSuggestion = (item: MedicineHistoryItem) => {
+    setAddForm((prev) => {
+      const qty = Number(prev.quantity) || 0;
+      const usage = item.historicalAvgUsage > 0 ? item.historicalAvgUsage : 0;
+      const newMos = calculateMos(qty, usage);
+      const newStatus = determineStockStatus(qty, newMos, prev.status);
+
+      return {
+        ...prev,
+        code: item.code,
+        name: item.name,
+        category: (item.category as MedicineCategory) || prev.category,
+        unit: item.unit || prev.unit,
+        nomenklatur: item.nomenklatur || prev.nomenklatur,
+        avgUsage: usage > 0 ? String(usage) : "",
+        mos: newMos !== null ? String(newMos) : "",
+        status: newStatus,
+      };
+    });
+
+    setHistoryHint({
+      message:
+        item.historicalAvgUsage > 0
+          ? `⚡ RPB ${item.historicalAvgUsage.toLocaleString("id-ID")}/bln ditarik dari tren ${item.sampleCount} bulan sebelumnya`
+          : `⚡ Data master obat (${item.category}, ${item.unit}) berhasil disinkronkan`,
+      type: "match",
+    });
+
+    setShowSuggestions(false);
+    setActiveSearchField(null);
+  };
+
+  // Handler onBlur jika user mengetik manual tanpa klik dropdown
+  const handleFieldBlur = (query: string, field: "name" | "code") => {
+    setTimeout(async () => {
+      setShowSuggestions(false);
+      setActiveSearchField(null);
+
+      const trimmed = query.trim();
+      if (!trimmed || trimmed.length < 2) return;
+
+      if (addForm.avgUsage === "" || !historyHint) {
+        setIsSearchingHistory(true);
+        try {
+          const res = await searchMedicineHistoryAction({
+            query: trimmed,
+            currentPeriod: activePeriod,
+          });
+
+          if (res.success && res.data && res.data.length > 0) {
+            const matched =
+              res.data.find(
+                (m) =>
+                  m.code.toLowerCase() === trimmed.toLowerCase() ||
+                  m.name.toLowerCase() === trimmed.toLowerCase()
+              ) || res.data[0];
+
+            if (matched) {
+              setAddForm((prev) => {
+                const qty = Number(prev.quantity) || 0;
+                const usage = matched.historicalAvgUsage > 0 ? matched.historicalAvgUsage : 0;
+                const newMos = calculateMos(qty, usage);
+                const newStatus = determineStockStatus(qty, newMos, prev.status);
+
+                return {
+                  ...prev,
+                  code: prev.code || matched.code,
+                  name: prev.name || matched.name,
+                  category: prev.category === "Obat Generik" ? (matched.category as MedicineCategory) : prev.category,
+                  unit: prev.unit === "Tablet" ? matched.unit : prev.unit,
+                  nomenklatur: prev.nomenklatur || matched.nomenklatur || "",
+                  avgUsage: prev.avgUsage === "" && usage > 0 ? String(usage) : prev.avgUsage,
+                  mos: newMos !== null ? String(newMos) : prev.mos,
+                  status: newStatus,
+                };
+              });
+
+              setHistoryHint({
+                message:
+                  matched.historicalAvgUsage > 0
+                    ? `⚡ Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
+                    : `⚡ Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
+                type: "match",
+              });
+              return;
+            }
+          }
+
+          setHistoryHint({
+            message: "🆕 Obat baru (belum ada riwayat pemakaian di periode sebelumnya)",
+            type: "new",
+          });
+        } catch (err) {
+          console.error("Error on blur check:", err);
+        } finally {
+          setIsSearchingHistory(false);
+        }
+      }
+    }, 200);
+  };
+
   const handleOpenAdd = () => {
     setAddForm({
       code: "",
@@ -340,6 +489,10 @@ export function StockTable({
       expiryDate: "",
       nomenklatur: "",
     });
+    setHistorySuggestions([]);
+    setShowSuggestions(false);
+    setActiveSearchField(null);
+    setHistoryHint(null);
     setIsAddOpen(true);
   };
 
@@ -1084,33 +1237,150 @@ export function StockTable({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                 {/* ── Kolom Kiri (50%): Data Master & Kuantitas Fisik ── */}
                 <div className="space-y-3.5">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
-                      Nama Obat / Barang
-                    </Label>
+                  <div className="space-y-1.5 relative">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
+                        Nama Obat / Barang
+                      </Label>
+                      {isSearchingHistory && activeSearchField === "name" && (
+                        <span className="text-[10px] text-zinc-400 flex items-center gap-1">
+                          <Loader2 className="h-3 w-3 animate-spin text-brand-400" />
+                          <span>Mencari histori...</span>
+                        </span>
+                      )}
+                    </div>
                     <Input
                       id="add-name"
                       value={addForm.name}
-                      onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAddForm((f) => ({ ...f, name: val }));
+                        triggerHistorySearch(val, "name");
+                      }}
+                      onFocus={() => {
+                        if (historySuggestions.length > 0) setShowSuggestions(true);
+                      }}
+                      onBlur={() => handleFieldBlur(addForm.name, "name")}
                       className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                       placeholder="Contoh: Paracetamol 500mg Tablet"
                       required
+                      autoComplete="off"
                     />
+
+                    {/* Dropdown Suggestions */}
+                    {showSuggestions && historySuggestions.length > 0 && activeSearchField === "name" && (
+                      <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-white/15 bg-zinc-950 shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-white/5">
+                        <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 bg-white/[0.02] flex items-center justify-between sticky top-0 backdrop-blur-md">
+                          <span>Saran Riwayat Obat IFK</span>
+                          <span className="text-brand-400">Pilih untuk Auto-fill</span>
+                        </div>
+                        {historySuggestions.map((item) => (
+                          <button
+                            key={item.code}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelectSuggestion(item);
+                            }}
+                            className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-brand-500/10 cursor-pointer group flex flex-col gap-0.5"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-white group-hover:text-brand-300">
+                                {item.name}
+                              </span>
+                              <span className="font-mono text-[10px] text-zinc-400 bg-white/5 px-1.5 py-0.5 rounded">
+                                {item.code}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] text-zinc-400">
+                              <span>{item.category}</span>
+                              <span>•</span>
+                              <span>{item.unit}</span>
+                              {item.historicalAvgUsage > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-emerald-400 font-medium">
+                                    RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}/bln ({item.sampleCount} bln lalu)
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="add-code" className="text-xs font-medium text-zinc-300">
-                        Kode Barang / Barcode
-                      </Label>
+                    <div className="space-y-1.5 relative">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="add-code" className="text-xs font-medium text-zinc-300">
+                          Kode Barang / Barcode
+                        </Label>
+                        {isSearchingHistory && activeSearchField === "code" && (
+                          <span className="text-[10px] text-zinc-400 flex items-center gap-1">
+                            <Loader2 className="h-3 w-3 animate-spin text-brand-400" />
+                          </span>
+                        )}
+                      </div>
                       <Input
                         id="add-code"
                         value={addForm.code}
-                        onChange={(e) => setAddForm((f) => ({ ...f, code: e.target.value }))}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setAddForm((f) => ({ ...f, code: val }));
+                          triggerHistorySearch(val, "code");
+                        }}
+                        onFocus={() => {
+                          if (historySuggestions.length > 0) setShowSuggestions(true);
+                        }}
+                        onBlur={() => handleFieldBlur(addForm.code, "code")}
                         className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                         placeholder="Contoh: OBG-999"
                         required
+                        autoComplete="off"
                       />
+
+                      {/* Dropdown Suggestions for Code */}
+                      {showSuggestions && historySuggestions.length > 0 && activeSearchField === "code" && (
+                        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-white/15 bg-zinc-950 shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-white/5">
+                          <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 bg-white/[0.02] flex items-center justify-between sticky top-0 backdrop-blur-md">
+                            <span>Saran Riwayat Obat</span>
+                            <span className="text-brand-400">Pilih</span>
+                          </div>
+                          {historySuggestions.map((item) => (
+                            <button
+                              key={item.code}
+                              type="button"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                handleSelectSuggestion(item);
+                              }}
+                              className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-brand-500/10 cursor-pointer group flex flex-col gap-0.5"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-white group-hover:text-brand-300">
+                                  {item.code}
+                                </span>
+                                <span className="text-[10px] text-zinc-400 truncate max-w-[120px]">
+                                  {item.name}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                <span>{item.unit}</span>
+                                {item.historicalAvgUsage > 0 && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="text-emerald-400">
+                                      RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
@@ -1133,6 +1403,20 @@ export function StockTable({
                       </select>
                     </div>
                   </div>
+
+                  {historyHint && (
+                    <div
+                      className={cn(
+                        "rounded-lg px-3 py-2 text-xs flex items-center gap-2 border transition-all animate-in fade-in",
+                        historyHint.type === "match"
+                          ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                          : "border-sky-500/25 bg-sky-500/10 text-sky-300"
+                      )}
+                    >
+                      <Sparkles className="h-4 w-4 shrink-0 text-brand-400" />
+                      <span className="leading-snug">{historyHint.message}</span>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
@@ -1165,10 +1449,14 @@ export function StockTable({
                         onChange={(e) => {
                           const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
                           const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
+                          const usage = addForm.avgUsage !== "" ? Number(addForm.avgUsage) : 0;
+                          const newMos = calculateMos(qty, usage);
+                          const newStatus = determineStockStatus(qty, newMos, addForm.status);
                           setAddForm((f) => ({
                             ...f,
                             quantity: cleaned,
-                            status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
+                            mos: newMos !== null ? String(newMos) : "",
+                            status: newStatus,
                           }));
                         }}
                         className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1219,17 +1507,17 @@ export function StockTable({
                           placeholder="Contoh: 1200"
                           value={addForm.avgUsage}
                           onChange={(e) => {
-                            const val = e.target.value;
-                            setAddForm((f) => {
-                              const qty = Number(f.quantity) || 0;
-                              const usage = Number(val) || 0;
-                              const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
-                              return {
-                                ...f,
-                                avgUsage: val,
-                                mos: f.mos === "" ? autoMos : f.mos,
-                              };
-                            });
+                            const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                            const usage = cleaned === "" ? 0 : Number(cleaned) || 0;
+                            const qty = Number(addForm.quantity) || 0;
+                            const newMos = calculateMos(qty, usage);
+                            const newStatus = determineStockStatus(qty, newMos, addForm.status);
+                            setAddForm((f) => ({
+                              ...f,
+                              avgUsage: cleaned,
+                              mos: newMos !== null ? String(newMos) : "",
+                              status: newStatus,
+                            }));
                           }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
@@ -1246,7 +1534,17 @@ export function StockTable({
                           min="0"
                           placeholder="Contoh: 12.5"
                           value={addForm.mos}
-                          onChange={(e) => setAddForm((f) => ({ ...f, mos: e.target.value }))}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const mosNum = val === "" ? null : Number(val);
+                            const qty = Number(addForm.quantity) || 0;
+                            const newStatus = determineStockStatus(qty, mosNum, addForm.status);
+                            setAddForm((f) => ({
+                              ...f,
+                              mos: val,
+                              status: newStatus,
+                            }));
+                          }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
@@ -1282,18 +1580,39 @@ export function StockTable({
                   </div>
 
                   {/* Quick Insight Box */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-1.5 mt-2">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-2 mt-2">
                     <div className="flex items-center justify-between text-zinc-400">
-                      <span className="font-medium text-[11px]">Pratinjau Status Logistik</span>
-                      <span className="text-[10px] text-zinc-400">Kalkulasi Cepat</span>
+                      <span className="font-medium text-[11px] flex items-center gap-1.5 text-zinc-300">
+                        <Sparkles className="h-3.5 w-3.5 text-brand-400" />
+                        <span>Pratinjau Status Logistik</span>
+                      </span>
+                      {(() => {
+                        const q = Number(addForm.quantity) || 0;
+                        const m = addForm.mos !== "" ? Number(addForm.mos) : null;
+                        const info = getMosBadgeInfo(q, m, addForm.status);
+                        const dotColors: Record<string, string> = {
+                          empty: "bg-rose-400",
+                          critical: "bg-rose-400",
+                          low: "bg-amber-400",
+                          safe: "bg-emerald-400",
+                          abundant: "bg-sky-400",
+                          unknown: "bg-zinc-400",
+                        };
+                        return (
+                          <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border border-white/10 bg-white/5">
+                            <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[info.variant] || "bg-zinc-400")} />
+                            <span>{info.label}</span>
+                          </span>
+                        );
+                      })()}
                     </div>
-                    <div className="flex items-center justify-between pt-0.5">
-                      <span className="text-zinc-200">
-                        Kuantitas: <strong className="text-white font-mono">{addForm.quantity ? Number(addForm.quantity).toLocaleString("id-ID") : "0"}</strong> {addForm.unit || "unit"}
-                      </span>
-                      <span className="text-zinc-200">
-                        Kecukupan: <strong className="text-brand-400 font-mono">{addForm.mos || (addForm.avgUsage && Number(addForm.avgUsage) > 0 ? (Number(addForm.quantity || 0) / Number(addForm.avgUsage)).toFixed(1) : "-")}</strong> bln
-                      </span>
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px]">
+                      <div className="text-zinc-400">
+                        Stok Fisik: <strong className="text-white font-mono">{addForm.quantity ? Number(addForm.quantity).toLocaleString("id-ID") : "0"}</strong> {addForm.unit || "unit"}
+                      </div>
+                      <div className="text-zinc-400 text-right">
+                        Kecukupan: <strong className="text-brand-400 font-mono">{addForm.mos ? `${addForm.mos} bln` : "-"}</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1435,10 +1754,14 @@ export function StockTable({
                         onChange={(e) => {
                           const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
                           const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
+                          const usage = editForm.avgUsage !== "" ? Number(editForm.avgUsage) : 0;
+                          const newMos = calculateMos(qty, usage);
+                          const newStatus = determineStockStatus(qty, newMos, editForm.status);
                           setEditForm((f) => ({
                             ...f,
                             quantity: cleaned,
-                            status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
+                            mos: newMos !== null ? String(newMos) : "",
+                            status: newStatus,
                           }));
                         }}
                         className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1479,9 +1802,43 @@ export function StockTable({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
-                          Rata-rata Pemakaian / Bln
-                        </Label>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
+                            Rata-rata Pemakaian / Bln
+                          </Label>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const res = await searchMedicineHistoryAction({
+                                query: editForm.code || editForm.name,
+                                currentPeriod: activePeriod,
+                              });
+                              if (res.success && res.data && res.data.length > 0) {
+                                const match = res.data[0];
+                                if (match.historicalAvgUsage > 0) {
+                                  const qty = Number(editForm.quantity) || 0;
+                                  const newMos = calculateMos(qty, match.historicalAvgUsage);
+                                  const newStatus = determineStockStatus(qty, newMos, editForm.status);
+                                  setEditForm((f) => ({
+                                    ...f,
+                                    avgUsage: String(match.historicalAvgUsage),
+                                    mos: newMos !== null ? String(newMos) : "",
+                                    status: newStatus,
+                                  }));
+                                  toast.success(`RPB ditarik dari tren ${match.sampleCount} bulan: ${match.historicalAvgUsage.toLocaleString("id-ID")}/bln`);
+                                } else {
+                                  toast.info("Belum ada riwayat RPB di periode sebelumnya");
+                                }
+                              } else {
+                                toast.info("Tidak ditemukan riwayat obat di periode sebelumnya");
+                              }
+                            }}
+                            className="text-[10px] text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <Sparkles className="h-3 w-3" />
+                            <span>Tarik RPB Histori</span>
+                          </button>
+                        </div>
                         <Input
                           id="edit-avg-usage"
                           type="number"
@@ -1489,17 +1846,17 @@ export function StockTable({
                           placeholder="Contoh: 1200"
                           value={editForm.avgUsage}
                           onChange={(e) => {
-                            const val = e.target.value;
-                            setEditForm((f) => {
-                              const qty = Number(f.quantity) || 0;
-                              const usage = Number(val) || 0;
-                              const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
-                              return {
-                                ...f,
-                                avgUsage: val,
-                                mos: f.mos === "" ? autoMos : f.mos,
-                              };
-                            });
+                            const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                            const usage = cleaned === "" ? 0 : Number(cleaned) || 0;
+                            const qty = Number(editForm.quantity) || 0;
+                            const newMos = calculateMos(qty, usage);
+                            const newStatus = determineStockStatus(qty, newMos, editForm.status);
+                            setEditForm((f) => ({
+                              ...f,
+                              avgUsage: cleaned,
+                              mos: newMos !== null ? String(newMos) : "",
+                              status: newStatus,
+                            }));
                           }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
@@ -1516,7 +1873,17 @@ export function StockTable({
                           min="0"
                           placeholder="Contoh: 12.5"
                           value={editForm.mos}
-                          onChange={(e) => setEditForm((f) => ({ ...f, mos: e.target.value }))}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const mosNum = val === "" ? null : Number(val);
+                            const qty = Number(editForm.quantity) || 0;
+                            const newStatus = determineStockStatus(qty, mosNum, editForm.status);
+                            setEditForm((f) => ({
+                              ...f,
+                              mos: val,
+                              status: newStatus,
+                            }));
+                          }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
@@ -1552,18 +1919,39 @@ export function StockTable({
                   </div>
 
                   {/* Quick Insight Box */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-1.5 mt-2">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-2 mt-2">
                     <div className="flex items-center justify-between text-zinc-400">
-                      <span className="font-medium text-[11px]">Pratinjau Status Logistik</span>
-                      <span className="text-[10px] text-zinc-400">Kalkulasi Cepat</span>
+                      <span className="font-medium text-[11px] flex items-center gap-1.5 text-zinc-300">
+                        <Sparkles className="h-3.5 w-3.5 text-brand-400" />
+                        <span>Pratinjau Status Logistik</span>
+                      </span>
+                      {(() => {
+                        const q = Number(editForm.quantity) || 0;
+                        const m = editForm.mos !== "" ? Number(editForm.mos) : null;
+                        const info = getMosBadgeInfo(q, m, editForm.status);
+                        const dotColors: Record<string, string> = {
+                          empty: "bg-rose-400",
+                          critical: "bg-rose-400",
+                          low: "bg-amber-400",
+                          safe: "bg-emerald-400",
+                          abundant: "bg-sky-400",
+                          unknown: "bg-zinc-400",
+                        };
+                        return (
+                          <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border border-white/10 bg-white/5">
+                            <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[info.variant] || "bg-zinc-400")} />
+                            <span>{info.label}</span>
+                          </span>
+                        );
+                      })()}
                     </div>
-                    <div className="flex items-center justify-between pt-0.5">
-                      <span className="text-zinc-200">
-                        Kuantitas: <strong className="text-white font-mono">{editForm.quantity ? Number(editForm.quantity).toLocaleString("id-ID") : "0"}</strong> {editForm.unit || "unit"}
-                      </span>
-                      <span className="text-zinc-200">
-                        Kecukupan: <strong className="text-brand-400 font-mono">{editForm.mos || (editForm.avgUsage && Number(editForm.avgUsage) > 0 ? (Number(editForm.quantity || 0) / Number(editForm.avgUsage)).toFixed(1) : "-")}</strong> bln
-                      </span>
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px]">
+                      <div className="text-zinc-400">
+                        Stok Fisik: <strong className="text-white font-mono">{editForm.quantity ? Number(editForm.quantity).toLocaleString("id-ID") : "0"}</strong> {editForm.unit || "unit"}
+                      </div>
+                      <div className="text-zinc-400 text-right">
+                        Kecukupan: <strong className="text-brand-400 font-mono">{editForm.mos ? `${editForm.mos} bln` : "-"}</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
