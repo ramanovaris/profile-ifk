@@ -19,6 +19,12 @@ export interface FilterFooterAction {
   disabled?: boolean;
 }
 
+export interface FilterHeaderAction {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+}
+
 export interface StockMultiSelectFilterProps {
   title: string; // e.g. "Kategori" or "Status"
   allLabel?: string; // e.g. "Semua Kategori"
@@ -31,6 +37,7 @@ export interface StockMultiSelectFilterProps {
   icon?: React.ReactNode;
   align?: "right" | "left" | "full-mobile";
   footerAction?: FilterFooterAction;
+  createAction?: FilterHeaderAction;
 }
 
 export function StockMultiSelectFilter({
@@ -45,6 +52,7 @@ export function StockMultiSelectFilter({
   icon,
   align = "right",
   footerAction,
+  createAction,
 }: StockMultiSelectFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -283,6 +291,28 @@ export function StockMultiSelectFilter({
                 className="cursor-pointer text-[11px] font-medium text-zinc-400 transition-colors hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Reset Filter
+              </button>
+            </div>
+          )}
+
+          {/* Create / Add Action (e.g. + Buka Periode Baru) */}
+          {createAction && (
+            <div className="mb-1.5 pb-1 border-b border-white/5">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeDropdown();
+                  createAction.onClick();
+                }}
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300 transition-colors cursor-pointer border border-emerald-500/20"
+              >
+                {createAction.icon ? (
+                  <span className="shrink-0">{createAction.icon}</span>
+                ) : (
+                  <span className="shrink-0 text-emerald-400 text-sm font-bold leading-none">+</span>
+                )}
+                <span className="truncate">{createAction.label}</span>
               </button>
             </div>
           )}
