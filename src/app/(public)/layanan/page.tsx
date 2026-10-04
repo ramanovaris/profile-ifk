@@ -118,6 +118,41 @@ export default async function LayananPage() {
         eyebrow="Pelayanan"
         title="Standar Pelayanan Operasional"
         subtitle="Pedoman operasional lengkap bagi faskes mitra, mencakup alur pengajuan perbekalan, format dokumen resmi, hingga standar mutu."
+        rightContent={
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md shadow-2xl shadow-black/40">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10 text-brand-300 border border-brand-400/20">
+                  <Clock className="h-4 w-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-white">Jam Pelayanan Distribusi</h3>
+                  <p className="text-[11px] text-zinc-400">Loket Layanan Gudang Farmasi</p>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-medium text-emerald-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Hari Kerja
+              </span>
+            </div>
+
+            <div className="mt-4 space-y-2.5">
+              {parsedHours.map((h, i) => (
+                <div key={i} className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 px-3.5 py-2">
+                  <span className="text-xs font-medium text-zinc-300">{h.day}</span>
+                  <span className="font-mono text-xs font-semibold text-brand-300">{h.time}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-zinc-400">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-brand-400 mt-0.5" />
+              <span>
+                Melayani penerimaan LPLPO rutin serta distribusi darurat obat/BMHP bagi 28 fasilitas kesehatan se-Kabupaten Kotabaru.
+              </span>
+            </div>
+          </div>
+        }
       />
 
       {/* ── Mekanisme Pengajuan Permintaan Perbekalan ───────────────── */}
