@@ -705,3 +705,139 @@ export async function searchMedicineHistoryAction(params: {
   }
 }
 
+export interface CreateStockPeriodInput {
+  targetPeriod: string;
+  mode: "COPY" | "BLANK";
+  sourcePeriod?: string;
+  _testUserId?: string;
+}
+
+/**
+ * Server Action: Membuat/menginisialisasi periode pelaporan stok baru secara manual.
+ * - Mode 'COPY': Menyalin seluruh master data obat dari sourcePeriod dengan kuantitas = 0, status = EMPTY.
+ * - Mode 'BLANK': Menginisialisasi periode kosong untuk input mandiri bertahap.
+ */
+export async function createStockPeriodAction(
+  data: CreateStockPeriodInput
+): Promise<StockActionResult<{ period: string; count: number }>> {
+  if (!data._testUserId) {
+    const session = await getCurrentSession();
+    if (!session) {
+      return {
+        success: false,
+        error: "Sesi tidak valid atau telah kedaluwarsa. Silakan masuk kembali.",
+      };
+    }
+  }
+
+  const targetPeriod = data.targetPeriod?.trim();
+  if (!targetPeriod || !/^\d{4}-\d{2}$/.test(targetPeriod)) {
+    return {
+      success: false,
+      error: "Format periode tidak valid (harus YYYY-MM, contoh: 2026-08).",
+    };
+  }
+
+  try {
+    // 1. Cek apakah targetPeriod sudah memiliki data di database
+    const existingCount = await db.medicineStock.count({
+      where: { period: targetPeriod },
+    });
+
+    if (existingCount > 0) {
+      return {
+        success: false,
+        error: `Periode '${targetPeriod}' sudah terdaftar dengan ${existingCount} data obat. Gunakan periode lain.`,
+      };
+    }
+
+    if (data.mode === "COPY") {
+      const sourcePeriod = data.sourcePeriod?.trim();
+      if (!sourcePeriod) {
+        return {
+          success: false,
+          error: "Periode sumber harus dipilih untuk menyalin master data obat.",
+        };
+      }
+
+      const sourceMedicines = await db.medicineStock.findMany({
+        where: { period: sourcePeriod },
+        orderBy: { name: "asc" },
+      });
+
+      if (sourceMedicines.length === 0) {
+        return {
+          success: false,
+          error: `Tidak ada data obat pada periode sumber '${sourcePeriod}' untuk disalin.`,
+        };
+      }
+
+      // Hindari duplikasi kode jika pada sumber terdapat kode yang sama
+      const seenCodes = new Set<string>();
+      const recordsToInsert = [];
+
+      for (const med of sourceMedicines) {
+        const normalizedCode = med.code.trim().toUpperCase();
+        if (seenCodes.has(normalizedCode)) continue;
+        seenCodes.add(normalizedCode);
+
+        recordsToInsert.push({
+          period: targetPeriod,
+          code: med.code,
+          name: med.name,
+          category: med.category,
+          unit: med.unit,
+          quantity: 0,
+          status: "EMPTY" as const,
+          avgUsage: med.avgUsage || 0,
+          mos: null,
+          expiryDate: null,
+          nomenklatur: med.nomenklatur || null,
+          source: "MANUAL",
+        });
+      }
+
+      const batchResult = await db.medicineStock.createMany({
+        data: recordsToInsert,
+      });
+
+      try {
+        revalidatePath("/admin/stok");
+        revalidatePath("/stok");
+      } catch {
+        // Safe fallback di luar request context
+      }
+
+      return {
+        success: true,
+        data: {
+          period: targetPeriod,
+          count: batchResult.count,
+        },
+      };
+    }
+
+    // Mode BLANK: Mengesahkan periode baru kosong
+    try {
+      revalidatePath("/admin/stok");
+      revalidatePath("/stok");
+    } catch {
+      // Safe fallback di luar request context
+    }
+
+    return {
+      success: true,
+      data: {
+        period: targetPeriod,
+        count: 0,
+      },
+    };
+  } catch (err) {
+    console.error("[createStockPeriodAction] Error:", err);
+    return {
+      success: false,
+      error: "Terjadi kesalahan pada basis data saat membuat periode baru.",
+    };
+  }
+}
+
