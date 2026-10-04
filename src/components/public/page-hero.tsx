@@ -8,11 +8,13 @@ interface PageHeroProps {
   title: React.ReactNode;
   subtitle: string;
   className?: string;
+  /** Konten kontekstual pelengkap di sisi kanan pada layar desktop. */
+  rightContent?: React.ReactNode;
 }
 
 /**
  * Hero shared untuk halaman non-Beranda.
- * Latar mesh + grid halus, hairline vertikal tengah sebagai pemisah visual.
+ * Latar mesh + grid halus, hairline vertikal tengah sebagai pemisah zona saat ada rightContent.
  */
 export function PageHero({
   breadcrumb,
@@ -20,24 +22,34 @@ export function PageHero({
   title,
   subtitle,
   className,
+  rightContent,
 }: PageHeroProps) {
   return (
     <section className={cn("page-hero relative overflow-hidden text-white", className)}>
       <div aria-hidden className="hero-grid pointer-events-none absolute inset-0" />
-      {/* Hairline vertikal pemisah zona — hanya di desktop */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-0 bottom-0 left-1/2 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block"
-      />
+      {/* Hairline vertikal pemisah zona — hanya di desktop saat ada konten kanan */}
+      {rightContent && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute top-0 bottom-0 left-1/2 hidden w-px bg-gradient-to-b from-transparent via-white/10 to-transparent lg:block"
+        />
+      )}
       <div className="section-container relative z-10 pt-36 pb-20 sm:pt-40 sm:pb-24 md:pt-44">
-        <div className="max-w-2xl">
-          <Breadcrumb items={breadcrumb} variant="dark" />
-          <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden />
-            {eyebrow}
-          </span>
-          <h1 className="mt-4 text-5xl font-bold tracking-tighter sm:text-6xl">{title}</h1>
-          <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-zinc-400">{subtitle}</p>
+        <div className={cn(rightContent ? "grid gap-12 lg:grid-cols-2 lg:items-center" : "max-w-2xl")}>
+          <div className="max-w-2xl">
+            <Breadcrumb items={breadcrumb} variant="dark" />
+            <span className="eyebrow mt-6 border border-white/10 bg-white/5 text-brand-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden />
+              {eyebrow}
+            </span>
+            <h1 className="mt-4 text-5xl font-bold tracking-tighter sm:text-6xl">{title}</h1>
+            <p className="mt-5 max-w-[60ch] text-lg leading-relaxed text-zinc-400">{subtitle}</p>
+          </div>
+          {rightContent && (
+            <div className="hidden lg:block lg:pl-6">
+              {rightContent}
+            </div>
+          )}
         </div>
       </div>
     </section>
