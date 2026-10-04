@@ -64,7 +64,9 @@ export function determineStockStatus(
 
 /**
  * Menghitung nilai agregasi Rata-rata Pemakaian Bulanan (RPB)
- * dari periode-periode historis sebelumnya (hingga 12 bulan terakhir).
+ * dari periode-periode historis sebelumnya (hingga 12 bulan terakhir)
+ * berdasarkan Standar Metode Konsumsi Kemenkes:
+ * Total pemakaian dijumlahkan lalu dibagi seluruh periode observasi yang tercatat (termasuk bulan berpemakaian 0).
  */
 export function aggregateHistoricalUsage(
   records: Array<{ period?: string; avgUsage?: number | null }>
@@ -73,19 +75,24 @@ export function aggregateHistoricalUsage(
     return { avgUsage: 0, count: 0 };
   }
 
-  const validUsage = records
-    .map((r) => Number(r.avgUsage))
-    .filter((u) => !isNaN(u) && u > 0);
+  const validRecords = records.filter(
+    (r) => r !== null && r !== undefined
+  );
 
-  if (validUsage.length === 0) {
+  if (validRecords.length === 0) {
     return { avgUsage: 0, count: 0 };
   }
 
-  const total = validUsage.reduce((acc, curr) => acc + curr, 0);
-  const avg = total / validUsage.length;
+  const total = validRecords.reduce((acc, curr) => {
+    const val = Number(curr.avgUsage);
+    return acc + (isNaN(val) || val < 0 ? 0 : val);
+  }, 0);
+
+  const count = validRecords.length;
+  const avg = count > 0 ? total / count : 0;
 
   return {
     avgUsage: Number(avg.toFixed(1)),
-    count: validUsage.length,
+    count,
   };
 }

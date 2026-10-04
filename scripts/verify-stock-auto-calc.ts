@@ -54,15 +54,15 @@ const emptyAgg = aggregateHistoricalUsage([]);
 assert.strictEqual(emptyAgg.count, 0);
 assert.strictEqual(emptyAgg.avgUsage, 0);
 
-// Kasus data dengan nilai null/0
+// Kasus data dengan nilai null/0 (Standar Metode Konsumsi Kemenkes: tetap dibagi total bulan observasi)
 const mixedHistory = [
   { period: "2026-07", avgUsage: 100 },
   { period: "2026-06", avgUsage: 0 },
   { period: "2026-05", avgUsage: null },
 ];
 const mixedAgg = aggregateHistoricalUsage(mixedHistory);
-assert.strictEqual(mixedAgg.count, 1, "Hanya periode dengan pemakaian > 0 yang dihitung rata-rata");
-assert.strictEqual(mixedAgg.avgUsage, 100);
+assert.strictEqual(mixedAgg.count, 3, "Seluruh periode observasi (termasuk yang 0/null) harus menjadi pembagi");
+assert.strictEqual(mixedAgg.avgUsage, 33.3, "Rata-rata 100 / 3 bulan harus 33.3");
 console.log("   ✅ Seluruh pengujian aggregateHistoricalUsage lolos!");
 
 // ── 4. Uji Server Action searchMedicineHistoryAction dengan Database Riil ──────
