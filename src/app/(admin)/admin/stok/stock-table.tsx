@@ -17,6 +17,9 @@ import {
   Save,
   Loader2,
   Calendar,
+  CalendarPlus,
+  Copy,
+  FileText,
   FileSpreadsheet,
   ChevronDown,
   Sparkles
@@ -47,6 +50,7 @@ import {
   updateStockAction, 
   deleteStockAction,
   deleteStockPeriodAction,
+  createStockPeriodAction,
   searchMedicineHistoryAction,
   type MedicineHistoryItem 
 } from "@/actions/stock";
@@ -262,6 +266,14 @@ export function StockTable({
   const [activeSearchField, setActiveSearchField] = useState<"name" | "code" | null>(null);
   const [historyHint, setHistoryHint] = useState<{ message: string; type: "match" | "new" | "warning" } | null>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // State Modal Tambah Periode Baru Manual
+  const [isCreatePeriodOpen, setIsCreatePeriodOpen] = useState(false);
+  const [createPeriodMonth, setCreatePeriodMonth] = useState("08");
+  const [createPeriodYear, setCreatePeriodYear] = useState("2026");
+  const [createPeriodMode, setCreatePeriodMode] = useState<"COPY" | "BLANK">("COPY");
+  const [createPeriodSource, setCreatePeriodSource] = useState(selectedPeriod);
+  const [isCreatingPeriod, setIsCreatingPeriod] = useState(false);
 
   const summary = useMemo(() => getStockSummary(items), [items]);
 
@@ -712,6 +724,71 @@ export function StockTable({
     });
   };
 
+  const handleOpenCreatePeriod = () => {
+    const latest = periodsList[0] || selectedPeriod || "2026-06";
+    const [y, m] = latest.split("-");
+    const numY = Number(y) || 2026;
+    const numM = Number(m) || 6;
+
+    let nextM = numM + 1;
+    let nextY = numY;
+    if (nextM > 12) {
+      nextM = 1;
+      nextY += 1;
+    }
+
+    setCreatePeriodMonth(String(nextM).padStart(2, "0"));
+    setCreatePeriodYear(String(nextY));
+    setCreatePeriodMode("COPY");
+    setCreatePeriodSource(latest);
+    setIsCreatePeriodOpen(true);
+  };
+
+  const handleConfirmCreatePeriod = () => {
+    const targetPeriod = `${createPeriodYear}-${createPeriodMonth}`;
+    if (periodsList.includes(targetPeriod)) {
+      toast.error(`Periode ${formatStockPeriodLabel(targetPeriod)} sudah terdaftar di sistem`);
+      return;
+    }
+
+    setIsCreatingPeriod(true);
+    startTransition(async () => {
+      try {
+        const res = await createStockPeriodAction({
+          targetPeriod,
+          mode: createPeriodMode,
+          sourcePeriod: createPeriodMode === "COPY" ? createPeriodSource : undefined,
+        });
+
+        if (!res.success || !res.data) {
+          toast.error(res.error || "Gagal membuat periode baru");
+          setIsCreatingPeriod(false);
+          return;
+        }
+
+        setPeriodsList((prev) => [targetPeriod, ...prev.filter((p) => p !== targetPeriod)]);
+        setIsCreatePeriodOpen(false);
+        setIsCreatingPeriod(false);
+
+        if (createPeriodMode === "COPY") {
+          toast.success(
+            `Periode ${formatStockPeriodLabel(targetPeriod)} berhasil dibuka dengan ${res.data.count} master obat disalin`
+          );
+        } else {
+          toast.success(
+            `Periode ${formatStockPeriodLabel(targetPeriod)} berhasil dibuka (lembar kosong)`
+          );
+        }
+
+        updateUrl({ periode: targetPeriod, page: null });
+      } catch (err) {
+        console.error("[handleConfirmCreatePeriod] Error:", err);
+        toast.error("Terjadi kesalahan saat membuat periode baru");
+        setIsCreatingPeriod(false);
+      }
+    });
+  };
+
   const handleDownloadTemplate = () => {
     const csvContent =
       "data:text/csv;charset=utf-8,Kode,Nama Obat,Kategori,Satuan,Jumlah Stok,Pemakaian Rata-Rata,Kecukupan Stok (Bulan),ED,Nomenklatur\n" +
@@ -1039,6 +1116,11 @@ export function StockTable({
               enableSearch={true}
               singleSelect={true}
               icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-400" />}
+              createAction={{
+                label: "Buka Periode Baru",
+                icon: <CalendarPlus className="h-3.5 w-3.5 text-emerald-400 shrink-0" />,
+                onClick: handleOpenCreatePeriod,
+              }}
               footerAction={{
                 label: "Hapus Periode Ini",
                 icon: <Trash2 className="h-3.5 w-3.5 text-rose-400 shrink-0" />,
@@ -2162,6 +2244,210 @@ export function StockTable({
                 <Trash2 className="h-4 w-4" />
               )}
               <span>{isDeletingPeriod ? "Menghapus..." : "Hapus Periode"}</span>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Modal Buka Periode Stok Baru ─────────────────────────────────── */}
+      <Dialog
+        open={isCreatePeriodOpen}
+        onOpenChange={(open) => !open && !isCreatingPeriod && setIsCreatePeriodOpen(false)}
+      >
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg shadow-2xl rounded-2xl p-5 sm:p-6">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+                <CalendarPlus className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                  Buka Periode Stok Baru
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                  Inisialisasi lembar pelaporan obat bulanan untuk pencatatan stok fisik.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="mt-4 space-y-4">
+            {/* Pemilihan Bulan & Tahun */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-zinc-300">
+                Pilih Periode Bulan & Tahun
+              </Label>
+              <div className="grid grid-cols-2 gap-3">
+                <select
+                  value={createPeriodMonth}
+                  onChange={(e) => setCreatePeriodMonth(e.target.value)}
+                  className="h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                >
+                  <option value="01">Januari</option>
+                  <option value="02">Februari</option>
+                  <option value="03">Maret</option>
+                  <option value="04">April</option>
+                  <option value="05">Mei</option>
+                  <option value="06">Juni</option>
+                  <option value="07">Juli</option>
+                  <option value="08">Agustus</option>
+                  <option value="09">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+
+                <select
+                  value={createPeriodYear}
+                  onChange={(e) => setCreatePeriodYear(e.target.value)}
+                  className="h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                >
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                </select>
+              </div>
+
+              {/* Status Validasi Pratinjau */}
+              {(() => {
+                const target = `${createPeriodYear}-${createPeriodMonth}`;
+                const isDuplicate = periodsList.includes(target);
+                if (isDuplicate) {
+                  return (
+                    <div className="flex items-center gap-1.5 pt-1 text-xs text-amber-400">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <span>Periode {formatStockPeriodLabel(target)} ({target}) sudah terdaftar di sistem.</span>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-400">
+                    <span>Format target sistem:</span>
+                    <span className="font-mono font-semibold text-emerald-400">
+                      {formatStockPeriodLabel(target)} ({target})
+                    </span>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Metode Inisialisasi Data Obat */}
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <Label className="text-xs font-medium text-zinc-300">
+                Metode Inisialisasi Data Obat
+              </Label>
+              
+              <div className="grid grid-cols-1 gap-2.5">
+                {/* Opsi 1: Salin Master Obat */}
+                <label
+                  onClick={() => setCreatePeriodMode("COPY")}
+                  className={cn(
+                    "flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all",
+                    createPeriodMode === "COPY"
+                      ? "border-emerald-500/40 bg-emerald-500/10 ring-1 ring-emerald-500/40"
+                      : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="create-period-mode"
+                    checked={createPeriodMode === "COPY"}
+                    onChange={() => setCreatePeriodMode("COPY")}
+                    className="mt-0.5 h-4 w-4 text-emerald-500 focus:ring-emerald-500 bg-zinc-900 border-white/20"
+                  />
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-zinc-100 flex items-center gap-1.5">
+                        <Copy className="h-3.5 w-3.5 text-emerald-400" />
+                        <span>Salin Master Obat dari Periode Terakhir</span>
+                      </span>
+                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-medium text-emerald-300">
+                        Disarankan
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                      Menyalin seluruh daftar obat, kode, kategori, dan satuan. Kuantitas fisik di-reset ke 0 (status Kosong) dan RPB histori otomatis terhubung.
+                    </p>
+
+                    {createPeriodMode === "COPY" && (
+                      <div className="pt-2">
+                        <label className="text-[10px] text-zinc-400 block mb-1">
+                          Sumber Master Obat:
+                        </label>
+                        <select
+                          value={createPeriodSource}
+                          onChange={(e) => setCreatePeriodSource(e.target.value)}
+                          className="h-8 w-full rounded-md border border-white/10 bg-zinc-900 px-2.5 text-xs text-zinc-200 focus:border-brand-500/60 focus:outline-none"
+                        >
+                          {periodsList.map((p) => (
+                            <option key={p} value={p}>
+                              {formatStockPeriodLabel(p)} ({p})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </label>
+
+                {/* Opsi 2: Lembar Kosong */}
+                <label
+                  onClick={() => setCreatePeriodMode("BLANK")}
+                  className={cn(
+                    "flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all",
+                    createPeriodMode === "BLANK"
+                      ? "border-brand-500/40 bg-brand-500/10 ring-1 ring-brand-500/40"
+                      : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="create-period-mode"
+                    checked={createPeriodMode === "BLANK"}
+                    onChange={() => setCreatePeriodMode("BLANK")}
+                    className="mt-0.5 h-4 w-4 text-brand-500 focus:ring-brand-500 bg-zinc-900 border-white/20"
+                  />
+                  <div className="space-y-1 flex-1">
+                    <span className="text-xs font-semibold text-zinc-100 flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5 text-brand-400" />
+                      <span>Lembar Kosong Murni (Blank Sheet)</span>
+                    </span>
+                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                      Membuka periode baru dengan 0 obat. Petugas dapat menginput obat satu per satu secara manual atau mengimpor data Excel nanti.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 pt-3 border-t border-white/10">
+            <button
+              type="button"
+              disabled={isCreatingPeriod}
+              onClick={() => setIsCreatePeriodOpen(false)}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:opacity-50"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={isCreatingPeriod || periodsList.includes(`${createPeriodYear}-${createPeriodMonth}`)}
+              onClick={handleConfirmCreatePeriod}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isCreatingPeriod ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Memproses...</span>
+                </>
+              ) : (
+                <>
+                  <CalendarPlus className="h-4 w-4" />
+                  <span>Buka Periode</span>
+                </>
+              )}
             </button>
           </div>
         </DialogContent>
