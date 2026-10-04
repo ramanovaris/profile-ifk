@@ -11,11 +11,11 @@ interface PageCheck {
 }
 
 const PAGES: PageCheck[] = [
-  { path: "/layanan", expectedKeyword: "Jam Pelayanan Distribusi" },
-  { path: "/profil", expectedKeyword: "Jangkauan Layanan Logistik" },
-  { path: "/stok", expectedKeyword: "Standar Data Stok Fisik" },
-  { path: "/kontak", expectedKeyword: "Kanal Konsultasi" },
-  { path: "/berita", expectedKeyword: "Pusat Informasi & Publikasi" },
+  { path: "/layanan/", expectedKeyword: "Jam Pelayanan Distribusi" },
+  { path: "/profil/", expectedKeyword: "Jangkauan Layanan Logistik" },
+  { path: "/stok/", expectedKeyword: "Standar Data Stok Fisik" },
+  { path: "/kontak/", expectedKeyword: "Kanal Konsultasi" },
+  { path: "/berita/", expectedKeyword: "Pusat Informasi" },
 ];
 
 async function verifyPages() {
