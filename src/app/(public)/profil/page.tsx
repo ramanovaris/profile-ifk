@@ -173,6 +173,43 @@ export default async function ProfilPage() {
         eyebrow="Tentang Kami"
         title="Profil Instansi"
         subtitle={`${settings.name} — ${settings.motto}`}
+        rightContent={
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md shadow-2xl shadow-black/40">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10 text-brand-300 border border-brand-400/20">
+                  <ShieldCheck className="h-4 w-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-white">Jangkauan Layanan Logistik</h3>
+                  <p className="text-[11px] text-zinc-400">UPTD Instalasi Farmasi Kab. Kotabaru</p>
+                </div>
+              </div>
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] font-medium text-brand-300">
+                Mandat Wilayah
+              </span>
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-2.5">
+              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
+                <p className="font-mono text-xl font-bold text-brand-300">28</p>
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">Faskes Mitra</p>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
+                <p className="font-mono text-xl font-bold text-brand-300">22</p>
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">Kecamatan</p>
+              </div>
+              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
+                <p className="font-mono text-xl font-bold text-brand-300">334k+</p>
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">Jiwa Terlayani</p>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-zinc-400 italic">
+              &ldquo;Menjamin ketersediaan, pemerataan, dan keterjangkauan obat bermutu bagi seluruh masyarakat hingga pelosok kepulauan.&rdquo;
+            </div>
+          </div>
+        }
       />
 
       {/* ── Sambutan Kepala ───────────────────────────────────────── */}
