@@ -45,7 +45,14 @@ export async function createStockAction(data: StockItemInput): Promise<StockActi
   }
 
   try {
-    const period = data.period?.trim() || "2026-06";
+    let period = data.period?.trim();
+    if (!period) {
+      const latest = await db.medicineStock.findFirst({
+        select: { period: true },
+        orderBy: { period: "desc" },
+      });
+      period = latest?.period || "2026-06";
+    }
     const existing = await db.medicineStock.findFirst({
       where: { period, code: trimmedCode },
     });

@@ -260,7 +260,7 @@ export function StockTable({
   const [isSearchingHistory, setIsSearchingHistory] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSearchField, setActiveSearchField] = useState<"name" | "code" | null>(null);
-  const [historyHint, setHistoryHint] = useState<{ message: string; type: "match" | "new" } | null>(null);
+  const [historyHint, setHistoryHint] = useState<{ message: string; type: "match" | "new" | "warning" } | null>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const summary = useMemo(() => getStockSummary(items), [items]);
@@ -358,7 +358,7 @@ export function StockTable({
       try {
         const res = await searchMedicineHistoryAction({
           query: trimmed,
-          currentPeriod: activePeriod,
+          currentPeriod: selectedPeriod,
         });
         if (res.success && res.data && res.data.length > 0) {
           setHistorySuggestions(res.data);
@@ -376,6 +376,10 @@ export function StockTable({
   };
 
   const handleSelectSuggestion = (item: MedicineHistoryItem) => {
+    const isAlreadyInCurrentPeriod = items.some(
+      (i) => i.code.trim().toUpperCase() === item.code.trim().toUpperCase()
+    );
+
     setAddForm((prev) => {
       const qty = Number(prev.quantity) || 0;
       const usage = item.historicalAvgUsage > 0 ? item.historicalAvgUsage : 0;
@@ -395,13 +399,20 @@ export function StockTable({
       };
     });
 
-    setHistoryHint({
-      message:
-        item.historicalAvgUsage > 0
-          ? `⚡ RPB ${item.historicalAvgUsage.toLocaleString("id-ID")}/bln ditarik dari tren ${item.sampleCount} bulan sebelumnya`
-          : `⚡ Data master obat (${item.category}, ${item.unit}) berhasil disinkronkan`,
-      type: "match",
-    });
+    if (isAlreadyInCurrentPeriod) {
+      setHistoryHint({
+        message: `⚠️ Obat '${item.name}' (${item.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel jika ingin mengubah stok.`,
+        type: "warning",
+      });
+    } else {
+      setHistoryHint({
+        message:
+          item.historicalAvgUsage > 0
+            ? `⚡ RPB ${item.historicalAvgUsage.toLocaleString("id-ID")}/bln ditarik dari tren ${item.sampleCount} bulan sebelumnya`
+            : `⚡ Data master obat (${item.category}, ${item.unit}) berhasil disinkronkan`,
+        type: "match",
+      });
+    }
 
     setShowSuggestions(false);
     setActiveSearchField(null);
@@ -421,7 +432,7 @@ export function StockTable({
         try {
           const res = await searchMedicineHistoryAction({
             query: trimmed,
-            currentPeriod: activePeriod,
+            currentPeriod: selectedPeriod,
           });
 
           if (res.success && res.data && res.data.length > 0) {
@@ -433,6 +444,10 @@ export function StockTable({
               ) || res.data[0];
 
             if (matched) {
+              const isAlreadyInCurrentPeriod = items.some(
+                (i) => i.code.trim().toUpperCase() === matched.code.trim().toUpperCase()
+              );
+
               setAddForm((prev) => {
                 const qty = Number(prev.quantity) || 0;
                 const usage = matched.historicalAvgUsage > 0 ? matched.historicalAvgUsage : 0;
@@ -452,13 +467,20 @@ export function StockTable({
                 };
               });
 
-              setHistoryHint({
-                message:
-                  matched.historicalAvgUsage > 0
-                    ? `⚡ Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
-                    : `⚡ Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
-                type: "match",
-              });
+              if (isAlreadyInCurrentPeriod) {
+                setHistoryHint({
+                  message: `⚠️ Obat '${matched.name}' (${matched.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel.`,
+                  type: "warning",
+                });
+              } else {
+                setHistoryHint({
+                  message:
+                    matched.historicalAvgUsage > 0
+                      ? `⚡ Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
+                      : `⚡ Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
+                  type: "match",
+                });
+              }
               return;
             }
           }
@@ -499,19 +521,33 @@ export function StockTable({
   const handleSaveAdd = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!addForm.name.trim()) {
+    const trimmedName = addForm.name.trim();
+    const trimmedCode = addForm.code.trim();
+
+    if (!trimmedName) {
       toast.error("Nama obat tidak boleh kosong");
       return;
     }
-    if (!addForm.code.trim()) {
+    if (!trimmedCode) {
       toast.error("Kode obat tidak boleh kosong");
+      return;
+    }
+
+    const duplicateInCurrent = items.find(
+      (item) => item.code.trim().toUpperCase() === trimmedCode.toUpperCase()
+    );
+    if (duplicateInCurrent) {
+      toast.error(
+        `Kode obat '${trimmedCode}' sudah digunakan oleh '${duplicateInCurrent.name}' pada periode ${formatStockPeriodLabel(selectedPeriod)}. Gunakan fitur Edit di tabel atau masukkan kode lain.`
+      );
       return;
     }
 
     startTransition(async () => {
       const res = await createStockAction({
-        code: addForm.code.trim(),
-        name: addForm.name.trim(),
+        period: selectedPeriod,
+        code: trimmedCode,
+        name: trimmedName,
         category: addForm.category,
         unit: addForm.unit.trim() || "Tablet",
         quantity: Number(addForm.quantity),
@@ -529,6 +565,7 @@ export function StockTable({
 
       const newItem: MedicineStockItem = {
         id: res.data.id,
+        period: res.data.period,
         code: res.data.code,
         name: res.data.name,
         category: res.data.category as MedicineCategory,
@@ -1410,10 +1447,16 @@ export function StockTable({
                         "rounded-lg px-3 py-2 text-xs flex items-center gap-2 border transition-all animate-in fade-in",
                         historyHint.type === "match"
                           ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                          : historyHint.type === "warning"
+                          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
                           : "border-sky-500/25 bg-sky-500/10 text-sky-300"
                       )}
                     >
-                      <Sparkles className="h-4 w-4 shrink-0 text-brand-400" />
+                      {historyHint.type === "warning" ? (
+                        <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 shrink-0 text-brand-400" />
+                      )}
                       <span className="leading-snug">{historyHint.message}</span>
                     </div>
                   )}
@@ -1518,6 +1561,12 @@ export function StockTable({
                               mos: newMos !== null ? String(newMos) : "",
                               status: newStatus,
                             }));
+                            if (historyHint && (historyHint.type === "match" || historyHint.type === "warning")) {
+                              setHistoryHint({
+                                message: `⚡ Nilai RPB disesuaikan manual (${cleaned ? Number(cleaned).toLocaleString("id-ID") : "0"}/bln)`,
+                                type: "match",
+                              });
+                            }
                           }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
@@ -1811,7 +1860,7 @@ export function StockTable({
                             onClick={async () => {
                               const res = await searchMedicineHistoryAction({
                                 query: editForm.code || editForm.name,
-                                currentPeriod: activePeriod,
+                                currentPeriod: selectedPeriod,
                               });
                               if (res.success && res.data && res.data.length > 0) {
                                 const match = res.data[0];
