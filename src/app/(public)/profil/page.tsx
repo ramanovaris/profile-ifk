@@ -192,21 +192,33 @@ export default async function ProfilPage() {
 
             <div className="mt-4 grid grid-cols-3 gap-2.5">
               <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
-                <p className="font-mono text-xl font-bold text-brand-300">28</p>
-                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">Faskes Mitra</p>
+                <p className="font-mono text-base sm:text-lg font-bold text-brand-300 truncate" title={settings.statsFaskesCount || "30 Faskes"}>
+                  {settings.statsFaskesCount || "30 Faskes"}
+                </p>
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400 truncate" title={settings.statsFaskesLabel || "Jejaring Faskes"}>
+                  {settings.statsFaskesLabel || "Jejaring Faskes"}
+                </p>
               </div>
               <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
-                <p className="font-mono text-xl font-bold text-brand-300">22</p>
-                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">Kecamatan</p>
+                <p className="font-mono text-base sm:text-lg font-bold text-brand-300 truncate" title={settings.statsPulauCount || "45 Pulau"}>
+                  {settings.statsPulauCount || "45 Pulau"}
+                </p>
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400 truncate" title={settings.statsPulauLabel || "Kepulauan"}>
+                  {settings.statsPulauLabel || "Kepulauan"}
+                </p>
               </div>
               <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
-                <p className="font-mono text-xl font-bold text-brand-300">334k+</p>
-                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400">Jiwa Terlayani</p>
+                <p className="font-mono text-base sm:text-lg font-bold text-brand-300 truncate" title={settings.statsMasyarakatCount || "334 Ribu+"}>
+                  {settings.statsMasyarakatCount || "334 Ribu+"}
+                </p>
+                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400 truncate" title={settings.statsMasyarakatLabel || "Masyarakat"}>
+                  {settings.statsMasyarakatLabel || "Masyarakat"}
+                </p>
               </div>
             </div>
 
             <div className="mt-4 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-zinc-400 italic">
-              &ldquo;Menjamin ketersediaan, pemerataan, dan keterjangkauan obat bermutu bagi seluruh masyarakat hingga pelosok kepulauan.&rdquo;
+              &ldquo;{settings.motto || "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat"}&rdquo;
             </div>
           </div>
         }
