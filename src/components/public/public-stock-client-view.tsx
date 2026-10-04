@@ -337,11 +337,11 @@ export function PublicStockClientView({
                   <span className="text-xs font-medium">Total Perbekalan</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-1.5">
-                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-heading">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-heading truncate">
                     {summary.totalItems}
                   </p>
                   {isAllActive && (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700">
+                    <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-brand-600" />
                       Aktif
                     </span>
@@ -367,11 +367,11 @@ export function PublicStockClientView({
                   <span className="text-xs font-medium">Stok Aman</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-1.5">
-                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-800">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-800 truncate">
                     {summary.availableItems}
                   </p>
                   {isAvailableActive && (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+                    <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       Aktif
                     </span>
@@ -397,11 +397,11 @@ export function PublicStockClientView({
                   <span className="text-xs font-medium">Stok Menipis</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-1.5">
-                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-amber-800">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-amber-800 truncate">
                     {summary.lowItems}
                   </p>
                   {isLowActive && (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                    <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                       Aktif
                     </span>
@@ -427,11 +427,11 @@ export function PublicStockClientView({
                   <span className="text-xs font-medium">Stok Kosong</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-1.5">
-                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-rose-800">
+                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-rose-800 truncate">
                     {summary.emptyItems}
                   </p>
                   {isEmptyActive && (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">
+                    <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">
                       <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                       Aktif
                     </span>

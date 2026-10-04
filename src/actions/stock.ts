@@ -314,6 +314,14 @@ export async function deleteStockPeriodAction(
     });
 
     try {
+      await db.stockPeriod.deleteMany({
+        where: { period: trimmed },
+      });
+    } catch {
+      // Safe fallback jika model stock_periods belum ada
+    }
+
+    try {
       revalidatePath("/admin/stok");
       revalidatePath("/stok");
     } catch {
@@ -611,13 +619,24 @@ export async function importStockFileAction(
  */
 export async function getStockPeriodsAction(): Promise<string[]> {
   try {
-    const raw = await db.medicineStock.findMany({
-      select: { period: true },
-      distinct: ["period"],
-      orderBy: { period: "desc" },
-    });
-    const periods = raw.map((r) => r.period);
-    return periods.length > 0 ? periods : ["2026-06"];
+    const [periodsFromStock, periodsFromList] = await Promise.all([
+      db.medicineStock.findMany({
+        select: { period: true },
+        distinct: ["period"],
+        orderBy: { period: "desc" },
+      }),
+      db.stockPeriod.findMany({
+        select: { period: true },
+        orderBy: { period: "desc" },
+      }),
+    ]);
+    const merged = Array.from(
+      new Set([
+        ...periodsFromList.map((r) => r.period),
+        ...periodsFromStock.map((r) => r.period),
+      ])
+    ).sort().reverse();
+    return merged.length > 0 ? merged : ["2026-06"];
   } catch (err) {
     console.error("[getStockPeriodsAction] Error:", err);
     return ["2026-06"];
@@ -739,17 +758,27 @@ export async function createStockPeriodAction(
   }
 
   try {
-    // 1. Cek apakah targetPeriod sudah memiliki data di database
-    const existingCount = await db.medicineStock.count({
-      where: { period: targetPeriod },
-    });
+    // 1. Cek apakah targetPeriod sudah terdaftar di database
+    const [periodRecord, existingCount] = await Promise.all([
+      db.stockPeriod.findUnique({
+        where: { period: targetPeriod },
+      }),
+      db.medicineStock.count({
+        where: { period: targetPeriod },
+      }),
+    ]);
 
-    if (existingCount > 0) {
+    if (periodRecord || existingCount > 0) {
       return {
         success: false,
-        error: `Periode '${targetPeriod}' sudah terdaftar dengan ${existingCount} data obat. Gunakan periode lain.`,
+        error: `Periode '${targetPeriod}' sudah terdaftar di sistem. Gunakan periode lain.`,
       };
     }
+
+    // Daftarkan periode secara permanen
+    await db.stockPeriod.create({
+      data: { period: targetPeriod },
+    });
 
     if (data.mode === "COPY") {
       const sourcePeriod = data.sourcePeriod?.trim();

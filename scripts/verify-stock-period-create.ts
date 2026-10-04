@@ -43,6 +43,7 @@ async function main() {
   const testPeriod = "2026-99";
   // Bersihkan data uji jika sebelumnya tersisa
   await db.medicineStock.deleteMany({ where: { period: testPeriod } });
+  await db.stockPeriod.deleteMany({ where: { period: testPeriod } });
 
   const copyRes = await createStockPeriodAction({
     targetPeriod: testPeriod,
@@ -67,22 +68,44 @@ async function main() {
     assert.strictEqual(item.status, "EMPTY", `Status obat ${item.name} harus EMPTY`);
     assert.strictEqual(item.source, "MANUAL", "Source obat harus MANUAL");
   }
-  console.log("   ✅ Verifikasi data tersalin di DB lolos (semua stok = 0, status = EMPTY)!");
+
+  // Verifikasi stockPeriod tercatat
+  const savedPeriod = await db.stockPeriod.findUnique({
+    where: { period: testPeriod },
+  });
+  assert(savedPeriod !== null, "Periode harus tersimpan di tabel stock_periods");
+  console.log("   ✅ Verifikasi data tersalin di DB lolos (semua stok = 0, status = EMPTY, periode tercatat)!");
 
   // Bersihkan data uji
   await db.medicineStock.deleteMany({ where: { period: testPeriod } });
+  await db.stockPeriod.deleteMany({ where: { period: testPeriod } });
   console.log("   ✅ Data uji berhasil dibersihkan");
 
   // 4. Uji mode BLANK
   console.log("4. Pengujian pembuatan periode mode BLANK...");
+  const blankPeriod = "2026-98";
+  await db.stockPeriod.deleteMany({ where: { period: blankPeriod } });
+
   const blankRes = await createStockPeriodAction({
-    targetPeriod: "2026-98",
+    targetPeriod: blankPeriod,
     mode: "BLANK",
     _testUserId: "test-super-admin",
   });
   assert.strictEqual(blankRes.success, true, "createStockPeriodAction mode BLANK harus berhasil");
   assert.strictEqual(blankRes.data?.count, 0, "Mode BLANK mengembalikan count 0");
-  console.log("   ✅ Pengujian mode BLANK lolos!");
+
+  const blankSaved = await db.stockPeriod.findUnique({
+    where: { period: blankPeriod },
+  });
+  assert(blankSaved !== null, "Periode BLANK harus tersimpan di tabel stock_periods");
+
+  const blankStocks = await db.medicineStock.findMany({
+    where: { period: blankPeriod },
+  });
+  assert.strictEqual(blankStocks.length, 0, "Periode BLANK harus memiliki 0 obat di tabel medicine_stocks");
+
+  await db.stockPeriod.deleteMany({ where: { period: blankPeriod } });
+  console.log("   ✅ Pengujian mode BLANK lolos (periode tersimpan permanen dan obat = 0)!");
 
   console.log("\n🎉 Seluruh pengujian TDD createStockPeriodAction berhasil 100%!");
 }

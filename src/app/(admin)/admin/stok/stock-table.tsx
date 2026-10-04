@@ -985,9 +985,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Total Item</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-zinc-100">{summary.totalItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-zinc-100 truncate">{summary.totalItems}</p>
             {isAllActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
                 Aktif
               </span>
@@ -1012,9 +1012,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Stok Aman</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-emerald-400">{summary.availableItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-400 truncate">{summary.availableItems}</p>
             {isAvailableActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 Aktif
               </span>
@@ -1039,9 +1039,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Menipis</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-amber-400">{summary.lowItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-amber-400 truncate">{summary.lowItems}</p>
             {isLowActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
                 Aktif
               </span>
@@ -1066,9 +1066,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Kosong</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-rose-400">{summary.emptyItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-rose-400 truncate">{summary.emptyItems}</p>
             {isEmptyActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
                 Aktif
               </span>
@@ -1325,10 +1325,30 @@ export function StockTable({
       </div>
       
       {filtered.length === 0 && (
-        <div className="mt-12 text-center">
-          <Package className="mx-auto h-12 w-12 text-zinc-700" />
-          <h3 className="mt-2 text-sm font-semibold text-zinc-200">Tidak ada data ditemukan</h3>
-          <p className="mt-1 text-sm text-zinc-500">Coba ubah filter atau kata kunci pencarian Anda.</p>
+        <div className="mt-8 text-center p-8 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/30 max-w-lg mx-auto">
+          <Package className="mx-auto h-12 w-12 text-zinc-600" />
+          <h3 className="mt-3 text-base font-semibold text-zinc-200">
+            {items.length === 0
+              ? `Periode ${formatStockPeriodLabel(selectedPeriod)} Masih Kosong`
+              : "Tidak ada data ditemukan"}
+          </h3>
+          <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+            {items.length === 0
+              ? "Belum ada data obat atau perbekalan farmasi pada periode ini. Klik '+ Tambah Obat' di atas atau lakukan impor berkas untuk mulai mengisi lembar stok."
+              : "Coba ubah filter atau kata kunci pencarian Anda."}
+          </p>
+          {items.length === 0 && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenAdd}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Tambah Obat Baru
+              </button>
+            </div>
+          )}
         </div>
       )}
 

@@ -33,20 +33,37 @@ export default async function StokPublikPage({ searchParams }: StokPublikPagePro
   let activePeriod = "2026-08";
 
   try {
-    const periodsRaw = await db.medicineStock.findMany({
-      select: { period: true },
-      distinct: ["period"],
-      orderBy: { period: "desc" },
-    });
-    availablePeriods = periodsRaw.map((p) => p.period);
+    const [periodsRaw, stockPeriodsRaw] = await Promise.all([
+      db.medicineStock.findMany({
+        select: { period: true },
+        distinct: ["period"],
+        orderBy: { period: "desc" },
+      }),
+      db.stockPeriod.findMany({
+        select: { period: true },
+        orderBy: { period: "desc" },
+      }),
+    ]);
+
+    availablePeriods = Array.from(
+      new Set([
+        ...stockPeriodsRaw.map((p) => p.period),
+        ...periodsRaw.map((p) => p.period),
+      ])
+    ).sort().reverse();
+
     if (availablePeriods.length === 0) {
       availablePeriods = ["2026-08", "2026-07", "2026-06"];
     }
 
     activePeriod =
-      requestedPeriod && availablePeriods.includes(requestedPeriod)
+      requestedPeriod && (availablePeriods.includes(requestedPeriod) || /^\d{4}-\d{2}$/.test(requestedPeriod))
         ? requestedPeriod
         : availablePeriods[0];
+
+    if (!availablePeriods.includes(activePeriod)) {
+      availablePeriods.unshift(activePeriod);
+    }
 
     const dbStocks = await db.medicineStock.findMany({
       where: { period: activePeriod },

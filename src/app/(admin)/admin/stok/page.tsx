@@ -19,16 +19,33 @@ export default async function AdminStokPage({ searchParams }: AdminStokPageProps
   const resolvedParams = await searchParams;
   const requestedPeriod = resolvedParams?.periode;
 
-  const periodsRaw = await db.medicineStock.findMany({
-    select: { period: true },
-    distinct: ["period"],
-    orderBy: { period: "desc" },
-  });
-  const availablePeriods = periodsRaw.map((p) => p.period);
+  const [periodsRaw, stockPeriodsRaw] = await Promise.all([
+    db.medicineStock.findMany({
+      select: { period: true },
+      distinct: ["period"],
+      orderBy: { period: "desc" },
+    }),
+    db.stockPeriod.findMany({
+      select: { period: true },
+      orderBy: { period: "desc" },
+    }),
+  ]);
+
+  const availablePeriods = Array.from(
+    new Set([
+      ...stockPeriodsRaw.map((p) => p.period),
+      ...periodsRaw.map((p) => p.period),
+    ])
+  ).sort().reverse();
+
   const activePeriod =
-    requestedPeriod && availablePeriods.includes(requestedPeriod)
+    requestedPeriod && (availablePeriods.includes(requestedPeriod) || /^\d{4}-\d{2}$/.test(requestedPeriod))
       ? requestedPeriod
       : availablePeriods[0] || "2026-08";
+
+  if (!availablePeriods.includes(activePeriod)) {
+    availablePeriods.unshift(activePeriod);
+  }
 
   const stocks = await db.medicineStock.findMany({
     where: { period: activePeriod },
