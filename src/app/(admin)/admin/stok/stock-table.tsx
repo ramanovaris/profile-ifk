@@ -17,8 +17,12 @@ import {
   Save,
   Loader2,
   Calendar,
+  CalendarPlus,
+  Copy,
+  FileText,
   FileSpreadsheet,
-  ChevronDown
+  ChevronDown,
+  Sparkles
 } from "lucide-react";
 import { 
   Dialog, 
@@ -45,8 +49,12 @@ import {
   createStockAction, 
   updateStockAction, 
   deleteStockAction,
-  deleteStockPeriodAction 
+  deleteStockPeriodAction,
+  createStockPeriodAction,
+  searchMedicineHistoryAction,
+  type MedicineHistoryItem 
 } from "@/actions/stock";
+import { calculateMos, determineStockStatus } from "@/lib/stock-calc";
 import { exportStockToExcel } from "@/lib/stock-exporter";
 import { StockForm } from "./stock-form";
 import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
@@ -251,6 +259,22 @@ export function StockTable({
     nomenklatur: "",
   });
 
+  // State Autocomplete & Riwayat Obat (Issue #118)
+  const [historySuggestions, setHistorySuggestions] = useState<MedicineHistoryItem[]>([]);
+  const [isSearchingHistory, setIsSearchingHistory] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSearchField, setActiveSearchField] = useState<"name" | "code" | null>(null);
+  const [historyHint, setHistoryHint] = useState<{ message: string; type: "match" | "new" | "warning" } | null>(null);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // State Modal Tambah Periode Baru Manual
+  const [isCreatePeriodOpen, setIsCreatePeriodOpen] = useState(false);
+  const [createPeriodMonth, setCreatePeriodMonth] = useState("08");
+  const [createPeriodYear, setCreatePeriodYear] = useState("2026");
+  const [createPeriodMode, setCreatePeriodMode] = useState<"COPY" | "BLANK">("COPY");
+  const [createPeriodSource, setCreatePeriodSource] = useState(selectedPeriod);
+  const [isCreatingPeriod, setIsCreatingPeriod] = useState(false);
+
   const summary = useMemo(() => getStockSummary(items), [items]);
 
   const categoryOptions = useMemo(() => {
@@ -327,6 +351,165 @@ export function StockTable({
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
+  // Handler pencarian riwayat obat (debounced)
+  const triggerHistorySearch = (query: string, field: "name" | "code") => {
+    setActiveSearchField(field);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      setHistorySuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    setIsSearchingHistory(true);
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await searchMedicineHistoryAction({
+          query: trimmed,
+          currentPeriod: selectedPeriod,
+        });
+        if (res.success && res.data && res.data.length > 0) {
+          setHistorySuggestions(res.data);
+          setShowSuggestions(true);
+        } else {
+          setHistorySuggestions([]);
+          setShowSuggestions(false);
+        }
+      } catch (err) {
+        console.error("Error searching medicine history:", err);
+      } finally {
+        setIsSearchingHistory(false);
+      }
+    }, 250);
+  };
+
+  const handleSelectSuggestion = (item: MedicineHistoryItem) => {
+    const isAlreadyInCurrentPeriod = items.some(
+      (i) => i.code.trim().toUpperCase() === item.code.trim().toUpperCase()
+    );
+
+    setAddForm((prev) => {
+      const qty = Number(prev.quantity) || 0;
+      const usage = item.historicalAvgUsage > 0 ? item.historicalAvgUsage : 0;
+      const newMos = calculateMos(qty, usage);
+      const newStatus = determineStockStatus(qty, newMos, prev.status);
+
+      return {
+        ...prev,
+        code: item.code,
+        name: item.name,
+        category: (item.category as MedicineCategory) || prev.category,
+        unit: item.unit || prev.unit,
+        nomenklatur: item.nomenklatur || prev.nomenklatur,
+        avgUsage: usage > 0 ? String(usage) : "",
+        mos: newMos !== null ? String(newMos) : "",
+        status: newStatus,
+      };
+    });
+
+    if (isAlreadyInCurrentPeriod) {
+      setHistoryHint({
+        message: `⚠️ Obat '${item.name}' (${item.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel jika ingin mengubah stok.`,
+        type: "warning",
+      });
+    } else {
+      setHistoryHint({
+        message:
+          item.historicalAvgUsage > 0
+            ? `⚡ RPB ${item.historicalAvgUsage.toLocaleString("id-ID")}/bln ditarik dari tren ${item.sampleCount} bulan sebelumnya`
+            : `⚡ Data master obat (${item.category}, ${item.unit}) berhasil disinkronkan`,
+        type: "match",
+      });
+    }
+
+    setShowSuggestions(false);
+    setActiveSearchField(null);
+  };
+
+  // Handler onBlur jika user mengetik manual tanpa klik dropdown
+  const handleFieldBlur = (query: string, field: "name" | "code") => {
+    setTimeout(async () => {
+      setShowSuggestions(false);
+      setActiveSearchField(null);
+
+      const trimmed = query.trim();
+      if (!trimmed || trimmed.length < 2) return;
+
+      if (addForm.avgUsage === "" || !historyHint) {
+        setIsSearchingHistory(true);
+        try {
+          const res = await searchMedicineHistoryAction({
+            query: trimmed,
+            currentPeriod: selectedPeriod,
+          });
+
+          if (res.success && res.data && res.data.length > 0) {
+            const matched =
+              res.data.find(
+                (m) =>
+                  m.code.toLowerCase() === trimmed.toLowerCase() ||
+                  m.name.toLowerCase() === trimmed.toLowerCase()
+              ) || res.data[0];
+
+            if (matched) {
+              const isAlreadyInCurrentPeriod = items.some(
+                (i) => i.code.trim().toUpperCase() === matched.code.trim().toUpperCase()
+              );
+
+              setAddForm((prev) => {
+                const qty = Number(prev.quantity) || 0;
+                const usage = matched.historicalAvgUsage > 0 ? matched.historicalAvgUsage : 0;
+                const newMos = calculateMos(qty, usage);
+                const newStatus = determineStockStatus(qty, newMos, prev.status);
+
+                return {
+                  ...prev,
+                  code: prev.code || matched.code,
+                  name: prev.name || matched.name,
+                  category: prev.category === "Obat Generik" ? (matched.category as MedicineCategory) : prev.category,
+                  unit: prev.unit === "Tablet" ? matched.unit : prev.unit,
+                  nomenklatur: prev.nomenklatur || matched.nomenklatur || "",
+                  avgUsage: prev.avgUsage === "" && usage > 0 ? String(usage) : prev.avgUsage,
+                  mos: newMos !== null ? String(newMos) : prev.mos,
+                  status: newStatus,
+                };
+              });
+
+              if (isAlreadyInCurrentPeriod) {
+                setHistoryHint({
+                  message: `⚠️ Obat '${matched.name}' (${matched.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel.`,
+                  type: "warning",
+                });
+              } else {
+                setHistoryHint({
+                  message:
+                    matched.historicalAvgUsage > 0
+                      ? `⚡ Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
+                      : `⚡ Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
+                  type: "match",
+                });
+              }
+              return;
+            }
+          }
+
+          setHistoryHint({
+            message: "🆕 Obat baru (belum ada riwayat pemakaian di periode sebelumnya)",
+            type: "new",
+          });
+        } catch (err) {
+          console.error("Error on blur check:", err);
+        } finally {
+          setIsSearchingHistory(false);
+        }
+      }
+    }, 200);
+  };
+
   const handleOpenAdd = () => {
     setAddForm({
       code: "",
@@ -340,25 +523,43 @@ export function StockTable({
       expiryDate: "",
       nomenklatur: "",
     });
+    setHistorySuggestions([]);
+    setShowSuggestions(false);
+    setActiveSearchField(null);
+    setHistoryHint(null);
     setIsAddOpen(true);
   };
 
   const handleSaveAdd = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!addForm.name.trim()) {
+    const trimmedName = addForm.name.trim();
+    const trimmedCode = addForm.code.trim();
+
+    if (!trimmedName) {
       toast.error("Nama obat tidak boleh kosong");
       return;
     }
-    if (!addForm.code.trim()) {
+    if (!trimmedCode) {
       toast.error("Kode obat tidak boleh kosong");
+      return;
+    }
+
+    const duplicateInCurrent = items.find(
+      (item) => item.code.trim().toUpperCase() === trimmedCode.toUpperCase()
+    );
+    if (duplicateInCurrent) {
+      toast.error(
+        `Kode obat '${trimmedCode}' sudah digunakan oleh '${duplicateInCurrent.name}' pada periode ${formatStockPeriodLabel(selectedPeriod)}. Gunakan fitur Edit di tabel atau masukkan kode lain.`
+      );
       return;
     }
 
     startTransition(async () => {
       const res = await createStockAction({
-        code: addForm.code.trim(),
-        name: addForm.name.trim(),
+        period: selectedPeriod,
+        code: trimmedCode,
+        name: trimmedName,
         category: addForm.category,
         unit: addForm.unit.trim() || "Tablet",
         quantity: Number(addForm.quantity),
@@ -376,6 +577,7 @@ export function StockTable({
 
       const newItem: MedicineStockItem = {
         id: res.data.id,
+        period: res.data.period,
         code: res.data.code,
         name: res.data.name,
         category: res.data.category as MedicineCategory,
@@ -518,6 +720,71 @@ export function StockTable({
         toast.error("Terjadi kesalahan saat menghapus data periode");
       } finally {
         setIsDeletingPeriod(false);
+      }
+    });
+  };
+
+  const handleOpenCreatePeriod = () => {
+    const latest = periodsList[0] || selectedPeriod || "2026-06";
+    const [y, m] = latest.split("-");
+    const numY = Number(y) || 2026;
+    const numM = Number(m) || 6;
+
+    let nextM = numM + 1;
+    let nextY = numY;
+    if (nextM > 12) {
+      nextM = 1;
+      nextY += 1;
+    }
+
+    setCreatePeriodMonth(String(nextM).padStart(2, "0"));
+    setCreatePeriodYear(String(nextY));
+    setCreatePeriodMode("COPY");
+    setCreatePeriodSource(latest);
+    setIsCreatePeriodOpen(true);
+  };
+
+  const handleConfirmCreatePeriod = () => {
+    const targetPeriod = `${createPeriodYear}-${createPeriodMonth}`;
+    if (periodsList.includes(targetPeriod)) {
+      toast.error(`Periode ${formatStockPeriodLabel(targetPeriod)} sudah terdaftar di sistem`);
+      return;
+    }
+
+    setIsCreatingPeriod(true);
+    startTransition(async () => {
+      try {
+        const res = await createStockPeriodAction({
+          targetPeriod,
+          mode: createPeriodMode,
+          sourcePeriod: createPeriodMode === "COPY" ? createPeriodSource : undefined,
+        });
+
+        if (!res.success || !res.data) {
+          toast.error(res.error || "Gagal membuat periode baru");
+          setIsCreatingPeriod(false);
+          return;
+        }
+
+        setPeriodsList((prev) => [targetPeriod, ...prev.filter((p) => p !== targetPeriod)]);
+        setIsCreatePeriodOpen(false);
+        setIsCreatingPeriod(false);
+
+        if (createPeriodMode === "COPY") {
+          toast.success(
+            `Periode ${formatStockPeriodLabel(targetPeriod)} berhasil dibuka dengan ${res.data.count} master obat disalin`
+          );
+        } else {
+          toast.success(
+            `Periode ${formatStockPeriodLabel(targetPeriod)} berhasil dibuka (lembar kosong)`
+          );
+        }
+
+        updateUrl({ periode: targetPeriod, page: null });
+      } catch (err) {
+        console.error("[handleConfirmCreatePeriod] Error:", err);
+        toast.error("Terjadi kesalahan saat membuat periode baru");
+        setIsCreatingPeriod(false);
       }
     });
   };
@@ -718,9 +985,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Total Item</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-zinc-100">{summary.totalItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-zinc-100 truncate">{summary.totalItems}</p>
             {isAllActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
                 Aktif
               </span>
@@ -745,9 +1012,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Stok Aman</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-emerald-400">{summary.availableItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-400 truncate">{summary.availableItems}</p>
             {isAvailableActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 Aktif
               </span>
@@ -772,9 +1039,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Menipis</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-amber-400">{summary.lowItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-amber-400 truncate">{summary.lowItems}</p>
             {isLowActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
                 Aktif
               </span>
@@ -799,9 +1066,9 @@ export function StockTable({
             <span className="text-xs sm:text-sm font-medium">Kosong</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-rose-400">{summary.emptyItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-rose-400 truncate">{summary.emptyItems}</p>
             {isEmptyActive && (
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
                 Aktif
               </span>
@@ -849,6 +1116,11 @@ export function StockTable({
               enableSearch={true}
               singleSelect={true}
               icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-400" />}
+              createAction={{
+                label: "Buka Periode Baru",
+                icon: <CalendarPlus className="h-3.5 w-3.5 text-emerald-400 shrink-0" />,
+                onClick: handleOpenCreatePeriod,
+              }}
               footerAction={{
                 label: "Hapus Periode Ini",
                 icon: <Trash2 className="h-3.5 w-3.5 text-rose-400 shrink-0" />,
@@ -1053,10 +1325,30 @@ export function StockTable({
       </div>
       
       {filtered.length === 0 && (
-        <div className="mt-12 text-center">
-          <Package className="mx-auto h-12 w-12 text-zinc-700" />
-          <h3 className="mt-2 text-sm font-semibold text-zinc-200">Tidak ada data ditemukan</h3>
-          <p className="mt-1 text-sm text-zinc-500">Coba ubah filter atau kata kunci pencarian Anda.</p>
+        <div className="mt-8 text-center p-8 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/30 max-w-lg mx-auto">
+          <Package className="mx-auto h-12 w-12 text-zinc-600" />
+          <h3 className="mt-3 text-base font-semibold text-zinc-200">
+            {items.length === 0
+              ? `Periode ${formatStockPeriodLabel(selectedPeriod)} Masih Kosong`
+              : "Tidak ada data ditemukan"}
+          </h3>
+          <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+            {items.length === 0
+              ? "Belum ada data obat atau perbekalan farmasi pada periode ini. Klik '+ Tambah Obat' di atas atau lakukan impor berkas untuk mulai mengisi lembar stok."
+              : "Coba ubah filter atau kata kunci pencarian Anda."}
+          </p>
+          {items.length === 0 && (
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenAdd}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Tambah Obat Baru
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -1084,33 +1376,150 @@ export function StockTable({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                 {/* ── Kolom Kiri (50%): Data Master & Kuantitas Fisik ── */}
                 <div className="space-y-3.5">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
-                      Nama Obat / Barang
-                    </Label>
+                  <div className="space-y-1.5 relative">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
+                        Nama Obat / Barang
+                      </Label>
+                      {isSearchingHistory && activeSearchField === "name" && (
+                        <span className="text-[10px] text-zinc-400 flex items-center gap-1">
+                          <Loader2 className="h-3 w-3 animate-spin text-brand-400" />
+                          <span>Mencari histori...</span>
+                        </span>
+                      )}
+                    </div>
                     <Input
                       id="add-name"
                       value={addForm.name}
-                      onChange={(e) => setAddForm((f) => ({ ...f, name: e.target.value }))}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAddForm((f) => ({ ...f, name: val }));
+                        triggerHistorySearch(val, "name");
+                      }}
+                      onFocus={() => {
+                        if (historySuggestions.length > 0) setShowSuggestions(true);
+                      }}
+                      onBlur={() => handleFieldBlur(addForm.name, "name")}
                       className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                       placeholder="Contoh: Paracetamol 500mg Tablet"
                       required
+                      autoComplete="off"
                     />
+
+                    {/* Dropdown Suggestions */}
+                    {showSuggestions && historySuggestions.length > 0 && activeSearchField === "name" && (
+                      <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-white/15 bg-zinc-950 shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-white/5">
+                        <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 bg-white/[0.02] flex items-center justify-between sticky top-0 backdrop-blur-md">
+                          <span>Saran Riwayat Obat IFK</span>
+                          <span className="text-brand-400">Pilih untuk Auto-fill</span>
+                        </div>
+                        {historySuggestions.map((item) => (
+                          <button
+                            key={item.code}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelectSuggestion(item);
+                            }}
+                            className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-brand-500/10 cursor-pointer group flex flex-col gap-0.5"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-white group-hover:text-brand-300">
+                                {item.name}
+                              </span>
+                              <span className="font-mono text-[10px] text-zinc-400 bg-white/5 px-1.5 py-0.5 rounded">
+                                {item.code}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] text-zinc-400">
+                              <span>{item.category}</span>
+                              <span>•</span>
+                              <span>{item.unit}</span>
+                              {item.historicalAvgUsage > 0 && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-emerald-400 font-medium">
+                                    RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}/bln ({item.sampleCount} bln lalu)
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="add-code" className="text-xs font-medium text-zinc-300">
-                        Kode Barang / Barcode
-                      </Label>
+                    <div className="space-y-1.5 relative">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="add-code" className="text-xs font-medium text-zinc-300">
+                          Kode Barang / Barcode
+                        </Label>
+                        {isSearchingHistory && activeSearchField === "code" && (
+                          <span className="text-[10px] text-zinc-400 flex items-center gap-1">
+                            <Loader2 className="h-3 w-3 animate-spin text-brand-400" />
+                          </span>
+                        )}
+                      </div>
                       <Input
                         id="add-code"
                         value={addForm.code}
-                        onChange={(e) => setAddForm((f) => ({ ...f, code: e.target.value }))}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setAddForm((f) => ({ ...f, code: val }));
+                          triggerHistorySearch(val, "code");
+                        }}
+                        onFocus={() => {
+                          if (historySuggestions.length > 0) setShowSuggestions(true);
+                        }}
+                        onBlur={() => handleFieldBlur(addForm.code, "code")}
                         className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                         placeholder="Contoh: OBG-999"
                         required
+                        autoComplete="off"
                       />
+
+                      {/* Dropdown Suggestions for Code */}
+                      {showSuggestions && historySuggestions.length > 0 && activeSearchField === "code" && (
+                        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-white/15 bg-zinc-950 shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-white/5">
+                          <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 bg-white/[0.02] flex items-center justify-between sticky top-0 backdrop-blur-md">
+                            <span>Saran Riwayat Obat</span>
+                            <span className="text-brand-400">Pilih</span>
+                          </div>
+                          {historySuggestions.map((item) => (
+                            <button
+                              key={item.code}
+                              type="button"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                handleSelectSuggestion(item);
+                              }}
+                              className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-brand-500/10 cursor-pointer group flex flex-col gap-0.5"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-white group-hover:text-brand-300">
+                                  {item.code}
+                                </span>
+                                <span className="text-[10px] text-zinc-400 truncate max-w-[120px]">
+                                  {item.name}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                                <span>{item.unit}</span>
+                                {item.historicalAvgUsage > 0 && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="text-emerald-400">
+                                      RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
@@ -1133,6 +1542,26 @@ export function StockTable({
                       </select>
                     </div>
                   </div>
+
+                  {historyHint && (
+                    <div
+                      className={cn(
+                        "rounded-lg px-3 py-2 text-xs flex items-center gap-2 border transition-all animate-in fade-in",
+                        historyHint.type === "match"
+                          ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
+                          : historyHint.type === "warning"
+                          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
+                          : "border-sky-500/25 bg-sky-500/10 text-sky-300"
+                      )}
+                    >
+                      {historyHint.type === "warning" ? (
+                        <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
+                      ) : (
+                        <Sparkles className="h-4 w-4 shrink-0 text-brand-400" />
+                      )}
+                      <span className="leading-snug">{historyHint.message}</span>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
@@ -1165,10 +1594,14 @@ export function StockTable({
                         onChange={(e) => {
                           const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
                           const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
+                          const usage = addForm.avgUsage !== "" ? Number(addForm.avgUsage) : 0;
+                          const newMos = calculateMos(qty, usage);
+                          const newStatus = determineStockStatus(qty, newMos, addForm.status);
                           setAddForm((f) => ({
                             ...f,
                             quantity: cleaned,
-                            status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
+                            mos: newMos !== null ? String(newMos) : "",
+                            status: newStatus,
                           }));
                         }}
                         className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1219,17 +1652,23 @@ export function StockTable({
                           placeholder="Contoh: 1200"
                           value={addForm.avgUsage}
                           onChange={(e) => {
-                            const val = e.target.value;
-                            setAddForm((f) => {
-                              const qty = Number(f.quantity) || 0;
-                              const usage = Number(val) || 0;
-                              const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
-                              return {
-                                ...f,
-                                avgUsage: val,
-                                mos: f.mos === "" ? autoMos : f.mos,
-                              };
-                            });
+                            const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                            const usage = cleaned === "" ? 0 : Number(cleaned) || 0;
+                            const qty = Number(addForm.quantity) || 0;
+                            const newMos = calculateMos(qty, usage);
+                            const newStatus = determineStockStatus(qty, newMos, addForm.status);
+                            setAddForm((f) => ({
+                              ...f,
+                              avgUsage: cleaned,
+                              mos: newMos !== null ? String(newMos) : "",
+                              status: newStatus,
+                            }));
+                            if (historyHint && (historyHint.type === "match" || historyHint.type === "warning")) {
+                              setHistoryHint({
+                                message: `⚡ Nilai RPB disesuaikan manual (${cleaned ? Number(cleaned).toLocaleString("id-ID") : "0"}/bln)`,
+                                type: "match",
+                              });
+                            }
                           }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
@@ -1246,7 +1685,17 @@ export function StockTable({
                           min="0"
                           placeholder="Contoh: 12.5"
                           value={addForm.mos}
-                          onChange={(e) => setAddForm((f) => ({ ...f, mos: e.target.value }))}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const mosNum = val === "" ? null : Number(val);
+                            const qty = Number(addForm.quantity) || 0;
+                            const newStatus = determineStockStatus(qty, mosNum, addForm.status);
+                            setAddForm((f) => ({
+                              ...f,
+                              mos: val,
+                              status: newStatus,
+                            }));
+                          }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
@@ -1282,18 +1731,39 @@ export function StockTable({
                   </div>
 
                   {/* Quick Insight Box */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-1.5 mt-2">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-2 mt-2">
                     <div className="flex items-center justify-between text-zinc-400">
-                      <span className="font-medium text-[11px]">Pratinjau Status Logistik</span>
-                      <span className="text-[10px] text-zinc-400">Kalkulasi Cepat</span>
+                      <span className="font-medium text-[11px] flex items-center gap-1.5 text-zinc-300">
+                        <Sparkles className="h-3.5 w-3.5 text-brand-400" />
+                        <span>Pratinjau Status Logistik</span>
+                      </span>
+                      {(() => {
+                        const q = Number(addForm.quantity) || 0;
+                        const m = addForm.mos !== "" ? Number(addForm.mos) : null;
+                        const info = getMosBadgeInfo(q, m, addForm.status);
+                        const dotColors: Record<string, string> = {
+                          empty: "bg-rose-400",
+                          critical: "bg-rose-400",
+                          low: "bg-amber-400",
+                          safe: "bg-emerald-400",
+                          abundant: "bg-sky-400",
+                          unknown: "bg-zinc-400",
+                        };
+                        return (
+                          <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border border-white/10 bg-white/5">
+                            <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[info.variant] || "bg-zinc-400")} />
+                            <span>{info.label}</span>
+                          </span>
+                        );
+                      })()}
                     </div>
-                    <div className="flex items-center justify-between pt-0.5">
-                      <span className="text-zinc-200">
-                        Kuantitas: <strong className="text-white font-mono">{addForm.quantity ? Number(addForm.quantity).toLocaleString("id-ID") : "0"}</strong> {addForm.unit || "unit"}
-                      </span>
-                      <span className="text-zinc-200">
-                        Kecukupan: <strong className="text-brand-400 font-mono">{addForm.mos || (addForm.avgUsage && Number(addForm.avgUsage) > 0 ? (Number(addForm.quantity || 0) / Number(addForm.avgUsage)).toFixed(1) : "-")}</strong> bln
-                      </span>
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px]">
+                      <div className="text-zinc-400">
+                        Stok Fisik: <strong className="text-white font-mono">{addForm.quantity ? Number(addForm.quantity).toLocaleString("id-ID") : "0"}</strong> {addForm.unit || "unit"}
+                      </div>
+                      <div className="text-zinc-400 text-right">
+                        Kecukupan: <strong className="text-brand-400 font-mono">{addForm.mos ? `${addForm.mos} bln` : "-"}</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1435,10 +1905,14 @@ export function StockTable({
                         onChange={(e) => {
                           const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
                           const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
+                          const usage = editForm.avgUsage !== "" ? Number(editForm.avgUsage) : 0;
+                          const newMos = calculateMos(qty, usage);
+                          const newStatus = determineStockStatus(qty, newMos, editForm.status);
                           setEditForm((f) => ({
                             ...f,
                             quantity: cleaned,
-                            status: cleaned === "" || qty === 0 ? "EMPTY" : qty < 500 ? "LOW" : "AVAILABLE",
+                            mos: newMos !== null ? String(newMos) : "",
+                            status: newStatus,
                           }));
                         }}
                         className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -1479,9 +1953,43 @@ export function StockTable({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
-                          Rata-rata Pemakaian / Bln
-                        </Label>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
+                            Rata-rata Pemakaian / Bln
+                          </Label>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const res = await searchMedicineHistoryAction({
+                                query: editForm.code || editForm.name,
+                                currentPeriod: selectedPeriod,
+                              });
+                              if (res.success && res.data && res.data.length > 0) {
+                                const match = res.data[0];
+                                if (match.historicalAvgUsage > 0) {
+                                  const qty = Number(editForm.quantity) || 0;
+                                  const newMos = calculateMos(qty, match.historicalAvgUsage);
+                                  const newStatus = determineStockStatus(qty, newMos, editForm.status);
+                                  setEditForm((f) => ({
+                                    ...f,
+                                    avgUsage: String(match.historicalAvgUsage),
+                                    mos: newMos !== null ? String(newMos) : "",
+                                    status: newStatus,
+                                  }));
+                                  toast.success(`RPB ditarik dari tren ${match.sampleCount} bulan: ${match.historicalAvgUsage.toLocaleString("id-ID")}/bln`);
+                                } else {
+                                  toast.info("Belum ada riwayat RPB di periode sebelumnya");
+                                }
+                              } else {
+                                toast.info("Tidak ditemukan riwayat obat di periode sebelumnya");
+                              }
+                            }}
+                            className="text-[10px] text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <Sparkles className="h-3 w-3" />
+                            <span>Tarik RPB Histori</span>
+                          </button>
+                        </div>
                         <Input
                           id="edit-avg-usage"
                           type="number"
@@ -1489,17 +1997,17 @@ export function StockTable({
                           placeholder="Contoh: 1200"
                           value={editForm.avgUsage}
                           onChange={(e) => {
-                            const val = e.target.value;
-                            setEditForm((f) => {
-                              const qty = Number(f.quantity) || 0;
-                              const usage = Number(val) || 0;
-                              const autoMos = usage > 0 ? (qty / usage).toFixed(1) : "";
-                              return {
-                                ...f,
-                                avgUsage: val,
-                                mos: f.mos === "" ? autoMos : f.mos,
-                              };
-                            });
+                            const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                            const usage = cleaned === "" ? 0 : Number(cleaned) || 0;
+                            const qty = Number(editForm.quantity) || 0;
+                            const newMos = calculateMos(qty, usage);
+                            const newStatus = determineStockStatus(qty, newMos, editForm.status);
+                            setEditForm((f) => ({
+                              ...f,
+                              avgUsage: cleaned,
+                              mos: newMos !== null ? String(newMos) : "",
+                              status: newStatus,
+                            }));
                           }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
@@ -1516,7 +2024,17 @@ export function StockTable({
                           min="0"
                           placeholder="Contoh: 12.5"
                           value={editForm.mos}
-                          onChange={(e) => setEditForm((f) => ({ ...f, mos: e.target.value }))}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const mosNum = val === "" ? null : Number(val);
+                            const qty = Number(editForm.quantity) || 0;
+                            const newStatus = determineStockStatus(qty, mosNum, editForm.status);
+                            setEditForm((f) => ({
+                              ...f,
+                              mos: val,
+                              status: newStatus,
+                            }));
+                          }}
                           className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
@@ -1552,18 +2070,39 @@ export function StockTable({
                   </div>
 
                   {/* Quick Insight Box */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-1.5 mt-2">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-2 mt-2">
                     <div className="flex items-center justify-between text-zinc-400">
-                      <span className="font-medium text-[11px]">Pratinjau Status Logistik</span>
-                      <span className="text-[10px] text-zinc-400">Kalkulasi Cepat</span>
+                      <span className="font-medium text-[11px] flex items-center gap-1.5 text-zinc-300">
+                        <Sparkles className="h-3.5 w-3.5 text-brand-400" />
+                        <span>Pratinjau Status Logistik</span>
+                      </span>
+                      {(() => {
+                        const q = Number(editForm.quantity) || 0;
+                        const m = editForm.mos !== "" ? Number(editForm.mos) : null;
+                        const info = getMosBadgeInfo(q, m, editForm.status);
+                        const dotColors: Record<string, string> = {
+                          empty: "bg-rose-400",
+                          critical: "bg-rose-400",
+                          low: "bg-amber-400",
+                          safe: "bg-emerald-400",
+                          abundant: "bg-sky-400",
+                          unknown: "bg-zinc-400",
+                        };
+                        return (
+                          <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border border-white/10 bg-white/5">
+                            <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[info.variant] || "bg-zinc-400")} />
+                            <span>{info.label}</span>
+                          </span>
+                        );
+                      })()}
                     </div>
-                    <div className="flex items-center justify-between pt-0.5">
-                      <span className="text-zinc-200">
-                        Kuantitas: <strong className="text-white font-mono">{editForm.quantity ? Number(editForm.quantity).toLocaleString("id-ID") : "0"}</strong> {editForm.unit || "unit"}
-                      </span>
-                      <span className="text-zinc-200">
-                        Kecukupan: <strong className="text-brand-400 font-mono">{editForm.mos || (editForm.avgUsage && Number(editForm.avgUsage) > 0 ? (Number(editForm.quantity || 0) / Number(editForm.avgUsage)).toFixed(1) : "-")}</strong> bln
-                      </span>
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px]">
+                      <div className="text-zinc-400">
+                        Stok Fisik: <strong className="text-white font-mono">{editForm.quantity ? Number(editForm.quantity).toLocaleString("id-ID") : "0"}</strong> {editForm.unit || "unit"}
+                      </div>
+                      <div className="text-zinc-400 text-right">
+                        Kecukupan: <strong className="text-brand-400 font-mono">{editForm.mos ? `${editForm.mos} bln` : "-"}</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1725,6 +2264,210 @@ export function StockTable({
                 <Trash2 className="h-4 w-4" />
               )}
               <span>{isDeletingPeriod ? "Menghapus..." : "Hapus Periode"}</span>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Modal Buka Periode Stok Baru ─────────────────────────────────── */}
+      <Dialog
+        open={isCreatePeriodOpen}
+        onOpenChange={(open) => !open && !isCreatingPeriod && setIsCreatePeriodOpen(false)}
+      >
+        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg shadow-2xl rounded-2xl p-5 sm:p-6">
+          <DialogHeader className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+                <CalendarPlus className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                  Buka Periode Stok Baru
+                </DialogTitle>
+                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                  Inisialisasi lembar pelaporan obat bulanan untuk pencatatan stok fisik.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="mt-4 space-y-4">
+            {/* Pemilihan Bulan & Tahun */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-zinc-300">
+                Pilih Periode Bulan & Tahun
+              </Label>
+              <div className="grid grid-cols-2 gap-3">
+                <select
+                  value={createPeriodMonth}
+                  onChange={(e) => setCreatePeriodMonth(e.target.value)}
+                  className="h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                >
+                  <option value="01">Januari</option>
+                  <option value="02">Februari</option>
+                  <option value="03">Maret</option>
+                  <option value="04">April</option>
+                  <option value="05">Mei</option>
+                  <option value="06">Juni</option>
+                  <option value="07">Juli</option>
+                  <option value="08">Agustus</option>
+                  <option value="09">September</option>
+                  <option value="10">Oktober</option>
+                  <option value="11">November</option>
+                  <option value="12">Desember</option>
+                </select>
+
+                <select
+                  value={createPeriodYear}
+                  onChange={(e) => setCreatePeriodYear(e.target.value)}
+                  className="h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                >
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                </select>
+              </div>
+
+              {/* Status Validasi Pratinjau */}
+              {(() => {
+                const target = `${createPeriodYear}-${createPeriodMonth}`;
+                const isDuplicate = periodsList.includes(target);
+                if (isDuplicate) {
+                  return (
+                    <div className="flex items-center gap-1.5 pt-1 text-xs text-amber-400">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <span>Periode {formatStockPeriodLabel(target)} ({target}) sudah terdaftar di sistem.</span>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-400">
+                    <span>Format target sistem:</span>
+                    <span className="font-mono font-semibold text-emerald-400">
+                      {formatStockPeriodLabel(target)} ({target})
+                    </span>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Metode Inisialisasi Data Obat */}
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <Label className="text-xs font-medium text-zinc-300">
+                Metode Inisialisasi Data Obat
+              </Label>
+              
+              <div className="grid grid-cols-1 gap-2.5">
+                {/* Opsi 1: Salin Master Obat */}
+                <label
+                  onClick={() => setCreatePeriodMode("COPY")}
+                  className={cn(
+                    "flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all",
+                    createPeriodMode === "COPY"
+                      ? "border-emerald-500/40 bg-emerald-500/10 ring-1 ring-emerald-500/40"
+                      : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="create-period-mode"
+                    checked={createPeriodMode === "COPY"}
+                    onChange={() => setCreatePeriodMode("COPY")}
+                    className="mt-0.5 h-4 w-4 text-emerald-500 focus:ring-emerald-500 bg-zinc-900 border-white/20"
+                  />
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-zinc-100 flex items-center gap-1.5">
+                        <Copy className="h-3.5 w-3.5 text-emerald-400" />
+                        <span>Salin Master Obat dari Periode Terakhir</span>
+                      </span>
+                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-medium text-emerald-300">
+                        Disarankan
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                      Menyalin seluruh daftar obat, kode, kategori, dan satuan. Kuantitas fisik di-reset ke 0 (status Kosong) dan RPB histori otomatis terhubung.
+                    </p>
+
+                    {createPeriodMode === "COPY" && (
+                      <div className="pt-2">
+                        <label className="text-[10px] text-zinc-400 block mb-1">
+                          Sumber Master Obat:
+                        </label>
+                        <select
+                          value={createPeriodSource}
+                          onChange={(e) => setCreatePeriodSource(e.target.value)}
+                          className="h-8 w-full rounded-md border border-white/10 bg-zinc-900 px-2.5 text-xs text-zinc-200 focus:border-brand-500/60 focus:outline-none"
+                        >
+                          {periodsList.map((p) => (
+                            <option key={p} value={p}>
+                              {formatStockPeriodLabel(p)} ({p})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </label>
+
+                {/* Opsi 2: Lembar Kosong */}
+                <label
+                  onClick={() => setCreatePeriodMode("BLANK")}
+                  className={cn(
+                    "flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all",
+                    createPeriodMode === "BLANK"
+                      ? "border-brand-500/40 bg-brand-500/10 ring-1 ring-brand-500/40"
+                      : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="create-period-mode"
+                    checked={createPeriodMode === "BLANK"}
+                    onChange={() => setCreatePeriodMode("BLANK")}
+                    className="mt-0.5 h-4 w-4 text-brand-500 focus:ring-brand-500 bg-zinc-900 border-white/20"
+                  />
+                  <div className="space-y-1 flex-1">
+                    <span className="text-xs font-semibold text-zinc-100 flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5 text-brand-400" />
+                      <span>Lembar Kosong Murni (Blank Sheet)</span>
+                    </span>
+                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                      Membuka periode baru dengan 0 obat. Petugas dapat menginput obat satu per satu secara manual atau mengimpor data Excel nanti.
+                    </p>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 pt-3 border-t border-white/10">
+            <button
+              type="button"
+              disabled={isCreatingPeriod}
+              onClick={() => setIsCreatePeriodOpen(false)}
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:opacity-50"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={isCreatingPeriod || periodsList.includes(`${createPeriodYear}-${createPeriodMonth}`)}
+              onClick={handleConfirmCreatePeriod}
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {isCreatingPeriod ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Memproses...</span>
+                </>
+              ) : (
+                <>
+                  <CalendarPlus className="h-4 w-4" />
+                  <span>Buka Periode</span>
+                </>
+              )}
             </button>
           </div>
         </DialogContent>

@@ -122,6 +122,14 @@ model MedicineStock {
   @@map("medicine_stocks")
 }
 
+model StockPeriod {
+  id        String   @id @default(cuid())
+  period    String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("stock_periods")
+}
+
 model SiteSetting {
   id                  String   @id @default("default")
   name                String
