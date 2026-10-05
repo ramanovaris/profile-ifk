@@ -21,7 +21,7 @@ export const metadata: Metadata = {
       "Website resmi UPTD Instalasi Farmasi Kabupaten Kotabaru — Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat.",
     images: [
       {
-        url: "/images/kantor-ifk.webp",
+        url: "/images/kantor-ifk.jpg",
         width: 1200,
         height: 630,
         alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     title: "UPTD Instalasi Farmasi Kab. Kotabaru",
     description:
       "Website resmi UPTD Instalasi Farmasi Kabupaten Kotabaru — Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat.",
-    images: ["/images/kantor-ifk.webp"],
+    images: ["/images/kantor-ifk.jpg"],
   },
 };
 

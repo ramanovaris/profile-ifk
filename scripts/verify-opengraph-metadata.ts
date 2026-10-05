@@ -21,31 +21,31 @@ const PAGES_TO_TEST: OgPageCheck[] = [
     path: "/",
     name: "Beranda",
     expectedOgTitleContains: "Beranda",
-    expectedOgImageContains: "kantor-ifk.webp",
+    expectedOgImageContains: "kantor-ifk.jpg",
   },
   {
     path: "/profil/",
     name: "Profil & Struktur Organisasi",
     expectedOgTitleContains: "Profil",
-    expectedOgImageContains: "kantor-ifk.webp",
+    expectedOgImageContains: "kantor-ifk.jpg",
   },
   {
     path: "/layanan/",
     name: "Standar Layanan & Distribusi",
     expectedOgTitleContains: "Standar Pelayanan",
-    expectedOgImageContains: "cold-room-ifk.webp",
+    expectedOgImageContains: "cold-room-ifk.jpg",
   },
   {
     path: "/stok/",
     name: "Ketersediaan Stok",
     expectedOgTitleContains: "Ketersediaan Stok",
-    expectedOgImageContains: "kantor-ifk.webp",
+    expectedOgImageContains: "kantor-ifk.jpg",
   },
   {
     path: "/berita/",
     name: "Indeks Berita",
     expectedOgTitleContains: "Berita",
-    expectedOgImageContains: "kantor-ifk.webp",
+    expectedOgImageContains: "kantor-ifk.jpg",
   },
   {
     path: "/berita/sosialisasi-sistem-informasi-kefarmasian/",
@@ -58,7 +58,7 @@ const PAGES_TO_TEST: OgPageCheck[] = [
     path: "/kontak/",
     name: "Kontak & Layanan Pengaduan",
     expectedOgTitleContains: "Kontak",
-    expectedOgImageContains: "kantor-ifk.webp",
+    expectedOgImageContains: "kantor-ifk.jpg",
   },
 ];
 

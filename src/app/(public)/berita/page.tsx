@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     url: "/berita",
     images: [
       {
-        url: "/images/kantor-ifk.webp",
+        url: "/images/kantor-ifk.jpg",
         width: 1200,
         height: 630,
         alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",

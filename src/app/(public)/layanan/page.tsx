@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     url: "/layanan",
     images: [
       {
-        url: "/images/cold-room-ifk.webp",
+        url: "/images/cold-room-ifk.jpg",
         width: 1200,
         height: 630,
         alt: "Fasilitas Cold Room Penyimpanan Vaksin UPTD Instalasi Farmasi Kab. Kotabaru",

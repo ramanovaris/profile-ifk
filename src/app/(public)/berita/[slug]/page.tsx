@@ -41,7 +41,7 @@ export async function generateMetadata(props: {
     const coverImageUrl =
       rawCover && !rawCover.startsWith("data:")
         ? rawCover
-        : "/images/kantor-ifk.webp";
+        : "/images/kantor-ifk.jpg";
     const description = stripHtmlAndTruncate(dbArticle.content, 160);
     const publishedTime = dbArticle.publishedAt
       ? new Date(dbArticle.publishedAt).toISOString()
@@ -87,7 +87,7 @@ export async function generateMetadata(props: {
     const coverImageUrl =
       rawCover && !rawCover.startsWith("data:")
         ? rawCover
-        : "/images/kantor-ifk.webp";
+        : "/images/kantor-ifk.jpg";
     const description = stripHtmlAndTruncate(dummy.content, 160);
     const publishedTime = dummy.publishedAt
       ? new Date(dummy.publishedAt).toISOString()
