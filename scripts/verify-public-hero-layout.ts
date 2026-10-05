@@ -11,7 +11,7 @@ interface PageCheck {
 }
 
 const PAGES: PageCheck[] = [
-  { path: "/layanan/", expectedKeyword: "HUB IFK" },
+  { path: "/layanan/", expectedKeyword: "GUDANG FARMASI" },
   { path: "/profil/", expectedKeyword: "KANTOR UPTD IFK" },
   { path: "/stok/", expectedKeyword: "Opname Fisik" },
   { path: "/kontak/", expectedKeyword: "Konsultasi IFK" },
