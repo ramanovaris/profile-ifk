@@ -4,9 +4,11 @@
  * keberadaan tag <meta property="og:*">, <meta name="twitter:*">, dan <link rel="canonical">.
  */
 
+export {};
+
 const BASE_URL = process.env.BASE_URL || "http://localhost:3003/profile-ifk";
 
-interface PageCheck {
+interface OgPageCheck {
   path: string;
   name: string;
   expectedOgTitleContains: string;
@@ -14,7 +16,7 @@ interface PageCheck {
   isArticle?: boolean;
 }
 
-const PAGES_TO_TEST: PageCheck[] = [
+const PAGES_TO_TEST: OgPageCheck[] = [
   {
     path: "/",
     name: "Beranda",
@@ -60,7 +62,7 @@ const PAGES_TO_TEST: PageCheck[] = [
   },
 ];
 
-async function verifyPage(page: PageCheck): Promise<boolean> {
+async function verifyPage(page: OgPageCheck): Promise<boolean> {
   const url = `${BASE_URL}${page.path}`;
   try {
     const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; VerifyBot/1.0)" } });
