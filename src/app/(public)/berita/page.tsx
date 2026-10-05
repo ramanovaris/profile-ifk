@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/public/page-hero";
+import { BeritaHeroIllustration } from "@/components/public/hero-illustrations";
 import { BeritaClientView } from "@/components/public/berita-client-view";
 import { db } from "@/lib/db";
 import { dummyArticles } from "@/lib/dummy-data";
@@ -93,6 +94,7 @@ export default async function BeritaPage() {
         eyebrow="Informasi"
         title={<>Berita &amp; Informasi</>}
         subtitle="Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian."
+        rightContent={<BeritaHeroIllustration />}
       />
 
       <section className="border-t border-border bg-surface py-24">

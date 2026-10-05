@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/public/page-hero";
+import { LayananHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { SuratPengantarModalButton } from "@/components/public/surat-pengantar-modal";
 import { getSiteSettings } from "@/actions/setting";
@@ -118,6 +119,7 @@ export default async function LayananPage() {
         eyebrow="Pelayanan"
         title="Standar Pelayanan Operasional"
         subtitle="Pedoman operasional lengkap bagi faskes mitra, mencakup alur pengajuan perbekalan, format dokumen resmi, hingga standar mutu."
+        rightContent={<LayananHeroIllustration />}
       />
 
       {/* ── Mekanisme Pengajuan Permintaan Perbekalan ───────────────── */}

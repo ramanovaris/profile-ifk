@@ -5,7 +5,6 @@ import {
   FlaskConical,
   UserCog,
   Warehouse,
-  Snowflake,
   Lock,
   Network,
   ClipboardCheck,
@@ -22,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/public/page-hero";
+import { ProfilHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { placeholderImage } from "@/lib/placeholder";
 import { getAssetUrl } from "@/lib/utils";
@@ -173,6 +173,7 @@ export default async function ProfilPage() {
         eyebrow="Tentang Kami"
         title="Profil Instansi"
         subtitle={`${settings.name} — ${settings.motto}`}
+        rightContent={<ProfilHeroIllustration />}
       />
 
       {/* ── Sambutan Kepala ───────────────────────────────────────── */}

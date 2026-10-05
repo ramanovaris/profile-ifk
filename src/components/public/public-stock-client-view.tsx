@@ -5,6 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   Search,
   Package,
+  PackageCheck,
   CheckCircle2,
   AlertTriangle,
   XCircle,
@@ -16,6 +17,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
+import { StokHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { PublicStockFilter } from "@/components/public/public-stock-filter";
 import { exportStockToExcel } from "@/lib/stock-exporter";
@@ -262,6 +264,7 @@ export function PublicStockClientView({
         eyebrow="Transparansi Publik"
         title={<>Ketersediaan Stok Obat &amp; BMHP</>}
         subtitle="Informasi transparansi ketersediaan stok fisik perbekalan farmasi pada UPTD Instalasi Farmasi Kab. Kotabaru per akhir bulan."
+        rightContent={<StokHeroIllustration />}
       />
 
       <section className="border-t border-border bg-surface py-16 md:py-24">

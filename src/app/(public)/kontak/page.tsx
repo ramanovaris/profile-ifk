@@ -1,5 +1,6 @@
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
+import { KontakHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { getSiteSettings } from "@/actions/setting";
 
@@ -54,6 +55,7 @@ export default async function KontakPage() {
         eyebrow="Pelayanan Publik"
         title="Layanan Kontak & Informasi"
         subtitle="Saluran resmi komunikasi, konsultasi kefarmasian, dan layanan pengaduan terpadu UPTD Instalasi Farmasi Kabupaten Kotabaru."
+        rightContent={<KontakHeroIllustration />}
       />
 
       <section className="border-t border-border bg-surface py-24">

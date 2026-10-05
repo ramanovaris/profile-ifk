@@ -8,7 +8,6 @@ import { Search, X, Loader2, ArrowDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
 import { PublicMultiSelectFilter } from "@/components/public/public-stock-filter";
-import { cn } from "@/lib/utils";
 import {
   getPublicArticlesAction,
   type PublicArticleItem,
