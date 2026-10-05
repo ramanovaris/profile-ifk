@@ -644,7 +644,9 @@ export function StokHeroIllustration({ className }: { className?: string }) {
 
 /**
  * 4. Ilustrasi Halaman Kontak (/kontak)
- * Tema: Kanal Komunikasi Terpadu, Gelombang Hotline & Respon Pengaduan
+ * Tema: Pusat Komunikasi & Layanan Informasi Publik Terpadu
+ * (Konsol Dialog Responsif, Kanal WhatsApp, Hotline Telepon, Email & Geolokasi Kantor)
+ * Didesain murni simbolik vektor tanpa teks dan tanpa SP4N-LAPOR.
  */
 export function KontakHeroIllustration({ className }: { className?: string }) {
   const p = "kontak";
@@ -655,89 +657,161 @@ export function KontakHeroIllustration({ className }: { className?: string }) {
         viewBox="0 0 480 360"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-auto max-w-[440px] drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] select-none"
+        className="w-full h-auto max-w-[460px] drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] select-none"
       >
         <SharedSvgDefs idPrefix={p} />
 
-        {/* Glow Latar */}
-        <circle cx="240" cy="180" r="140" fill={`url(#${p}-glow)`} />
+        {/* Glow Latar Belakang */}
+        <circle cx="240" cy="180" r="145" fill={`url(#${p}-glow)`} />
 
-        {/* Gelombang Frekuensi Komunikasi */}
-        <g stroke="#10b981" strokeOpacity="0.2" strokeWidth="1.5" fill="none">
-          <circle cx="240" cy="170" r="110" strokeDasharray="4 6" />
-          <circle cx="240" cy="170" r="80" strokeDasharray="3 4" />
-          <circle cx="240" cy="170" r="50" />
+        {/* Gelombang Frekuensi Komunikasi Melingkar */}
+        <g stroke="#ffffff" strokeOpacity="0.05" strokeDasharray="3 3">
+          <circle cx="240" cy="180" r="140" />
+          <circle cx="240" cy="180" r="95" stroke="#10b981" strokeOpacity="0.12" />
+          <circle cx="240" cy="180" r="50" />
+          <line x1="40" y1="180" x2="440" y2="180" />
+          <line x1="240" y1="30" x2="240" y2="330" />
         </g>
 
-        {/* Kartu Dialog Konsultasi Utama (Tengah) */}
-        <g transform="translate(160, 115)">
+        {/* Jalur Berkas Energi Dinamis dari Simpul Kanal ke Pusat */}
+        <path
+          d="M 100 115 C 140 115, 150 140, 175 155"
+          stroke="#10b981"
+          strokeWidth="1.5"
+          strokeDasharray="4 4"
+          className="animate-pulse"
+        />
+        <path
+          d="M 110 235 C 140 235, 150 215, 175 200"
+          stroke="#34d399"
+          strokeWidth="1.5"
+          strokeDasharray="4 4"
+        />
+        <path
+          d="M 380 115 C 340 115, 330 140, 305 155"
+          stroke="#38bdf8"
+          strokeWidth="1.5"
+          strokeDasharray="4 4"
+          className="animate-pulse"
+        />
+        <path
+          d="M 370 235 C 340 235, 330 215, 305 200"
+          stroke="#10b981"
+          strokeWidth="1.5"
+          strokeDasharray="4 4"
+        />
+
+        {/* ── 1. PUSAT: KONSOL PERANGKAT DIALOG & RESPON CEPAT ────────── */}
+        <g transform="translate(175, 80)">
+          {/* Rangka Layar / Perangkat Komunikasi */}
           <rect
-            width="160"
-            height="110"
-            rx="20"
+            width="130"
+            height="185"
+            rx="22"
             fill="#09090b"
             stroke={`url(#${p}-border-grad)`}
             strokeWidth="1.5"
           />
-          {/* Header Chat */}
-          <circle cx="28" cy="28" r="12" fill="#10b981" fillOpacity="0.2" />
+
+          {/* Kamera & Speaker Atas */}
+          <rect x="50" y="8" width="30" height="3" rx="1.5" fill="#ffffff" fillOpacity="0.2" />
+          <circle cx="88" cy="9.5" r="2" fill="#10b981" className="animate-pulse" />
+
+          {/* Area Layar Obrolan Transparan */}
+          <rect x="10" y="20" width="110" height="142" rx="14" fill="#ffffff" fillOpacity="0.02" />
+
+          {/* Balon Pesan 1 (Pertanyaan / Masuk - Kiri) */}
+          <g transform="translate(18, 36)">
+            <rect width="78" height="28" rx="8" fill="#ffffff" fillOpacity="0.06" stroke="#ffffff" strokeOpacity="0.1" />
+            <line x1="8" y1="10" x2="68" y2="10" stroke="#ffffff" strokeOpacity="0.35" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="18" x2="48" y2="18" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="1.5" strokeLinecap="round" />
+          </g>
+
+          {/* Balon Pesan 2 (Tanggapan Resmi IFK - Kanan) */}
+          <g transform="translate(34, 74)">
+            <rect width="78" height="32" rx="8" fill="#10b981" fillOpacity="0.15" stroke="#10b981" strokeOpacity="0.3" />
+            <line x1="8" y1="11" x2="68" y2="11" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
+            <line x1="8" y1="19" x2="52" y2="19" stroke="#34d399" strokeOpacity="0.5" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Tanda Centang Dua (Read Receipt) */}
+            <path d="M 58 24 L 62 27 L 70 20 M 64 24 L 67 27 L 72 21" stroke="#34d399" strokeWidth="1.2" strokeLinecap="round" />
+          </g>
+
+          {/* Equalizer Frekuensi Suara / Respon Aktif */}
+          <g transform="translate(32, 126)">
+            <rect x="0" y="8" width="3" height="12" rx="1.5" fill="#34d399" />
+            <rect x="8" y="2" width="3" height="18" rx="1.5" fill="#10b981" />
+            <rect x="16" y="5" width="3" height="15" rx="1.5" fill="#38bdf8" />
+            <rect x="24" y="0" width="3" height="20" rx="1.5" fill="#34d399" />
+            <rect x="32" y="6" width="3" height="14" rx="1.5" fill="#10b981" />
+            <rect x="40" y="2" width="3" height="18" rx="1.5" fill="#38bdf8" />
+            <rect x="48" y="7" width="3" height="13" rx="1.5" fill="#34d399" />
+            <rect x="56" y="10" width="3" height="10" rx="1.5" fill="#10b981" />
+            <rect x="64" y="4" width="3" height="16" rx="1.5" fill="#38bdf8" />
+          </g>
+
+          {/* Tombol Home Bawah */}
+          <circle cx="65" cy="172" r="3" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1" />
+        </g>
+
+        {/* ── 2. SIMPUL KANAL 1: WHATSAPP PELAYANAN (KIRI ATAS) ──────── */}
+        <g transform="translate(80, 95)">
+          {/* Cincin Luar Berdenyut */}
+          <circle cx="0" cy="0" r="28" fill={`url(#${p}-card-bg)`} stroke="#10b981" strokeOpacity="0.4" strokeWidth="1.2" />
+          <circle cx="0" cy="0" r="34" stroke="#10b981" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="3 3" />
+          {/* Ikon Balon Percakapan WhatsApp */}
           <path
-            d="M 23 28 C 23 25, 33 25, 33 28 C 33 30, 26 31, 26 33"
+            d="M -7 9 L -6 4 C -9 0, -8 -6, -2 -8 C 5 -10, 11 -6, 11 0 C 11 7, 5 11, 0 10 Z"
             stroke="#34d399"
-            strokeWidth="1.75"
+            strokeWidth="2"
             strokeLinecap="round"
-            fill="none"
-          />
-          <circle cx="26" cy="36" r="1" fill="#34d399" />
-          <text x="46" y="26" fill="#ffffff" fontSize="11" fontWeight="bold">
-            Konsultasi IFK
-          </text>
-          <text x="46" y="38" fill="#10b981" fontSize="9" fontWeight="500">
-            Aktif Jam Kerja
-          </text>
-
-          {/* Balon Pesan 1 */}
-          <rect x="20" y="52" width="100" height="20" rx="8" fill="#ffffff" fillOpacity="0.06" />
-          <text x="30" y="65" fill="#d4d4d8" fontSize="8.5">
-            Layanan Pengaduan
-          </text>
-
-          {/* Balon Pesan 2 (Respon Timbal Balik) */}
-          <rect x="45" y="78" width="95" height="20" rx="8" fill="#10b981" fillOpacity="0.2" stroke="#10b981" strokeOpacity="0.3" />
-          <text x="55" y="91" fill="#34d399" fontSize="8.5" fontWeight="500">
-            Respon Tanggap
-          </text>
-        </g>
-
-        {/* Ikon Satelit WhatsApp (Kiri) */}
-        <g transform="translate(85, 140)">
-          <circle cx="32" cy="32" r="28" fill={`url(#${p}-card-bg)`} stroke="#ffffff" strokeOpacity="0.15" />
-          <path
-            d="M 23 38 L 24 33 C 21 29, 23 23, 29 21 C 35 19, 41 23, 41 29 C 41 35, 35 39, 30 38 Z"
-            stroke="#34d399"
-            strokeWidth="1.75"
-            fill="none"
-          />
-          <text x="32" y="72" textAnchor="middle" fill="#a1a1aa" fontSize="9" fontWeight="500">
-            WhatsApp
-          </text>
-        </g>
-
-        {/* Ikon Satelit SP4N-LAPOR! (Kanan) */}
-        <g transform="translate(335, 140)">
-          <circle cx="32" cy="32" r="28" fill={`url(#${p}-card-bg)`} stroke="#ffffff" strokeOpacity="0.15" />
-          {/* Ikon Megafon / Pengeras Suara */}
-          <path
-            d="M 24 30 L 32 26 L 40 34 L 32 38 Z"
-            stroke="#38bdf8"
-            strokeWidth="1.5"
-            fill="none"
             strokeLinejoin="round"
           />
-          <path d="M 24 30 L 22 38" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
-          <text x="32" y="72" textAnchor="middle" fill="#a1a1aa" fontSize="9" fontWeight="500">
-            SP4N-LAPOR!
-          </text>
+          {/* Gagang Telepon di Dalam */}
+          <path
+            d="M -2 -3 C -1 -4, 1 -4, 2 -3 L 4 -1 C 5 0, 5 1, 4 2 C 3 3, 2 4, 1 4 C -2 4, -4 2, -4 -1 C -4 -2, -3 -3, -2 -3 Z"
+            fill="#34d399"
+          />
+        </g>
+
+        {/* ── 3. SIMPUL KANAL 2: TELEPON KANTOR / HOTLINE (KIRI BAWAH) ─── */}
+        <g transform="translate(85, 235)">
+          <circle cx="0" cy="0" r="24" fill={`url(#${p}-card-bg)`} stroke="#ffffff" strokeOpacity="0.15" strokeWidth="1.2" />
+          {/* Gagang Telepon Klasik */}
+          <path
+            d="M -6 -7 C -4 -9, -1 -9, 1 -7 L 3 -5 C 5 -3, 5 -1, 3 1 L 2 2 C 3 5, 5 7, 8 8 L 9 7 C 11 5, 13 5, 15 7 L 17 9 C 19 11, 19 14, 17 16 C 14 19, 9 18, 4 14 C -2 9, -5 4, -7 0 C -9 -3, -8 -6, -6 -7 Z"
+            stroke="#34d399"
+            strokeWidth="1.5"
+            fill="none"
+          />
+          {/* Gelombang Suara Siaran */}
+          <path d="M 6 -8 C 10 -6, 13 -3, 14 2" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+          <path d="M 10 -11 C 15 -8, 18 -4, 19 3" stroke="#34d399" strokeWidth="1.2" strokeOpacity="0.5" strokeLinecap="round" fill="none" />
+        </g>
+
+        {/* ── 4. SIMPUL KANAL 3: EMAIL RESMI KEDINASAN (KANAN ATAS) ───── */}
+        <g transform="translate(390, 95)">
+          <circle cx="0" cy="0" r="28" fill={`url(#${p}-card-bg)`} stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="1.2" />
+          <circle cx="0" cy="0" r="34" stroke="#38bdf8" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="3 3" />
+          {/* Amplop Surat Modern */}
+          <rect x="-14" y="-10" width="28" height="20" rx="3" fill="#09090b" stroke="#38bdf8" strokeWidth="1.5" />
+          <path d="M -14 -8 L 0 3 L 14 -8" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Lencana Notifikasi Pesan Baru */}
+          <circle cx="12" cy="-10" r="4.5" fill="#10b981" />
+        </g>
+
+        {/* ── 5. SIMPUL KANAL 4: GEOLOKASI KANTOR IFK (KANAN BAWAH) ───── */}
+        <g transform="translate(385, 235)">
+          <circle cx="0" cy="0" r="24" fill={`url(#${p}-card-bg)`} stroke="#ffffff" strokeOpacity="0.15" strokeWidth="1.2" />
+          {/* Pin Lokasi Geografis */}
+          <path
+            d="M 0 -9 C -6 -9, -9 -5, -9 1 C -9 6, 0 13, 0 13 C 0 13, 9 6, 9 1 C 9 -5, 6 -9, 0 -9 Z"
+            stroke="#10b981"
+            strokeWidth="1.5"
+            fill="none"
+          />
+          <circle cx="0" cy="0" r="3" fill="#34d399" />
+          {/* Cincin Radar Target */}
+          <circle cx="0" cy="0" r="14" stroke="#10b981" strokeWidth="1" strokeDasharray="2 2" opacity="0.4" />
         </g>
       </svg>
     </div>

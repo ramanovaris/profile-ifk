@@ -14,7 +14,7 @@ const PAGES: PageCheck[] = [
   { path: "/layanan/", expectedKeyword: "layanan-emerald-grad" },
   { path: "/profil/", expectedKeyword: "KANTOR UPTD IFK" },
   { path: "/stok/", expectedKeyword: "Opname Fisik" },
-  { path: "/kontak/", expectedKeyword: "Konsultasi IFK" },
+  { path: "/kontak/", expectedKeyword: "kontak-emerald-grad" },
   { path: "/berita/", expectedKeyword: "WARTA" },
 ];
 
