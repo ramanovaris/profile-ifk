@@ -169,7 +169,7 @@ export function LayananHeroIllustration({ className }: { className?: string }) {
 
 /**
  * 2. Ilustrasi Halaman Profil (/profil)
- * Tema: Radar Cakupan Wilayah & Jejaring Faskes Kepulauan Kotabaru
+ * Tema: Fasad Gedung Kantor & Lambang Instansi UPTD Instalasi Farmasi Kab. Kotabaru
  */
 export function ProfilHeroIllustration({ className }: { className?: string }) {
   const p = "profil";
@@ -184,78 +184,158 @@ export function ProfilHeroIllustration({ className }: { className?: string }) {
       >
         <SharedSvgDefs idPrefix={p} />
 
-        {/* Glow Lingkaran Radar */}
+        {/* Glow Latar Belakang */}
         <circle cx="240" cy="180" r="140" fill={`url(#${p}-glow)`} />
 
-        {/* Cincin-Cincin Radar Konsentris */}
-        <circle cx="240" cy="180" r="130" stroke="#ffffff" strokeOpacity="0.08" strokeWidth="1" />
-        <circle cx="240" cy="180" r="95" stroke="#10b981" strokeOpacity="0.2" strokeWidth="1" strokeDasharray="4 4" />
-        <circle cx="240" cy="180" r="60" stroke="#ffffff" strokeOpacity="0.08" strokeWidth="1" />
-        <circle cx="240" cy="180" r="25" stroke="#34d399" strokeOpacity="0.4" strokeWidth="1.5" />
+        {/* Garis Grid Sketsa Arsitektur */}
+        <g stroke="#ffffff" strokeOpacity="0.05" strokeDasharray="3 3">
+          <line x1="60" y1="90" x2="420" y2="90" />
+          <line x1="60" y1="180" x2="420" y2="180" />
+          <line x1="60" y1="270" x2="420" y2="270" />
+          <line x1="120" y1="50" x2="120" y2="310" />
+          <line x1="240" y1="50" x2="240" y2="310" />
+          <line x1="360" y1="50" x2="360" y2="310" />
+        </g>
 
-        {/* Garis Crosshair Sumbu */}
-        <line x1="240" y1="40" x2="240" y2="320" stroke="#ffffff" strokeOpacity="0.08" strokeDasharray="3 3" />
-        <line x1="100" y1="180" x2="380" y2="180" stroke="#ffffff" strokeOpacity="0.08" strokeDasharray="3 3" />
+        {/* Lingkaran Lambang Prestasi & Integritas Belakang */}
+        <circle cx="240" cy="80" r="48" stroke="#10b981" strokeOpacity="0.2" strokeWidth="1" strokeDasharray="4 4" />
+        <circle cx="240" cy="80" r="38" stroke="#ffffff" strokeOpacity="0.08" strokeWidth="1" />
 
-        {/* Kontur Peta Abstrak Gugus Pulau Kotabaru */}
-        <path
-          d="M 170 120 Q 200 100 230 130 T 290 140 T 320 200 T 260 250 T 190 220 Z"
-          fill="#10b981"
-          fillOpacity="0.06"
-          stroke="#10b981"
-          strokeOpacity="0.25"
+        {/* ── BANGUNAN GEDUNG UTAMA ───────────────────────────────────── */}
+        {/* Badan Gedung 2 Lantai */}
+        <rect
+          x="105"
+          y="95"
+          width="270"
+          height="175"
+          rx="12"
+          fill={`url(#${p}-card-bg)`}
+          stroke={`url(#${p}-border-grad)`}
           strokeWidth="1.5"
-          strokeDasharray="5 5"
         />
-        {/* Pulau Satelit */}
-        <ellipse cx="320" cy="130" rx="16" ry="10" fill="#38bdf8" fillOpacity="0.08" stroke="#38bdf8" strokeOpacity="0.3" />
-        <ellipse cx="160" cy="230" rx="14" ry="8" fill="#38bdf8" fillOpacity="0.08" stroke="#38bdf8" strokeOpacity="0.3" />
 
-        {/* Titik-Titik Faskes Binaan yang Menyebar */}
+        {/* Atap Fascia Modern */}
+        <rect x="95" y="85" width="290" height="14" rx="4" fill="#09090b" stroke="#34d399" strokeWidth="1.5" />
+        <line x1="105" y1="92" x2="375" y2="92" stroke="#10b981" strokeOpacity="0.4" strokeWidth="1" />
+
+        {/* Papan Nama Instansi di Puncak Gedung */}
+        <g transform="translate(165, 52)">
+          <rect
+            width="150"
+            height="30"
+            rx="8"
+            fill="#09090b"
+            stroke="#10b981"
+            strokeOpacity="0.6"
+            strokeWidth="1.2"
+          />
+          {/* Lambang Palang Medis Hijau */}
+          <circle cx="20" cy="15" r="8" fill="#10b981" fillOpacity="0.2" />
+          <path d="M 20 10 L 20 20 M 15 15 L 25 15" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
+          <text x="36" y="15" fill="#ffffff" fontSize="9" fontWeight="bold" letterSpacing="0.05em">
+            UPTD IFK KOTABARU
+          </text>
+          <text x="36" y="23" fill="#a1a1aa" fontSize="7" fontWeight="500">
+            Dinas Kesehatan
+          </text>
+        </g>
+
+        {/* Jendela Lantai 2 (Kaca Reflektif Modern) */}
         {[
-          { x: 190, y: 140, label: "Puskesmas 01" },
-          { x: 270, y: 130, label: "Puskesmas 02" },
-          { x: 220, y: 220, label: "Puskesmas 03" },
-          { x: 290, y: 210, label: "Puskesmas 04" },
-          { x: 160, y: 190, label: "Puskesmas 05" },
-          { x: 330, y: 170, label: "Kepulauan" },
-        ].map((pt, idx) => (
-          <g key={idx} className="transition-transform hover:scale-125">
-            <circle cx={pt.x} cy={pt.y} r="6" fill="#10b981" fillOpacity="0.3" />
-            <circle cx={pt.x} cy={pt.y} r="3" fill="#34d399" />
+          { x: 125, y: 115 },
+          { x: 185, y: 115 },
+          { x: 250, y: 115 },
+          { x: 310, y: 115 },
+        ].map((win, i) => (
+          <g key={i}>
+            <rect
+              x={win.x}
+              y={win.y}
+              width="45"
+              height="40"
+              rx="6"
+              fill="#38bdf8"
+              fillOpacity="0.08"
+              stroke="#ffffff"
+              strokeOpacity="0.15"
+              strokeWidth="1"
+            />
+            {/* Pantulan Cahaya Kaca */}
+            <line
+              x1={win.x + 8}
+              y1={win.y + 32}
+              x2={win.x + 28}
+              y2={win.y + 8}
+              stroke="#38bdf8"
+              strokeOpacity="0.3"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            {/* Tralis Pembagi */}
+            <line x1={win.x + 22.5} y1={win.y} x2={win.x + 22.5} y2={win.y + 40} stroke="#ffffff" strokeOpacity="0.1" />
           </g>
         ))}
 
-        {/* Pusat Radar IFK Kotabaru */}
-        <g transform="translate(240, 180)">
-          <circle cx="0" cy="0" r="10" fill="#10b981" fillOpacity="0.4" />
-          <circle cx="0" cy="0" r="5" fill="#ffffff" />
-          {/* Jarum Sapuan Radar */}
-          <line x1="0" y1="0" x2="85" y2="-50" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Pemisah Lantai 1 & Lantai 2 (List Horizontal) */}
+        <line x1="105" y1="170" x2="375" y2="170" stroke="#10b981" strokeOpacity="0.3" strokeWidth="2" />
+
+        {/* Jendela Lantai 1 (Sayap Kiri & Kanan) */}
+        <g>
+          {/* Sayap Kiri */}
+          <rect x="125" y="185" width="45" height="60" rx="6" fill="#38bdf8" fillOpacity="0.06" stroke="#ffffff" strokeOpacity="0.12" />
+          <line x1="125" y1="215" x2="170" y2="215" stroke="#ffffff" strokeOpacity="0.1" />
+          {/* Sayap Kanan */}
+          <rect x="310" y="185" width="45" height="60" rx="6" fill="#38bdf8" fillOpacity="0.06" stroke="#ffffff" strokeOpacity="0.12" />
+          <line x1="310" y1="215" x2="355" y2="215" stroke="#ffffff" strokeOpacity="0.1" />
         </g>
 
-        {/* Kotak Ringkasan HUD Sisi Bawah */}
-        <g transform="translate(140, 275)">
+        {/* ── PORTAL MASUK & PILAR KANOPI (Lantai 1 Tengah) ─────────── */}
+        {/* Kanopi Utama */}
+        <rect x="180" y="172" width="120" height="8" rx="2" fill="#10b981" fillOpacity="0.8" />
+        <rect x="185" y="170" width="110" height="2" fill="#34d399" />
+
+        {/* Pilar Modern Kiri & Kanan */}
+        <rect x="195" y="180" width="10" height="90" fill="#09090b" stroke="#34d399" strokeOpacity="0.5" strokeWidth="1" />
+        <rect x="275" y="180" width="10" height="90" fill="#09090b" stroke="#34d399" strokeOpacity="0.5" strokeWidth="1" />
+
+        {/* Pintu Kaca Geser / Lobi Utama */}
+        <rect
+          x="212"
+          y="182"
+          width="56"
+          height="88"
+          rx="4"
+          fill="#10b981"
+          fillOpacity="0.12"
+          stroke="#ffffff"
+          strokeOpacity="0.2"
+        />
+        {/* Garis Tengah Daun Pintu */}
+        <line x1="240" y1="182" x2="240" y2="270" stroke="#34d399" strokeOpacity="0.4" strokeWidth="1.5" />
+        {/* Handel Pintu */}
+        <line x1="237" y1="225" x2="237" y2="240" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+        <line x1="243" y1="225" x2="243" y2="240" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+
+        {/* Tangga Masuk / Pedestrian Fasad */}
+        <rect x="85" y="270" width="310" height="8" rx="2" fill="#09090b" stroke="#ffffff" strokeOpacity="0.15" />
+        <rect x="70" y="278" width="340" height="8" rx="2" fill="#09090b" stroke="#ffffff" strokeOpacity="0.08" />
+
+        {/* ── LENCANA STATUS IDENTITAS DI BAWAH (HUD) ────────────────── */}
+        <g transform="translate(130, 298)">
           <rect
-            width="200"
-            height="46"
-            rx="14"
+            width="220"
+            height="40"
+            rx="12"
             fill="#09090b"
             stroke={`url(#${p}-border-grad)`}
             strokeWidth="1"
           />
-          <text x="35" y="24" fill="#34d399" fontSize="13" fontWeight="bold" fontFamily="monospace">
-            28 FASKES
+          <circle cx="20" cy="20" r="4" fill="#34d399" className="animate-pulse" />
+          <text x="32" y="18" fill="#e4e4e7" fontSize="10" fontWeight="bold">
+            Gedung Kantor &amp; Gudang Utama
           </text>
-          <text x="35" y="38" fill="#a1a1aa" fontSize="9" fontWeight="500">
-            Jejaring Distribusi
-          </text>
-          <line x1="105" y1="12" x2="105" y2="36" stroke="#ffffff" strokeOpacity="0.15" />
-          <text x="120" y="24" fill="#38bdf8" fontSize="13" fontWeight="bold" fontFamily="monospace">
-            45 PULAU
-          </text>
-          <text x="120" y="38" fill="#a1a1aa" fontSize="9" fontWeight="500">
-            Wilayah Binaan
+          <text x="32" y="28" fill="#a1a1aa" fontSize="8">
+            Pusat Pengelolaan Logistik Farmasi Kab. Kotabaru
           </text>
         </g>
       </svg>
