@@ -36,8 +36,9 @@ function SharedSvgDefs({ idPrefix }: { idPrefix: string }) {
 
 /**
  * 1. Ilustrasi Halaman Layanan (/layanan)
- * Tema: Alur Standar Pelayanan Operasional Gudang Farmasi
- * (Pengajuan LPLPO, Verifikasi Gudang Farmasi, Cold Chain 2-8°C & Serah Terima Faskes)
+ * Tema: Alur Simbolik Standar Pelayanan Operasional Gudang Farmasi
+ * (Pengajuan Berkas & Digital -> Loket Verifikasi Farmasi & Cold Chain -> Serah Terima Distribusi)
+ * Didesain murni simbolik vektor tanpa teks untuk estetika premium dan bersih.
  */
 export function LayananHeroIllustration({ className }: { className?: string }) {
   const p = "layanan";
@@ -55,7 +56,7 @@ export function LayananHeroIllustration({ className }: { className?: string }) {
         {/* Latar Belakang Lingkaran Glow */}
         <circle cx="240" cy="180" r="145" fill={`url(#${p}-glow)`} />
 
-        {/* Garis Grid Skematik Alur Pelayanan */}
+        {/* Garis Grid Skematik Alur Simbolik */}
         <g stroke="#ffffff" strokeOpacity="0.05" strokeDasharray="3 3">
           <line x1="40" y1="90" x2="440" y2="90" />
           <line x1="40" y1="180" x2="440" y2="180" />
@@ -65,9 +66,13 @@ export function LayananHeroIllustration({ className }: { className?: string }) {
           <line x1="360" y1="40" x2="360" y2="320" />
         </g>
 
-        {/* Jalur Panah Alur dari Pengajuan (Kiri) ke Gudang (Tengah) ke Kontrol Mutu (Kanan) */}
+        {/* Orbit Lingkaran Simbolik */}
+        <circle cx="240" cy="155" r="115" stroke="#ffffff" strokeOpacity="0.06" strokeWidth="1" />
+        <circle cx="240" cy="155" r="75" stroke="#10b981" strokeOpacity="0.15" strokeWidth="1" strokeDasharray="4 4" />
+
+        {/* Jalur Panah Alur Berdenyut */}
         <path
-          d="M 145 150 C 160 150, 160 145, 175 145"
+          d="M 140 155 C 160 155, 160 150, 175 150"
           stroke="#10b981"
           strokeWidth="2"
           strokeLinecap="round"
@@ -75,214 +80,224 @@ export function LayananHeroIllustration({ className }: { className?: string }) {
           className="animate-pulse"
         />
         <path
-          d="M 305 145 C 320 145, 320 150, 335 150"
+          d="M 305 150 C 320 150, 320 155, 340 155"
           stroke="#38bdf8"
           strokeWidth="2"
           strokeLinecap="round"
           strokeDasharray="4 4"
           className="animate-pulse"
         />
-        {/* Jalur Menuju Serah Terima Bawah */}
         <path
-          d="M 240 200 L 240 225"
+          d="M 240 215 L 240 230"
           stroke="#34d399"
           strokeWidth="2"
           strokeLinecap="round"
           strokeDasharray="3 3"
         />
 
-        {/* ── 1. KIRI: TAHAP PENGAJUAN (DOKUMEN LPLPO & DIGITAL) ──────── */}
-        <g transform="translate(35, 100)">
+        {/* ── 1. KIRI: SIMBOL PENGAJUAN (BERKAS & DIGITAL) ────────────── */}
+        <g transform="translate(40, 95)">
           <rect
-            width="110"
-            height="100"
-            rx="14"
+            width="100"
+            height="115"
+            rx="16"
             fill={`url(#${p}-card-bg)`}
             stroke="#ffffff"
-            strokeOpacity="0.15"
+            strokeOpacity="0.12"
             strokeWidth="1.2"
           />
-          <rect x="10" y="10" width="62" height="16" rx="4" fill="#10b981" fillOpacity="0.2" />
-          <text x="41" y="21" textAnchor="middle" fill="#34d399" fontSize="7.5" fontWeight="bold">
-            01. PENGAJUAN
-          </text>
 
-          {/* Ikon Dokumen Berkas LPLPO */}
-          <g transform="translate(20, 35)">
-            <rect width="32" height="42" rx="3" fill="#09090b" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="1" />
-            {/* Garis-Garis Form */}
-            <line x1="6" y1="10" x2="26" y2="10" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
-            <line x1="6" y1="18" x2="22" y2="18" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="6" y1="24" x2="24" y2="24" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="1.5" strokeLinecap="round" />
-            <line x1="6" y1="30" x2="18" y2="30" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="1.5" strokeLinecap="round" />
-            {/* Cap/Stempel Persetujuan */}
-            <circle cx="24" cy="32" r="6" fill="#10b981" fillOpacity="0.3" stroke="#10b981" strokeWidth="1" />
-            <path d="M 22 32 L 23.5 33.5 L 26.5 30.5" stroke="#34d399" strokeWidth="1" strokeLinecap="round" />
+          {/* Ikon Berkas / Dokumen Fisik */}
+          <g transform="translate(18, 20)">
+            <rect width="36" height="48" rx="4" fill="#09090b" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.2" />
+            {/* Sudut Lipat Dokumen */}
+            <path d="M 24 0 L 36 12 L 24 12 Z" fill="#ffffff" fillOpacity="0.1" stroke="#ffffff" strokeOpacity="0.25" />
+            {/* Garis-Garis Dokumen */}
+            <line x1="6" y1="12" x2="20" y2="12" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
+            <line x1="6" y1="20" x2="30" y2="20" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="6" y1="27" x2="26" y2="27" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="6" y1="34" x2="22" y2="34" stroke="#ffffff" strokeOpacity="0.25" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Stempel Centang Verifikasi */}
+            <circle cx="26" cy="38" r="6" fill="#10b981" fillOpacity="0.25" stroke="#10b981" strokeWidth="1" />
+            <path d="M 23.5 38 L 25 39.5 L 28.5 36.5" stroke="#34d399" strokeWidth="1.2" strokeLinecap="round" />
           </g>
 
-          {/* Badge Smartphone/Digital H-1 */}
-          <g transform="translate(62, 42)">
-            <rect width="28" height="35" rx="4" fill="#09090b" stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="1" />
-            <circle cx="76" cy="46" r="1.5" fill="#38bdf8" />
-            <rect x="4" y="6" width="20" height="20" rx="2" fill="#38bdf8" fillOpacity="0.1" />
-            <text x="14" y="19" textAnchor="middle" fill="#38bdf8" fontSize="7" fontWeight="bold">
-              PDF
-            </text>
-            <text x="14" y="31" textAnchor="middle" fill="#a1a1aa" fontSize="5.5">
-              WA H-1
-            </text>
+          {/* Ikon Perangkat Digital / PDF Pengajuan */}
+          <g transform="translate(56, 45)">
+            <rect width="28" height="46" rx="5" fill="#09090b" stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="1.2" />
+            {/* Kamera Depan */}
+            <circle cx="14" cy="5" r="1" fill="#38bdf8" />
+            {/* Layar dengan Simbol Panah Unggah / Kirim */}
+            <rect x="3" y="9" width="22" height="28" rx="2" fill="#38bdf8" fillOpacity="0.08" />
+            <path d="M 14 18 L 14 28 M 9 23 L 14 18 L 19 23" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            {/* Tombol Home */}
+            <circle cx="14" cy="41" r="2" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="1" />
           </g>
 
-          <text x="55" y="90" textAnchor="middle" fill="#a1a1aa" fontSize="7.5" fontWeight="500">
-            Hardcopy &amp; Digital
-          </text>
+          {/* Indikator Titik Status Bawah */}
+          <g transform="translate(38, 98)">
+            <circle cx="6" cy="0" r="2.5" fill="#10b981" />
+            <circle cx="18" cy="0" r="2.5" fill="#38bdf8" />
+          </g>
         </g>
 
         {/* ── 2. PUSAT: LOKET PELAYANAN GUDANG FARMASI ────────────────── */}
-        <g transform="translate(170, 85)">
-          {/* Badan Loket */}
+        <g transform="translate(170, 75)">
+          {/* Badan Loket Farmasi */}
           <rect
             width="140"
-            height="115"
-            rx="16"
+            height="130"
+            rx="18"
             fill="#09090b"
             stroke={`url(#${p}-border-grad)`}
             strokeWidth="1.5"
           />
 
-          {/* Papan Nama Utama: GUDANG FARMASI */}
-          <g transform="translate(15, -12)">
-            <rect
-              width="110"
-              height="24"
-              rx="6"
-              fill="#09090b"
-              stroke="#10b981"
-              strokeWidth="1.5"
-            />
-            <circle cx="14" cy="12" r="5" fill="#10b981" fillOpacity="0.3" />
-            <path d="M 14 9 L 14 15 M 11 12 L 17 12" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" />
-            <text x="26" y="15" fill="#ffffff" fontSize="8.5" fontWeight="bold" letterSpacing="0.04em">
-              GUDANG FARMASI
-            </text>
+          {/* Medali Lambang Farmasi (Palang Medis & Perisai) di Puncak */}
+          <g transform="translate(70, 0)">
+            <circle cx="0" cy="0" r="20" fill="#09090b" stroke="#10b981" strokeWidth="1.5" />
+            <circle cx="0" cy="0" r="16" fill="#10b981" fillOpacity="0.15" />
+            {/* Palang Farmasi */}
+            <path d="M 0 -8 L 0 8 M -8 0 L 8 0" stroke="#34d399" strokeWidth="3" strokeLinecap="round" />
           </g>
 
-          {/* Jendela Kaca Loket Pelayanan */}
+          {/* Jendela Kaca Loket Transparan */}
           <rect
             x="16"
-            y="24"
+            y="30"
             width="108"
-            height="50"
-            rx="8"
+            height="56"
+            rx="10"
             fill="#10b981"
             fillOpacity="0.08"
             stroke="#ffffff"
             strokeOpacity="0.15"
             strokeWidth="1"
           />
-          {/* Garis Pantulan Kaca */}
-          <line x1="28" y1="64" x2="68" y2="28" stroke="#34d399" strokeOpacity="0.25" strokeWidth="1.5" strokeLinecap="round" />
+          {/* Garis Kilap Refleksi Kaca */}
+          <line x1="28" y1="74" x2="72" y2="34" stroke="#34d399" strokeOpacity="0.25" strokeWidth="2" strokeLinecap="round" />
 
-          {/* Celah Meja Loket Penyerahan */}
-          <rect x="42" y="58" width="56" height="16" rx="4" fill="#09090b" stroke="#34d399" strokeOpacity="0.5" strokeWidth="1" />
-          <text x="70" y="69" textAnchor="middle" fill="#34d399" fontSize="7" fontWeight="bold">
-            LOKET LAYANAN
-          </text>
+          {/* Laser Pemindai / Barcode Scanner Simbolik */}
+          <line x1="26" y1="58" x2="114" y2="58" stroke="#34d399" strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />
 
-          {/* Meja Konter Depan */}
-          <rect x="10" y="80" width="120" height="24" rx="6" fill="#ffffff" fillOpacity="0.03" stroke="#ffffff" strokeOpacity="0.1" />
-          <circle cx="28" cy="92" r="4" fill="#10b981" className="animate-pulse" />
-          <text x="38" y="95" fill="#e4e4e7" fontSize="8.5" fontWeight="600">
-            Verifikasi &amp; Penyiapan
-          </text>
+          {/* Celah Meja Serah Terima Loket */}
+          <rect x="42" y="72" width="56" height="14" rx="4" fill="#09090b" stroke="#34d399" strokeOpacity="0.4" strokeWidth="1" />
+          <circle cx="70" cy="79" r="2" fill="#34d399" />
+
+          {/* Meja Konter Layanan Bawah */}
+          <rect x="10" y="94" width="120" height="26" rx="8" fill="#ffffff" fillOpacity="0.03" stroke="#ffffff" strokeOpacity="0.1" />
+          {/* Sepasang Indikator Lampu LED Status */}
+          <circle cx="28" cy="107" r="3.5" fill="#10b981" className="animate-pulse" />
+          <line x1="40" y1="107" x2="80" y2="107" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="112" cy="107" r="3.5" fill="#38bdf8" />
         </g>
 
-        {/* ── 3. KANAN: STANDAR MUTU & RANTAI DINGIN (COLD CHAIN) ─────── */}
-        <g transform="translate(335, 100)">
+        {/* ── 3. KANAN: SIMBOL KONTROL MUTU & RANTAI DINGIN ────────────── */}
+        <g transform="translate(340, 95)">
           <rect
-            width="110"
-            height="100"
-            rx="14"
+            width="100"
+            height="115"
+            rx="16"
             fill={`url(#${p}-card-bg)`}
             stroke="#ffffff"
-            strokeOpacity="0.15"
+            strokeOpacity="0.12"
             strokeWidth="1.2"
           />
-          <rect x="10" y="10" width="70" height="16" rx="4" fill="#38bdf8" fillOpacity="0.15" />
-          <text x="45" y="21" textAnchor="middle" fill="#38bdf8" fontSize="7.5" fontWeight="bold">
-            02. KONTROL MUTU
-          </text>
 
-          {/* Boks Vaksin / Cold Box Suhu Dingin */}
-          <g transform="translate(25, 36)">
-            {/* Boks Insulasi */}
-            <rect width="60" height="38" rx="6" fill="#09090b" stroke="#38bdf8" strokeOpacity="0.5" strokeWidth="1.2" />
-            <path d="M 12 36 L 48 36" stroke="#38bdf8" strokeOpacity="0.3" strokeWidth="1" />
-            {/* Pegangan Boks */}
-            <path d="M 22 36 L 22 32 C 22 30, 38 30, 38 32 L 38 36" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-
-            {/* Simbol Kristal Salju & Suhu */}
-            <circle cx="22" cy="55" r="7" fill="#38bdf8" fillOpacity="0.2" />
-            {/* Ikon Suhu Terjaga 2-8 C */}
-            <text x="34" y="58" fill="#38bdf8" fontSize="9" fontWeight="bold" fontFamily="monospace">
-              2°– 8°C
-            </text>
+          {/* Boks Insulasi Rantai Dingin (Cold Box Vaksin) */}
+          <g transform="translate(18, 22)">
+            <rect width="48" height="38" rx="6" fill="#09090b" stroke="#38bdf8" strokeOpacity="0.6" strokeWidth="1.2" />
+            {/* Pegangan Logam Boks */}
+            <path d="M 16 0 L 16 -6 C 16 -8, 32 -8, 32 -6 L 32 0" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+            {/* Kunci Grendel Boks */}
+            <rect x="20" y="14" width="8" height="8" rx="2" fill="#38bdf8" fillOpacity="0.4" stroke="#38bdf8" strokeWidth="1" />
           </g>
 
-          <text x="55" y="90" textAnchor="middle" fill="#a1a1aa" fontSize="7.5" fontWeight="500">
-            Standar Rantai Dingin
-          </text>
+          {/* Ikon Kristal Salju (Suhu Terkendali) */}
+          <g transform="translate(36, 75)">
+            <circle cx="0" cy="0" r="14" fill="#38bdf8" fillOpacity="0.15" stroke="#38bdf8" strokeOpacity="0.3" strokeWidth="1" />
+            {/* Sumbu Salju */}
+            <line x1="0" y1="-8" x2="0" y2="8" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="-7" y1="-4" x2="7" y2="4" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="-7" y1="4" x2="7" y2="-4" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
+          </g>
+
+          {/* Termometer Tabung Presisi di Samping */}
+          <g transform="translate(74, 22)">
+            <rect width="10" height="50" rx="5" fill="#09090b" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="1" />
+            {/* Kolom Cairan Raksa / Suhu Hijau Optimal */}
+            <rect x="3" y="16" width="4" height="26" rx="2" fill="#10b981" />
+            <circle cx="5" cy="42" r="4" fill="#10b981" />
+            {/* Garis-Garis Skala Termometer */}
+            <line x1="1" y1="12" x2="4" y2="12" stroke="#ffffff" strokeOpacity="0.4" strokeWidth="1" />
+            <line x1="1" y1="20" x2="4" y2="20" stroke="#ffffff" strokeOpacity="0.4" strokeWidth="1" />
+            <line x1="1" y1="28" x2="4" y2="28" stroke="#ffffff" strokeOpacity="0.4" strokeWidth="1" />
+          </g>
         </g>
 
-        {/* ── 4. BAWAH: SERAH TERIMA & PUSKESMAS MITRA ────────────────── */}
-        <g transform="translate(100, 228)">
+        {/* ── 4. BAWAH: SERAH TERIMA & DISTRIBUSI KE FASKES ───────────── */}
+        <g transform="translate(100, 225)">
           <rect
             width="280"
-            height="70"
-            rx="16"
+            height="85"
+            rx="18"
             fill="#09090b"
             stroke={`url(#${p}-border-grad)`}
             strokeWidth="1.2"
           />
-          {/* Header Status Penyerahan */}
-          <g transform="translate(18, 14)">
-            <circle cx="10" cy="10" r="10" fill="#10b981" fillOpacity="0.2" />
-            <path d="M 6 10 L 9 13 L 15 7" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <text x="26" y="9" fill="#ffffff" fontSize="9.5" fontWeight="bold">
-              03. Serah Terima Perbekalan
-            </text>
-            <text x="26" y="20" fill="#a1a1aa" fontSize="8">
-              Pemeriksaan Fisik, Kartu Batch &amp; BAP Resmi
-            </text>
+
+          {/* Tumpukan Kardus Logistik Obat Bersegel */}
+          <g transform="translate(24, 20)">
+            {/* Kardus Utama */}
+            <rect width="46" height="42" rx="4" fill="#10b981" fillOpacity="0.1" stroke="#34d399" strokeWidth="1.2" />
+            {/* Lakban Pengaman */}
+            <line x1="23" y1="0" x2="23" y2="42" stroke="#34d399" strokeOpacity="0.4" strokeWidth="1.5" />
+            {/* Matriks Kode QR */}
+            <rect x="8" y="12" width="14" height="14" rx="2" fill="#ffffff" fillOpacity="0.1" stroke="#ffffff" strokeOpacity="0.3" strokeWidth="1" />
+            <circle cx="15" cy="19" r="2" fill="#34d399" />
           </g>
 
-          {/* Badge Faskes Tujuan */}
-          <g transform="translate(18, 42)">
-            <rect width="244" height="20" rx="6" fill="#ffffff" fillOpacity="0.04" stroke="#ffffff" strokeOpacity="0.08" />
-            <text x="12" y="13" fill="#34d399" fontSize="8" fontWeight="bold">
-              DISTRIBUSI RESMI:
-            </text>
-            <text x="96" y="13" fill="#d4d4d8" fontSize="8">
-              28 Puskesmas, 2 RSUD &amp; Jaringan Kepulauan
-            </text>
+          <g transform="translate(64, 28)">
+            {/* Kardus Pendamping */}
+            <rect width="36" height="34" rx="3" fill="#38bdf8" fillOpacity="0.08" stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="1.2" />
+            <line x1="18" y1="0" x2="18" y2="34" stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="1" />
           </g>
-        </g>
 
-        {/* Lencana Status Atas */}
-        <g transform="translate(160, 42)">
-          <rect
-            width="160"
-            height="26"
-            rx="13"
-            fill="#09090b"
-            stroke="#10b981"
-            strokeOpacity="0.4"
-            strokeWidth="1"
-          />
-          <circle cx="16" cy="13" r="3.5" fill="#34d399" className="animate-pulse" />
-          <text x="26" y="16" fill="#e4e4e7" fontSize="8.5" fontWeight="600">
-            Standar Pelayanan Operasional
-          </text>
+          {/* Vektor Panah Distribusi Bergerak Menuju Faskes */}
+          <g transform="translate(125, 42)">
+            <path
+              d="M 0 0 L 35 0 M 27 -6 L 35 0 L 27 6"
+              stroke="#34d399"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="animate-pulse"
+            />
+          </g>
+
+          {/* Node Simbolik Fasilitas Kesehatan Jejaring */}
+          {/* Faskes 1: Puskesmas */}
+          <g transform="translate(195, 42)">
+            <circle cx="0" cy="0" r="16" fill={`url(#${p}-card-bg)`} stroke="#10b981" strokeOpacity="0.5" strokeWidth="1.2" />
+            <path d="M 0 -6 L 0 6 M -6 0 L 6 0" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
+          </g>
+
+          {/* Faskes 2: Puskesmas Pulau (Simbol Gelombang / Perahu) */}
+          <g transform="translate(242, 28)">
+            <circle cx="0" cy="0" r="13" fill={`url(#${p}-card-bg)`} stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="1" />
+            <path d="M -5 3 C -2 6, 2 6, 5 3 L 6 0 L -6 0 Z" stroke="#38bdf8" strokeWidth="1.2" fill="none" strokeLinejoin="round" />
+            <line x1="0" y1="-4" x2="0" y2="0" stroke="#38bdf8" strokeWidth="1.2" />
+          </g>
+
+          {/* Faskes 3: Rumah Sakit / Jejaring */}
+          <g transform="translate(242, 56)">
+            <circle cx="0" cy="0" r="13" fill={`url(#${p}-card-bg)`} stroke="#ffffff" strokeOpacity="0.2" strokeWidth="1" />
+            <path d="M 0 -5 L 0 5 M -5 0 L 5 0" stroke="#ffffff" strokeOpacity="0.6" strokeWidth="1.5" strokeLinecap="round" />
+          </g>
+
+          {/* Garis Koneksi Antar Simpul Faskes */}
+          <line x1="195" y1="42" x2="230" y2="32" stroke="#38bdf8" strokeOpacity="0.3" strokeDasharray="2 2" />
+          <line x1="195" y1="42" x2="230" y2="52" stroke="#10b981" strokeOpacity="0.3" strokeDasharray="2 2" />
         </g>
       </svg>
     </div>
