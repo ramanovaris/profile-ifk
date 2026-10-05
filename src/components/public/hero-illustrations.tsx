@@ -605,28 +605,29 @@ export function StokHeroIllustration({ className }: { className?: string }) {
             stroke={`url(#${p}-border-grad)`}
             strokeWidth="1.5"
           />
-          {/* Header Kartu */}
+          {/* Header Kartu Simbolik */}
           <circle cx="24" cy="24" r="8" fill="#10b981" fillOpacity="0.2" />
-          <path d="M 20 24 L 23 27 L 29 21" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          <text x="38" y="24" fill="#e4e4e7" fontSize="10" fontWeight="bold">
-            Opname Fisik
-          </text>
-          <text x="38" y="34" fill="#71717a" fontSize="8">
-            Cut-off Akhir Bulan
-          </text>
+          <path d="M 20 24 L 23 27 L 29 21" stroke="#34d399" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          <line x1="40" y1="20" x2="105" y2="20" stroke="#ffffff" strokeOpacity="0.4" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="40" y1="27" x2="80" y2="27" stroke="#ffffff" strokeOpacity="0.2" strokeWidth="1.5" strokeLinecap="round" />
 
           {/* Baris Progress Kapasitas */}
           <rect x="20" y="46" width="110" height="6" rx="3" fill="#ffffff" fillOpacity="0.08" />
           <rect x="20" y="46" width="88" height="6" rx="3" fill="#10b981" />
 
-          {/* Tag Status */}
-          <rect x="20" y="60" width="55" height="18" rx="6" fill="#10b981" fillOpacity="0.15" />
-          <text x="47" y="72" textAnchor="middle" fill="#34d399" fontSize="8" fontWeight="600">
-            Aman (92%)
-          </text>
-          <text x="130" y="72" textAnchor="end" fill="#a1a1aa" fontSize="9" fontFamily="monospace">
-            200+ Item
-          </text>
+          {/* Indikator Status Simbolik (Diagram Batang / Gauge) */}
+          <g transform="translate(20, 60)">
+            <rect x="0" y="0" width="36" height="18" rx="5" fill="#10b981" fillOpacity="0.15" stroke="#10b981" strokeOpacity="0.3" />
+            <circle cx="10" cy="9" r="3" fill="#34d399" />
+            <line x1="17" y1="9" x2="28" y2="9" stroke="#34d399" strokeWidth="1.5" strokeLinecap="round" />
+          </g>
+          {/* Mini Barchart Kanan */}
+          <g transform="translate(90, 60)">
+            <rect x="0" y="8" width="4" height="10" rx="1.5" fill="#38bdf8" />
+            <rect x="8" y="4" width="4" height="14" rx="1.5" fill="#10b981" />
+            <rect x="16" y="0" width="4" height="18" rx="1.5" fill="#34d399" />
+            <rect x="24" y="6" width="4" height="12" rx="1.5" fill="#38bdf8" />
+          </g>
         </g>
 
         {/* Blister Tablet di Sudut Kiri Bawah */}
@@ -868,12 +869,10 @@ export function BeritaHeroIllustration({ className }: { className?: string }) {
             stroke={`url(#${p}-border-grad)`}
             strokeWidth="1.5"
           />
-          {/* Header Publikasi & Kategori */}
-          <rect x="20" y="20" width="50" height="16" rx="6" fill="#10b981" fillOpacity="0.2" />
-          <text x="45" y="31" textAnchor="middle" fill="#34d399" fontSize="8" fontWeight="bold">
-            WARTA
-          </text>
-          <circle cx="145" cy="28" r="4" fill="#38bdf8" />
+          {/* Header Publikasi & Kategori Simbolik */}
+          <rect x="20" y="20" width="38" height="14" rx="4" fill="#10b981" fillOpacity="0.2" stroke="#10b981" strokeOpacity="0.4" />
+          <line x1="28" y1="27" x2="48" y2="27" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="145" cy="27" r="4" fill="#38bdf8" />
 
           {/* Thumbnail Ilustratif Mini */}
           <rect x="20" y="44" width="135" height="40" rx="8" fill="#ffffff" fillOpacity="0.05" stroke="#ffffff" strokeOpacity="0.1" />

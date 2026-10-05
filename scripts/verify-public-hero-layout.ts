@@ -12,10 +12,10 @@ interface PageCheck {
 
 const PAGES: PageCheck[] = [
   { path: "/layanan/", expectedKeyword: "layanan-emerald-grad" },
-  { path: "/profil/", expectedKeyword: "KANTOR UPTD IFK" },
-  { path: "/stok/", expectedKeyword: "Opname Fisik" },
+  { path: "/profil/", expectedKeyword: "profil-emerald-grad" },
+  { path: "/stok/", expectedKeyword: "stok-emerald-grad" },
   { path: "/kontak/", expectedKeyword: "kontak-emerald-grad" },
-  { path: "/berita/", expectedKeyword: "WARTA" },
+  { path: "/berita/", expectedKeyword: "berita-emerald-grad" },
 ];
 
 async function verifyPages() {
