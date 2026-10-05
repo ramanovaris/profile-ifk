@@ -1,8 +1,32 @@
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
+import type { Metadata } from "next";
 import { PageHero } from "@/components/public/page-hero";
 import { KontakHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { getSiteSettings } from "@/actions/setting";
+
+export const metadata: Metadata = {
+  title: "Kontak & Layanan Pengaduan",
+  description:
+    "Hubungi UPTD Instalasi Farmasi Kab. Kotabaru untuk informasi layanan, koordinasi faskes, atau pengaduan resmi.",
+  alternates: {
+    canonical: "/kontak",
+  },
+  openGraph: {
+    title: "Kontak & Layanan Pengaduan | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Hubungi UPTD Instalasi Farmasi Kab. Kotabaru untuk informasi layanan, koordinasi faskes, atau pengaduan resmi.",
+    url: "/kontak",
+    images: [
+      {
+        url: "/images/kantor-ifk.webp",
+        width: 1200,
+        height: 630,
+        alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
+      },
+    ],
+  },
+};
 
 // Override per-section untuk section tinggi — trigger IO lebih awal + fallback cepat
 const ioRootMargin = "0px 0px 50px 0px";

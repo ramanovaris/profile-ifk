@@ -12,9 +12,26 @@ import { PublicStockClientView } from "@/components/public/public-stock-client-v
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Ketersediaan Stok Obat & BMHP | UPTD Instalasi Farmasi Kab. Kotabaru",
+  title: "Ketersediaan Stok Obat & BMHP",
   description:
     "Informasi transparansi ketersediaan stok fisik perbekalan farmasi pada UPTD Instalasi Farmasi Kab. Kotabaru per akhir bulan.",
+  alternates: {
+    canonical: "/stok",
+  },
+  openGraph: {
+    title: "Ketersediaan Stok Obat & BMHP | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Informasi transparansi ketersediaan stok fisik perbekalan farmasi pada UPTD Instalasi Farmasi Kab. Kotabaru per akhir bulan.",
+    url: "/stok",
+    images: [
+      {
+        url: "/images/kantor-ifk.webp",
+        width: 1200,
+        height: 630,
+        alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
+      },
+    ],
+  },
 };
 
 interface StokPublikPageProps {

@@ -10,9 +10,26 @@ import type { PublicArticleItem } from "@/actions/article";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Berita & Informasi | UPTD Instalasi Farmasi Kab. Kotabaru",
+  title: "Berita & Informasi Publik",
   description:
-    "Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian di Kabupaten Kotabaru.",
+    "Publikasi warta kegiatan, distribusi logistik, dan pengumuman resmi kefarmasian Kabupaten Kotabaru.",
+  alternates: {
+    canonical: "/berita",
+  },
+  openGraph: {
+    title: "Berita & Informasi Publik | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Publikasi warta kegiatan, distribusi logistik, dan pengumuman resmi kefarmasian Kabupaten Kotabaru.",
+    url: "/berita",
+    images: [
+      {
+        url: "/images/kantor-ifk.webp",
+        width: 1200,
+        height: 630,
+        alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
+      },
+    ],
+  },
 };
 
 export default async function BeritaPage() {

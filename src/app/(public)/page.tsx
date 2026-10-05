@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import {
   ArrowRight,
   Building2,
@@ -16,6 +17,29 @@ import { dummyArticles } from "@/lib/dummy-data";
 import { db } from "@/lib/db";
 import { placeholderImage } from "@/lib/placeholder";
 import { getSiteSettings } from "@/actions/setting";
+
+export const metadata: Metadata = {
+  title: "Beranda",
+  description:
+    "Pusat distribusi logistik farmasi, pengelolaan ketersediaan obat, vaksin, dan BMHP terpadu Kabupaten Kotabaru.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Beranda | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Pusat distribusi logistik farmasi, pengelolaan ketersediaan obat, vaksin, dan BMHP terpadu Kabupaten Kotabaru.",
+    url: "/",
+    images: [
+      {
+        url: "/images/kantor-ifk.webp",
+        width: 1200,
+        height: 630,
+        alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
+      },
+    ],
+  },
+};
 
 const pillars = [
   {

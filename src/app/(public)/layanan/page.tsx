@@ -12,12 +12,36 @@ import {
   Clock,
   ShieldCheck,
 } from "lucide-react";
+import type { Metadata } from "next";
 
 import { PageHero } from "@/components/public/page-hero";
 import { LayananHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { SuratPengantarModalButton } from "@/components/public/surat-pengantar-modal";
 import { getSiteSettings } from "@/actions/setting";
+
+export const metadata: Metadata = {
+  title: "Standar Pelayanan & Distribusi",
+  description:
+    "Standar alur pelayanan distribusi obat dan perbekalan kesehatan bagi faskes binaan se-Kabupaten Kotabaru.",
+  alternates: {
+    canonical: "/layanan",
+  },
+  openGraph: {
+    title: "Standar Pelayanan & Distribusi | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Standar alur pelayanan distribusi obat dan perbekalan kesehatan bagi faskes binaan se-Kabupaten Kotabaru.",
+    url: "/layanan",
+    images: [
+      {
+        url: "/images/cold-room-ifk.webp",
+        width: 1200,
+        height: 630,
+        alt: "Fasilitas Cold Room Penyimpanan Vaksin UPTD Instalasi Farmasi Kab. Kotabaru",
+      },
+    ],
+  },
+};
 
 const hardcopySteps = [
   {
