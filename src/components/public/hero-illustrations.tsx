@@ -399,25 +399,6 @@ export function ProfilHeroIllustration({ className }: { className?: string }) {
         {/* Marka Jalur Distribusi Depan Gudang */}
         <line x1="45" y1="284" x2="115" y2="284" stroke="#10b981" strokeOpacity="0.4" strokeWidth="1.5" strokeDasharray="4 4" />
         <line x1="365" y1="284" x2="435" y2="284" stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="1.5" strokeDasharray="4 4" />
-
-        {/* ── HUD LENCANA STATUS IDENTITAS DI BAWAH ───────────────────── */}
-        <g transform="translate(100, 300)">
-          <rect
-            width="280"
-            height="40"
-            rx="12"
-            fill="#09090b"
-            stroke={`url(#${p}-border-grad)`}
-            strokeWidth="1"
-          />
-          <circle cx="20" cy="20" r="4" fill="#34d399" className="animate-pulse" />
-          <text x="32" y="17" fill="#e4e4e7" fontSize="9.5" fontWeight="bold">
-            Kompleks Perkantoran &amp; Pergudangan Farmasi
-          </text>
-          <text x="32" y="28" fill="#a1a1aa" fontSize="7.5">
-            Gudang Obat • Kantor Pusat UPTD IFK • Cold Chain &amp; BMHP
-          </text>
-        </g>
       </svg>
     </div>
   );
