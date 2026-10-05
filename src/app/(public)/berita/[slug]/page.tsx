@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Breadcrumb } from "@/components/public/breadcrumb";
 import { ArticlePreviewBanner } from "@/components/public/article-preview-banner";
+import { ArticleShareBar } from "@/components/public/article-share-bar";
 import { dummyArticles } from "@/lib/dummy-data";
 import { db } from "@/lib/db";
 import { getCurrentSession } from "@/lib/auth";
@@ -210,6 +211,14 @@ export default async function BeritaDetailPage(props: {
                 {readingMinutes} menit baca
               </span>
             </div>
+
+            {/* Bilah Berbagi Ringkas Atas */}
+            <ArticleShareBar
+              title={title}
+              slug={slug}
+              variant="compact"
+              className="mt-5"
+            />
           </div>
         </div>
       </header>
@@ -255,6 +264,14 @@ export default async function BeritaDetailPage(props: {
             <div
               className="prose prose-zinc max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-800"
               dangerouslySetInnerHTML={{ __html: content }}
+            />
+
+            {/* Bilah Berbagi Lengkap di Bawah Naskah */}
+            <ArticleShareBar
+              title={title}
+              slug={slug}
+              variant="card"
+              className="mt-12 sm:mt-16"
             />
           </div>
         </div>
