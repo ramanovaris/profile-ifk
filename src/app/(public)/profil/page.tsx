@@ -5,7 +5,6 @@ import {
   FlaskConical,
   UserCog,
   Warehouse,
-  Snowflake,
   Lock,
   Network,
   ClipboardCheck,

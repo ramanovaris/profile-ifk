@@ -41,8 +41,9 @@ async function verifyPages() {
           console.log(`   ⏳ Keyword kartu hero belum ditemukan (belum diimplementasikan): "${page.expectedKeyword}"`);
         }
       }
-    } catch (err: any) {
-      console.error(`❌ [${page.path}] Fetch failed: ${err.message}`);
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error(`❌ [${page.path}] Fetch failed: ${errMsg}`);
       allPassed = false;
     }
   }

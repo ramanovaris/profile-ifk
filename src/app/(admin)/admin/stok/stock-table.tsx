@@ -431,7 +431,7 @@ export function StockTable({
   };
 
   // Handler onBlur jika user mengetik manual tanpa klik dropdown
-  const handleFieldBlur = (query: string, field: "name" | "code") => {
+  const handleFieldBlur = (query: string, _field: "name" | "code") => {
     setTimeout(async () => {
       setShowSuggestions(false);
       setActiveSearchField(null);

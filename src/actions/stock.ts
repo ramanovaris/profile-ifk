@@ -6,7 +6,7 @@ import { getCurrentSession } from "../lib/auth";
 import { calculateStockStatus } from "../lib/dummy-data";
 import { calculateMos, determineStockStatus, aggregateHistoricalUsage } from "../lib/stock-calc";
 import { parseStockWorkbook, type StockItemInput } from "../lib/stock-parser";
-import type { MedicineStock } from "@prisma/client";
+import type { MedicineStock, StockStatus } from "@prisma/client";
 
 export type { StockItemInput };
 
@@ -72,7 +72,7 @@ export async function createStockAction(data: StockItemInput): Promise<StockActi
     const expiryDate = data.expiryDate ? data.expiryDate.trim() : null;
     const nomenklatur = data.nomenklatur ? data.nomenklatur.trim() : null;
     const source = data.source ? data.source.trim() : "MANUAL";
-    const calculatedStatus = determineStockStatus(quantity, mos, data.status as any);
+    const calculatedStatus = determineStockStatus(quantity, mos, data.status as StockStatus | undefined);
 
     const created = await db.medicineStock.create({
       data: {
@@ -198,7 +198,7 @@ export async function updateStockAction(
           : "MANUAL"
         : existing.source;
 
-    const calculatedStatus = determineStockStatus(quantity, mos, data.status as any);
+    const calculatedStatus = determineStockStatus(quantity, mos, data.status as StockStatus | undefined);
 
     const updated = await db.medicineStock.update({
       where: { id },
