@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://43.129.57.214/profile-ifk";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ramanovaris.my.id/profile-ifk";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
