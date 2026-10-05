@@ -1,5 +1,6 @@
-import { MapPin, Phone, Mail, Clock, ExternalLink, MessageSquareText } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
+import { KontakHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { getSiteSettings } from "@/actions/setting";
 
@@ -54,67 +55,7 @@ export default async function KontakPage() {
         eyebrow="Pelayanan Publik"
         title="Layanan Kontak & Informasi"
         subtitle="Saluran resmi komunikasi, konsultasi kefarmasian, dan layanan pengaduan terpadu UPTD Instalasi Farmasi Kabupaten Kotabaru."
-        rightContent={
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md shadow-2xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10 text-brand-300 border border-brand-400/20">
-                  <MessageSquareText className="h-4 w-4" />
-                </span>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Kanal Konsultasi &amp; Pengaduan</h3>
-                  <p className="text-[11px] text-zinc-400">Saluran Resmi Komunikasi Publik</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-medium text-emerald-400">
-                Respon Cepat
-              </span>
-            </div>
-
-            <div className="mt-4 space-y-2.5">
-              {settings.whatsappLink && (
-                <a
-                  href={settings.whatsappLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 p-3 text-xs text-zinc-200 transition-colors hover:bg-white/[0.07] hover:border-white/10"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Phone className="h-4 w-4 text-emerald-400" />
-                    <div>
-                      <p className="font-semibold text-white">WhatsApp Pelayanan IFK</p>
-                      <p className="text-[10px] text-zinc-400">{settings.phone}</p>
-                    </div>
-                  </div>
-                  <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
-                </a>
-              )}
-
-              {settings.sp4nLaporUrl && (
-                <a
-                  href={settings.sp4nLaporUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 p-3 text-xs text-zinc-200 transition-colors hover:bg-white/[0.07] hover:border-white/10"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <ExternalLink className="h-4 w-4 text-brand-300" />
-                    <div>
-                      <p className="font-semibold text-white">SP4N-LAPOR! Kotabaru</p>
-                      <p className="text-[10px] text-zinc-400">Portal Pengaduan Pelayanan Publik</p>
-                    </div>
-                  </div>
-                  <ExternalLink className="h-3.5 w-3.5 text-zinc-400" />
-                </a>
-              )}
-            </div>
-
-            <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[11px] text-zinc-400">
-              <span>Konsultasi aktif di jam operasional</span>
-              <span className="font-mono text-xs text-brand-300">WITA</span>
-            </div>
-          </div>
-        }
+        rightContent={<KontakHeroIllustration />}
       />
 
       <section className="border-t border-border bg-surface py-24">

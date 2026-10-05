@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Newspaper } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
+import { BeritaHeroIllustration } from "@/components/public/hero-illustrations";
 import { BeritaClientView } from "@/components/public/berita-client-view";
 import { db } from "@/lib/db";
 import { dummyArticles } from "@/lib/dummy-data";
@@ -94,43 +94,7 @@ export default async function BeritaPage() {
         eyebrow="Informasi"
         title={<>Berita &amp; Informasi</>}
         subtitle="Informasi kegiatan dan pengumuman terkini seputar pelayanan kefarmasian."
-        rightContent={
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md shadow-2xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10 text-brand-300 border border-brand-400/20">
-                  <Newspaper className="h-4 w-4" />
-                </span>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Pusat Informasi &amp; Publikasi</h3>
-                  <p className="text-[11px] text-zinc-400">Warta Resmi UPTD IFK Kotabaru</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] font-medium text-brand-300">
-                Warta Terkini
-              </span>
-            </div>
-
-            <div className="mt-4 space-y-2 text-xs">
-              <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.03] border border-white/5 p-2.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-                <span className="text-zinc-200">Distribusi Logistik Faskes &amp; Kepulauan</span>
-              </div>
-              <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.03] border border-white/5 p-2.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-                <span className="text-zinc-200">Jaminan Mutu &amp; Keamanan Sediaan Farmasi</span>
-              </div>
-              <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.03] border border-white/5 p-2.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-                <span className="text-zinc-200">Edukasi Penggunaan Obat Rasional (POR)</span>
-              </div>
-            </div>
-
-            <div className="mt-4 border-t border-white/10 pt-3 text-[11px] text-zinc-400">
-              Pembaruan informasi publik seputar kebijakan dan pelayanan kefarmasian di wilayah Kotabaru.
-            </div>
-          </div>
-        }
+        rightContent={<BeritaHeroIllustration />}
       />
 
       <section className="border-t border-border bg-surface py-24">

@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/public/page-hero";
+import { ProfilHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { placeholderImage } from "@/lib/placeholder";
 import { getAssetUrl } from "@/lib/utils";
@@ -173,55 +174,7 @@ export default async function ProfilPage() {
         eyebrow="Tentang Kami"
         title="Profil Instansi"
         subtitle={`${settings.name} — ${settings.motto}`}
-        rightContent={
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md shadow-2xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10 text-brand-300 border border-brand-400/20">
-                  <ShieldCheck className="h-4 w-4" />
-                </span>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Jangkauan Layanan Logistik</h3>
-                  <p className="text-[11px] text-zinc-400">UPTD Instalasi Farmasi Kab. Kotabaru</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] font-medium text-brand-300">
-                Cakupan Layanan
-              </span>
-            </div>
-
-            <div className="mt-4 grid grid-cols-3 gap-2.5">
-              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
-                <p className="font-mono text-base sm:text-lg font-bold text-brand-300 truncate" title={settings.statsFaskesCount || "30 Faskes"}>
-                  {settings.statsFaskesCount || "30 Faskes"}
-                </p>
-                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400 truncate" title={settings.statsFaskesLabel || "Jejaring Faskes"}>
-                  {settings.statsFaskesLabel || "Jejaring Faskes"}
-                </p>
-              </div>
-              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
-                <p className="font-mono text-base sm:text-lg font-bold text-brand-300 truncate" title={settings.statsPulauCount || "45 Pulau"}>
-                  {settings.statsPulauCount || "45 Pulau"}
-                </p>
-                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400 truncate" title={settings.statsPulauLabel || "Kepulauan"}>
-                  {settings.statsPulauLabel || "Kepulauan"}
-                </p>
-              </div>
-              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3 text-center">
-                <p className="font-mono text-base sm:text-lg font-bold text-brand-300 truncate" title={settings.statsMasyarakatCount || "334 Ribu+"}>
-                  {settings.statsMasyarakatCount || "334 Ribu+"}
-                </p>
-                <p className="mt-1 text-[10px] font-medium uppercase tracking-wider text-zinc-400 truncate" title={settings.statsMasyarakatLabel || "Masyarakat"}>
-                  {settings.statsMasyarakatLabel || "Masyarakat"}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-[11px] leading-relaxed text-zinc-400 italic">
-              &ldquo;{settings.motto || "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat"}&rdquo;
-            </div>
-          </div>
-        }
+        rightContent={<ProfilHeroIllustration />}
       />
 
       {/* ── Sambutan Kepala ───────────────────────────────────────── */}

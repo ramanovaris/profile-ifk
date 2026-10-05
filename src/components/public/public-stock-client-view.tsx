@@ -17,6 +17,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
+import { StokHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { PublicStockFilter } from "@/components/public/public-stock-filter";
 import { exportStockToExcel } from "@/lib/stock-exporter";
@@ -263,48 +264,7 @@ export function PublicStockClientView({
         eyebrow="Transparansi Publik"
         title={<>Ketersediaan Stok Obat &amp; BMHP</>}
         subtitle="Informasi transparansi ketersediaan stok fisik perbekalan farmasi pada UPTD Instalasi Farmasi Kab. Kotabaru per akhir bulan."
-        rightContent={
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md shadow-2xl shadow-black/40">
-            <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/10 text-brand-300 border border-brand-400/20">
-                  <PackageCheck className="h-4 w-4" />
-                </span>
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Standar Data Stok Fisik</h3>
-                  <p className="text-[11px] text-zinc-400">Transparansi Logistik Farmasi</p>
-                </div>
-              </div>
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] font-medium text-brand-300">
-                Opname Bulanan
-              </span>
-            </div>
-
-            <div className="mt-4 space-y-2.5 text-xs text-zinc-300">
-              <div className="flex items-start gap-2 rounded-xl bg-white/[0.03] border border-white/5 p-3">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400 mt-0.5" />
-                <p className="text-[11px] leading-relaxed text-zinc-300">
-                  Data ketersediaan dihimpun dari opname fisik perbekalan farmasi gudang instalasi per akhir bulan (cut-off bulanan).
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-center text-[11px]">
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-2.5">
-                  <p className="text-zinc-400">Format Resmi</p>
-                  <p className="mt-0.5 font-semibold text-white">LPLPO &amp; Excel</p>
-                </div>
-                <div className="rounded-xl border border-white/5 bg-white/[0.02] p-2.5">
-                  <p className="text-zinc-400">Cakupan Data</p>
-                  <p className="mt-0.5 font-semibold text-white">Obat &amp; BMHP</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[11px] text-zinc-400">
-              <span>Diperbarui berkala tiap awal bulan</span>
-              <span className="font-mono text-xs text-brand-300">UPTD IFK</span>
-            </div>
-          </div>
-        }
+        rightContent={<StokHeroIllustration />}
       />
 
       <section className="border-t border-border bg-surface py-16 md:py-24">
