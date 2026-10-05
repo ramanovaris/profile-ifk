@@ -256,19 +256,13 @@ export function ArticleShareBar({
       )}
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-100 text-brand-700 border border-brand-200/60">
-              <Share2 className="h-4 w-4" />
-            </span>
-            <h3 className="text-base font-bold text-heading">
-              Bagikan Informasi Ini
-            </h3>
-          </div>
-          <p className="mt-1 text-xs sm:text-sm text-zinc-600 max-w-lg leading-relaxed">
-            Dukung keterbukaan informasi dan edukasi kesehatan kefarmasian dengan
-            membagikan warta ini kepada rekan dan masyarakat.
-          </p>
+        <div className="flex items-center gap-2">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-100 text-brand-700 border border-brand-200/60">
+            <Share2 className="h-4 w-4" />
+          </span>
+          <h3 className="text-base font-bold text-heading">
+            Bagikan Informasi Ini
+          </h3>
         </div>
 
         {canNativeShare && (

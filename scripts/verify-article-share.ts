@@ -21,10 +21,6 @@ async function verifyArticleShare() {
 
   // 2. Verifikasi elemen varian card
   assert.ok(html.includes("Bagikan Informasi Ini"), "Judul 'Bagikan Informasi Ini' pada varian card harus ada");
-  assert.ok(
-    html.includes("Dukung keterbukaan informasi dan edukasi kesehatan kefarmasian"),
-    "Deskripsi edukasi pada varian card harus ada"
-  );
 
   // 3. Verifikasi tautan media sosial
   assert.ok(html.includes("https://api.whatsapp.com/send?text="), "Skema URL WhatsApp harus valid");
