@@ -39,10 +39,10 @@ export const metadata: Metadata = {
     url: "/profil",
     images: [
       {
-        url: "/images/kantor-ifk.jpg",
+        url: "/images/profil-ifk.jpg",
         width: 1200,
         height: 630,
-        alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
+        alt: "Profil & Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru",
       },
     ],
   },

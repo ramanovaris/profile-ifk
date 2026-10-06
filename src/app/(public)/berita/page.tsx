@@ -9,28 +9,44 @@ import type { PublicArticleItem } from "@/actions/article";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Berita & Informasi Publik",
-  description:
-    "Publikasi warta kegiatan, distribusi logistik, dan pengumuman resmi kefarmasian Kabupaten Kotabaru.",
-  alternates: {
-    canonical: "/berita",
-  },
-  openGraph: {
-    title: "Berita & Informasi Publik | UPTD Instalasi Farmasi Kab. Kotabaru",
+export async function generateMetadata(): Promise<Metadata> {
+  let coverImageUrl = "/images/berita-ifk.jpg";
+  try {
+    const latest = await db.article.findFirst({
+      where: { isPublished: true },
+      orderBy: { publishedAt: "desc" },
+      select: { coverImage: true, title: true },
+    });
+    if (latest?.coverImage && !latest.coverImage.startsWith("data:")) {
+      coverImageUrl = latest.coverImage;
+    }
+  } catch {
+    // fallback ke berita-ifk.jpg
+  }
+
+  return {
+    title: "Berita & Informasi Publik",
     description:
       "Publikasi warta kegiatan, distribusi logistik, dan pengumuman resmi kefarmasian Kabupaten Kotabaru.",
-    url: "/berita",
-    images: [
-      {
-        url: "/images/kantor-ifk.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
-      },
-    ],
-  },
-};
+    alternates: {
+      canonical: "/berita",
+    },
+    openGraph: {
+      title: "Berita & Informasi Publik | UPTD Instalasi Farmasi Kab. Kotabaru",
+      description:
+        "Publikasi warta kegiatan, distribusi logistik, dan pengumuman resmi kefarmasian Kabupaten Kotabaru.",
+      url: "/berita",
+      images: [
+        {
+          url: coverImageUrl,
+          width: 1200,
+          height: 630,
+          alt: "Warta Berita & Informasi Publik UPTD Instalasi Farmasi Kab. Kotabaru",
+        },
+      ],
+    },
+  };
+}
 
 export default async function BeritaPage() {
   let initialArticles: PublicArticleItem[] = [];

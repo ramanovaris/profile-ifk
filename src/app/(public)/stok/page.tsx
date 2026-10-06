@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     url: "/stok",
     images: [
       {
-        url: "/images/kantor-ifk.jpg",
+        url: "/images/stok-obat-ifk.jpg",
         width: 1200,
         height: 630,
-        alt: "Gedung Kantor UPTD Instalasi Farmasi Kab. Kotabaru",
+        alt: "Ketersediaan Stok Obat & BMHP UPTD Instalasi Farmasi Kab. Kotabaru",
       },
     ],
   },
