@@ -46,6 +46,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Profil & Struktur Organisasi | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Profil instansi, visi misi, tupoksi, dan susunan organisasi UPTD Instalasi Farmasi Kab. Kotabaru.",
+    images: ["/images/profil-ifk.jpg"],
+  },
 };
 import { placeholderImage } from "@/lib/placeholder";
 import { getAssetUrl } from "@/lib/utils";

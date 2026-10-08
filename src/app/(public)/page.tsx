@@ -39,6 +39,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Beranda | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Pusat distribusi logistik farmasi, pengelolaan ketersediaan obat, vaksin, dan BMHP terpadu Kabupaten Kotabaru.",
+    images: ["/images/kantor-ifk.jpg"],
+  },
 };
 
 const pillars = [

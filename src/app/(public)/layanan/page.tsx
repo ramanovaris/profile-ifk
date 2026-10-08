@@ -41,6 +41,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Standar Pelayanan & Distribusi | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Standar alur pelayanan distribusi obat dan perbekalan kesehatan bagi faskes binaan se-Kabupaten Kotabaru.",
+    images: ["/images/cold-room-ifk.jpg"],
+  },
 };
 
 const hardcopySteps = [

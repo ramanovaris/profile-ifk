@@ -32,6 +32,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ketersediaan Stok Obat & BMHP | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Informasi transparansi ketersediaan stok fisik perbekalan farmasi pada UPTD Instalasi Farmasi Kab. Kotabaru per akhir bulan.",
+    images: ["/images/stok-obat-ifk.jpg"],
+  },
 };
 
 interface StokPublikPageProps {

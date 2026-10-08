@@ -26,6 +26,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kontak & Layanan Pengaduan | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Hubungi UPTD Instalasi Farmasi Kab. Kotabaru untuk informasi layanan, koordinasi faskes, atau pengaduan resmi.",
+    images: ["/images/kontak-ifk.jpg"],
+  },
 };
 
 // Override per-section untuk section tinggi — trigger IO lebih awal + fallback cepat
