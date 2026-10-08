@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import {
   Users,
   Pill,
@@ -23,6 +24,36 @@ import {
 import { PageHero } from "@/components/public/page-hero";
 import { ProfilHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
+
+export const metadata: Metadata = {
+  title: "Profil & Struktur Organisasi",
+  description:
+    "Profil instansi, visi misi, tupoksi, dan susunan organisasi UPTD Instalasi Farmasi Kab. Kotabaru.",
+  alternates: {
+    canonical: "/profil",
+  },
+  openGraph: {
+    title: "Profil & Struktur Organisasi | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Profil instansi, visi misi, tupoksi, dan susunan organisasi UPTD Instalasi Farmasi Kab. Kotabaru.",
+    url: "/profil",
+    images: [
+      {
+        url: "/images/profil-ifk.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Profil & Struktur Organisasi UPTD Instalasi Farmasi Kab. Kotabaru",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Profil & Struktur Organisasi | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description:
+      "Profil instansi, visi misi, tupoksi, dan susunan organisasi UPTD Instalasi Farmasi Kab. Kotabaru.",
+    images: ["/images/profil-ifk.jpg"],
+  },
+};
 import { placeholderImage } from "@/lib/placeholder";
 import { getAssetUrl } from "@/lib/utils";
 import { getSiteSettings } from "@/actions/setting";

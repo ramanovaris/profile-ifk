@@ -10,6 +10,7 @@ import { ArticleShareBar } from "@/components/public/article-share-bar";
 import { dummyArticles } from "@/lib/dummy-data";
 import { db } from "@/lib/db";
 import { getCurrentSession } from "@/lib/auth";
+import { stripHtmlAndTruncate } from "@/lib/string";
 
 export const dynamic = "force-dynamic";
 
@@ -20,25 +21,114 @@ export async function generateMetadata(props: {
 
   const dbArticle = await db.article.findUnique({
     where: { slug },
-    select: { title: true, isPublished: true },
+    select: {
+      title: true,
+      content: true,
+      coverImage: true,
+      publishedAt: true,
+      isPublished: true,
+      author: {
+        select: { name: true },
+      },
+      category: {
+        select: { name: true },
+      },
+    },
   });
 
   if (dbArticle) {
+    const rawCover = dbArticle.coverImage;
+    const coverImageUrl =
+      rawCover && !rawCover.startsWith("data:")
+        ? rawCover
+        : "/images/kantor-ifk.jpg";
+    const description = stripHtmlAndTruncate(dbArticle.content, 160);
+    const publishedTime = dbArticle.publishedAt
+      ? new Date(dbArticle.publishedAt).toISOString()
+      : undefined;
+    const authorName = dbArticle.author?.name || "Administrator";
+    const title = dbArticle.title;
+
     return {
-      title: `${dbArticle.title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+      title,
+      description,
+      alternates: {
+        canonical: `/berita/${slug}`,
+      },
       robots: dbArticle.isPublished ? undefined : { index: false, follow: false },
+      openGraph: {
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        url: `/berita/${slug}`,
+        type: "article",
+        publishedTime,
+        authors: [authorName],
+        images: [
+          {
+            url: coverImageUrl,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        images: [coverImageUrl],
+      },
     };
   }
 
   const dummy = dummyArticles.find((a) => a.slug === slug);
   if (dummy) {
+    const rawCover = dummy.coverImage;
+    const coverImageUrl =
+      rawCover && !rawCover.startsWith("data:")
+        ? rawCover
+        : "/images/kantor-ifk.jpg";
+    const description = stripHtmlAndTruncate(dummy.content, 160);
+    const publishedTime = dummy.publishedAt
+      ? new Date(dummy.publishedAt).toISOString()
+      : undefined;
+    const authorName = dummy.authorName || "Administrator";
+    const title = dummy.title;
+
     return {
-      title: `${dummy.title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+      title,
+      description,
+      alternates: {
+        canonical: `/berita/${slug}`,
+      },
+      openGraph: {
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        url: `/berita/${slug}`,
+        type: "article",
+        publishedTime,
+        authors: [authorName],
+        images: [
+          {
+            url: coverImageUrl,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        images: [coverImageUrl],
+      },
     };
   }
 
   return {
     title: "Artikel Tidak Ditemukan | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description: "Artikel yang Anda cari tidak ditemukan atau telah dihapus.",
   };
 }
 
