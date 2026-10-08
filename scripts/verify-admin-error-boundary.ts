@@ -4,7 +4,7 @@ import * as path from "path";
 /**
  * Skrip verifikasi statis & struktur komponen untuk src/app/(admin)/admin/error.tsx
  */
-async function run() {
+export async function runAdminErrorBoundaryVerification() {
   const filePath = path.join(process.cwd(), "src/app/(admin)/admin/error.tsx");
   console.log(`[TEST] Memeriksa berkas Admin Error Boundary di: ${filePath}`);
 
@@ -42,4 +42,4 @@ async function run() {
   console.log("\n✨ SEMUA VERIFIKASI ADMIN ERROR BOUNDARY BERHASIL!");
 }
 
-run();
+runAdminErrorBoundaryVerification();

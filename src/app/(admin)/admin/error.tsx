@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { ShieldAlert, RotateCcw, LayoutDashboard, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface AdminErrorProps {
   error: Error & { digest?: string };
@@ -64,16 +65,16 @@ export default function AdminError({ error, reset }: AdminErrorProps) {
             Coba Muat Ulang
           </Button>
 
-          <Button
-            asChild
-            variant="outline"
-            className="h-10 px-4 rounded-xl border-zinc-700 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 hover:text-white font-medium transition-all"
+          <Link
+            href="/admin/dashboard"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-10 px-4 rounded-xl border-zinc-700 bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 hover:text-white font-medium transition-all inline-flex items-center justify-center"
+            )}
           >
-            <Link href="/admin/dashboard">
-              <LayoutDashboard className="w-4 h-4 mr-2 text-emerald-400" />
-              Kembali ke Dashboard
-            </Link>
-          </Button>
+            <LayoutDashboard className="w-4 h-4 mr-2 text-emerald-400" />
+            Kembali ke Dashboard
+          </Link>
         </div>
 
         {/* Tautan Kembali ke Portal Publik */}

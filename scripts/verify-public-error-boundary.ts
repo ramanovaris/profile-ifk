@@ -4,7 +4,7 @@ import * as path from "path";
 /**
  * Skrip verifikasi statis & struktur komponen untuk src/app/(public)/error.tsx
  */
-async function run() {
+export async function runPublicErrorBoundaryVerification() {
   const filePath = path.join(process.cwd(), "src/app/(public)/error.tsx");
   console.log(`[TEST] Memeriksa berkas Public Error Boundary di: ${filePath}`);
 
@@ -42,4 +42,4 @@ async function run() {
   console.log("\n✨ SEMUA VERIFIKASI PUBLIC ERROR BOUNDARY BERHASIL!");
 }
 
-run();
+runPublicErrorBoundaryVerification();

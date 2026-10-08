@@ -3,8 +3,9 @@ import { Home, Pill, FileQuestion, ArrowRight, PhoneCall } from "lucide-react";
 import { Navbar } from "@/components/public/navbar";
 import { Footer } from "@/components/public/footer";
 import { ScrollToTop } from "@/components/public/scroll-to-top";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { getSiteSettings } from "@/actions/setting";
+import { cn } from "@/lib/utils";
 
 export default async function NotFound() {
   const settings = await getSiteSettings();
@@ -43,26 +44,27 @@ export default async function NotFound() {
 
           {/* Tombol Aksi Navigasi Cepat */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 max-w-md mx-auto mb-10">
-            <Button
-              asChild
-              className="h-11 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition-all"
+            <Link
+              href="/"
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                "h-11 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium shadow-sm transition-all inline-flex items-center justify-center"
+              )}
             >
-              <Link href="/">
-                <Home className="w-4 h-4 mr-2" />
-                Kembali ke Beranda
-              </Link>
-            </Button>
+              <Home className="w-4 h-4 mr-2" />
+              Kembali ke Beranda
+            </Link>
 
-            <Button
-              asChild
-              variant="outline"
-              className="h-11 px-5 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-all"
+            <Link
+              href="/stok"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "h-11 px-5 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-all inline-flex items-center justify-center"
+              )}
             >
-              <Link href="/stok">
-                <Pill className="w-4 h-4 mr-2 text-emerald-600" />
-                Cek Ketersediaan Obat
-              </Link>
-            </Button>
+              <Pill className="w-4 h-4 mr-2 text-emerald-600" />
+              Cek Ketersediaan Obat
+            </Link>
           </div>
 
           {/* Navigasi Bantuan Tambahan */}

@@ -1,7 +1,7 @@
 /**
  * Skrip verifikasi integrasi end-to-end menyeluruh untuk seluruh penanganan rute galat / 404.
  */
-async function run() {
+export async function runAllErrorPagesVerification() {
   const testEndpoints = [
     {
       name: "Rute Statis Tidak Ada",
@@ -63,4 +63,4 @@ async function run() {
   console.log("🎉 SELURUH PENGUJIAN INTEGRASI 404 & ERROR PAGES BERHASIL 100%!");
 }
 
-run();
+runAllErrorPagesVerification();

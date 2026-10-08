@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { AlertTriangle, RotateCcw, Home, MessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface PublicErrorProps {
   error: Error & { digest?: string };
@@ -62,16 +63,16 @@ export default function PublicError({ error, reset }: PublicErrorProps) {
             Coba Lagi
           </Button>
 
-          <Button
-            asChild
-            variant="outline"
-            className="h-11 px-5 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-all"
+          <Link
+            href="/"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-11 px-5 rounded-xl border-slate-200 hover:bg-slate-50 text-slate-700 font-medium transition-all inline-flex items-center justify-center"
+            )}
           >
-            <Link href="/">
-              <Home className="w-4 h-4 mr-2 text-emerald-600" />
-              Kembali ke Beranda
-            </Link>
-          </Button>
+            <Home className="w-4 h-4 mr-2 text-emerald-600" />
+            Kembali ke Beranda
+          </Link>
         </div>
 
         {/* Navigasi Bantuan Tambahan */}

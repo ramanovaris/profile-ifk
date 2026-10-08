@@ -2,7 +2,7 @@
  * Skrip verifikasi HTTP untuk halaman 404 Kustom IFK Kotabaru.
  * Menjalankan pengecekan GET request pada dev server (port 3003).
  */
-async function run() {
+export async function runCustom404Verification() {
   const targetUrl = "http://localhost:3003/profile-ifk/halaman-uji-coba-pasti-tidak-ada-12345/";
   console.log(`[TEST] Menguji URL rute tidak ditemukan: ${targetUrl}`);
 
@@ -47,4 +47,4 @@ async function run() {
   }
 }
 
-run();
+runCustom404Verification();
