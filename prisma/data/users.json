@@ -1,0 +1,38 @@
+[
+  {
+    "username": "admin",
+    "password": "$2b$10$95oBUwBVFKShHQJvouOa.OcjPomntpI45UMoXyMq4S8rKFMZq6LeO",
+    "name": "Administrator IFK Kotabaru",
+    "email": null,
+    "avatar": null,
+    "role": "SUPER_ADMIN",
+    "status": "ACTIVE"
+  },
+  {
+    "username": "staff1",
+    "password": "$2b$10$3XPsrLB3GMrQVFjwDqrxw.2hj/lYCBb9y/xcIItYGl3G9spZJNDEG",
+    "name": "Awaludin Jamil, S.Farm",
+    "email": "jamil@gmail.com",
+    "avatar": "/uploads/avatars/avatar-cmtvqtdot0000wg61xfnt9sx0-1789731202156-0f4vr.jpg",
+    "role": "STAFF",
+    "status": "ACTIVE"
+  },
+  {
+    "username": "ramaedit",
+    "password": "$2b$10$.0DJ5sgXPo80EPIRDIYhyu9vL.za31lC9Wwm6rWpr7582vWl06jbC",
+    "name": "ini super admin edit",
+    "email": null,
+    "avatar": null,
+    "role": "STAFF",
+    "status": "ACTIVE"
+  },
+  {
+    "username": "staff2",
+    "password": "$2b$10$X8pqKS0RdDzZXrZ1qN0af.eukNVqRBTAXrtJnFQfGDtbbpPL6kJey",
+    "name": "Ahmad Rizky, S.Farm",
+    "email": null,
+    "avatar": null,
+    "role": "STAFF",
+    "status": "ACTIVE"
+  }
+]
