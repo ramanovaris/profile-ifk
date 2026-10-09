@@ -25,7 +25,8 @@ async function main() {
   // 1. Sinkronisasi Pengaturan Profil Instansi (SiteSetting)
   const siteSettingData = loadJsonSnapshot<Record<string, unknown>>("site-settings.json");
   if (siteSettingData) {
-    const { id: _ignoredId, ...settingFields } = siteSettingData;
+    const settingFields = { ...siteSettingData };
+    delete settingFields.id;
     await prisma.siteSetting.upsert({
       where: { id: "default" },
       update: settingFields as Prisma.SiteSettingUpdateInput,

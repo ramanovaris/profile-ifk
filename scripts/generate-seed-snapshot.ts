@@ -15,7 +15,8 @@ async function generateSnapshot() {
     where: { id: "default" },
   });
   if (siteSetting) {
-    const { updatedAt, ...cleanSetting } = siteSetting;
+    const cleanSetting = { ...siteSetting } as Record<string, unknown>;
+    delete cleanSetting.updatedAt;
     await fs.writeFile(
       path.join(dataDir, "site-settings.json"),
       JSON.stringify(cleanSetting, null, 2),
@@ -28,7 +29,15 @@ async function generateSnapshot() {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "asc" },
   });
-  const cleanUsers = users.map(({ id, createdAt, updatedAt, ...rest }) => rest);
+  const cleanUsers = users.map((u) => ({
+    username: u.username,
+    password: u.password,
+    name: u.name,
+    email: u.email,
+    avatar: u.avatar,
+    role: u.role,
+    status: u.status,
+  }));
   await fs.writeFile(
     path.join(dataDir, "users.json"),
     JSON.stringify(cleanUsers, null, 2),
@@ -40,7 +49,11 @@ async function generateSnapshot() {
   const categories = await prisma.category.findMany({
     orderBy: { createdAt: "asc" },
   });
-  const cleanCategories = categories.map(({ id, createdAt, updatedAt, ...rest }) => rest);
+  const cleanCategories = categories.map((c) => ({
+    name: c.name,
+    slug: c.slug,
+    status: c.status,
+  }));
   await fs.writeFile(
     path.join(dataDir, "categories.json"),
     JSON.stringify(cleanCategories, null, 2),
@@ -77,7 +90,9 @@ async function generateSnapshot() {
   const stockPeriods = await prisma.stockPeriod.findMany({
     orderBy: { period: "asc" },
   });
-  const cleanPeriods = stockPeriods.map(({ id, createdAt, ...rest }) => rest);
+  const cleanPeriods = stockPeriods.map((p) => ({
+    period: p.period,
+  }));
   await fs.writeFile(
     path.join(dataDir, "stock-periods.json"),
     JSON.stringify(cleanPeriods, null, 2),
@@ -89,9 +104,20 @@ async function generateSnapshot() {
   const medicineStocks = await prisma.medicineStock.findMany({
     orderBy: [{ period: "asc" }, { code: "asc" }],
   });
-  const cleanStocks = medicineStocks.map(
-    ({ id, createdAt, updatedAt, ...rest }) => rest
-  );
+  const cleanStocks = medicineStocks.map((m) => ({
+    period: m.period,
+    code: m.code,
+    name: m.name,
+    category: m.category,
+    unit: m.unit,
+    quantity: m.quantity,
+    status: m.status,
+    avgUsage: m.avgUsage,
+    mos: m.mos,
+    expiryDate: m.expiryDate,
+    nomenklatur: m.nomenklatur,
+    source: m.source,
+  }));
   await fs.writeFile(
     path.join(dataDir, "medicine-stocks.json"),
     JSON.stringify(cleanStocks, null, 2),
