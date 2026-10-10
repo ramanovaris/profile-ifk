@@ -1,9 +1,10 @@
 # Spesifikasi Desain: Buku Pedoman dan Petunjuk Penggunaan Aplikasi untuk End User
 
 - **Tanggal Dokumen:** 2026-10-04
+- **Terkait Issue:** [#133](https://github.com/ramanovaris/profile-ifk/issues/133)
 - **Kategori:** Dokumentasi & User Enablement (`docs`)
 - **Status:** Approved by User (Ready for Plan & Implementation)
-- **Target Rilis:** Branch `docs/user-manual-guide` -> `develop`
+- **Target Rilis:** Branch `docs/133-user-manual-guide` -> `develop`
 
 ---
 
