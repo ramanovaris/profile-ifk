@@ -11,7 +11,8 @@
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
-    "prisma:seed": "prisma db seed"
+    "prisma:seed": "prisma db seed",
+    "seed:snapshot": "tsx scripts/generate-seed-snapshot.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

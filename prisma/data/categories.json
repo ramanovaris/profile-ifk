@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Kegiatan",
+    "slug": "kegiatan",
+    "status": "ACTIVE"
+  },
+  {
+    "name": "Informasi",
+    "slug": "informasi",
+    "status": "ACTIVE"
+  },
+  {
+    "name": "Sosialisasi",
+    "slug": "sosialisasi",
+    "status": "ACTIVE"
+  }
+]
