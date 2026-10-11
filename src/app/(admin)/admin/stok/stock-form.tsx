@@ -146,13 +146,13 @@ export function StockForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-zinc-900 border border-zinc-800 text-zinc-50 sm:max-w-md rounded-2xl p-6">
+      <DialogContent className="bg-[var(--admin-card-bg)] border border-[var(--admin-border)] text-[var(--admin-text-main)] sm:max-w-md rounded-2xl p-6">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5 text-brand-400" />
+          <DialogTitle className="flex items-center gap-2 text-[var(--admin-text-main)]">
+            <Upload className="h-5 w-5 text-[#455a26] dark:text-brand-400" />
             Import Data Stok Bulanan
           </DialogTitle>
-          <DialogDescription className="text-zinc-400">
+          <DialogDescription className="text-[var(--admin-muted)]">
             Unggah file spreadsheet Excel (.xlsx, .xls) atau CSV (.csv) data stok fisik per akhir bulan.
           </DialogDescription>
         </DialogHeader>
@@ -166,54 +166,54 @@ export function StockForm({
         />
 
         <div className="pt-3 pb-1 space-y-2">
-          <label className="text-xs font-medium text-zinc-300 flex items-center justify-between">
+          <label className="text-xs font-medium text-[var(--admin-text-main)] flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5 text-brand-400" />
+              <Calendar className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
               <span>Periode Target Impor</span>
             </span>
-            <span className="text-[10px] text-zinc-400 font-normal">Otomatis sinkron ke tabel</span>
+            <span className="text-[10px] text-[var(--admin-muted)] font-normal">Otomatis sinkron ke tabel</span>
           </label>
           <div className="grid grid-cols-1 gap-2">
             <select
               value={targetPeriod}
               onChange={(e) => setTargetPeriod(e.target.value)}
-              className="w-full h-9.5 rounded-xl border border-white/10 bg-zinc-950/80 px-3 text-xs text-white outline-none focus:border-brand-500/60 focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
+              className="w-full h-9.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 text-xs text-[var(--admin-text-main)] outline-none focus:border-brand-500/60 focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
             >
               {availablePeriods.map((p) => (
-                <option key={p} value={p} className="bg-zinc-900 text-white">
+                <option key={p} value={p} className="bg-[var(--admin-surface)] text-[var(--admin-text-main)]">
                   {formatStockPeriodLabel(p)} ({p})
                 </option>
               ))}
-              <option value="custom" className="bg-zinc-900 text-brand-300">
+              <option value="custom" className="bg-[var(--admin-surface)] text-[#455a26] dark:text-brand-300 font-semibold">
                 + Pilih Periode Baru...
               </option>
             </select>
             {targetPeriod === "custom" && (
-              <div className="space-y-1.5 rounded-xl border border-white/10 bg-zinc-950/60 p-2.5">
+              <div className="space-y-1.5 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-2.5">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] text-zinc-400 mb-1 block font-medium">Bulan</label>
+                    <label className="text-[10px] text-[var(--admin-muted)] mb-1 block font-medium">Bulan</label>
                     <select
                       value={customMonth}
                       onChange={(e) => setCustomMonth(e.target.value)}
-                      className="w-full h-9 rounded-xl border border-brand-500/40 bg-zinc-900 px-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
+                      className="w-full h-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
                     >
                       {MONTH_OPTIONS.map((m) => (
-                        <option key={m.value} value={m.value} className="bg-zinc-900 text-white">
+                        <option key={m.value} value={m.value} className="bg-[var(--admin-surface)] text-[var(--admin-text-main)]">
                           {m.label} ({m.value})
                         </option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] text-zinc-400 mb-1 block font-medium">Tahun</label>
+                    <label className="text-[10px] text-[var(--admin-muted)] mb-1 block font-medium">Tahun</label>
                     <select
                       value={customYear}
                       onChange={(e) => setCustomYear(e.target.value)}
-                      className="w-full h-9 rounded-xl border border-brand-500/40 bg-zinc-900 px-2.5 text-xs text-white outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
+                      className="w-full h-9 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 text-xs text-[var(--admin-text-main)] outline-none focus:ring-1 focus:ring-brand-500/40 cursor-pointer"
                     >
                       {YEAR_OPTIONS.map((y) => (
-                        <option key={y} value={y} className="bg-zinc-900 text-white">
+                        <option key={y} value={y} className="bg-[var(--admin-surface)] text-[var(--admin-text-main)]">
                           {y}
                         </option>
                       ))}
@@ -221,10 +221,10 @@ export function StockForm({
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-[11px] pt-0.5">
-                  <span className="text-zinc-400">Periode target:</span>
-                  <span className="font-medium text-brand-300">
+                  <span className="text-[var(--admin-muted)]">Periode target:</span>
+                  <span className="font-semibold text-[#455a26] dark:text-brand-300">
                     {MONTH_OPTIONS.find((m) => m.value === customMonth)?.label} {customYear}{" "}
-                    <span className="font-mono text-[10px] text-zinc-500">({customYear}-{customMonth})</span>
+                    <span className="font-mono text-[10px] text-[var(--admin-muted)]">({customYear}-{customMonth})</span>
                   </span>
                 </div>
               </div>
@@ -236,10 +236,10 @@ export function StockForm({
           <div 
             className={`flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 transition-colors cursor-pointer ${
               isDragging 
-                ? "border-brand-500 bg-brand-500/10" 
+                ? "border-[#455a26] bg-[#455a26]/10" 
                 : selectedFile
-                ? "border-emerald-500/50 bg-emerald-500/5"
-                : "border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800"
+                ? "border-emerald-600/50 bg-emerald-50 dark:bg-emerald-500/5"
+                : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-hover-bg)]"
             }`}
             onDragOver={(e) => {
               e.preventDefault();
@@ -263,29 +263,29 @@ export function StockForm({
           >
             {selectedFile ? (
               <>
-                <CheckCircle2 className="mb-3 h-10 w-10 text-emerald-400" />
-                <p className="mb-1 text-sm font-semibold text-zinc-100">
+                <CheckCircle2 className="mb-3 h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+                <p className="mb-1 text-sm font-semibold text-[var(--admin-text-main)]">
                   {selectedFile.name}
                 </p>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-[var(--admin-muted)]">
                   {(selectedFile.size / 1024).toFixed(1)} KB — Klik untuk ganti file
                 </p>
               </>
             ) : (
               <>
-                <FileSpreadsheet className="mb-4 h-10 w-10 text-zinc-400" />
-                <p className="mb-2 text-sm text-zinc-300">
-                  <span className="font-semibold text-brand-400">Klik untuk unggah</span> atau seret dan lepas
+                <FileSpreadsheet className="mb-4 h-10 w-10 text-[var(--admin-muted)]" />
+                <p className="mb-2 text-sm text-[var(--admin-text-main)]">
+                  <span className="font-semibold text-[#455a26] dark:text-brand-400">Klik untuk unggah</span> atau seret dan lepas
                 </p>
-                <p className="text-xs text-zinc-500">File format Excel (.xlsx, .xls) atau CSV (Maks. 5MB)</p>
+                <p className="text-xs text-[var(--admin-muted)]">File format Excel (.xlsx, .xls) atau CSV (Maks. 5MB)</p>
               </>
             )}
           </div>
           
-          <div className="mt-4 flex items-start gap-2 rounded-lg bg-zinc-800/50 p-3 text-sm text-zinc-400">
-            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-400" />
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3 text-sm text-[var(--admin-muted)]">
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
             <p>
-              Format kolom yang didukung: <span className="font-medium text-zinc-300">Kode, Nama Obat, Kategori, Satuan, Jumlah Stok/Sisa, Pemakaian Rata-Rata, Kecukupan Stok (Bulan), ED, Nomenklatur.</span>
+              Format kolom yang didukung: <span className="font-medium text-[var(--admin-text-main)]">Kode, Nama Obat, Kategori, Satuan, Jumlah Stok/Sisa, Pemakaian Rata-Rata, Kecukupan Stok (Bulan), ED, Nomenklatur.</span>
             </p>
           </div>
         </div>
@@ -294,9 +294,9 @@ export function StockForm({
           <button 
             type="button"
             onClick={handleDownloadTemplate}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer active:scale-95"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer active:scale-95"
           >
-            <Download className="h-4 w-4 text-zinc-400" />
+            <Download className="h-4 w-4 text-[var(--admin-muted)]" />
             <span>Unduh Template</span>
           </button>
           <button 
