@@ -1222,18 +1222,37 @@ export function StockTable({
                   </td>
                   <td className="px-4 py-3 text-center whitespace-nowrap">
                     {(() => {
-                      const effectiveStatus = getItemEffectiveStatus(item);
-                      const statusInfo = getStockSummary(effectiveStatus);
-                      const mosInfo = getMosBadgeInfo(item.mos);
+                      const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
+                      const badgeClasses: Record<string, string> = {
+                        empty: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+                        critical: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+                        low: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+                        safe: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+                        abundant: "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+                        unknown: "bg-zinc-500/10 text-[var(--admin-muted)] border-[var(--admin-border)]",
+                      };
+                      const dotClasses: Record<string, string> = {
+                        empty: "bg-rose-500",
+                        critical: "bg-rose-500",
+                        low: "bg-amber-500",
+                        safe: "bg-emerald-500",
+                        abundant: "bg-sky-500",
+                        unknown: "bg-zinc-400",
+                      };
 
                       return (
                         <span
                           className={cn(
-                            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium border",
-                            statusInfo.badgeClass
+                            "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium border",
+                            badgeClasses[mosInfo.variant] || badgeClasses.unknown
                           )}
                         >
-                          <span className={cn("h-1.5 w-1.5 rounded-full", statusInfo.dotClass)} />
+                          <span
+                            className={cn(
+                              "h-1.5 w-1.5 rounded-full",
+                              dotClasses[mosInfo.variant] || dotClasses.unknown
+                            )}
+                          />
                           {mosInfo.label}
                         </span>
                       );
