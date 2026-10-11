@@ -858,10 +858,10 @@ export function StockTable({
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
             Kelola Stok Obat
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[var(--admin-muted)]">
             Manajemen dan pembaruan data stok fisik IFK per akhir bulan
           </p>
         </div>
@@ -876,15 +876,15 @@ export function StockTable({
               className={cn(
                 "inline-flex h-9 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border px-3.5 text-sm font-medium transition-all active:scale-95 cursor-pointer whitespace-nowrap",
                 isFileMenuOpen
-                  ? "border-emerald-500/50 bg-white/10 text-white shadow-sm"
-                  : "border-white/10 bg-white/5 text-zinc-300 shadow-sm hover:border-white/20 hover:bg-white/10 hover:text-white"
+                  ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 shadow-xs"
+                  : "border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] shadow-xs hover:bg-[var(--admin-hover-bg)]"
               )}
             >
-              <FileSpreadsheet className="h-4 w-4 text-emerald-400 shrink-0" />
+              <FileSpreadsheet className="h-4 w-4 text-emerald-500 shrink-0" />
               <span>Kelola Berkas</span>
               <ChevronDown
                 className={cn(
-                  "h-3.5 w-3.5 text-zinc-400 transition-transform duration-200 shrink-0",
+                  "h-3.5 w-3.5 text-[var(--admin-muted)] transition-transform duration-200 shrink-0",
                   isFileMenuOpen && "rotate-180"
                 )}
               />
@@ -893,9 +893,9 @@ export function StockTable({
             {isFileMenuOpen && (
               <div
                 role="menu"
-                className="absolute left-0 sm:left-auto sm:right-0 top-full z-50 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-white/10 bg-zinc-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+                className="absolute left-0 sm:left-auto sm:right-0 top-full z-50 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
               >
-                <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--admin-muted)]">
                   Aksi Impor &amp; Ekspor
                 </div>
 
@@ -907,12 +907,12 @@ export function StockTable({
                     setIsFileMenuOpen(false);
                     handleExportExcel();
                   }}
-                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
                 >
-                  <FileSpreadsheet className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <FileSpreadsheet className="h-4 w-4 text-emerald-500 shrink-0" />
                   <div className="flex flex-col">
-                    <span className="text-zinc-200 font-medium">Ekspor Data Excel</span>
-                    <span className="text-[10px] text-zinc-400">Unduh data (.xlsx)</span>
+                    <span className="font-medium text-[var(--admin-text-main)]">Ekspor Data Excel</span>
+                    <span className="text-[10px] text-[var(--admin-muted)]">Unduh data (.xlsx)</span>
                   </div>
                 </button>
 
@@ -924,16 +924,16 @@ export function StockTable({
                     setIsFileMenuOpen(false);
                     setIsImportOpen(true);
                   }}
-                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
                 >
-                  <Upload className="h-4 w-4 text-sky-400 shrink-0" />
+                  <Upload className="h-4 w-4 text-sky-500 shrink-0" />
                   <div className="flex flex-col">
-                    <span className="text-zinc-200 font-medium">Import CSV / Excel</span>
-                    <span className="text-[10px] text-zinc-400">Unggah berkas logistik</span>
+                    <span className="font-medium text-[var(--admin-text-main)]">Import CSV / Excel</span>
+                    <span className="text-[10px] text-[var(--admin-muted)]">Unggah berkas logistik</span>
                   </div>
                 </button>
 
-                <div className="my-1 border-t border-white/5" />
+                <div className="my-1 border-t border-[var(--admin-border)]" />
 
                 {/* Unduh Template */}
                 <button
@@ -943,12 +943,12 @@ export function StockTable({
                     setIsFileMenuOpen(false);
                     handleDownloadTemplate();
                   }}
-                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
                 >
-                  <Download className="h-4 w-4 text-zinc-400 shrink-0" />
+                  <Download className="h-4 w-4 text-[var(--admin-muted)] shrink-0" />
                   <div className="flex flex-col">
-                    <span className="text-zinc-200 font-medium">Unduh Template CSV</span>
-                    <span className="text-[10px] text-zinc-400">Format standar impor</span>
+                    <span className="font-medium text-[var(--admin-text-main)]">Unduh Template CSV</span>
+                    <span className="text-[10px] text-[var(--admin-muted)]">Format standar impor</span>
                   </div>
                 </button>
               </div>
@@ -977,18 +977,18 @@ export function StockTable({
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isAllActive
               ? "border-brand-500/60 bg-brand-500/15 ring-2 ring-brand-500/40"
-              : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-900/60"
+              : "border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] hover:bg-[var(--admin-hover-bg)]"
           )}
         >
-          <div className="flex items-center gap-2 text-zinc-400">
-            <Package className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400" />
+          <div className="flex items-center gap-2 text-[var(--admin-muted)]">
+            <Package className="h-4 w-4 sm:h-5 sm:w-5 text-brand-500" />
             <span className="text-xs sm:text-sm font-medium">Total Item</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-zinc-100 truncate">{summary.totalItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[var(--admin-text-main)] truncate">{summary.totalItems}</p>
             {isAllActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-600 dark:text-brand-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
                 Aktif
               </span>
             )}
@@ -1003,19 +1003,19 @@ export function StockTable({
           className={cn(
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isAvailableActive
-              ? "border-emerald-500/60 bg-emerald-950/40 ring-2 ring-emerald-500/40"
-              : "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10"
+              ? "border-emerald-500/60 bg-emerald-500/20 ring-2 ring-emerald-500/40"
+              : "border-emerald-500/20 bg-emerald-500/10 hover:border-emerald-500/40 hover:bg-emerald-500/15"
           )}
         >
-          <div className="flex items-center gap-2 text-emerald-400">
+          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
             <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-xs sm:text-sm font-medium">Stok Aman</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-emerald-400 truncate">{summary.availableItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400 truncate">{summary.availableItems}</p>
             {isAvailableActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Aktif
               </span>
             )}
@@ -1030,19 +1030,19 @@ export function StockTable({
           className={cn(
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isLowActive
-              ? "border-amber-500/60 bg-amber-950/40 ring-2 ring-amber-500/40"
-              : "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/10"
+              ? "border-amber-500/60 bg-amber-500/20 ring-2 ring-amber-500/40"
+              : "border-amber-500/20 bg-amber-500/10 hover:border-amber-500/40 hover:bg-amber-500/15"
           )}
         >
-          <div className="flex items-center gap-2 text-amber-400">
+          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
             <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-xs sm:text-sm font-medium">Menipis</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-amber-400 truncate">{summary.lowItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-amber-600 dark:text-amber-400 truncate">{summary.lowItems}</p>
             {isLowActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                 Aktif
               </span>
             )}
@@ -1057,19 +1057,19 @@ export function StockTable({
           className={cn(
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isEmptyActive
-              ? "border-rose-500/60 bg-rose-950/40 ring-2 ring-rose-500/40"
-              : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
+              ? "border-rose-500/60 bg-rose-500/20 ring-2 ring-rose-500/40"
+              : "border-rose-500/20 bg-rose-500/10 hover:border-rose-500/40 hover:bg-rose-500/15"
           )}
         >
-          <div className="flex items-center gap-2 text-rose-400">
+          <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400">
             <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-xs sm:text-sm font-medium">Kosong</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-rose-400 truncate">{summary.emptyItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-rose-600 dark:text-rose-400 truncate">{summary.emptyItems}</p>
             {isEmptyActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700 dark:text-rose-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                 Aktif
               </span>
             )}
@@ -1078,23 +1078,23 @@ export function StockTable({
       </div>
 
       {/* ── Toolbar Pencarian & Filter Terpadu ────────────────────────── */}
-      <div className="relative z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+      <div className="relative z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-3.5 backdrop-blur-xl">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
           <input
             type="text"
             placeholder="Cari nama obat, kode barang, atau kategori..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-9 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+            className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] py-2 pl-9 pr-9 text-sm text-[var(--admin-text-main)] placeholder-[var(--admin-muted)] outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
           />
           {search && (
             <button
               type="button"
               onClick={handleClearSearch}
               aria-label="Bersihkan pencarian"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-md text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -1115,15 +1115,15 @@ export function StockTable({
               }}
               enableSearch={true}
               singleSelect={true}
-              icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-400" />}
+              icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-500" />}
               createAction={{
                 label: "Buka Periode Baru",
-                icon: <CalendarPlus className="h-3.5 w-3.5 text-emerald-400 shrink-0" />,
+                icon: <CalendarPlus className="h-3.5 w-3.5 text-emerald-500 shrink-0" />,
                 onClick: handleOpenCreatePeriod,
               }}
               footerAction={{
                 label: "Hapus Periode Ini",
-                icon: <Trash2 className="h-3.5 w-3.5 text-rose-400 shrink-0" />,
+                icon: <Trash2 className="h-3.5 w-3.5 text-rose-500 shrink-0" />,
                 variant: "danger",
                 onClick: () => setIsDeletePeriodOpen(true),
               }}
@@ -1161,58 +1161,58 @@ export function StockTable({
       </div>
 
       {/* ── Tabel Stok ──────────────────────────────────────────────────── */}
-      <div className="relative z-10 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
+      <div className="relative z-10 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left text-sm text-zinc-300">
+          <table className="w-full min-w-[980px] text-left text-sm text-[var(--admin-text-main)]">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-900">
-                <th className="px-4 py-3 font-medium text-zinc-400 w-12">No</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Nama Obat / Kode</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Kategori</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Satuan</th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-right">Stok Fisik</th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-right">
+              <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)]">
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] w-12">No</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Nama Obat / Kode</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Kategori</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Satuan</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Stok Fisik</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">
                   <div>Rata-rata Pemakaian</div>
-                  <div className="text-[10px] font-normal normal-case text-zinc-500">RPB (Tren 12 Bln)</div>
+                  <div className="text-[10px] font-normal normal-case text-[var(--admin-muted)]">RPB (Tren 12 Bln)</div>
                 </th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-center">Status</th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-right">Aksi</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-center">Status</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {paginatedItems.map((item, index) => (
-                <tr key={item.id} className="transition-colors hover:bg-zinc-800/30">
-                  <td className="px-4 py-3 text-zinc-500 font-mono text-xs">
+                <tr key={item.id} className="transition-colors hover:bg-[var(--admin-hover-bg)]">
+                  <td className="px-4 py-3 text-[var(--admin-muted)] font-mono text-xs">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-zinc-100">{item.name}</div>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-zinc-400">
-                      <span className="font-mono text-zinc-500">{item.code}</span>
+                    <div className="font-medium text-[var(--admin-text-main)]">{item.name}</div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-[var(--admin-muted)]">
+                      <span className="font-mono text-[var(--admin-muted)]">{item.code}</span>
                       {item.nomenklatur && (
                         <>
-                          <span className="text-zinc-600">•</span>
-                          <span className="inline-block truncate max-w-[180px] text-zinc-400" title={item.nomenklatur}>
+                          <span className="text-[var(--admin-muted)]">•</span>
+                          <span className="inline-block truncate max-w-[180px] text-[var(--admin-muted)]" title={item.nomenklatur}>
                             {item.nomenklatur}
                           </span>
                         </>
                       )}
                       {item.expiryDate && (
                         <>
-                          <span className="text-zinc-600">•</span>
-                          <span className="text-amber-400/90 font-medium">
+                          <span className="text-[var(--admin-muted)]">•</span>
+                          <span className="text-amber-500 font-medium">
                             ED: {item.expiryDate}
                           </span>
                         </>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3">{item.category}</td>
-                  <td className="px-4 py-3">{item.unit}</td>
-                  <td className="px-4 py-3 text-right font-mono font-semibold text-zinc-100">
+                  <td className="px-4 py-3 text-[var(--admin-muted)]">{item.category}</td>
+                  <td className="px-4 py-3 text-[var(--admin-muted)]">{item.unit}</td>
+                  <td className="px-4 py-3 text-right font-mono font-semibold text-[var(--admin-text-main)]">
                     {item.quantity.toLocaleString("id-ID")}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-zinc-400 text-xs">
+                  <td className="px-4 py-3 text-right font-mono text-[var(--admin-muted)] text-xs">
                     {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
                       ? item.avgUsage.toLocaleString("id-ID", {
                           minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
@@ -1222,36 +1222,18 @@ export function StockTable({
                   </td>
                   <td className="px-4 py-3 text-center whitespace-nowrap">
                     {(() => {
-                      const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
-                      const badgeClasses: Record<string, string> = {
-                        empty: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-                        critical: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-                        low: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                        safe: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                        abundant: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-                        unknown: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
-                      };
-                      const dotClasses: Record<string, string> = {
-                        empty: "bg-rose-400",
-                        critical: "bg-rose-400",
-                        low: "bg-amber-400",
-                        safe: "bg-emerald-400",
-                        abundant: "bg-sky-400",
-                        unknown: "bg-zinc-400",
-                      };
+                      const effectiveStatus = getItemEffectiveStatus(item);
+                      const statusInfo = getStockSummary(effectiveStatus);
+                      const mosInfo = getMosBadgeInfo(item.mos);
+
                       return (
                         <span
                           className={cn(
-                            "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium border",
-                            badgeClasses[mosInfo.variant] || badgeClasses.unknown
+                            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium border",
+                            statusInfo.badgeClass
                           )}
                         >
-                          <span
-                            className={cn(
-                              "h-1.5 w-1.5 rounded-full",
-                              dotClasses[mosInfo.variant] || dotClasses.unknown
-                            )}
-                          />
+                          <span className={cn("h-1.5 w-1.5 rounded-full", statusInfo.dotClass)} />
                           {mosInfo.label}
                         </span>
                       );
@@ -1262,7 +1244,7 @@ export function StockTable({
                       <button 
                         type="button" 
                         onClick={() => handleOpenEdit(item)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-white/10 [@media(hover:hover)]:hover:bg-white/5 [@media(hover:hover)]:hover:text-white active:bg-white/10 active:text-white cursor-pointer"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-[var(--admin-border)] [@media(hover:hover)]:hover:bg-[var(--admin-hover-bg)] [@media(hover:hover)]:hover:text-[var(--admin-text-main)] active:bg-[var(--admin-hover-bg)] cursor-pointer"
                         title="Edit Item"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -1270,7 +1252,7 @@ export function StockTable({
                       <button 
                         type="button" 
                         onClick={() => setDeleteItem(item)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-400 active:bg-red-500/20 active:text-red-400 cursor-pointer"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-500 active:bg-red-500/20 cursor-pointer"
                         title="Hapus Item"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1285,13 +1267,13 @@ export function StockTable({
 
         {/* ── Pagination ──────────────────────────────────────────────── */}
         {filtered.length > itemsPerPage && (
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-zinc-800 bg-zinc-900/50 px-4 py-3 sm:flex-row">
-            <p className="text-sm text-zinc-400">
-              Menampilkan <span className="font-medium text-zinc-200">{(currentPage - 1) * itemsPerPage + 1}</span> -{" "}
-              <span className="font-medium text-zinc-200">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row">
+            <p className="text-sm text-[var(--admin-muted)]">
+              Menampilkan <span className="font-medium text-[var(--admin-text-main)]">{(currentPage - 1) * itemsPerPage + 1}</span> -{" "}
+              <span className="font-medium text-[var(--admin-text-main)]">
                 {Math.min(currentPage * itemsPerPage, filtered.length)}
               </span>{" "}
-              dari <span className="font-medium text-zinc-200">{filtered.length}</span> item
+              dari <span className="font-medium text-[var(--admin-text-main)]">{filtered.length}</span> item
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -1301,11 +1283,11 @@ export function StockTable({
                   })
                 }
                 disabled={currentPage <= 1}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 Sebelumnya
               </button>
-              <span className="text-sm text-zinc-400">
+              <span className="text-sm text-[var(--admin-muted)]">
                 Hal {currentPage} / {totalPages}
               </span>
               <button
@@ -1315,7 +1297,7 @@ export function StockTable({
                   })
                 }
                 disabled={currentPage >= totalPages}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 Selanjutnya
               </button>
