@@ -165,31 +165,24 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   const [open, setOpen] = useState(false);
   const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
 
-  const [themeSetting, setThemeSetting] = useState<ThemeSetting>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
-        if (stored === "light" || stored === "dark" || stored === "system") {
-          return stored;
-        }
-      } catch {
-        // ignore
-      }
-    }
-    return "light";
-  });
-
-  const [systemIsDark, setSystemIsDark] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    return false;
-  });
+  const [themeSetting, setThemeSetting] = useState<ThemeSetting>("light");
+  const [systemIsDark, setSystemIsDark] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    try {
+      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
+      if (stored === "light" || stored === "dark" || stored === "system") {
+        setThemeSetting(stored);
+      }
+    } catch {
+      // ignore
+    }
+
     const media = window.matchMedia("(prefers-color-scheme: dark)");
+    setSystemIsDark(media.matches);
+
     const listener = (e: MediaQueryListEvent) => {
       setSystemIsDark(e.matches);
     };

@@ -62,6 +62,7 @@ async function verifyThemeToggleImplementation() {
     "AdminShell mengimpor ThemeDropdown"
   );
   assert(
+    shellCode.includes('useState<ThemeSetting>("light")') ||
     shellCode.includes('return "light";'),
     "Nilai bawaan (default) tema adalah 'light'"
   );
