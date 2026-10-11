@@ -170,13 +170,13 @@ export function CategoryMultiSelectFilter({
     }
     if (count === 1) {
       return (
-        <span className="truncate font-semibold text-[#455a26] dark:text-brand-300">
+        <span className="truncate font-bold text-white">
           {selectedCategories[0]}
         </span>
       );
     }
     return (
-      <span className="truncate font-semibold text-[#455a26] dark:text-brand-300">
+      <span className="truncate font-bold text-white">
         {count} Kategori
       </span>
     );
@@ -195,17 +195,17 @@ export function CategoryMultiSelectFilter({
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className={`inline-flex h-9.5 w-full items-center justify-between gap-2.5 rounded-lg border bg-[var(--admin-hover-bg)] px-3.5 text-xs text-[var(--admin-text-main)] outline-none transition-all hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)] focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 sm:w-auto sm:min-w-[210px] ${
+        className={`inline-flex h-9.5 w-full items-center justify-between gap-2.5 rounded-lg border px-3.5 text-xs outline-none transition-all focus:ring-2 focus:ring-brand-500/40 sm:w-auto sm:min-w-[210px] ${
           selectedCategories.length > 0
-            ? "border-brand-500/30 bg-brand-500/10 text-[#455a26] dark:text-brand-300"
-            : "border-[var(--admin-border)]"
+            ? "border-[#455a26] bg-[#455a26] text-white font-bold shadow-xs hover:brightness-110"
+            : "border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-text-main)] hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)]"
         }`}
       >
         <div className="flex items-center gap-2 truncate">
           <SlidersHorizontal
             className={`h-3.5 w-3.5 shrink-0 transition-colors ${
               selectedCategories.length > 0
-                ? "text-[#455a26] dark:text-brand-400"
+                ? "text-white"
                 : "text-[var(--admin-muted)]"
             }`}
           />
@@ -214,14 +214,14 @@ export function CategoryMultiSelectFilter({
 
         <div className="flex items-center gap-1.5 shrink-0">
           {selectedCategories.length > 0 && (
-            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-[#455a26] px-1.5 text-[10px] font-bold text-white dark:bg-brand-500 dark:text-zinc-950">
+            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-black/20 px-1.5 text-[10px] font-bold text-white">
               {selectedCategories.length}
             </span>
           )}
           <ChevronDown
-            className={`h-3.5 w-3.5 text-[var(--admin-muted)] transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={`h-3.5 w-3.5 transition-transform duration-200 ${
+              selectedCategories.length > 0 ? "text-white/80" : "text-[var(--admin-muted)]"
+            } ${isOpen ? "rotate-180" : ""}`}
           />
         </div>
       </button>

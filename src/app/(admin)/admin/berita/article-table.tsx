@@ -603,16 +603,14 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                         onClick={() => setToggleArticle(article)}
                         disabled={isPending}
                         title="Klik untuk mengubah status publikasi"
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all cursor-pointer ${
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-all cursor-pointer shadow-xs ${
                           article.isPublished
-                            ? "border-emerald-600/30 bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-500/25"
-                            : "border-amber-600/30 bg-amber-500/15 text-amber-900 dark:text-amber-300 hover:bg-amber-500/25"
+                            ? "border border-emerald-600 bg-emerald-700 text-white hover:bg-emerald-600"
+                            : "border border-amber-600 bg-amber-700 text-white hover:bg-amber-600"
                         } disabled:opacity-50`}
                       >
                         <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            article.isPublished ? "bg-emerald-500" : "bg-amber-500"
-                          }`}
+                          className="h-1.5 w-1.5 rounded-full bg-white"
                         />
                         <span>{article.isPublished ? "Terbit" : "Draft"}</span>
                       </button>
