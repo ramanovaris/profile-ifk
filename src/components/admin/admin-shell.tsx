@@ -214,6 +214,14 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
         : "light"
       : themeSetting;
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.setAttribute("data-admin-theme", resolvedTheme);
+    return () => {
+      document.documentElement.removeAttribute("data-admin-theme");
+    };
+  }, [resolvedTheme]);
+
   const user: AuthUserInfo | null = currentUser
     ? {
         id: currentUser.id || "",

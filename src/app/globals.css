@@ -244,6 +244,7 @@ input[type="number"] {
 }
 
 /* ── Admin Semantic Theme Variables ────────────────────────────── */
+:root[data-admin-theme="light"],
 .admin-root[data-admin-theme="light"] {
   --admin-bg: #f8fafc;
   --admin-surface: #ffffff;
@@ -265,6 +266,7 @@ input[type="number"] {
   --admin-popover-border: #cbd5e1;
 }
 
+:root[data-admin-theme="dark"],
 .admin-root[data-admin-theme="dark"] {
   --admin-bg: #09090b;
   --admin-surface: rgba(24, 24, 27, 0.6);
@@ -287,11 +289,15 @@ input[type="number"] {
 }
 
 /* Pastikan judul halaman di area admin selalu kontras di mode terang */
+:root[data-admin-theme="light"] h1,
+:root[data-admin-theme="light"] h2,
 .admin-root[data-admin-theme="light"] h1,
 .admin-root[data-admin-theme="light"] h2 {
   color: var(--admin-text-main);
 }
 
+:root[data-admin-theme="light"] h1 + p,
+:root[data-admin-theme="light"] h2 + p,
 .admin-root[data-admin-theme="light"] h1 + p,
 .admin-root[data-admin-theme="light"] h2 + p {
   color: var(--admin-muted);

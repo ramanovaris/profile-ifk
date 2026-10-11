@@ -729,14 +729,14 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
       {/* Dialog Konfirmasi Toggle Status Publikasi */}
       <Dialog open={!!toggleArticle} onOpenChange={() => setToggleArticle(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl w-[calc(100vw-2rem)] sm:w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-5 sm:p-6 overflow-hidden">
+        <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] backdrop-blur-2xl w-[calc(100vw-2rem)] sm:w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-5 sm:p-6 overflow-hidden">
           <DialogHeader className="space-y-2 pr-6">
             <div className="flex items-start gap-3 min-w-0">
               <div
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${
                   toggleArticle?.isPublished
-                    ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
-                    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
+                    ? "border-amber-500/20 bg-amber-500/10 text-amber-500"
+                    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
                 }`}
               >
                 {toggleArticle?.isPublished ? (
@@ -746,10 +746,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <DialogTitle className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                <DialogTitle className="text-base sm:text-lg font-bold text-[var(--admin-text-main)] tracking-tight leading-snug">
                   {toggleArticle?.isPublished ? "Jadikan Draft?" : "Terbitkan Artikel?"}
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                <DialogDescription className="text-xs text-[var(--admin-text-muted)] mt-1 leading-relaxed">
                   {toggleArticle?.isPublished
                     ? "Artikel akan disembunyikan dari akses publik."
                     : "Artikel akan segera dapat diakses oleh masyarakat umum."}
@@ -761,9 +761,9 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
           {toggleArticle && (
             <div className="space-y-3 mt-2 min-w-0 w-full">
               {/* Article Preview Card */}
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
+              <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)]/50 p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
                 <div className="flex items-start gap-3 min-w-0 w-full">
-                  <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950 mt-0.5">
+                  <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface)] mt-0.5">
                     {toggleArticle.coverImage ? (
                       <Image
                         src={getAssetUrl(toggleArticle.coverImage)}
@@ -773,40 +773,40 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                         className="object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center text-[10px] text-zinc-500 font-mono">
+                      <div className="flex h-full w-full items-center justify-center text-[10px] text-[var(--admin-text-muted)] font-mono">
                         IFK
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-sm font-medium text-zinc-200 leading-snug break-words">
+                    <p className="line-clamp-2 text-sm font-medium text-[var(--admin-text-main)] leading-snug break-words">
                       {toggleArticle.title}
                     </p>
-                    <p className="truncate text-xs text-zinc-400 mt-0.5 block">
+                    <p className="truncate text-xs text-[var(--admin-text-muted)] mt-0.5 block">
                       /{toggleArticle.slug}
                     </p>
                   </div>
                 </div>
 
                 {/* Status Transition Indicator */}
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/5 pt-2 text-xs w-full min-w-0">
-                  <span className="text-zinc-400 shrink-0">Perubahan Status:</span>
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--admin-border)] pt-2 text-xs w-full min-w-0">
+                  <span className="text-[var(--admin-text-muted)] shrink-0">Perubahan Status:</span>
                   <div className="flex items-center gap-1.5 font-medium shrink-0">
                     <span
                       className={
                         toggleArticle.isPublished
-                          ? "text-emerald-400"
-                          : "text-amber-400"
+                          ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                          : "text-amber-600 dark:text-amber-400 font-medium"
                       }
                     >
                       {toggleArticle.isPublished ? "Terbit" : "Draft"}
                     </span>
-                    <ArrowRight className="h-3 w-3 text-zinc-500" />
+                    <ArrowRight className="h-3 w-3 text-[var(--admin-text-muted)]" />
                     <span
                       className={
                         toggleArticle.isPublished
-                          ? "text-amber-400 font-semibold"
-                          : "text-emerald-400 font-semibold"
+                          ? "text-amber-600 dark:text-amber-400 font-semibold"
+                          : "text-emerald-600 dark:text-emerald-400 font-semibold"
                       }
                     >
                       {toggleArticle.isPublished ? "Draft" : "Terbit"}
@@ -819,8 +819,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               <div
                 className={`rounded-lg border p-3 text-xs leading-relaxed break-words w-full ${
                   toggleArticle.isPublished
-                    ? "border-amber-500/20 bg-amber-500/5 text-amber-300/90"
-                    : "border-emerald-500/20 bg-emerald-500/5 text-emerald-300/90"
+                    ? "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                    : "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                 }`}
               >
                 {toggleArticle.isPublished
@@ -835,7 +835,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               type="button"
               disabled={isPending}
               onClick={() => setToggleArticle(null)}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
@@ -864,19 +864,19 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Konfirmasi Hapus Dark Theme */}
+      {/* Dialog Konfirmasi Hapus */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl w-[calc(100vw-2rem)] sm:w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-5 sm:p-6 overflow-hidden">
+        <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] backdrop-blur-2xl w-[calc(100vw-2rem)] sm:w-full max-w-[calc(100vw-2rem)] sm:max-w-md shadow-2xl rounded-2xl p-5 sm:p-6 overflow-hidden">
           <DialogHeader className="space-y-2 pr-6">
             <div className="flex items-start gap-3 min-w-0">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
                 <AlertTriangle className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <DialogTitle className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug">
+                <DialogTitle className="text-base sm:text-lg font-bold text-[var(--admin-text-main)] tracking-tight leading-snug">
                   Hapus Artikel?
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                <DialogDescription className="text-xs text-[var(--admin-text-muted)] mt-1 leading-relaxed">
                   Tindakan ini permanen dan tidak dapat dibatalkan.
                 </DialogDescription>
               </div>
@@ -885,9 +885,9 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
           {articleToDelete && (
             <div className="space-y-3 mt-2 min-w-0 w-full">
-              <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
+              <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)]/50 p-3.5 space-y-2.5 min-w-0 w-full overflow-hidden">
                 <div className="flex items-start gap-3 min-w-0 w-full">
-                  <div className="relative h-12 w-16 shrink-0 rounded-lg overflow-hidden border border-white/10 bg-zinc-900">
+                  <div className="relative h-12 w-16 shrink-0 rounded-lg overflow-hidden border border-[var(--admin-border)] bg-[var(--admin-surface)]">
                     {articleToDelete.coverImage ? (
                       <Image
                         src={getAssetUrl(articleToDelete.coverImage)}
@@ -897,23 +897,23 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                         unoptimized
                       />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-zinc-600">
+                      <div className="h-full w-full flex items-center justify-center text-[var(--admin-text-muted)]">
                         <Newspaper className="h-5 w-5" />
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-zinc-200 line-clamp-2 leading-tight break-words">
+                    <p className="text-xs font-semibold text-[var(--admin-text-main)] line-clamp-2 leading-tight break-words">
                       {articleToDelete.title}
                     </p>
-                    <p className="text-[11px] text-zinc-500 font-mono mt-1 truncate">
+                    <p className="text-[11px] text-[var(--admin-text-muted)] font-mono mt-1 truncate">
                       /{articleToDelete.slug}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-xs leading-relaxed text-red-300/90 break-words w-full">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs leading-relaxed text-red-600 dark:text-red-300 break-words w-full">
                 Artikel ini beserta berkas gambar sampul terkait akan dihapus secara permanen dari sistem.
               </div>
             </div>
@@ -924,7 +924,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               type="button"
               disabled={isPending}
               onClick={() => setDeleteId(null)}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50 cursor-pointer"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] disabled:opacity-50 cursor-pointer"
             >
               Batal
             </button>
