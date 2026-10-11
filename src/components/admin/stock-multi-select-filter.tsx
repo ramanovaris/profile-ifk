@@ -183,13 +183,13 @@ export function StockMultiSelectFilter({
     if (count === 1) {
       const found = options.find((o) => o.value === selectedValues[0]);
       return (
-        <span className="truncate font-semibold text-brand-700 dark:text-brand-300">
+        <span className="truncate font-semibold text-emerald-800 dark:text-emerald-300">
           {found ? found.label : selectedValues[0]}
         </span>
       );
     }
     return (
-      <span className="truncate font-semibold text-brand-700 dark:text-brand-300">
+      <span className="truncate font-semibold text-emerald-800 dark:text-emerald-300">
         {count} {title}
       </span>
     );
@@ -210,7 +210,7 @@ export function StockMultiSelectFilter({
         aria-haspopup="listbox"
         className={`inline-flex h-9.5 w-full items-center justify-between gap-2.5 rounded-lg border bg-[var(--admin-hover-bg)] px-3.5 text-xs text-[var(--admin-text-main)] outline-none transition-all hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)] focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 sm:w-auto sm:min-w-[170px] ${
           selectedValues.length > 0
-            ? "border-brand-500/30 bg-brand-500/10 text-brand-600 dark:text-brand-300"
+            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300"
             : "border-[var(--admin-border)]"
         }`}
       >
@@ -220,7 +220,7 @@ export function StockMultiSelectFilter({
           ) : (
             <SlidersHorizontal
               className={`h-3.5 w-3.5 shrink-0 transition-colors ${
-                selectedValues.length > 0 ? "text-brand-500" : "text-[var(--admin-muted)]"
+                selectedValues.length > 0 ? "text-emerald-800 dark:text-emerald-400" : "text-[var(--admin-muted)]"
               }`}
             />
           )}
@@ -229,7 +229,7 @@ export function StockMultiSelectFilter({
 
         <div className="flex items-center gap-1.5 shrink-0">
           {!singleSelect && selectedValues.length > 0 && (
-            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-brand-500/20 px-1.5 text-[10px] font-semibold text-brand-600 dark:text-brand-300">
+            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-emerald-500/20 px-1.5 text-[10px] font-semibold text-emerald-800 dark:text-emerald-300">
               {selectedValues.length}
             </span>
           )}

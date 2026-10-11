@@ -296,7 +296,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               className={cn(
                 "inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer border",
                 isActive
-                  ? tab.activeColor || "border-brand-500/30 bg-brand-500/15 text-brand-600 dark:text-brand-400 shadow-xs shadow-brand-500/10 font-semibold"
+                  ? tab.activeColor || "border-emerald-500/30 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 shadow-xs shadow-emerald-500/10 font-semibold"
                   : "border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
               )}
             >
@@ -305,7 +305,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 className={cn(
                   "rounded-full px-1.5 py-0.2 text-[10px] font-semibold",
                   isActive
-                    ? "bg-brand-500/20 text-brand-700 dark:text-brand-300"
+                    ? "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300"
                     : "bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]"
                 )}
               >
@@ -386,7 +386,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "title"
-                          ? "text-brand-600 dark:text-brand-400 font-semibold"
+                          ? "text-emerald-800 dark:text-emerald-400 font-semibold"
                           : ""
                       }
                     >
@@ -394,9 +394,9 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "title" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       )
                     ) : (
                       <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
@@ -429,7 +429,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "category"
-                          ? "text-brand-600 dark:text-brand-400 font-semibold"
+                          ? "text-emerald-800 dark:text-emerald-400 font-semibold"
                           : ""
                       }
                     >
@@ -437,9 +437,9 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "category" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       )
                     ) : (
                       <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
@@ -472,7 +472,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "isPublished"
-                          ? "text-brand-600 dark:text-brand-400 font-semibold"
+                          ? "text-emerald-800 dark:text-emerald-400 font-semibold"
                           : ""
                       }
                     >
@@ -480,9 +480,9 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "isPublished" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       )
                     ) : (
                       <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
@@ -515,7 +515,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "publishedAt"
-                          ? "text-brand-600 dark:text-brand-400 font-semibold"
+                          ? "text-emerald-800 dark:text-emerald-400 font-semibold"
                           : ""
                       }
                     >
@@ -523,9 +523,9 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "publishedAt" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-emerald-800 dark:text-emerald-400" />
                       )
                     ) : (
                       <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
