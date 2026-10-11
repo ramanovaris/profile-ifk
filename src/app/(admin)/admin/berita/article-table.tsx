@@ -273,22 +273,22 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             key: null,
             label: "Semua",
             count: optimisticArticles.length,
-            activeColor: "border-brand-500/30 bg-brand-500/15 text-[#455a26] dark:text-brand-300 shadow-xs shadow-brand-500/10 font-bold",
-            badgeColor: "bg-[#455a26] text-white dark:bg-brand-500 dark:text-zinc-950 font-bold",
+            activeColor: "border-[#455a26] bg-[#455a26] text-white shadow-xs font-bold",
+            badgeColor: "bg-black/20 text-white font-bold",
           },
           {
             key: "terbit",
             label: "Terbit",
             count: optimisticArticles.filter((a) => a.isPublished).length,
-            activeColor: "border-emerald-500/30 bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 shadow-xs shadow-emerald-500/10 font-bold",
-            badgeColor: "bg-emerald-800 text-white dark:bg-emerald-400 dark:text-zinc-950 font-bold",
+            activeColor: "border-emerald-700 bg-emerald-700 text-white shadow-xs font-bold",
+            badgeColor: "bg-black/20 text-white font-bold",
           },
           {
             key: "draft",
             label: "Draft",
             count: optimisticArticles.filter((a) => !a.isPublished).length,
-            activeColor: "border-amber-500/40 bg-amber-500/15 text-[#78350f] dark:text-amber-300 shadow-xs shadow-amber-500/10 font-bold",
-            badgeColor: "bg-[#78350f] text-white dark:bg-amber-400 dark:text-zinc-950 font-bold",
+            activeColor: "border-amber-700 bg-amber-700 text-white shadow-xs font-bold",
+            badgeColor: "bg-black/20 text-white font-bold",
           },
         ].map((tab) => {
           const isActive =
@@ -603,10 +603,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                         onClick={() => setToggleArticle(article)}
                         disabled={isPending}
                         title="Klik untuk mengubah status publikasi"
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all cursor-pointer ${
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-all cursor-pointer ${
                           article.isPublished
-                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
-                            : "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
+                            ? "border-emerald-600/30 bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 hover:bg-emerald-500/25"
+                            : "border-amber-600/30 bg-amber-500/15 text-amber-900 dark:text-amber-300 hover:bg-amber-500/25"
                         } disabled:opacity-50`}
                       >
                         <span
