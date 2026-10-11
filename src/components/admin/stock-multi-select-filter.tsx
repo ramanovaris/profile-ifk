@@ -178,18 +178,18 @@ export function StockMultiSelectFilter({
   const renderTriggerLabel = () => {
     const count = selectedValues.length;
     if (count === 0) {
-      return <span className="truncate text-zinc-300">{allLabel}</span>;
+      return <span className="truncate text-[var(--admin-muted)]">{allLabel}</span>;
     }
     if (count === 1) {
       const found = options.find((o) => o.value === selectedValues[0]);
       return (
-        <span className="truncate font-medium text-white">
+        <span className="truncate font-semibold text-brand-700 dark:text-brand-300">
           {found ? found.label : selectedValues[0]}
         </span>
       );
     }
     return (
-      <span className="truncate font-medium text-white">
+      <span className="truncate font-semibold text-brand-700 dark:text-brand-300">
         {count} {title}
       </span>
     );

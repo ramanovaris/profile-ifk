@@ -165,18 +165,18 @@ export function CategoryMultiSelectFilter({
     const count = selectedCategories.length;
     if (count === 0) {
       return (
-        <span className="truncate text-zinc-300">Semua Kategori</span>
+        <span className="truncate text-[var(--admin-muted)]">Semua Kategori</span>
       );
     }
     if (count === 1) {
       return (
-        <span className="truncate font-medium text-white">
+        <span className="truncate font-semibold text-brand-700 dark:text-brand-300">
           {selectedCategories[0]}
         </span>
       );
     }
     return (
-      <span className="truncate font-medium text-white">
+      <span className="truncate font-semibold text-brand-700 dark:text-brand-300">
         {count} Kategori
       </span>
     );
