@@ -229,7 +229,7 @@ export function StockMultiSelectFilter({
 
         <div className="flex items-center gap-1.5 shrink-0">
           {!singleSelect && selectedValues.length > 0 && (
-            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-brand-500/20 px-1.5 text-[10px] font-semibold text-[#455a26] dark:text-brand-300">
+            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-[#455a26] px-1.5 text-[10px] font-bold text-white dark:bg-brand-500 dark:text-zinc-950">
               {selectedValues.length}
             </span>
           )}

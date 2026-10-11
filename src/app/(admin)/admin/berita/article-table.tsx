@@ -274,21 +274,21 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             label: "Semua",
             count: optimisticArticles.length,
             activeColor: "border-brand-500/30 bg-brand-500/15 text-[#455a26] dark:text-brand-300 shadow-xs shadow-brand-500/10 font-bold",
-            badgeColor: "bg-brand-500/20 text-[#455a26] dark:text-brand-300",
+            badgeColor: "bg-[#455a26] text-white dark:bg-brand-500 dark:text-zinc-950 font-bold",
           },
           {
             key: "terbit",
             label: "Terbit",
             count: optimisticArticles.filter((a) => a.isPublished).length,
-            activeColor: "border-emerald-500/30 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 shadow-xs shadow-emerald-500/10 font-bold",
-            badgeColor: "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300",
+            activeColor: "border-emerald-500/30 bg-emerald-500/15 text-emerald-900 dark:text-emerald-300 shadow-xs shadow-emerald-500/10 font-bold",
+            badgeColor: "bg-emerald-800 text-white dark:bg-emerald-400 dark:text-zinc-950 font-bold",
           },
           {
             key: "draft",
             label: "Draft",
             count: optimisticArticles.filter((a) => !a.isPublished).length,
-            activeColor: "border-amber-500/30 bg-amber-500/15 text-amber-900 dark:text-amber-300 shadow-xs shadow-amber-500/10 font-bold",
-            badgeColor: "bg-amber-500/20 text-amber-900 dark:text-amber-300",
+            activeColor: "border-amber-500/40 bg-amber-500/15 text-[#78350f] dark:text-amber-300 shadow-xs shadow-amber-500/10 font-bold",
+            badgeColor: "bg-[#78350f] text-white dark:bg-amber-400 dark:text-zinc-950 font-bold",
           },
         ].map((tab) => {
           const isActive =
