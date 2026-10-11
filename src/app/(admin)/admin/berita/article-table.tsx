@@ -248,10 +248,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
       {/* Header section */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
             Kelola Berita
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[var(--admin-muted)]">
             Daftar publikasi, pengumuman, dan artikel informasi farmasi.
           </p>
         </div>
@@ -274,13 +274,13 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             key: "terbit",
             label: "Terbit",
             count: optimisticArticles.filter((a) => a.isPublished).length,
-            activeColor: "border-emerald-500/30 bg-emerald-500/15 text-emerald-400 shadow-sm shadow-emerald-500/10",
+            activeColor: "border-emerald-500/30 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 shadow-xs shadow-emerald-500/10 font-semibold",
           },
           {
             key: "draft",
             label: "Draft",
             count: optimisticArticles.filter((a) => !a.isPublished).length,
-            activeColor: "border-amber-500/30 bg-amber-500/15 text-amber-400 shadow-sm shadow-amber-500/10",
+            activeColor: "border-amber-500/30 bg-amber-500/15 text-amber-600 dark:text-amber-400 shadow-xs shadow-amber-500/10 font-semibold",
           },
         ].map((tab) => {
           const isActive =
@@ -296,8 +296,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               className={cn(
                 "inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer border",
                 isActive
-                  ? tab.activeColor || "border-brand-500/30 bg-brand-500/15 text-brand-400 shadow-sm shadow-brand-500/10"
-                  : "border-white/5 bg-zinc-900/60 text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
+                  ? tab.activeColor || "border-brand-500/30 bg-brand-500/15 text-brand-600 dark:text-brand-400 shadow-xs shadow-brand-500/10 font-semibold"
+                  : "border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
               )}
             >
               <span>{tab.label}</span>
@@ -305,8 +305,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 className={cn(
                   "rounded-full px-1.5 py-0.2 text-[10px] font-semibold",
                   isActive
-                    ? "bg-white/10 text-white"
-                    : "bg-white/5 text-zinc-500"
+                    ? "bg-brand-500/20 text-brand-700 dark:text-brand-300"
+                    : "bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]"
                 )}
               >
                 {tab.count}
@@ -317,16 +317,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
       </div>
 
       {/* Filter and Search Toolbar */}
-      <div className="relative z-20 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+      <div className="relative z-20 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-3.5 backdrop-blur-xl">
         {/* Search input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
           <input
             type="text"
             placeholder="Cari judul atau topik artikel..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-9 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+            className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] py-2 pl-9 pr-9 text-sm text-[var(--admin-text-main)] placeholder-[var(--admin-muted)] outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
           />
           {searchQuery && (
             <button
@@ -356,11 +356,11 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
       </div>
 
       {/* Table Container */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 backdrop-blur-xl">
+      <div className="mt-4 overflow-hidden rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-white/5 bg-white/[0.02] text-xs font-medium uppercase tracking-wider text-zinc-400">
+              <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)] text-xs font-medium uppercase tracking-wider text-[var(--admin-muted)]">
                 {/* Artikel / Judul */}
                 <th
                   scope="col"
@@ -376,7 +376,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   <button
                     type="button"
                     onClick={() => handleSort("title")}
-                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-[var(--admin-text-main)] focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
                     title={`Urutkan berdasarkan Judul Artikel (${
                       sortKey === "title" && sortOrder === "asc"
                         ? "Z ke A"
@@ -386,7 +386,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "title"
-                          ? "text-brand-400 font-semibold"
+                          ? "text-brand-600 dark:text-brand-400 font-semibold"
                           : ""
                       }
                     >
@@ -394,12 +394,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "title" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       )
                     ) : (
-                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
                     )}
                   </button>
                 </th>
@@ -419,7 +419,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   <button
                     type="button"
                     onClick={() => handleSort("category")}
-                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-[var(--admin-text-main)] focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
                     title={`Urutkan berdasarkan Kategori (${
                       sortKey === "category" && sortOrder === "asc"
                         ? "Z ke A"
@@ -429,7 +429,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "category"
-                          ? "text-brand-400 font-semibold"
+                          ? "text-brand-600 dark:text-brand-400 font-semibold"
                           : ""
                       }
                     >
@@ -437,12 +437,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "category" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       )
                     ) : (
-                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
                     )}
                   </button>
                 </th>
@@ -462,8 +462,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   <button
                     type="button"
                     onClick={() => handleSort("isPublished")}
-                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
-                    title={`Urutkan berdasarkan Status Publikasi (${
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-[var(--admin-text-main)] focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    title={`Urutkan berdasarkan Status (${
                       sortKey === "isPublished" && sortOrder === "asc"
                         ? "Draft dahulu"
                         : "Terbit dahulu"
@@ -472,7 +472,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "isPublished"
-                          ? "text-brand-400 font-semibold"
+                          ? "text-brand-600 dark:text-brand-400 font-semibold"
                           : ""
                       }
                     >
@@ -480,12 +480,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "isPublished" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       )
                     ) : (
-                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
                     )}
                   </button>
                 </th>
@@ -505,7 +505,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                   <button
                     type="button"
                     onClick={() => handleSort("publishedAt")}
-                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-white focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
+                    className="group inline-flex items-center gap-1.5 font-medium uppercase tracking-wider transition-colors hover:text-[var(--admin-text-main)] focus:outline-none focus-visible:ring-1 focus-visible:ring-brand-400 rounded-sm cursor-pointer"
                     title={`Urutkan berdasarkan Tanggal Terbit (${
                       sortKey === "publishedAt" && sortOrder === "desc"
                         ? "Terlama dahulu"
@@ -515,7 +515,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     <span
                       className={
                         sortKey === "publishedAt"
-                          ? "text-brand-400 font-semibold"
+                          ? "text-brand-600 dark:text-brand-400 font-semibold"
                           : ""
                       }
                     >
@@ -523,12 +523,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </span>
                     {sortKey === "publishedAt" ? (
                       sortOrder === "asc" ? (
-                        <ArrowUp className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowUp className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       ) : (
-                        <ArrowDown className="h-3.5 w-3.5 text-brand-400" />
+                        <ArrowDown className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
                       )
                     ) : (
-                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                      <ArrowUpDown className="h-3.5 w-3.5 text-zinc-400 transition-colors" />
                     )}
                   </button>
                 </th>
@@ -538,11 +538,11 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {paginatedArticles.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-zinc-400">
-                    <Newspaper className="mx-auto h-8 w-8 text-zinc-400/80 mb-2" />
+                  <td colSpan={5} className="py-12 text-center text-[var(--admin-muted)]">
+                    <Newspaper className="mx-auto h-8 w-8 text-[var(--admin-muted)]/80 mb-2" />
                     <p className="text-sm">Tidak ada artikel yang cocok dengan pencarian.</p>
                   </td>
                 </tr>
@@ -550,12 +550,12 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 paginatedArticles.map((article) => (
                   <tr
                     key={article.id}
-                    className="transition-colors hover:bg-white/[0.02]"
+                    className="transition-colors hover:bg-[var(--admin-hover-bg)]"
                   >
                     {/* Judul & Cover */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+                        <div className="relative h-11 w-14 shrink-0 overflow-hidden rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)]">
                           {article.coverImage ? (
                             <Image
                               src={getAssetUrl(article.coverImage)}
@@ -565,16 +565,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                               className="object-cover"
                             />
                           ) : (
-                            <div className="flex h-full w-full items-center justify-center text-[10px] text-zinc-400">
+                            <div className="flex h-full w-full items-center justify-center text-[10px] text-[var(--admin-muted)] font-mono">
                               IFK
                             </div>
                           )}
                         </div>
                         <div className="min-w-0 max-w-md">
-                          <p className="truncate font-medium text-zinc-200">
+                          <p className="truncate font-medium text-[var(--admin-text-main)]">
                             {article.title}
                           </p>
-                          <p className="truncate text-xs text-zinc-400">
+                          <p className="truncate text-xs text-[var(--admin-muted)]">
                             /{article.slug}
                           </p>
                         </div>
@@ -582,8 +582,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </td>
 
                     {/* Kategori */}
-                    <td className="px-4 py-3 text-zinc-300">
-                      <span className="rounded-md border border-white/5 bg-white/[0.03] px-2.5 py-1 text-xs">
+                    <td className="px-4 py-3 text-[var(--admin-muted)]">
+                      <span className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2.5 py-1 text-xs">
                         {article.category.name}
                       </span>
                     </td>
@@ -597,13 +597,13 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                         title="Klik untuk mengubah status publikasi"
                         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-all cursor-pointer ${
                           article.isPublished
-                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                            : "border-amber-500/20 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                            : "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
                         } disabled:opacity-50`}
                       >
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
-                            article.isPublished ? "bg-emerald-400" : "bg-amber-400"
+                            article.isPublished ? "bg-emerald-500" : "bg-amber-500"
                           }`}
                         />
                         <span>{article.isPublished ? "Terbit" : "Draft"}</span>
@@ -611,7 +611,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     </td>
 
                     {/* Tanggal */}
-                    <td className="px-4 py-3 text-xs text-zinc-400">
+                    <td className="px-4 py-3 text-xs text-[var(--admin-muted)]">
                       {new Date(article.publishedAt).toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "short",
@@ -626,14 +626,14 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                           href={`/berita/${article.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-400"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors hover:border-emerald-500/20 hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400"
                           title="Pratinjau Artikel di Tab Baru"
                         >
                           <Eye className="h-3.5 w-3.5" />
                         </Link>
                         <Link
                           href={`/admin/berita/${article.id}/edit/`}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
                           title="Edit Artikel"
                         >
                           <Pencil className="h-3.5 w-3.5" />
@@ -641,7 +641,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                         <button
                           type="button"
                           onClick={() => setDeleteId(article.id)}
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-400"
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-500"
                           title="Hapus Artikel"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -657,26 +657,26 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
 
         {/* Pagination Bar */}
         {sortedArticles.length > 0 && (
-          <div className="flex flex-col gap-3 border-t border-white/5 bg-white/[0.01] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+          <div className="flex flex-col gap-3 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--admin-muted)]">
               <p>
                 Menampilkan{" "}
-                <span className="font-medium text-white">
+                <span className="font-medium text-[var(--admin-text-main)]">
                   {startIndex + 1}–{Math.min(startIndex + itemsPerPage, sortedArticles.length)}
                 </span>{" "}
-                dari <span className="font-medium text-white">{sortedArticles.length}</span> artikel
+                dari <span className="font-medium text-[var(--admin-text-main)]">{sortedArticles.length}</span> artikel
               </p>
 
               {/* Selector Baris Per Halaman */}
-              <div className="flex items-center gap-1.5 border-l border-white/10 pl-3">
-                <span className="text-zinc-500">Baris:</span>
+              <div className="flex items-center gap-1.5 border-l border-[var(--admin-border)] pl-3">
+                <span className="text-[var(--admin-muted)]">Baris:</span>
                 <select
                   value={itemsPerPage}
                   onChange={(e) => {
                     setItemsPerPage(Number(e.target.value));
                     handlePageChange(1);
                   }}
-                  className="rounded-md border border-white/10 bg-zinc-950 px-2 py-1 text-xs text-zinc-300 outline-none transition-colors hover:border-white/20 focus:border-brand-500/50"
+                  className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2 py-1 text-xs text-[var(--admin-text-main)] outline-none transition-colors hover:border-[var(--admin-border)] focus:border-brand-500/50"
                 >
                   <option value={5}>5</option>
                   <option value={10}>10</option>
@@ -690,7 +690,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 type="button"
                 disabled={validPage <= 1}
                 onClick={() => handlePageChange(Math.max(1, validPage - 1))}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 <span>Sebelumnya</span>
@@ -704,8 +704,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                     onClick={() => handlePageChange(page)}
                     className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
                       validPage === page
-                        ? "border border-brand-500/30 bg-brand-500/15 text-brand-300 font-semibold shadow-sm shadow-brand-500/10"
-                        : "border border-transparent text-zinc-400 hover:bg-white/5 hover:text-white"
+                        ? "border border-brand-500/30 bg-brand-500/15 text-brand-600 dark:text-brand-300 font-semibold shadow-xs shadow-brand-500/10"
+                        : "border border-transparent text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
                     }`}
                   >
                     {page}
@@ -717,7 +717,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 type="button"
                 disabled={validPage >= totalPages}
                 onClick={() => handlePageChange(Math.min(totalPages, validPage + 1))}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-white/5 bg-white/[0.02] px-2.5 text-xs font-medium text-zinc-400 transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
               >
                 <span>Selanjutnya</span>
                 <ChevronRight className="h-3.5 w-3.5" />

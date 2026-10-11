@@ -286,4 +286,16 @@ input[type="number"] {
   --admin-popover-border: rgba(255, 255, 255, 0.12);
 }
 
+/* Pastikan judul halaman di area admin selalu kontras di mode terang */
+.admin-root[data-admin-theme="light"] h1,
+.admin-root[data-admin-theme="light"] h2 {
+  color: var(--admin-text-main);
+}
+
+.admin-root[data-admin-theme="light"] h1 + p,
+.admin-root[data-admin-theme="light"] h2 + p {
+  color: var(--admin-muted);
+}
+
+
 
