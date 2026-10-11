@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import * as fs from "fs";
+import * as path from "path";
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -62,7 +62,7 @@ async function verifyThemeToggleImplementation() {
     "AdminShell mengimpor ThemeDropdown"
   );
   assert(
-    shellCode.includes('useState<ThemeSetting>("light")'),
+    shellCode.includes('return "light";'),
     "Nilai bawaan (default) tema adalah 'light'"
   );
   assert(

@@ -165,31 +165,37 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   const [open, setOpen] = useState(false);
   const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
 
-  const [themeSetting, setThemeSetting] = useState<ThemeSetting>("light");
-  const [systemIsDark, setSystemIsDark] = useState(false);
+  const [themeSetting, setThemeSetting] = useState<ThemeSetting>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
+        if (stored === "light" || stored === "dark" || stored === "system") {
+          return stored;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return "light";
+  });
+
+  const [systemIsDark, setSystemIsDark] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
-      if (stored === "light" || stored === "dark" || stored === "system") {
-        setThemeSetting(stored);
-      } else {
-        setThemeSetting("light");
-      }
-    } catch {
-      setThemeSetting("light");
-    }
+    if (typeof window === "undefined") return;
 
-    if (typeof window !== "undefined") {
-      const media = window.matchMedia("(prefers-color-scheme: dark)");
-      setSystemIsDark(media.matches);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const listener = (e: MediaQueryListEvent) => {
+      setSystemIsDark(e.matches);
+    };
 
-      const listener = (e: MediaQueryListEvent) => {
-        setSystemIsDark(e.matches);
-      };
-      media.addEventListener("change", listener);
-      return () => media.removeEventListener("change", listener);
-    }
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
   }, []);
 
   const handleThemeChange = (newTheme: ThemeSetting) => {
