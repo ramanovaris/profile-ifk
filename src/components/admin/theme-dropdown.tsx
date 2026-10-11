@@ -97,12 +97,18 @@ export function ThemeDropdown({
         <div
           role="menu"
           aria-orientation="vertical"
-          className="absolute right-0 top-full z-50 mt-2 w-36 origin-top-right rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-1.5 shadow-xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+          className="absolute left-1/2 -translate-x-1/2 top-full z-50 mt-2.5 w-36 origin-top rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] p-1.5 shadow-2xl animate-in fade-in-0 zoom-in-95"
         >
-          <div className="px-2 py-1 text-[10px] font-semibold tracking-wider uppercase text-[var(--admin-muted)]">
+          {/* Arrow anchor point to trigger button */}
+          <div
+            className="absolute -top-1 left-1/2 -translate-x-1/2 h-2 w-2 rotate-45 border-t border-l border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)]"
+            aria-hidden="true"
+          />
+
+          <div className="relative z-10 px-2 py-1 text-[10px] font-semibold tracking-wider uppercase text-[var(--admin-muted)]">
             Mode Tema
           </div>
-          <div className="flex flex-col gap-0.5">
+          <div className="relative z-10 flex flex-col gap-0.5">
             {themeOptions.map((option) => {
               const Icon = option.icon;
               const isSelected = themeSetting === option.value;

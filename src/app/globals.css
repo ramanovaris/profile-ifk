@@ -261,6 +261,8 @@ input[type="number"] {
   --admin-table-header-bg: #f8fafc;
   --admin-ambient-glow-1: rgba(16, 185, 129, 0.08);
   --admin-ambient-glow-2: rgba(61, 143, 32, 0.06);
+  --admin-popover-bg: #ffffff;
+  --admin-popover-border: #cbd5e1;
 }
 
 .admin-root[data-admin-theme="dark"] {
@@ -280,6 +282,8 @@ input[type="number"] {
   --admin-table-header-bg: rgba(255, 255, 255, 0.02);
   --admin-ambient-glow-1: rgba(16, 185, 129, 0.1);
   --admin-ambient-glow-2: rgba(61, 143, 32, 0.1);
+  --admin-popover-bg: #18181b;
+  --admin-popover-border: rgba(255, 255, 255, 0.12);
 }
 
 
