@@ -65,7 +65,7 @@ function SidebarLink({
       className={cn(
         "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
         active
-          ? "border border-brand-500/20 bg-brand-500/10 text-brand-950 dark:text-brand-300 shadow-xs shadow-brand-500/10 font-bold"
+          ? "border border-brand-500/20 bg-brand-500/10 text-[#6e903c] dark:text-brand-300 shadow-xs shadow-brand-500/10 font-bold"
           : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
       )}
     >
@@ -73,7 +73,7 @@ function SidebarLink({
         className={cn(
           "h-4 w-4 transition-colors",
           active
-            ? "text-brand-950 dark:text-brand-300"
+            ? "text-[#6e903c] dark:text-brand-300"
             : "text-[var(--admin-muted)] group-hover:text-[var(--admin-text-main)]"
         )}
       />
