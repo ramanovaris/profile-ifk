@@ -269,18 +269,26 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
       {/* Status Filter Tabs (Semua / Terbit / Draft) */}
       <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1">
         {[
-          { key: null, label: "Semua", count: optimisticArticles.length },
+          {
+            key: null,
+            label: "Semua",
+            count: optimisticArticles.length,
+            activeColor: "border-brand-500/30 bg-brand-500/15 text-[#455a26] dark:text-brand-300 shadow-xs shadow-brand-500/10 font-bold",
+            badgeColor: "bg-brand-500/20 text-[#455a26] dark:text-brand-300",
+          },
           {
             key: "terbit",
             label: "Terbit",
             count: optimisticArticles.filter((a) => a.isPublished).length,
-            activeColor: "border-brand-500/30 bg-brand-500/15 text-[#455a26] dark:text-brand-300 shadow-xs shadow-brand-500/10 font-bold",
+            activeColor: "border-emerald-500/30 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 shadow-xs shadow-emerald-500/10 font-bold",
+            badgeColor: "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300",
           },
           {
             key: "draft",
             label: "Draft",
             count: optimisticArticles.filter((a) => !a.isPublished).length,
-            activeColor: "border-amber-500/30 bg-amber-500/15 text-amber-700 dark:text-amber-400 shadow-xs shadow-amber-500/10 font-bold",
+            activeColor: "border-amber-500/30 bg-amber-500/15 text-amber-900 dark:text-amber-300 shadow-xs shadow-amber-500/10 font-bold",
+            badgeColor: "bg-amber-500/20 text-amber-900 dark:text-amber-300",
           },
         ].map((tab) => {
           const isActive =
@@ -296,7 +304,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               className={cn(
                 "inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200 cursor-pointer border",
                 isActive
-                  ? tab.activeColor || "border-brand-500/30 bg-brand-500/15 text-[#455a26] dark:text-brand-300 shadow-xs shadow-brand-500/10 font-bold"
+                  ? tab.activeColor
                   : "border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
               )}
             >
@@ -305,7 +313,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                 className={cn(
                   "rounded-full px-1.5 py-0.2 text-[10px] font-bold",
                   isActive
-                    ? "bg-brand-500/20 text-[#455a26] dark:text-brand-300"
+                    ? tab.badgeColor
                     : "bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]"
                 )}
               >
