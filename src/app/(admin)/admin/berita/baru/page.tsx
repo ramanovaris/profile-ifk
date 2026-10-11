@@ -39,10 +39,10 @@ export default async function AdminBeritaBaruPage() {
     <AdminShell>
       <div className="mx-auto max-w-4xl w-full min-w-0">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
             Tambah Artikel Baru
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[var(--admin-muted)]">
             Publikasikan pengumuman atau berita terbaru UPTD IFK Kotabaru.
           </p>
         </div>

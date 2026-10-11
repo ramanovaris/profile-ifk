@@ -194,9 +194,9 @@ function ToolbarButton({
       className={cn(
         "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-medium transition-colors outline-none",
         isActive
-          ? "bg-brand-500/20 text-brand-400 border border-brand-500/40 shadow-xs"
-          : "text-zinc-400 hover:bg-white/5 hover:text-white border border-transparent",
-        disabled && "opacity-30 cursor-not-allowed hover:bg-transparent hover:text-zinc-400"
+          ? "bg-[#455a26] text-white border-[#455a26] font-bold shadow-xs dark:bg-brand-500/20 dark:text-brand-400 dark:border-brand-500/40"
+          : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] border border-transparent",
+        disabled && "opacity-30 cursor-not-allowed hover:bg-transparent hover:text-[var(--admin-muted)]"
       )}
     >
       <Icon className="h-4 w-4" />
@@ -205,7 +205,7 @@ function ToolbarButton({
 }
 
 function ToolbarDivider() {
-  return <div className="h-4 w-px shrink-0 bg-white/10 mx-0.5" aria-hidden="true" />;
+  return <div className="h-4 w-px shrink-0 bg-[var(--admin-border)] mx-0.5" aria-hidden="true" />;
 }
 
 export function RichTextEditor({
@@ -243,7 +243,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "min-h-[220px] p-4 text-sm leading-relaxed text-zinc-200 outline-none focus:outline-none max-w-none [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-white [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-white [&_h3]:mt-3 [&_h3]:mb-1.5 [&_p]:mb-3 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-3 [&_li]:mb-1 [&_blockquote]:border-l-2 [&_blockquote]:border-brand-500/60 [&_blockquote]:pl-3.5 [&_blockquote]:italic [&_blockquote]:text-zinc-400 [&_blockquote]:my-3 [&_hr]:border-white/10 [&_hr]:my-4",
+          "min-h-[220px] p-4 text-sm leading-relaxed text-[var(--admin-text-main)] outline-none focus:outline-none max-w-none [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-[var(--admin-text-main)] [&_h2]:mt-4 [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-[var(--admin-text-main)] [&_h3]:mt-3 [&_h3]:mb-1.5 [&_p]:mb-3 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-3 [&_li]:mb-1 [&_blockquote]:border-l-2 [&_blockquote]:border-brand-500/60 [&_blockquote]:pl-3.5 [&_blockquote]:italic [&_blockquote]:text-[var(--admin-muted)] [&_blockquote]:my-3 [&_hr]:border-[var(--admin-border)] [&_hr]:my-4",
       },
       handleKeyDown: (_view, event) => {
         if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
@@ -309,14 +309,14 @@ export function RichTextEditor({
     <div
       onKeyDown={onKeyDown}
       className={cn(
-        "group relative flex flex-col rounded-xl border border-white/10 bg-zinc-950/60 backdrop-blur-md transition-all w-full max-w-full min-w-0 overflow-hidden",
+        "group relative flex flex-col rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] backdrop-blur-md transition-all w-full max-w-full min-w-0 overflow-hidden",
         "focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/40",
         disabled && "opacity-60 cursor-not-allowed",
         className
       )}
     >
       {/* Sticky Toolbar */}
-      <div className="sticky top-0 z-10 flex w-full max-w-full min-w-0 items-center gap-1 border-b border-white/10 bg-zinc-900/90 p-1.5 rounded-t-xl backdrop-blur-md overflow-x-auto sm:flex-wrap">
+      <div className="sticky top-0 z-10 flex w-full max-w-full min-w-0 items-center gap-1 border-b border-[var(--admin-border)] bg-[var(--admin-surface)] p-1.5 rounded-t-xl backdrop-blur-md overflow-x-auto sm:flex-wrap">
         {/* Grup 1: Text Style */}
         <ToolbarButton
           icon={Bold}

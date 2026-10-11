@@ -255,6 +255,7 @@ input[type="number"] {
   --admin-border-subtle: #f1f5f9;
   --admin-text-main: #0f172a;
   --admin-text-muted: #64748b;
+  --admin-muted: #64748b;
   --admin-card-bg: #ffffff;
   --admin-card-border: #e2e8f0;
   --admin-header-bg: rgba(255, 255, 255, 0.85);
@@ -277,6 +278,7 @@ input[type="number"] {
   --admin-border-subtle: rgba(255, 255, 255, 0.03);
   --admin-text-main: #f4f4f5;
   --admin-text-muted: #a1a1aa;
+  --admin-muted: #a1a1aa;
   --admin-card-bg: rgba(24, 24, 27, 0.6);
   --admin-card-border: rgba(255, 255, 255, 0.05);
   --admin-header-bg: rgba(24, 24, 27, 0.6);

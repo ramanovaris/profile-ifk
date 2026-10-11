@@ -64,11 +64,11 @@ export default async function AdminBeritaEditPage(props: {
   if (!article) {
     return (
       <AdminShell>
-        <div className="mx-auto max-w-4xl rounded-2xl border border-white/5 bg-zinc-900/60 p-8 text-center backdrop-blur-xl">
-          <p className="text-base text-zinc-300">Artikel tidak ditemukan.</p>
+        <div className="mx-auto max-w-4xl rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-8 text-center backdrop-blur-xl">
+          <p className="text-base text-[var(--admin-text-main)]">Artikel tidak ditemukan.</p>
           <Link
             href="/admin/berita/"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm text-brand-400 hover:text-brand-300"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#455a26] dark:text-brand-400 hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Kembali ke Daftar Berita</span>
@@ -82,10 +82,10 @@ export default async function AdminBeritaEditPage(props: {
     <AdminShell>
       <div className="mx-auto max-w-4xl w-full min-w-0">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
             Edit Artikel
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[var(--admin-muted)]">
             Perbarui informasi artikel atau ubah status publikasinya.
           </p>
         </div>
