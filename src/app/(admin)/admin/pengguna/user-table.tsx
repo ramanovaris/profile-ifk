@@ -26,6 +26,7 @@ import {
   ArrowRight,
   UserCheck,
   UserX,
+  RotateCcw,
 } from "lucide-react";
 import {
   Dialog,
@@ -147,6 +148,13 @@ export function UserTable({
     });
     setFormError(null);
     setIsUserModalOpen(true);
+  };
+
+  // Reset Filter & Pencarian
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setRoleFilter("ALL");
+    setCurrentPage(1);
   };
 
   // Handler Edit
@@ -568,10 +576,11 @@ export function UserTable({
         </div>
       </div>
 
-      {/* Tabel Pengguna */}
-      <div className="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] backdrop-blur-xl shadow-2xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+      {/* Tabel Pengguna / Status Kosong */}
+      {filteredUsers.length > 0 ? (
+        <div className="overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] backdrop-blur-xl shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)] text-[var(--admin-muted)] font-medium tracking-wider uppercase">
                 <th className="px-4 py-3.5 align-middle">Pengguna</th>
@@ -584,8 +593,7 @@ export function UserTable({
               </tr>
             </thead>
             <tbody>
-              {paginatedUsers.length > 0 ? (
-                paginatedUsers.map((user) => {
+              {paginatedUsers.map((user) => {
                   const isSuper = user.role === "SUPER_ADMIN";
                   const formattedDate = new Date(user.createdAt).toLocaleDateString(
                     "id-ID",
@@ -725,22 +733,7 @@ export function UserTable({
                       </td>
                     </tr>
                   );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-[var(--admin-muted)]">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]">
-                      <Users className="h-6 w-6" />
-                    </div>
-                    <p className="mt-3 text-sm font-medium text-[var(--admin-text-main)]">
-                      Tidak ada pengguna yang ditemukan
-                    </p>
-                    <p className="mt-1 text-xs text-[var(--admin-muted)]">
-                      Coba sesuaikan kata kunci pencarian atau filter peran yang dipilih.
-                    </p>
-                  </td>
-                </tr>
-              )}
+                })}
             </tbody>
           </table>
         </div>
@@ -816,6 +809,44 @@ export function UserTable({
           </div>
         )}
       </div>
+    ) : (
+      <div className="mt-6 rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)]/80 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-sm">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]">
+          <Users className="h-7 w-7" />
+        </div>
+        <h3 className="mt-4 text-base font-semibold text-[var(--admin-text-main)]">
+          {users.length === 0
+            ? "Belum ada akun pengguna"
+            : "Tidak ada pengguna yang ditemukan"}
+        </h3>
+        <p className="mt-1.5 text-xs sm:text-sm text-[var(--admin-muted)] leading-relaxed">
+          {users.length === 0
+            ? "Tambahkan akun pengguna baru untuk memberikan akses staf ke panel administrasi."
+            : "Tidak ada pengguna yang cocok dengan kata kunci pencarian atau filter peran yang dipilih."}
+        </p>
+        <div className="mt-5 flex items-center justify-center gap-2.5">
+          {users.length === 0 ? (
+            <button
+              type="button"
+              onClick={handleOpenAdd}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#455a26] hover:bg-[#3b4d20] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors cursor-pointer"
+            >
+              <UserPlus className="h-3.5 w-3.5" />
+              Tambah Pengguna Baru
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] hover:bg-[var(--admin-border)] px-4 py-2 text-xs font-semibold text-[var(--admin-text-main)] transition-colors cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5 text-[var(--admin-muted)]" />
+              Reset Filter & Pencarian
+            </button>
+          )}
+        </div>
+      </div>
+    )}
 
       {/* Modal Tambah / Edit Pengguna */}
       <Dialog open={isUserModalOpen} onOpenChange={setIsUserModalOpen}>
