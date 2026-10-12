@@ -64,7 +64,7 @@ export function Footer({ settings }: FooterProps = {}) {
 
   return (
     <footer className="page-hero text-zinc-300">
-      <div className="section-container py-24">
+      <div className="section-container pt-16 pb-8">
         <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr]">
           {/* Kolom 1 — Info Instansi + Motto */}
           <div>
@@ -168,7 +168,7 @@ export function Footer({ settings }: FooterProps = {}) {
         </div>
 
         {/* Copyright */}
-        <div className="mt-16 border-t border-white/10 pt-6 text-center text-xs text-zinc-600">
+        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-zinc-600">
           &copy; {new Date().getFullYear()} {name}. Hak cipta dilindungi.
         </div>
       </div>
