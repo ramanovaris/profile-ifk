@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  RotateCcw,
 } from "lucide-react";
 import {
   Dialog,
@@ -274,42 +275,31 @@ export function CategoryTable({
         </div>
       </div>
 
-      {/* Table Container */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)] text-xs font-medium uppercase tracking-wider text-[var(--admin-muted)]">
-                <th className="px-3 sm:px-4 py-3 align-middle">
-                  <span className="sm:hidden">Kategori</span>
-                  <span className="hidden sm:inline">Nama Kategori</span>
-                </th>
-                <th className="px-2 sm:px-4 py-3 text-center align-middle w-[90px] sm:w-[130px]">
-                  <span className="sm:hidden">Artikel</span>
-                  <span className="hidden sm:inline">Jumlah Artikel</span>
-                </th>
-                <th className="px-2 sm:px-4 py-3 text-center align-middle w-[105px] sm:w-[120px]">
-                  Status
-                </th>
-                <th className="px-3 sm:px-4 py-3 text-right align-middle w-[75px] sm:w-[90px]">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedCategories.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-12 text-center text-[var(--admin-muted)]">
-                    <Tags className="mx-auto h-8 w-8 text-[var(--admin-muted)]/80 mb-2" />
-                    <p className="text-sm">
-                      {categories.length === 0
-                        ? "Belum ada kategori yang ditambahkan."
-                        : "Tidak ada kategori yang cocok dengan pencarian."}
-                    </p>
-                  </td>
+      {/* Table Container / Status Kosong */}
+      {filteredCategories.length > 0 ? (
+        <div className="mt-4 overflow-hidden rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)] text-xs font-medium uppercase tracking-wider text-[var(--admin-muted)]">
+                  <th className="px-3 sm:px-4 py-3 align-middle">
+                    <span className="sm:hidden">Kategori</span>
+                    <span className="hidden sm:inline">Nama Kategori</span>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 text-center align-middle w-[90px] sm:w-[130px]">
+                    <span className="sm:hidden">Artikel</span>
+                    <span className="hidden sm:inline">Jumlah Artikel</span>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 text-center align-middle w-[105px] sm:w-[120px]">
+                    Status
+                  </th>
+                  <th className="px-3 sm:px-4 py-3 text-right align-middle w-[75px] sm:w-[90px]">
+                    Aksi
+                  </th>
                 </tr>
-              ) : (
-                paginatedCategories.map((cat) => {
+              </thead>
+              <tbody>
+                {paginatedCategories.map((cat) => {
                   return (
                     <tr
                       key={cat.id}
@@ -334,18 +324,18 @@ export function CategoryTable({
                       <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
                         <button
                           type="button"
-                          onClick={() => toggleStatus(cat)}
+                          onClick={() => handleToggleStatus(cat)}
                           disabled={isPending}
-                          className={`inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
                             cat.status === "ACTIVE"
-                              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 [@media(hover:hover)]:hover:bg-emerald-500/20 active:bg-emerald-500/30"
-                              : "border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-[var(--admin-muted)] [@media(hover:hover)]:hover:bg-zinc-200 active:bg-zinc-300"
-                          } disabled:opacity-50`}
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+                              : "bg-[var(--admin-hover-bg)] text-[var(--admin-muted)] border border-[var(--admin-border)]"
+                          }`}
                         >
                           {cat.status === "ACTIVE" ? (
-                            <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+                            <CheckCircle className="h-3.5 w-3.5" />
                           ) : (
-                            <XCircle className="h-3.5 w-3.5 shrink-0" />
+                            <XCircle className="h-3.5 w-3.5" />
                           )}
                           <span>{cat.status === "ACTIVE" ? "Aktif" : "Non-Aktif"}</span>
                         </button>
@@ -374,83 +364,123 @@ export function CategoryTable({
                       </td>
                     </tr>
                   );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination Bar */}
-        {filteredCategories.length > 0 && (
-          <div className="flex flex-col gap-3 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--admin-muted)]">
-              <p>
-                Menampilkan{" "}
-                <span className="font-medium text-[var(--admin-text-main)]">
-                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredCategories.length)}
-                </span>{" "}
-                dari <span className="font-medium text-[var(--admin-text-main)]">{filteredCategories.length}</span> kategori
-              </p>
-
-              {/* Selector Baris Per Halaman */}
-              <div className="flex items-center gap-1.5 border-l border-[var(--admin-border)] pl-3">
-                <span className="text-[var(--admin-muted)]">Baris:</span>
-                <select
-                  value={itemsPerPage}
-                  onChange={(e) => {
-                    setItemsPerPage(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                  className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2 py-1 text-xs text-[var(--admin-text-main)] outline-none transition-colors hover:border-[var(--admin-border)] focus:border-brand-500/50"
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 self-end sm:self-auto">
-              <button
-                type="button"
-                disabled={validPage <= 1}
-                onClick={() => setCurrentPage(Math.max(1, validPage - 1))}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-                <span>Sebelumnya</span>
-              </button>
-
-              <div className="flex items-center gap-1 px-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    type="button"
-                    onClick={() => setCurrentPage(page)}
-                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
-                      validPage === page
-                        ? "border border-brand-500/30 bg-brand-500/15 text-brand-600 dark:text-brand-300 font-semibold shadow-xs shadow-brand-500/10"
-                        : "border border-transparent text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                disabled={validPage >= totalPages}
-                onClick={() => setCurrentPage(Math.min(totalPages, validPage + 1))}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
-              >
-                <span>Selanjutnya</span>
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
+                })}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
+
+          {/* Pagination Bar */}
+          {filteredCategories.length > 0 && (
+            <div className="flex flex-col gap-3 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--admin-muted)]">
+                <p>
+                  Menampilkan{" "}
+                  <span className="font-medium text-[var(--admin-text-main)]">
+                    {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredCategories.length)}
+                  </span>{" "}
+                  dari <span className="font-medium text-[var(--admin-text-main)]">{filteredCategories.length}</span> kategori
+                </p>
+
+                {/* Selector Baris Per Halaman */}
+                <div className="flex items-center gap-1.5 border-l border-[var(--admin-border)] pl-3">
+                  <span className="text-[var(--admin-muted)]">Baris:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2 py-1 text-xs text-[var(--admin-text-main)] outline-none transition-colors hover:border-[var(--admin-border)] focus:border-brand-500/50"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                <button
+                  type="button"
+                  disabled={validPage <= 1}
+                  onClick={() => setCurrentPage(Math.max(1, validPage - 1))}
+                  className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <span>Sebelumnya</span>
+                </button>
+
+                <div className="flex items-center gap-1 px-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setCurrentPage(page)}
+                      className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
+                        validPage === page
+                          ? "border border-brand-500/30 bg-brand-500/15 text-brand-600 dark:text-brand-300 font-semibold shadow-xs shadow-brand-500/10"
+                          : "border border-transparent text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={validPage >= totalPages}
+                  onClick={() => setCurrentPage(Math.min(totalPages, validPage + 1))}
+                  className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <span>Selanjutnya</span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="mt-6 rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)]/80 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]">
+            <Tags className="h-7 w-7" />
+          </div>
+          <h3 className="mt-4 text-base font-semibold text-[var(--admin-text-main)]">
+            {categories.length === 0
+              ? "Belum ada kategori yang ditambahkan"
+              : "Tidak ada kategori yang ditemukan"}
+          </h3>
+          <p className="mt-1.5 text-xs sm:text-sm text-[var(--admin-muted)] leading-relaxed">
+            {categories.length === 0
+              ? "Tambahkan kategori baru untuk mulai mengelompokkan artikel dan warta kesehatan."
+              : "Tidak ada kategori yang cocok dengan kata kunci pencarian Anda."}
+          </p>
+          <div className="mt-5 flex items-center justify-center gap-2.5">
+            {categories.length === 0 ? (
+              <button
+                type="button"
+                onClick={handleOpenAdd}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#455a26] hover:bg-[#3b4d20] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Tambah Kategori Baru
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setCurrentPage(1);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] hover:bg-[var(--admin-border)] px-4 py-2 text-xs font-semibold text-[var(--admin-text-main)] transition-colors cursor-pointer"
+              >
+                <RotateCcw className="h-3.5 w-3.5 text-[var(--admin-muted)]" />
+                Reset Pencarian
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Modal Tambah/Edit Kategori */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

@@ -275,7 +275,7 @@ export function CategoryMultiSelectFilter({
             className="max-h-56 space-y-0.5 overflow-y-auto pr-0.5 scrollbar-thin"
           >
             {filteredCategories.length === 0 ? (
-              <div className="py-4 text-center text-xs text-zinc-500">
+              <div className="py-4 text-center text-xs text-[var(--admin-muted)]">
                 Kategori tidak ditemukan
               </div>
             ) : (

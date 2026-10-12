@@ -24,7 +24,8 @@ import {
   ChevronDown,
   Activity,
   History,
-  Info
+  Info,
+  RotateCcw
 } from "lucide-react";
 import { 
   Dialog, 
@@ -178,6 +179,20 @@ export function StockTable({
   const handleClearSearch = () => {
     setSearch("");
     updateUrl({ q: null, page: null }, "replace");
+  };
+
+  // Reset seluruh filter & pencarian
+  const handleResetFilters = () => {
+    setSearch("");
+    updateUrl(
+      {
+        q: null,
+        kategori: null,
+        status: null,
+        page: null,
+      },
+      "replace"
+    );
   };
 
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -1162,196 +1177,207 @@ export function StockTable({
         </div>
       </div>
 
-      {/* ── Tabel Stok ──────────────────────────────────────────────────── */}
-      <div className="relative z-10 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left text-sm text-[var(--admin-text-main)]">
-            <thead>
-              <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)]">
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] w-12">No</th>
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Nama Obat / Kode</th>
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Kategori</th>
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Satuan</th>
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Stok Fisik</th>
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">
-                  <div>Rata-rata Pemakaian</div>
-                  <div className="text-[10px] font-normal normal-case text-[var(--admin-muted)]">RPB (Tren 12 Bln)</div>
-                </th>
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-center">Status</th>
-                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--admin-border)]">
-              {paginatedItems.map((item, index) => (
-                <tr key={item.id} className="transition-colors hover:bg-[var(--admin-hover-bg)]">
-                  <td className="px-4 py-3 text-[var(--admin-muted)] font-mono text-xs">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-[var(--admin-text-main)]">{item.name}</div>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-[var(--admin-muted)]">
-                      <span className="font-mono text-[var(--admin-muted)]">{item.code}</span>
-                      {item.nomenklatur && (
-                        <>
-                          <span className="text-[var(--admin-muted)]">•</span>
-                          <span className="inline-block truncate max-w-[180px] text-[var(--admin-muted)]" title={item.nomenklatur}>
-                            {item.nomenklatur}
-                          </span>
-                        </>
-                      )}
-                      {item.expiryDate && (
-                        <>
-                          <span className="text-[var(--admin-muted)]">•</span>
-                          <span className="text-amber-500 font-medium">
-                            ED: {item.expiryDate}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-[var(--admin-muted)]">{item.category}</td>
-                  <td className="px-4 py-3 text-[var(--admin-muted)]">{item.unit}</td>
-                  <td className="px-4 py-3 text-right font-mono font-semibold text-[var(--admin-text-main)]">
-                    {item.quantity.toLocaleString("id-ID")}
-                  </td>
-                  <td className="px-4 py-3 text-right font-mono text-[var(--admin-muted)] text-xs">
-                    {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
-                      ? item.avgUsage.toLocaleString("id-ID", {
-                          minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
-                          maximumFractionDigits: 2,
-                        })
-                      : "-"}
-                  </td>
-                  <td className="px-4 py-3 text-center whitespace-nowrap">
-                    {(() => {
-                      const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
-                      const badgeClasses: Record<string, string> = {
-                        empty: "bg-rose-700 text-white font-semibold shadow-xs border-transparent",
-                        critical: "bg-rose-700 text-white font-semibold shadow-xs border-transparent",
-                        low: "bg-amber-700 text-white font-semibold shadow-xs border-transparent",
-                        safe: "bg-emerald-700 text-white font-semibold shadow-xs border-transparent",
-                        abundant: "bg-sky-700 text-white font-semibold shadow-xs border-transparent",
-                        unknown: "border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]",
-                      };
-                      const dotClasses: Record<string, string> = {
-                        empty: "bg-white",
-                        critical: "bg-white",
-                        low: "bg-white",
-                        safe: "bg-white",
-                        abundant: "bg-white",
-                        unknown: "bg-zinc-400",
-                      };
+      {/* ── Tabel Stok / Status Kosong ───────────────────────────────── */}
+      {filtered.length > 0 ? (
+        <div className="relative z-10 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[980px] text-left text-sm text-[var(--admin-text-main)]">
+              <thead>
+                <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)]">
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)] w-12">No</th>
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Nama Obat / Kode</th>
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Kategori</th>
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Satuan</th>
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Stok Fisik</th>
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">
+                    <div>Rata-rata Pemakaian</div>
+                    <div className="text-[10px] font-normal normal-case text-[var(--admin-muted)]">RPB (Tren 12 Bln)</div>
+                  </th>
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-center">Status</th>
+                  <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[var(--admin-border)]">
+                {paginatedItems.map((item, index) => (
+                  <tr key={item.id} className="transition-colors hover:bg-[var(--admin-hover-bg)]">
+                    <td className="px-4 py-3 text-[var(--admin-muted)] font-mono text-xs">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-[var(--admin-text-main)]">{item.name}</div>
+                      <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-[var(--admin-muted)]">
+                        <span className="font-mono text-[var(--admin-muted)]">{item.code}</span>
+                        {item.nomenklatur && (
+                          <>
+                            <span className="text-[var(--admin-muted)]">•</span>
+                            <span className="inline-block truncate max-w-[180px] text-[var(--admin-muted)]" title={item.nomenklatur}>
+                              {item.nomenklatur}
+                            </span>
+                          </>
+                        )}
+                        {item.expiryDate && (
+                          <>
+                            <span className="text-[var(--admin-muted)]">•</span>
+                            <span className="text-amber-500 font-medium">
+                              ED: {item.expiryDate}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-[var(--admin-muted)]">{item.category}</td>
+                    <td className="px-4 py-3 text-[var(--admin-muted)]">{item.unit}</td>
+                    <td className="px-4 py-3 text-right font-mono font-semibold text-[var(--admin-text-main)]">
+                      {item.quantity.toLocaleString("id-ID")}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono text-[var(--admin-muted)] text-xs">
+                      {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
+                        ? item.avgUsage.toLocaleString("id-ID", {
+                            minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
+                            maximumFractionDigits: 2,
+                          })
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-3 text-center whitespace-nowrap">
+                      {(() => {
+                        const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
+                        const badgeClasses: Record<string, string> = {
+                          empty: "bg-rose-700 text-white font-semibold shadow-xs border-transparent",
+                          critical: "bg-rose-700 text-white font-semibold shadow-xs border-transparent",
+                          low: "bg-amber-700 text-white font-semibold shadow-xs border-transparent",
+                          safe: "bg-emerald-700 text-white font-semibold shadow-xs border-transparent",
+                          abundant: "bg-sky-700 text-white font-semibold shadow-xs border-transparent",
+                          unknown: "border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]",
+                        };
+                        const dotClasses: Record<string, string> = {
+                          empty: "bg-white",
+                          critical: "bg-white",
+                          low: "bg-white",
+                          safe: "bg-white",
+                          abundant: "bg-white",
+                          unknown: "bg-zinc-400",
+                        };
 
-                      return (
-                        <span
-                          className={cn(
-                            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
-                            badgeClasses[mosInfo.variant] || badgeClasses.unknown
-                          )}
-                        >
+                        return (
                           <span
                             className={cn(
-                              "h-1.5 w-1.5 rounded-full",
-                              dotClasses[mosInfo.variant] || dotClasses.unknown
+                              "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
+                              badgeClasses[mosInfo.variant] || badgeClasses.unknown
                             )}
-                          />
-                          {mosInfo.label}
-                        </span>
-                      );
-                    })()}
-                  </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <div className="inline-flex items-center gap-1 justify-end">
-                      <button 
-                        type="button" 
-                        onClick={() => handleOpenEdit(item)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-[var(--admin-border)] [@media(hover:hover)]:hover:bg-[var(--admin-hover-bg)] [@media(hover:hover)]:hover:text-[var(--admin-text-main)] active:bg-[var(--admin-hover-bg)] cursor-pointer"
-                        title="Edit Item"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button 
-                        type="button" 
-                        onClick={() => setDeleteItem(item)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-500 active:bg-red-500/20 cursor-pointer"
-                        title="Hapus Item"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* ── Pagination ──────────────────────────────────────────────── */}
-        {filtered.length > itemsPerPage && (
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row">
-            <p className="text-sm text-[var(--admin-muted)]">
-              Menampilkan <span className="font-medium text-[var(--admin-text-main)]">{(currentPage - 1) * itemsPerPage + 1}</span> -{" "}
-              <span className="font-medium text-[var(--admin-text-main)]">
-                {Math.min(currentPage * itemsPerPage, filtered.length)}
-              </span>{" "}
-              dari <span className="font-medium text-[var(--admin-text-main)]">{filtered.length}</span> item
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() =>
-                  updateUrl({
-                    page: currentPage > 2 ? String(currentPage - 1) : null,
-                  })
-                }
-                disabled={currentPage <= 1}
-                className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-              >
-                Sebelumnya
-              </button>
-              <span className="text-sm text-[var(--admin-muted)]">
-                Hal {currentPage} / {totalPages}
-              </span>
-              <button
-                onClick={() =>
-                  updateUrl({
-                    page: String(currentPage + 1),
-                  })
-                }
-                disabled={currentPage >= totalPages}
-                className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-              >
-                Selanjutnya
-              </button>
-            </div>
+                          >
+                            <span
+                              className={cn(
+                                "h-1.5 w-1.5 rounded-full",
+                                dotClasses[mosInfo.variant] || dotClasses.unknown
+                              )}
+                            />
+                            {mosInfo.label}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1 justify-end">
+                        <button 
+                          type="button" 
+                          onClick={() => handleOpenEdit(item)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-[var(--admin-border)] [@media(hover:hover)]:hover:bg-[var(--admin-hover-bg)] [@media(hover:hover)]:hover:text-[var(--admin-text-main)] active:bg-[var(--admin-hover-bg)] cursor-pointer"
+                          title="Edit Item"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button 
+                          type="button" 
+                          onClick={() => setDeleteItem(item)}
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-500 active:bg-red-500/20 cursor-pointer"
+                          title="Hapus Item"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-      </div>
-      
-      {filtered.length === 0 && (
-        <div className="mt-8 text-center p-8 rounded-xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)] max-w-lg mx-auto">
-          <Package className="mx-auto h-12 w-12 text-[var(--admin-muted)]" />
-          <h3 className="mt-3 text-base font-semibold text-[var(--admin-text-main)]">
+
+          {/* ── Pagination ──────────────────────────────────────────────── */}
+          {filtered.length > itemsPerPage && (
+            <div className="flex flex-col items-center justify-between gap-4 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row">
+              <p className="text-sm text-[var(--admin-muted)]">
+                Menampilkan <span className="font-medium text-[var(--admin-text-main)]">{(currentPage - 1) * itemsPerPage + 1}</span> -{" "}
+                <span className="font-medium text-[var(--admin-text-main)]">
+                  {Math.min(currentPage * itemsPerPage, filtered.length)}
+                </span>{" "}
+                dari <span className="font-medium text-[var(--admin-text-main)]">{filtered.length}</span> item
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    updateUrl({
+                      page: currentPage > 2 ? String(currentPage - 1) : null,
+                    })
+                  }
+                  disabled={currentPage <= 1}
+                  className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                >
+                  Sebelumnya
+                </button>
+                <span className="text-sm text-[var(--admin-muted)]">
+                  Hal {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    updateUrl({
+                      page: String(currentPage + 1),
+                    })
+                  }
+                  disabled={currentPage >= totalPages}
+                  className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                >
+                  Selanjutnya
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="relative z-10 rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)]/80 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]">
+            <Package className="h-7 w-7" />
+          </div>
+          <h3 className="mt-4 text-base font-semibold text-[var(--admin-text-main)]">
             {items.length === 0
               ? `Periode ${formatStockPeriodLabel(selectedPeriod)} Masih Kosong`
               : "Tidak ada data ditemukan"}
           </h3>
-          <p className="mt-1.5 text-xs text-[var(--admin-muted)] leading-relaxed">
+          <p className="mt-1.5 text-xs sm:text-sm text-[var(--admin-muted)] leading-relaxed">
             {items.length === 0
               ? "Belum ada data obat atau perbekalan farmasi pada periode ini. Klik '+ Tambah Obat' di atas atau lakukan impor berkas untuk mulai mengisi lembar stok."
-              : "Coba ubah filter atau kata kunci pencarian Anda."}
+              : "Tidak ada obat yang cocok dengan filter atau kata kunci pencarian yang dipilih."}
           </p>
-          {items.length === 0 && (
-            <div className="mt-4 flex items-center justify-center gap-3">
+          <div className="mt-5 flex items-center justify-center gap-2.5">
+            {items.length === 0 ? (
               <button
                 type="button"
                 onClick={handleOpenAdd}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#455a26] hover:bg-[#3b4d20] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 Tambah Obat Baru
               </button>
-            </div>
-          )}
+            ) : (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] hover:bg-[var(--admin-border)] px-4 py-2 text-xs font-semibold text-[var(--admin-text-main)] transition-colors cursor-pointer"
+              >
+                <RotateCcw className="h-3.5 w-3.5 text-[var(--admin-muted)]" />
+                Reset Filter & Pencarian
+              </button>
+            )}
+          </div>
         </div>
       )}
 

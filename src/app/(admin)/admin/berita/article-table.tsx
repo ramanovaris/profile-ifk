@@ -22,6 +22,7 @@ import {
   ArrowUp,
   ArrowDown,
   X,
+  RotateCcw,
 } from "lucide-react";
 import {
   Dialog,
@@ -157,6 +158,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
   const handleCategoryChange = (cats: string[]) => {
     updateUrl({
       kategori: cats.length > 0 ? cats.join(",") : null,
+      page: null,
+    });
+  };
+
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    updateUrl({
+      q: null,
+      kategori: null,
+      status: null,
       page: null,
     });
   };
@@ -363,10 +374,11 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         />
       </div>
 
-      {/* Table Container */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+      {/* Table Container / Status Kosong */}
+      {filteredArticles.length > 0 ? (
+        <div className="mt-4 overflow-hidden rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)] text-xs font-medium uppercase tracking-wider text-[var(--admin-muted)]">
                 {/* Artikel / Judul */}
@@ -547,15 +559,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--admin-border)]">
-              {paginatedArticles.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-[var(--admin-muted)]">
-                    <Newspaper className="mx-auto h-8 w-8 text-[var(--admin-muted)]/80 mb-2" />
-                    <p className="text-sm">Tidak ada artikel yang cocok dengan pencarian.</p>
-                  </td>
-                </tr>
-              ) : (
-                paginatedArticles.map((article) => (
+              {paginatedArticles.map((article) => (
                   <tr
                     key={article.id}
                     className="transition-colors hover:bg-[var(--admin-hover-bg)]"
@@ -655,8 +659,7 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
+                ))}
             </tbody>
           </table>
         </div>
@@ -732,6 +735,43 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
           </div>
         )}
       </div>
+    ) : (
+      <div className="mt-6 rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)]/80 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-sm">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]">
+          <Newspaper className="h-7 w-7" />
+        </div>
+        <h3 className="mt-4 text-base font-semibold text-[var(--admin-text-main)]">
+          {initialArticles.length === 0
+            ? "Belum ada warta atau berita"
+            : "Tidak ada artikel yang ditemukan"}
+        </h3>
+        <p className="mt-1.5 text-xs sm:text-sm text-[var(--admin-muted)] leading-relaxed">
+          {initialArticles.length === 0
+            ? "Mulai publikasikan warta kegiatan, edukasi farmasi, atau pengumuman resmi IFK Kotabaru."
+            : "Tidak ada artikel yang cocok dengan kata kunci pencarian atau filter yang dipilih."}
+        </p>
+        <div className="mt-5 flex items-center justify-center gap-2.5">
+          {initialArticles.length === 0 ? (
+            <Link
+              href="/admin/berita/baru"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#455a26] hover:bg-[#3b4d20] px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors cursor-pointer"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Tulis Berita Baru
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] hover:bg-[var(--admin-border)] px-4 py-2 text-xs font-semibold text-[var(--admin-text-main)] transition-colors cursor-pointer"
+            >
+              <RotateCcw className="h-3.5 w-3.5 text-[var(--admin-muted)]" />
+              Reset Filter & Pencarian
+            </button>
+          )}
+        </div>
+      </div>
+    )}
 
       {/* Dialog Konfirmasi Toggle Status Publikasi */}
       <Dialog open={!!toggleArticle} onOpenChange={() => setToggleArticle(null)}>
