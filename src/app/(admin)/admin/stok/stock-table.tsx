@@ -431,7 +431,7 @@ export function StockTable({
   };
 
   // Handler onBlur jika user mengetik manual tanpa klik dropdown
-  const handleFieldBlur = (query: string, _field: "name" | "code") => {
+  const handleFieldBlur = (query: string) => {
     setTimeout(async () => {
       setShowSuggestions(false);
       setActiveSearchField(null);
@@ -1400,7 +1400,7 @@ export function StockTable({
                               onFocus={() => {
                                 if (historySuggestions.length > 0) setShowSuggestions(true);
                               }}
-                              onBlur={() => handleFieldBlur(addForm.name, "name")}
+                              onBlur={() => handleFieldBlur(addForm.name)}
                               className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                               placeholder="Contoh: Paracetamol 500mg Tablet"
                               required
@@ -1467,7 +1467,7 @@ export function StockTable({
                                 onFocus={() => {
                                   if (historySuggestions.length > 0) setShowSuggestions(true);
                                 }}
-                                onBlur={() => handleFieldBlur(addForm.code, "code")}
+                                onBlur={() => handleFieldBlur(addForm.code)}
                                 className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] font-mono placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                                 placeholder="Contoh: OBG-999"
                                 required
