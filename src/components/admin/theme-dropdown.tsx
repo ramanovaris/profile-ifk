@@ -81,6 +81,7 @@ export function ThemeDropdown({
     <div ref={dropdownRef} className={cn("relative inline-block text-left", className)}>
       <button
         type="button"
+        suppressHydrationWarning
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="true"
         aria-expanded={isOpen}

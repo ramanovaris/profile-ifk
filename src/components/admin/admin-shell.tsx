@@ -160,13 +160,47 @@ export type AdminShellProps = {
   };
 };
 
+// Module-level persistent cache across route navigations
+let activeClientTheme: ThemeSetting | null = null;
+let activeSystemIsDark: boolean | null = null;
+
+function getInitialAdminTheme(): ThemeSetting {
+  if (activeClientTheme) return activeClientTheme;
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
+      if (stored === "light" || stored === "dark" || stored === "system") {
+        activeClientTheme = stored;
+        return stored;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return "light";
+}
+
+function getInitialSystemDark(): boolean {
+  if (activeSystemIsDark !== null) return activeSystemIsDark;
+  if (typeof window !== "undefined") {
+    try {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      activeSystemIsDark = isDark;
+      return isDark;
+    } catch {
+      // ignore
+    }
+  }
+  return false;
+}
+
 export function AdminShell({ children, currentUser }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
 
-  const [themeSetting, setThemeSetting] = useState<ThemeSetting>("light");
-  const [systemIsDark, setSystemIsDark] = useState<boolean>(false);
+  const [themeSetting, setThemeSetting] = useState<ThemeSetting>(getInitialAdminTheme);
+  const [systemIsDark, setSystemIsDark] = useState<boolean>(getInitialSystemDark);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -174,6 +208,7 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
     try {
       const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
       if (stored === "light" || stored === "dark" || stored === "system") {
+        activeClientTheme = stored;
         setThemeSetting(stored);
       }
     } catch {
@@ -181,9 +216,11 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
     }
 
     const media = window.matchMedia("(prefers-color-scheme: dark)");
+    activeSystemIsDark = media.matches;
     setSystemIsDark(media.matches);
 
     const listener = (e: MediaQueryListEvent) => {
+      activeSystemIsDark = e.matches;
       setSystemIsDark(e.matches);
     };
 
@@ -192,6 +229,7 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   }, []);
 
   const handleThemeChange = (newTheme: ThemeSetting) => {
+    activeClientTheme = newTheme;
     setThemeSetting(newTheme);
     try {
       localStorage.setItem("admin-theme", newTheme);
@@ -210,9 +248,6 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.documentElement.setAttribute("data-admin-theme", resolvedTheme);
-    return () => {
-      document.documentElement.removeAttribute("data-admin-theme");
-    };
   }, [resolvedTheme]);
 
   const user: AuthUserInfo | null = currentUser
@@ -251,6 +286,7 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   return (
     <div
       data-admin-theme={resolvedTheme}
+      suppressHydrationWarning
       className="admin-root relative flex h-dvh min-h-dvh overflow-hidden bg-[var(--admin-bg)] text-[var(--admin-text-main)] selection:bg-brand-500/30 transition-colors duration-200"
     >
       {/* Subtle Ambient Background Mesh Glows */}
