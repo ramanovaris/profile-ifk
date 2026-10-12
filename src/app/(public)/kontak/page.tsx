@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import type { Metadata } from "next";
 import { PageHero } from "@/components/public/page-hero";
 import { KontakHeroIllustration } from "@/components/public/hero-illustrations";
@@ -70,12 +70,6 @@ export default async function KontakPage() {
       label: "Email",
       value: settings.email,
       mailto: settings.email,
-    },
-    {
-      icon: ExternalLink,
-      label: "SP4N-LAPOR",
-      value: "lapor.go.id",
-      link: settings.sp4nLaporUrl,
     },
   ];
 

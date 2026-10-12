@@ -23,7 +23,6 @@ export interface UpdateIdentityInput {
 }
 
 export interface UpdateLinksInput {
-  sp4nLaporUrl: string;
   dinkesUrl: string;
   instagramUrl: string;
   facebookUrl: string;
@@ -105,7 +104,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSetting> => {
     whatsappLink: siteConfig.whatsappLink,
     googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
     operationalHours: siteConfig.operationalHours,
-    sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+    sp4nLaporUrl: "",
     dinkesUrl: "",
     instagramUrl: "",
     facebookUrl: "",
@@ -223,7 +222,7 @@ export async function updateSiteIdentityAction(
         whatsappLink,
         email,
         googleMapsEmbedUrl,
-        sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+        sp4nLaporUrl: "",
       },
     });
 
@@ -405,7 +404,7 @@ export async function updateSiteProfileAction(
         whatsappLink: siteConfig.whatsappLink,
         email: siteConfig.email,
         googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
-        sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+        sp4nLaporUrl: "",
         headName,
         headRole,
         headPhoto,
@@ -459,7 +458,6 @@ export async function updateSiteLinksAction(
     };
   }
 
-  const sp4nLaporUrl = data.sp4nLaporUrl?.trim() || "";
   const dinkesUrl = data.dinkesUrl?.trim() || "";
   const instagramUrl = data.instagramUrl?.trim() || "";
   const facebookUrl = data.facebookUrl?.trim() || "";
@@ -473,7 +471,6 @@ export async function updateSiteLinksAction(
   // Validasi URL format jika diisi
   const urlPattern = /^(https?:\/\/).+/;
   const urls = [
-    { name: "SP4N LAPOR!", value: sp4nLaporUrl },
     { name: "Portal Dinkes", value: dinkesUrl },
     { name: "Instagram", value: instagramUrl },
     { name: "Facebook", value: facebookUrl },
@@ -493,7 +490,7 @@ export async function updateSiteLinksAction(
     const updated = await db.siteSetting.upsert({
       where: { id: "default" },
       update: {
-        sp4nLaporUrl,
+        sp4nLaporUrl: "",
         dinkesUrl,
         instagramUrl,
         facebookUrl,
@@ -514,7 +511,7 @@ export async function updateSiteLinksAction(
         whatsappLink: siteConfig.whatsappLink,
         email: siteConfig.email,
         googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
-        sp4nLaporUrl,
+        sp4nLaporUrl: "",
         dinkesUrl,
         instagramUrl,
         facebookUrl,
@@ -601,7 +598,7 @@ export async function updateSiteServiceDocsAction(
         whatsappLink: siteConfig.whatsappLink,
         email: siteConfig.email,
         googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
-        sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+        sp4nLaporUrl: "",
         lplpoUrl,
         permintaanSewaktuUrl,
       },
@@ -686,7 +683,7 @@ export async function updateSitePublicStatsAction(
         whatsappLink: siteConfig.whatsappLink,
         email: siteConfig.email,
         googleMapsEmbedUrl: siteConfig.googleMapsEmbedUrl,
-        sp4nLaporUrl: siteConfig.sp4nLaporUrl,
+        sp4nLaporUrl: "",
         statsFaskesCount,
         statsFaskesLabel,
         statsPulauCount,

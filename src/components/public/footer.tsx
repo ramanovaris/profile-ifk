@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Mail, Phone, MapPin, Globe, ExternalLink } from "lucide-react";
+import { ArrowUpRight, Mail, Phone, MapPin, Globe } from "lucide-react";
 
 import { siteConfig } from "@/lib/dummy-data";
 import type { SiteSetting } from "@prisma/client";
@@ -58,7 +58,6 @@ export function Footer({ settings }: FooterProps = {}) {
   ].filter((link) => link.url);
 
   const externalLinks = [
-    { url: settings?.sp4nLaporUrl, label: "SP4N LAPOR!", icon: ExternalLink },
     { url: settings?.dinkesUrl, label: "Portal Dinkes", icon: Globe },
   ].filter((link) => link.url);
 

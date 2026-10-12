@@ -94,7 +94,6 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   // ── Tab 3: Tautan & Layanan State ─────────────────────────────────────────
   const initialLinks = {
-    sp4nLaporUrl: initialSettings.sp4nLaporUrl,
     dinkesUrl: initialSettings.dinkesUrl || "",
     instagramUrl: initialSettings.instagramUrl || "",
     facebookUrl: initialSettings.facebookUrl || "",
@@ -874,28 +873,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               <div>
                 <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Integrasi Portal &amp; Media Sosial</h2>
                 <p className="text-xs text-[var(--admin-muted)]">
-                  Tautan saluran pengaduan nasional, portal dinas induk, dan jejaring sosial resmi.
+                  Tautan portal dinas induk dan jejaring sosial resmi.
                 </p>
               </div>
             </div>
 
             <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="link-sp4n" className="text-xs font-medium text-[var(--admin-text-main)]">
-                  URL SP4N LAPOR!
-                </Label>
-                <div className="relative">
-                  <ExternalLink className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
-                  <Input
-                    id="link-sp4n"
-                    value={linksForm.sp4nLaporUrl}
-                    onChange={(e) => setLinksForm({ ...linksForm, sp4nLaporUrl: e.target.value })}
-                    placeholder="https://www.lapor.go.id"
-                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
-                  />
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <Label htmlFor="link-dinkes" className="text-xs font-medium text-[var(--admin-text-main)]">
                   URL Portal Dinas Kesehatan
@@ -938,7 +921,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 />
               </div>
 
-              <div className="space-y-2 md:col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="link-yt" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Kanal YouTube Resmi
                 </Label>
