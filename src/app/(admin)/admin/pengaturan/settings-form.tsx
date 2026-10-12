@@ -22,6 +22,8 @@ import {
   FileSpreadsheet,
   BarChart3,
   Users,
+  AlertTriangle,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -294,15 +296,15 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   return (
     <div className="space-y-6">
       {/* Horizontal Segmented Tab Bar */}
-      <div className="inline-flex max-w-full gap-1.5 overflow-x-auto rounded-xl border border-white/5 bg-zinc-900/80 p-1.5 backdrop-blur-xl scrollbar-none">
+      <div className="inline-flex max-w-full gap-1.5 overflow-x-auto rounded-xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-1.5 backdrop-blur-xl scrollbar-none">
         <button
           type="button"
           onClick={() => setActiveTab("identitas")}
           className={cn(
-            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
             activeTab === "identitas"
-              ? "border border-brand-500/30 bg-brand-500/15 font-semibold text-brand-300 shadow-sm shadow-brand-500/20"
-              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
           )}
         >
           <Building2 className="h-4 w-4" />
@@ -313,10 +315,10 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           type="button"
           onClick={() => setActiveTab("profil")}
           className={cn(
-            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
             activeTab === "profil"
-              ? "border border-brand-500/30 bg-brand-500/15 font-semibold text-brand-300 shadow-sm shadow-brand-500/20"
-              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
           )}
         >
           <FileText className="h-4 w-4" />
@@ -327,10 +329,10 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           type="button"
           onClick={() => setActiveTab("tautan")}
           className={cn(
-            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
             activeTab === "tautan"
-              ? "border border-brand-500/30 bg-brand-500/15 font-semibold text-brand-300 shadow-sm shadow-brand-500/20"
-              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
           )}
         >
           <Link2 className="h-4 w-4" />
@@ -341,10 +343,10 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           type="button"
           onClick={() => setActiveTab("dokumen")}
           className={cn(
-            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
             activeTab === "dokumen"
-              ? "border border-brand-500/30 bg-brand-500/15 font-semibold text-brand-300 shadow-sm shadow-brand-500/20"
-              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
           )}
         >
           <FileSpreadsheet className="h-4 w-4" />
@@ -355,10 +357,10 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           type="button"
           onClick={() => setActiveTab("statistik")}
           className={cn(
-            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98]",
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
             activeTab === "statistik"
-              ? "border border-brand-500/30 bg-brand-500/15 font-semibold text-brand-300 shadow-sm shadow-brand-500/20"
-              : "text-zinc-400 hover:bg-white/5 hover:text-zinc-200"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
           )}
         >
           <BarChart3 className="h-4 w-4" />
@@ -370,16 +372,16 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       {activeTab === "identitas" && (
         <form onSubmit={handleIdentitySave} className="space-y-6">
           {/* Kartu Identitas Lembaga */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
             <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
 
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <Building2 className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Identitas Instansi</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Identitas Instansi</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Nama resmi, inisial lembaga, motto pelayanan, dan slogan publik.
                 </p>
               </div>
@@ -387,7 +389,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
             <div className="relative mt-6 grid gap-6 md:grid-cols-2">
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="instansi-name" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="instansi-name" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Nama Lengkap Instansi <span className="text-rose-400">*</span>
                 </Label>
                 <Input
@@ -395,13 +397,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.name}
                   onChange={(e) => setIdentityForm({ ...identityForm, name: e.target.value })}
                   placeholder="Contoh: UPTD Instalasi Farmasi Kab. Kotabaru"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="instansi-short" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="instansi-short" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Nama Pendek / Inisial <span className="text-rose-400">*</span>
                 </Label>
                 <Input
@@ -409,13 +411,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.shortName}
                   onChange={(e) => setIdentityForm({ ...identityForm, shortName: e.target.value })}
                   placeholder="Contoh: IFK Kotabaru"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="instansi-tagline" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="instansi-tagline" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Tagline Ringkas
                 </Label>
                 <Input
@@ -423,12 +425,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.tagline}
                   onChange={(e) => setIdentityForm({ ...identityForm, tagline: e.target.value })}
                   placeholder="Contoh: Stok Valid, Team Solid"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="instansi-motto" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="instansi-motto" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Motto Pelayanan
                 </Label>
                 <Textarea
@@ -437,21 +439,21 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.motto}
                   onChange={(e) => setIdentityForm({ ...identityForm, motto: e.target.value })}
                   placeholder="Contoh: Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
             </div>
           </div>
 
           {/* Kartu Kontak & Lokasi Pelayanan */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <Phone className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Kontak &amp; Alamat Pelayanan</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Kontak &amp; Alamat Pelayanan</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Alamat kantor, nomor kontak resmi, jam buka pelayanan, dan integrasi Google Maps.
                 </p>
               </div>
@@ -459,7 +461,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
             <div className="relative mt-6 grid gap-6 md:grid-cols-2">
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="contact-address" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="contact-address" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Alamat Lengkap Kantor
                 </Label>
                 <Textarea
@@ -468,12 +470,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.address}
                   onChange={(e) => setIdentityForm({ ...identityForm, address: e.target.value })}
                   placeholder="Jl. Kenanga Desa Dirgahayu, Kotabaru 72116. Telp/Fax (0518) 21603"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="contact-hours" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="contact-hours" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Jam Operasional Pelayanan (Format Baris Baru)
                 </Label>
                 <Textarea
@@ -482,28 +484,28 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.operationalHours}
                   onChange={(e) => setIdentityForm({ ...identityForm, operationalHours: e.target.value })}
                   placeholder="Senin - Kamis: 08.00 - 16.30 WITA&#10;Jumat: 08.00 - 11.00 WITA"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contact-phone" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="contact-phone" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Nomor Telepon Kantor
                 </Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
                   <Input
                     id="contact-phone"
                     value={identityForm.phone}
                     onChange={(e) => setIdentityForm({ ...identityForm, phone: e.target.value })}
                     placeholder="(0518) 21603"
-                    className="border-white/10 bg-zinc-950/60 pl-9 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contact-wa" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="contact-wa" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Tautan WhatsApp Layanan
                 </Label>
                 <Input
@@ -511,29 +513,29 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.whatsappLink}
                   onChange={(e) => setIdentityForm({ ...identityForm, whatsappLink: e.target.value })}
                   placeholder="https://wa.me/6281234567890"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="contact-email" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="contact-email" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Email Resmi Dinas
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
                   <Input
                     id="contact-email"
                     type="email"
                     value={identityForm.email}
                     onChange={(e) => setIdentityForm({ ...identityForm, email: e.target.value })}
                     placeholder="instalasifarmasi4@gmail.com"
-                    className="border-white/10 bg-zinc-950/60 pl-9 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                   />
                 </div>
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="contact-maps" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="contact-maps" className="text-xs font-medium text-[var(--admin-text-main)]">
                   URL Iframe Embed Google Maps
                 </Label>
                 <Input
@@ -541,17 +543,17 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={identityForm.googleMapsEmbedUrl}
                   onChange={(e) => setIdentityForm({ ...identityForm, googleMapsEmbedUrl: e.target.value })}
                   placeholder="https://www.google.com/maps/embed?pb=..."
-                  className="border-white/10 bg-zinc-950/60 text-xs font-mono text-zinc-300 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-mono text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
-                <p className="text-[11px] text-zinc-500">
-                  Salin URL dari atribut <code className="text-zinc-400">src</code> pada menu Google Maps &gt; Bagikan &gt; Sematkan Peta.
+                <p className="text-[11px] text-[var(--admin-muted)]">
+                  Salin URL dari atribut <code className="text-[var(--admin-text-main)]">src</code> pada menu Google Maps &gt; Bagikan &gt; Sematkan Peta.
                 </p>
               </div>
 
               {/* Mini Live Map Preview */}
               <div className="space-y-2 md:col-span-2">
-                <span className="text-xs font-medium text-zinc-400">Pratinjau Peta Google Maps</span>
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950">
+                <span className="text-xs font-medium text-[var(--admin-muted)]">Pratinjau Peta Google Maps</span>
+                <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
                   {identityForm.googleMapsEmbedUrl ? (
                     <iframe
                       src={identityForm.googleMapsEmbedUrl}
@@ -565,7 +567,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                       title="Pratinjau Lokasi IFK"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-xs text-zinc-500">
+                    <div className="flex h-full items-center justify-center text-xs text-[var(--admin-muted)]">
                       URL Peta Belum Diisi
                     </div>
                   )}
@@ -581,7 +583,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               variant="outline"
               disabled={isPending}
               onClick={handleIdentityReset}
-              className="gap-2 border-white/10 bg-zinc-800/60 text-zinc-300 transition-colors [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -589,11 +591,11 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             <Button
               type="submit"
               disabled={isPending}
-              className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isPending ? (
                 <>
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950 border-t-transparent" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                   <span>Menyimpan...</span>
                 </>
               ) : (
@@ -611,16 +613,16 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       {activeTab === "profil" && (
         <form onSubmit={handleProfileSave} className="space-y-6">
           {/* Kartu Pimpinan & Sambutan */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
             <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
 
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <FileText className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Sambutan Kepala UPTD</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Sambutan Kepala UPTD</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Foto pimpinan, identitas Kepala UPTD, dan naskah sambutan resmi di halaman profil.
                 </p>
               </div>
@@ -629,7 +631,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             <div className="mt-6 grid gap-6 md:grid-cols-[180px_1fr]">
               {/* Kolom Foto Kepala UPTD */}
               <div className="flex flex-col items-center gap-3">
-                <div className="group relative aspect-[3/4] w-full max-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-md">
+                <div className="group relative aspect-[3/4] w-full max-w-[180px] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-md">
                   <Image
                     src={photoPreview || placeholderImage(300, 400, "Kepala IFK", "Profil")}
                     alt="Kepala UPTD IFK"
@@ -659,7 +661,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => headPhotoInputRef.current?.click()}
-                  className="w-full max-w-[180px] gap-2 border-white/10 bg-zinc-800/60 text-xs text-zinc-300 [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white"
+                  className="w-full max-w-[180px] gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   Upload Foto (3:4)
@@ -670,7 +672,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               <div className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="head-name" className="text-xs font-medium text-zinc-300">
+                    <Label htmlFor="head-name" className="text-xs font-medium text-[var(--admin-text-main)]">
                       Nama &amp; Gelar Kepala UPTD <span className="text-rose-400">*</span>
                     </Label>
                     <Input
@@ -678,13 +680,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                       value={profileForm.headName}
                       onChange={(e) => setProfileForm({ ...profileForm, headName: e.target.value })}
                       placeholder="Contoh: apt. H. Muhammad Yusuf, S.Farm"
-                      className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                      className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="head-role" className="text-xs font-medium text-zinc-300">
+                    <Label htmlFor="head-role" className="text-xs font-medium text-[var(--admin-text-main)]">
                       Jabatan Resmi
                     </Label>
                     <Input
@@ -692,13 +694,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                       value={profileForm.headRole}
                       onChange={(e) => setProfileForm({ ...profileForm, headRole: e.target.value })}
                       placeholder="Kepala UPTD Instalasi Farmasi Kab. Kotabaru"
-                      className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                      className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="head-greeting" className="text-xs font-medium text-zinc-300">
+                  <Label htmlFor="head-greeting" className="text-xs font-medium text-[var(--admin-text-main)]">
                     Naskah Sambutan
                   </Label>
                   <Textarea
@@ -707,7 +709,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                     value={profileForm.greeting}
                     onChange={(e) => setProfileForm({ ...profileForm, greeting: e.target.value })}
                     placeholder="Tuliskan naskah sambutan resmi Kepala UPTD..."
-                    className="border-white/10 bg-zinc-950/60 text-sm leading-relaxed text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm leading-relaxed text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                   />
                 </div>
               </div>
@@ -715,14 +717,14 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           </div>
 
           {/* Kartu Visi, Misi & Tupoksi */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <FileText className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Visi, Misi &amp; Tupoksi</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Visi, Misi &amp; Tupoksi</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Arah haluan, pilar pelayanan, dan tugas pokok fungsi UPTD Instalasi Farmasi.
                 </p>
               </div>
@@ -730,7 +732,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
             <div className="mt-6 space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="profile-vision" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="profile-vision" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Pernyataan Visi Lembaga
                 </Label>
                 <Textarea
@@ -739,12 +741,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={profileForm.vision}
                   onChange={(e) => setProfileForm({ ...profileForm, vision: e.target.value })}
                   placeholder="Pernyataan visi instansi..."
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="profile-mission" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="profile-mission" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Butir-Butir Misi (Pisahkan Tiap Nomor/Baris)
                 </Label>
                 <Textarea
@@ -753,12 +755,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={profileForm.mission}
                   onChange={(e) => setProfileForm({ ...profileForm, mission: e.target.value })}
                   placeholder="1. Butir misi pertama&#10;2. Butir misi kedua..."
-                  className="border-white/10 bg-zinc-950/60 text-sm leading-relaxed text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm leading-relaxed text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="profile-tupoksi" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="profile-tupoksi" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Tugas Pokok &amp; Fungsi (Tupoksi)
                 </Label>
                 <Textarea
@@ -767,22 +769,22 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={profileForm.tupoksi}
                   onChange={(e) => setProfileForm({ ...profileForm, tupoksi: e.target.value })}
                   placeholder="Uraian tugas pokok dan fungsi instansi..."
-                  className="border-white/10 bg-zinc-950/60 text-sm leading-relaxed text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm leading-relaxed text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
             </div>
           </div>
 
           {/* Kartu Bagan Struktur Organisasi */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
-            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-4">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--admin-border)] pb-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                   <Network className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-white">Bagan Struktur Organisasi</h2>
-                  <p className="text-xs text-zinc-400">
+                  <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Bagan Struktur Organisasi</h2>
+                  <p className="text-xs text-[var(--admin-muted)]">
                     Bagan hierarki struktur organisasi UPTD Instalasi Farmasi untuk halaman profil.
                   </p>
                 </div>
@@ -792,7 +794,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => orgPhotoInputRef.current?.click()}
-                className="gap-2 border-white/10 bg-zinc-800/60 text-xs text-zinc-300 [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white"
+                className="gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
               >
                 <Upload className="h-3.5 w-3.5" />
                 <span>Upload Bagan Baru</span>
@@ -800,7 +802,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             </div>
 
             <div className="mt-6 space-y-4">
-              <div className="group relative aspect-[16/9] w-full max-h-[380px] overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-md">
+              <div className="group relative aspect-[16/9] w-full max-h-[380px] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-md">
                 <Image
                   src={
                     orgPhotoPreview ||
@@ -829,7 +831,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 accept="image/*"
                 className="hidden"
               />
-              <p className="text-[11px] text-zinc-500">
+              <p className="text-[11px] text-[var(--admin-muted)]">
                 Format yang didukung: PNG, JPG, WebP. Disarankan diagram berorientasi landscape dengan ukuran file maksimal 5MB.
               </p>
             </div>
@@ -841,7 +843,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleProfileReset}
-              className="gap-2 border-white/10 bg-zinc-800/60 text-zinc-300 transition-colors [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -849,7 +851,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             <Button
               type="submit"
               disabled={isPending}
-              className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
             >
               <Save className="h-4 w-4" />
               <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
@@ -862,16 +864,16 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       {activeTab === "tautan" && (
         <form onSubmit={handleLinksSave} className="space-y-6">
           {/* Kartu Portal Eksternal & Media Sosial */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
             <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
 
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <Share2 className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Integrasi Portal &amp; Media Sosial</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Integrasi Portal &amp; Media Sosial</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Tautan saluran pengaduan nasional, portal dinas induk, dan jejaring sosial resmi.
                 </p>
               </div>
@@ -879,39 +881,39 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
             <div className="mt-6 grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="link-sp4n" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="link-sp4n" className="text-xs font-medium text-[var(--admin-text-main)]">
                   URL SP4N LAPOR!
                 </Label>
                 <div className="relative">
-                  <ExternalLink className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <ExternalLink className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
                   <Input
                     id="link-sp4n"
                     value={linksForm.sp4nLaporUrl}
                     onChange={(e) => setLinksForm({ ...linksForm, sp4nLaporUrl: e.target.value })}
                     placeholder="https://www.lapor.go.id"
-                    className="border-white/10 bg-zinc-950/60 pl-9 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="link-dinkes" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="link-dinkes" className="text-xs font-medium text-[var(--admin-text-main)]">
                   URL Portal Dinas Kesehatan
                 </Label>
                 <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                  <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
                   <Input
                     id="link-dinkes"
                     value={linksForm.dinkesUrl}
                     onChange={(e) => setLinksForm({ ...linksForm, dinkesUrl: e.target.value })}
                     placeholder="https://dinkes.kotabarukab.go.id"
-                    className="border-white/10 bg-zinc-950/60 pl-9 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="link-ig" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="link-ig" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Akun Instagram Resmi
                 </Label>
                 <Input
@@ -919,12 +921,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={linksForm.instagramUrl}
                   onChange={(e) => setLinksForm({ ...linksForm, instagramUrl: e.target.value })}
                   placeholder="https://instagram.com/ifk_kotabaru"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="link-fb" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="link-fb" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Halaman Facebook Resmi
                 </Label>
                 <Input
@@ -932,12 +934,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={linksForm.facebookUrl}
                   onChange={(e) => setLinksForm({ ...linksForm, facebookUrl: e.target.value })}
                   placeholder="https://facebook.com/ifk.kotabaru"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="link-yt" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="link-yt" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Kanal YouTube Resmi
                 </Label>
                 <Input
@@ -945,22 +947,22 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={linksForm.youtubeUrl}
                   onChange={(e) => setLinksForm({ ...linksForm, youtubeUrl: e.target.value })}
                   placeholder="https://youtube.com/@ifkkotabaru"
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
             </div>
           </div>
 
           {/* Kartu Banner Pengumuman Darurat */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
-            <div className="relative flex items-center justify-between border-b border-white/5 pb-4">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center justify-between border-b border-[var(--admin-border)] pb-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-400">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400">
                   <Megaphone className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-semibold text-white">Banner Pengumuman Publik</h2>
-                  <p className="text-xs text-zinc-400">
+                  <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Banner Pengumuman Publik</h2>
+                  <p className="text-xs text-[var(--admin-muted)]">
                     Tampilkan pengumuman penting atau darurat tepat di bagian teratas halaman publik.
                   </p>
                 </div>
@@ -979,7 +981,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 }
                 className={cn(
                   "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500/40",
-                  linksForm.announcementEnabled ? "bg-amber-500" : "bg-zinc-800"
+                  linksForm.announcementEnabled ? "bg-amber-600 dark:bg-amber-500" : "bg-zinc-400 dark:bg-zinc-800"
                 )}
               >
                 <span
@@ -992,33 +994,43 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             </div>
 
             <div className="mt-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-medium text-zinc-400">Tipe Badge:</span>
-                <div className="flex gap-2">
-                  {(["info", "warning", "important"] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setLinksForm({ ...linksForm, announcementType: type })}
-                      className={cn(
-                        "rounded-lg px-2.5 py-1 text-xs font-medium capitalize transition-colors active:scale-95",
-                        linksForm.announcementType === type
-                          ? type === "warning"
-                            ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                            : type === "important"
-                            ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
-                            : "bg-sky-500/20 text-sky-300 border border-sky-500/40"
-                          : "bg-zinc-800/60 text-zinc-400 border border-white/5 hover:text-zinc-200"
-                      )}
-                    >
-                      {type === "info" ? "Informasi" : type === "warning" ? "Peringatan" : "Penting"}
-                    </button>
-                  ))}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="text-xs font-semibold text-[var(--admin-muted)]">Tipe Badge:</span>
+                <div className="flex flex-wrap gap-2">
+                  {(["info", "warning", "important"] as const).map((type) => {
+                    const isSelected = linksForm.announcementType === type;
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setLinksForm({ ...linksForm, announcementType: type })}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all active:scale-95 cursor-pointer",
+                          isSelected
+                            ? type === "warning"
+                              ? "bg-amber-700 text-white font-bold shadow-xs border border-amber-800"
+                              : type === "important"
+                              ? "bg-rose-700 text-white font-bold shadow-xs border border-rose-800"
+                              : "bg-sky-700 text-white font-bold shadow-xs border border-sky-800"
+                            : "bg-[var(--admin-surface)] text-[var(--admin-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] font-medium"
+                        )}
+                      >
+                        {type === "warning" ? (
+                          <Megaphone className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-amber-600 dark:text-amber-400")} />
+                        ) : type === "important" ? (
+                          <AlertTriangle className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-rose-600 dark:text-rose-400")} />
+                        ) : (
+                          <Info className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-sky-600 dark:text-sky-400")} />
+                        )}
+                        <span>{type === "info" ? "Informasi" : type === "warning" ? "Peringatan" : "Penting"}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="banner-text" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="banner-text" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Isi Pesan Pengumuman
                 </Label>
                 <Textarea
@@ -1027,18 +1039,65 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={linksForm.announcementText}
                   onChange={(e) => setLinksForm({ ...linksForm, announcementText: e.target.value })}
                   placeholder="Contoh: Layanan farmasi libur nasional..."
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
                 />
               </div>
 
               {/* Pratinjau Banner */}
               {linksForm.announcementEnabled && (
-                <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3.5 text-xs text-amber-200 flex items-center gap-2.5">
-                  <span className="inline-flex items-center gap-1 rounded bg-amber-500/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                    <Radio className="h-3 w-3 animate-pulse" />
-                    Live Preview
-                  </span>
-                  <span className="truncate">{linksForm.announcementText}</span>
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between text-xs font-semibold text-[var(--admin-muted)]">
+                    <span className="flex items-center gap-1.5">
+                      <Radio className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                      Pratinjau Banner di Halaman Publik
+                    </span>
+                    <span className="text-[11px] font-normal text-[var(--admin-muted)]">
+                      Tampil di bagian paling atas website
+                    </span>
+                  </div>
+
+                  <div
+                    className={cn(
+                      "rounded-xl border p-3.5 transition-colors shadow-xs flex flex-col sm:flex-row sm:items-center gap-3",
+                      linksForm.announcementType === "warning"
+                        ? "border-amber-300 bg-amber-50/90 dark:border-amber-800/60 dark:bg-amber-950/40"
+                        : linksForm.announcementType === "important"
+                        ? "border-rose-300 bg-rose-50/90 dark:border-rose-800/60 dark:bg-rose-950/40"
+                        : "border-sky-300 bg-sky-50/90 dark:border-sky-800/60 dark:bg-sky-950/40"
+                    )}
+                  >
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold text-white shadow-xs uppercase tracking-wider",
+                          linksForm.announcementType === "warning"
+                            ? "bg-amber-700"
+                            : linksForm.announcementType === "important"
+                            ? "bg-rose-700"
+                            : "bg-sky-700"
+                        )}
+                      >
+                        {linksForm.announcementType === "important" ? (
+                          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                        ) : linksForm.announcementType === "warning" ? (
+                          <Megaphone className="h-3.5 w-3.5 shrink-0" />
+                        ) : (
+                          <Info className="h-3.5 w-3.5 shrink-0" />
+                        )}
+                        <span>
+                          {linksForm.announcementType === "warning"
+                            ? "Peringatan"
+                            : linksForm.announcementType === "important"
+                            ? "Penting"
+                            : "Informasi"}
+                        </span>
+                      </span>
+                    </div>
+
+                    <p className="min-w-0 flex-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-snug break-words">
+                      {linksForm.announcementText || "(Pesan pengumuman belum diisi)"}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -1050,7 +1109,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleLinksReset}
-              className="gap-2 border-white/10 bg-zinc-800/60 text-zinc-300 transition-colors [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -1058,7 +1117,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             <Button
               type="submit"
               disabled={isPending}
-              className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
             >
               <Save className="h-4 w-4" />
               <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
@@ -1070,16 +1129,16 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       {/* ── TAB 4: DOKUMEN LAYANAN ───────────────────────────────────────── */}
       {activeTab === "dokumen" && (
         <form onSubmit={handleDocsSave} className="space-y-6">
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
             <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
 
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <FileSpreadsheet className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Tautan Dokumen &amp; Formulir Layanan</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Tautan Dokumen &amp; Formulir Layanan</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Kelola tautan Google Sheets atau Drive untuk formulir LPLPO rutin dan formulir permintaan sewaktu bagi Puskesmas.
                 </p>
               </div>
@@ -1089,7 +1148,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               {/* LPLPO */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="doc-lplpo" className="text-xs font-medium text-zinc-300">
+                  <Label htmlFor="doc-lplpo" className="text-xs font-medium text-[var(--admin-text-main)]">
                     URL Formulir LPLPO (Lembar Permintaan &amp; Pemakaian Obat)
                   </Label>
                   {docsForm.lplpoUrl && (
@@ -1097,7 +1156,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                       href={docsForm.lplpoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-brand-400 hover:text-brand-300 transition-colors"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#455a26] dark:text-brand-400 hover:underline transition-colors"
                     >
                       <ExternalLink className="h-3 w-3" />
                       <span>Uji Buka Tautan</span>
@@ -1110,9 +1169,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={docsForm.lplpoUrl}
                   onChange={(e) => setDocsForm({ ...docsForm, lplpoUrl: e.target.value })}
                   placeholder="https://docs.google.com/spreadsheets/d/..."
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
                 />
-                <p className="text-[11px] text-zinc-500">
+                <p className="text-[11px] text-[var(--admin-muted)]">
                   Digunakan pada tombol &quot;Buka Dokumen Resmi&quot; kartu LPLPO di halaman <code>/layanan</code>.
                 </p>
               </div>
@@ -1120,7 +1179,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               {/* Permintaan Sewaktu */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="doc-sewaktu" className="text-xs font-medium text-zinc-300">
+                  <Label htmlFor="doc-sewaktu" className="text-xs font-medium text-[var(--admin-text-main)]">
                     URL Formulir Permintaan Sewaktu (Program &amp; Non-Program)
                   </Label>
                   {docsForm.permintaanSewaktuUrl && (
@@ -1128,7 +1187,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                       href={docsForm.permintaanSewaktuUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-brand-400 hover:text-brand-300 transition-colors"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#455a26] dark:text-brand-400 hover:underline transition-colors"
                     >
                       <ExternalLink className="h-3 w-3" />
                       <span>Uji Buka Tautan</span>
@@ -1141,9 +1200,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={docsForm.permintaanSewaktuUrl}
                   onChange={(e) => setDocsForm({ ...docsForm, permintaanSewaktuUrl: e.target.value })}
                   placeholder="https://docs.google.com/spreadsheets/d/..."
-                  className="border-white/10 bg-zinc-950/60 text-sm text-zinc-100 placeholder:text-zinc-600 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
                 />
-                <p className="text-[11px] text-zinc-500">
+                <p className="text-[11px] text-[var(--admin-muted)]">
                   Digunakan pada tombol &quot;Buka Dokumen Resmi&quot; kartu Permintaan Sewaktu di halaman <code>/layanan</code>.
                 </p>
               </div>
@@ -1156,7 +1215,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleDocsReset}
-              className="gap-2 border-white/10 bg-zinc-800/60 text-zinc-300 transition-colors [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -1164,7 +1223,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             <Button
               type="submit"
               disabled={isPending}
-              className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
             >
               <Save className="h-4 w-4" />
               <span>{isPending ? "Menyimpan..." : "Simpan Dokumen"}</span>
@@ -1177,16 +1236,16 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       {activeTab === "statistik" && (
         <form onSubmit={handleStatsSave} className="space-y-6">
           {/* Kartu Metrik Wilayah Beranda */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
             <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
 
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <BarChart3 className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Indikator Wilayah Beranda</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Indikator Wilayah Beranda</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Tiga kartu metrik utama yang tampil pada bagian hero halaman depan portal publik.
                 </p>
               </div>
@@ -1194,76 +1253,76 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
             <div className="relative mt-6 grid gap-6 sm:grid-cols-3">
               {/* Metrik 1: Faskes */}
-              <div className="space-y-3 rounded-xl border border-white/5 bg-zinc-950/40 p-4">
-                <div className="text-xs font-semibold text-brand-400">Indikator 1 (Faskes)</div>
+              <div className="space-y-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+                <div className="text-xs font-semibold text-[#455a26] dark:text-brand-400">Indikator 1 (Faskes)</div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="stat-faskes-count" className="text-[11px] text-zinc-400">Jumlah / Angka</Label>
+                  <Label htmlFor="stat-faskes-count" className="text-[11px] text-[var(--admin-muted)]">Jumlah / Angka</Label>
                   <Input
                     id="stat-faskes-count"
                     value={statsForm.statsFaskesCount}
                     onChange={(e) => setStatsForm({ ...statsForm, statsFaskesCount: e.target.value })}
                     placeholder="30 Faskes"
-                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="stat-faskes-label" className="text-[11px] text-zinc-400">Keterangan Label</Label>
+                  <Label htmlFor="stat-faskes-label" className="text-[11px] text-[var(--admin-muted)]">Keterangan Label</Label>
                   <Input
                     id="stat-faskes-label"
                     value={statsForm.statsFaskesLabel}
                     onChange={(e) => setStatsForm({ ...statsForm, statsFaskesLabel: e.target.value })}
                     placeholder="28 Puskesmas &amp; 2 RSUD"
-                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
                   />
                 </div>
               </div>
 
               {/* Metrik 2: Pulau */}
-              <div className="space-y-3 rounded-xl border border-white/5 bg-zinc-950/40 p-4">
-                <div className="text-xs font-semibold text-brand-400">Indikator 2 (Pulau)</div>
+              <div className="space-y-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+                <div className="text-xs font-semibold text-[#455a26] dark:text-brand-400">Indikator 2 (Pulau)</div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="stat-pulau-count" className="text-[11px] text-zinc-400">Jumlah / Angka</Label>
+                  <Label htmlFor="stat-pulau-count" className="text-[11px] text-[var(--admin-muted)]">Jumlah / Angka</Label>
                   <Input
                     id="stat-pulau-count"
                     value={statsForm.statsPulauCount}
                     onChange={(e) => setStatsForm({ ...statsForm, statsPulauCount: e.target.value })}
                     placeholder="45 Pulau"
-                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="stat-pulau-label" className="text-[11px] text-zinc-400">Keterangan Label</Label>
+                  <Label htmlFor="stat-pulau-label" className="text-[11px] text-[var(--admin-muted)]">Keterangan Label</Label>
                   <Input
                     id="stat-pulau-label"
                     value={statsForm.statsPulauLabel}
                     onChange={(e) => setStatsForm({ ...statsForm, statsPulauLabel: e.target.value })}
                     placeholder="Jangkauan Kepulauan"
-                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
                   />
                 </div>
               </div>
 
               {/* Metrik 3: Masyarakat */}
-              <div className="space-y-3 rounded-xl border border-white/5 bg-zinc-950/40 p-4">
-                <div className="text-xs font-semibold text-brand-400">Indikator 3 (Masyarakat)</div>
+              <div className="space-y-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+                <div className="text-xs font-semibold text-[#455a26] dark:text-brand-400">Indikator 3 (Masyarakat)</div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="stat-masyarakat-count" className="text-[11px] text-zinc-400">Jumlah / Angka</Label>
+                  <Label htmlFor="stat-masyarakat-count" className="text-[11px] text-[var(--admin-muted)]">Jumlah / Angka</Label>
                   <Input
                     id="stat-masyarakat-count"
                     value={statsForm.statsMasyarakatCount}
                     onChange={(e) => setStatsForm({ ...statsForm, statsMasyarakatCount: e.target.value })}
                     placeholder="334 Ribu+"
-                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="stat-masyarakat-label" className="text-[11px] text-zinc-400">Keterangan Label</Label>
+                  <Label htmlFor="stat-masyarakat-label" className="text-[11px] text-[var(--admin-muted)]">Keterangan Label</Label>
                   <Input
                     id="stat-masyarakat-label"
                     value={statsForm.statsMasyarakatLabel}
                     onChange={(e) => setStatsForm({ ...statsForm, statsMasyarakatLabel: e.target.value })}
                     placeholder="Masyarakat Terlayani"
-                    className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
                   />
                 </div>
               </div>
@@ -1271,14 +1330,14 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           </div>
 
           {/* Kartu Komposisi SDM & Fasilitas Profil */}
-          <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-zinc-900/60 p-6 shadow-xl backdrop-blur-xl">
-            <div className="relative flex items-center gap-3 border-b border-white/5 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-brand-500/20 bg-brand-500/10 text-brand-400">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <Users className="h-5 w-5" />
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white">Ketenagaan SDM &amp; Fasilitas Gudang</h2>
-                <p className="text-xs text-zinc-400">
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Ketenagaan SDM &amp; Fasilitas Gudang</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
                   Statistik jumlah personel farmasi dan luasan gudang pada halaman Profil lembaga.
                 </p>
               </div>
@@ -1286,7 +1345,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
             <div className="relative mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <div className="space-y-2">
-                <Label htmlFor="sdm-total" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="sdm-total" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Total SDM Keseluruhan
                 </Label>
                 <Input
@@ -1294,12 +1353,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={statsForm.sdmTotalCount}
                   onChange={(e) => setStatsForm({ ...statsForm, sdmTotalCount: e.target.value })}
                   placeholder="24 Orang"
-                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sdm-apoteker" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="sdm-apoteker" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Tenaga Apoteker
                 </Label>
                 <Input
@@ -1307,12 +1366,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={statsForm.sdmApotekerCount}
                   onChange={(e) => setStatsForm({ ...statsForm, sdmApotekerCount: e.target.value })}
                   placeholder="5 Orang"
-                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sdm-ttk" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="sdm-ttk" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Tenaga Teknis (TTK)
                 </Label>
                 <Input
@@ -1320,12 +1379,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={statsForm.sdmTtkCount}
                   onChange={(e) => setStatsForm({ ...statsForm, sdmTtkCount: e.target.value })}
                   placeholder="7 Orang"
-                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="sdm-pendukung" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="sdm-pendukung" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Tenaga Pendukung / Operasional
                 </Label>
                 <Input
@@ -1333,12 +1392,12 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={statsForm.sdmPendukungCount}
                   onChange={(e) => setStatsForm({ ...statsForm, sdmPendukungCount: e.target.value })}
                   placeholder="11 Orang"
-                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
                 />
               </div>
 
               <div className="space-y-2 sm:col-span-2 lg:col-span-4">
-                <Label htmlFor="sarana-luas" className="text-xs font-medium text-zinc-300">
+                <Label htmlFor="sarana-luas" className="text-xs font-medium text-[var(--admin-text-main)]">
                   Kapasitas / Luas Gudang Farmasi
                 </Label>
                 <Input
@@ -1346,9 +1405,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={statsForm.saranaGudangLuas}
                   onChange={(e) => setStatsForm({ ...statsForm, saranaGudangLuas: e.target.value })}
                   placeholder="690 m²"
-                  className="border-white/10 bg-zinc-950/60 text-xs text-zinc-100 max-w-sm"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] max-w-sm"
                 />
-                <p className="text-[11px] text-zinc-500">
+                <p className="text-[11px] text-[var(--admin-muted)]">
                   Tampil pada kartu &quot;Gudang Farmasi&quot; di seksi Sarana &amp; Fasilitas Gudang.
                 </p>
               </div>
@@ -1361,7 +1420,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleStatsReset}
-              className="gap-2 border-white/10 bg-zinc-800/60 text-zinc-300 transition-colors [@media(hover:hover)]:hover:bg-zinc-800 [@media(hover:hover)]:hover:text-white active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -1369,7 +1428,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
             <Button
               type="submit"
               disabled={isPending}
-              className="gap-2 bg-brand-500 text-zinc-950 font-semibold shadow-lg shadow-brand-500/20 transition-all [@media(hover:hover)]:hover:bg-brand-400 active:scale-[0.98]"
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
             >
               <Save className="h-4 w-4" />
               <span>{isPending ? "Menyimpan..." : "Simpan Statistik"}</span>

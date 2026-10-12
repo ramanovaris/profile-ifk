@@ -28,6 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn, getAssetUrl } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toast";
 import { logoutAction, getCurrentUserAction, type AuthUserInfo } from "@/actions/auth";
+import { ThemeDropdown, type ThemeSetting } from "@/components/admin/theme-dropdown";
 import type { Role } from "@prisma/client";
 
 type SidebarItem = {
@@ -64,14 +65,16 @@ function SidebarLink({
       className={cn(
         "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
         active
-          ? "border border-brand-500/20 bg-brand-500/10 text-brand-400 shadow-sm shadow-brand-500/10"
-          : "text-zinc-400 hover:bg-white/5 hover:text-zinc-100"
+          ? "bg-[#455a26] text-white shadow-xs font-semibold"
+          : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
       )}
     >
       <Icon
         className={cn(
           "h-4 w-4 transition-colors",
-          active ? "text-brand-400" : "text-zinc-400 group-hover:text-zinc-200"
+          active
+            ? "text-white"
+            : "text-[var(--admin-muted)] group-hover:text-[var(--admin-text-main)]"
         )}
       />
       <span>{label}</span>
@@ -101,18 +104,20 @@ function SidebarContent({
             width={32}
             height={32}
             unoptimized
-            className="h-8 w-8 rounded-full ring-1 ring-white/15"
+            className="h-8 w-8 rounded-full ring-1 ring-[var(--admin-border)]"
           />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-bold tracking-tight text-white">Admin IFK</span>
-          <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+          <span className="text-sm font-bold tracking-tight text-[var(--admin-text-main)]">
+            Admin IFK
+          </span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--admin-muted)]">
             Kotabaru
           </span>
         </div>
       </div>
 
-      <Separator className="bg-white/5" />
+      <Separator className="bg-[var(--admin-border)]" />
 
       {/* Navigation */}
       <nav className="mt-4 flex flex-col gap-1 px-3">
@@ -127,12 +132,12 @@ function SidebarContent({
 
       {/* Bottom section */}
       <div className="mt-auto px-3 pb-4">
-        <Separator className="mb-4 bg-white/5" />
+        <Separator className="mb-4 bg-[var(--admin-border)]" />
         <form action={logoutAction}>
           <Button
             type="submit"
             variant="ghost"
-            className="w-full justify-start text-zinc-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+            className="w-full justify-start text-[var(--admin-muted)] hover:bg-red-500/10 hover:text-red-500 transition-colors"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Keluar Sesi
@@ -155,10 +160,95 @@ export type AdminShellProps = {
   };
 };
 
+// Module-level persistent cache across route navigations
+let activeClientTheme: ThemeSetting | null = null;
+let activeSystemIsDark: boolean | null = null;
+
+function getInitialAdminTheme(): ThemeSetting {
+  if (activeClientTheme) return activeClientTheme;
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
+      if (stored === "light" || stored === "dark" || stored === "system") {
+        activeClientTheme = stored;
+        return stored;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return "light";
+}
+
+function getInitialSystemDark(): boolean {
+  if (activeSystemIsDark !== null) return activeSystemIsDark;
+  if (typeof window !== "undefined") {
+    try {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      activeSystemIsDark = isDark;
+      return isDark;
+    } catch {
+      // ignore
+    }
+  }
+  return false;
+}
+
 export function AdminShell({ children, currentUser }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
+
+  const [themeSetting, setThemeSetting] = useState<ThemeSetting>(getInitialAdminTheme);
+  const [systemIsDark, setSystemIsDark] = useState<boolean>(getInitialSystemDark);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
+      if (stored === "light" || stored === "dark" || stored === "system") {
+        activeClientTheme = stored;
+        setThemeSetting(stored);
+      }
+    } catch {
+      // ignore
+    }
+
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    activeSystemIsDark = media.matches;
+    setSystemIsDark(media.matches);
+
+    const listener = (e: MediaQueryListEvent) => {
+      activeSystemIsDark = e.matches;
+      setSystemIsDark(e.matches);
+    };
+
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, []);
+
+  const handleThemeChange = (newTheme: ThemeSetting) => {
+    activeClientTheme = newTheme;
+    setThemeSetting(newTheme);
+    try {
+      localStorage.setItem("admin-theme", newTheme);
+    } catch {
+      // ignore
+    }
+  };
+
+  const resolvedTheme: "light" | "dark" =
+    themeSetting === "system"
+      ? systemIsDark
+        ? "dark"
+        : "light"
+      : themeSetting;
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.setAttribute("data-admin-theme", resolvedTheme);
+  }, [resolvedTheme]);
 
   const user: AuthUserInfo | null = currentUser
     ? {
@@ -194,35 +284,41 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
   return (
-    <div className="relative flex h-dvh min-h-dvh overflow-hidden bg-zinc-950 text-zinc-100 selection:bg-brand-500/30">
+    <div
+      data-admin-theme={resolvedTheme}
+      suppressHydrationWarning
+      className="admin-root relative flex h-dvh min-h-dvh overflow-hidden bg-[var(--admin-bg)] text-[var(--admin-text-main)] selection:bg-brand-500/30 transition-colors duration-200"
+    >
       {/* Subtle Ambient Background Mesh Glows */}
       <div
-        className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl"
+        className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full blur-3xl opacity-70 transition-opacity"
+        style={{ background: "var(--admin-ambient-glow-1)" }}
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full bg-brand-600/10 blur-3xl"
+        className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full blur-3xl opacity-70 transition-opacity"
+        style={{ background: "var(--admin-ambient-glow-2)" }}
         aria-hidden="true"
       />
 
       {/* Desktop sidebar */}
-      <aside className="relative z-10 hidden w-64 shrink-0 border-r border-white/5 bg-zinc-900/60 backdrop-blur-xl md:flex md:flex-col">
+      <aside className="relative z-10 hidden w-64 shrink-0 border-r border-[var(--admin-border)] bg-[var(--admin-sidebar-bg)] backdrop-blur-xl md:flex md:flex-col transition-colors duration-200">
         <SidebarContent pathname={pathname} user={user} />
       </aside>
 
       <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-white/5 bg-zinc-900/60 px-4 backdrop-blur-xl sm:px-6">
+        <header className="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-header-bg)] px-4 backdrop-blur-xl sm:px-6 transition-colors duration-200">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/5 bg-white/[0.02] text-zinc-400 hover:bg-white/5 hover:text-white md:hidden transition-colors"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] md:hidden transition-colors"
               aria-label="Buka menu"
             >
               <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-64 border-r border-white/10 bg-zinc-950/95 p-0 text-white backdrop-blur-2xl"
+              className="w-64 border-r border-[var(--admin-border)] bg-[var(--admin-sheet-bg)] p-0 text-[var(--admin-text-main)] backdrop-blur-2xl"
             >
               <SheetHeader>
                 <SheetTitle className="sr-only">Menu Admin</SheetTitle>
@@ -233,27 +329,32 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
 
           {/* Right Header Admin Info */}
           <div className="ml-auto flex items-center gap-3">
+            <ThemeDropdown
+              themeSetting={themeSetting}
+              onThemeChange={handleThemeChange}
+            />
+
             {user && (
               <span
                 className={cn(
                   "hidden items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium sm:inline-flex",
                   isSuperAdmin
-                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-                    : "border-sky-500/20 bg-sky-500/10 text-sky-400"
+                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : "border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-400"
                 )}
               >
                 {isSuperAdmin ? "Super Admin" : "Staff"}
               </span>
             )}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-zinc-200 max-w-[150px] truncate sm:max-w-xs">
+              <span className="text-sm font-medium text-[var(--admin-text-main)] max-w-[150px] truncate sm:max-w-xs">
                 {displayName}
               </span>
               <Avatar className="h-8 w-8 ring-1 ring-brand-500/30">
                 {user?.avatar ? (
                   <AvatarImage src={getAssetUrl(user.avatar)} alt={displayName} />
                 ) : null}
-                <AvatarFallback className="bg-brand-500/20 text-xs font-semibold text-brand-300">
+                <AvatarFallback className="bg-brand-500/20 text-xs font-semibold text-brand-600 dark:text-brand-300">
                   {initials}
                 </AvatarFallback>
               </Avatar>

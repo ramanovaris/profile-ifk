@@ -16,6 +16,7 @@
   --brand-700: #33781b;
   --brand-800: #2a5f17;
   --brand-900: #1f4a12;
+  --brand-950: #022c22;
 
   /* Neutral base — Zinc */
   --surface: #fafafa;
@@ -45,6 +46,7 @@
   --color-brand-700: var(--brand-700);
   --color-brand-800: var(--brand-800);
   --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
 
   --color-surface: var(--surface);
   --color-surface-alt: var(--surface-alt);
@@ -242,4 +244,70 @@ input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
+
+/* ── Admin Semantic Theme Variables ────────────────────────────── */
+:root[data-admin-theme="light"],
+:root[data-admin-theme="light"] .admin-root,
+.admin-root[data-admin-theme="light"] {
+  --admin-bg: #f8fafc;
+  --admin-surface: #ffffff;
+  --admin-surface-nav: #f1f5f9;
+  --admin-border: #e2e8f0;
+  --admin-border-subtle: #f1f5f9;
+  --admin-text-main: #0f172a;
+  --admin-text-muted: #64748b;
+  --admin-muted: #64748b;
+  --admin-card-bg: #ffffff;
+  --admin-card-border: #e2e8f0;
+  --admin-header-bg: rgba(255, 255, 255, 0.85);
+  --admin-sidebar-bg: #ffffff;
+  --admin-hover-bg: #f1f5f9;
+  --admin-sheet-bg: #ffffff;
+  --admin-table-header-bg: #f8fafc;
+  --admin-ambient-glow-1: rgba(16, 185, 129, 0.08);
+  --admin-ambient-glow-2: rgba(61, 143, 32, 0.06);
+  --admin-popover-bg: #ffffff;
+  --admin-popover-border: #cbd5e1;
+}
+
+:root[data-admin-theme="dark"],
+:root[data-admin-theme="dark"] .admin-root,
+.admin-root[data-admin-theme="dark"] {
+  --admin-bg: #09090b;
+  --admin-surface: rgba(24, 24, 27, 0.6);
+  --admin-surface-nav: rgba(24, 24, 27, 0.6);
+  --admin-border: rgba(255, 255, 255, 0.05);
+  --admin-border-subtle: rgba(255, 255, 255, 0.03);
+  --admin-text-main: #f4f4f5;
+  --admin-text-muted: #a1a1aa;
+  --admin-muted: #a1a1aa;
+  --admin-card-bg: rgba(24, 24, 27, 0.6);
+  --admin-card-border: rgba(255, 255, 255, 0.05);
+  --admin-header-bg: rgba(24, 24, 27, 0.6);
+  --admin-sidebar-bg: rgba(24, 24, 27, 0.6);
+  --admin-hover-bg: rgba(255, 255, 255, 0.05);
+  --admin-sheet-bg: rgba(9, 9, 11, 0.95);
+  --admin-table-header-bg: rgba(255, 255, 255, 0.02);
+  --admin-ambient-glow-1: rgba(16, 185, 129, 0.1);
+  --admin-ambient-glow-2: rgba(61, 143, 32, 0.1);
+  --admin-popover-bg: #18181b;
+  --admin-popover-border: rgba(255, 255, 255, 0.12);
+}
+
+/* Pastikan judul halaman di area admin selalu kontras di mode terang */
+:root[data-admin-theme="light"] h1,
+:root[data-admin-theme="light"] h2,
+.admin-root[data-admin-theme="light"] h1,
+.admin-root[data-admin-theme="light"] h2 {
+  color: var(--admin-text-main);
+}
+
+:root[data-admin-theme="light"] h1 + p,
+:root[data-admin-theme="light"] h2 + p,
+.admin-root[data-admin-theme="light"] h1 + p,
+.admin-root[data-admin-theme="light"] h2 + p {
+  color: var(--admin-muted);
+}
+
+
 

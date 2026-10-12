@@ -178,18 +178,18 @@ export function StockMultiSelectFilter({
   const renderTriggerLabel = () => {
     const count = selectedValues.length;
     if (count === 0) {
-      return <span className="truncate text-zinc-300">{allLabel}</span>;
+      return <span className="truncate text-[var(--admin-muted)]">{allLabel}</span>;
     }
     if (count === 1) {
       const found = options.find((o) => o.value === selectedValues[0]);
       return (
-        <span className="truncate font-medium text-white">
+        <span className="truncate font-bold text-white">
           {found ? found.label : selectedValues[0]}
         </span>
       );
     }
     return (
-      <span className="truncate font-medium text-white">
+      <span className="truncate font-bold text-white">
         {count} {title}
       </span>
     );
@@ -208,10 +208,10 @@ export function StockMultiSelectFilter({
         onClick={() => (isOpen ? closeDropdown() : openDropdown())}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
-        className={`inline-flex h-9.5 w-full items-center justify-between gap-2.5 rounded-lg border bg-zinc-950/60 px-3.5 text-xs text-white outline-none transition-all hover:border-white/10 hover:bg-zinc-900/60 focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 sm:w-auto sm:min-w-[170px] ${
+        className={`inline-flex h-9.5 w-full items-center justify-between gap-2.5 rounded-lg border px-3.5 text-xs outline-none transition-all focus:ring-2 focus:ring-brand-500/40 sm:w-auto sm:min-w-[170px] ${
           selectedValues.length > 0
-            ? "border-brand-500/30 bg-brand-500/5 text-brand-300"
-            : "border-white/5"
+            ? "border-[#455a26] bg-[#455a26] text-white font-bold shadow-xs hover:brightness-110"
+            : "border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-text-main)] hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)]"
         }`}
       >
         <div className="flex items-center gap-2 truncate">
@@ -220,7 +220,7 @@ export function StockMultiSelectFilter({
           ) : (
             <SlidersHorizontal
               className={`h-3.5 w-3.5 shrink-0 transition-colors ${
-                selectedValues.length > 0 ? "text-brand-400" : "text-zinc-400"
+                selectedValues.length > 0 ? "text-white" : "text-[var(--admin-muted)]"
               }`}
             />
           )}
@@ -229,14 +229,14 @@ export function StockMultiSelectFilter({
 
         <div className="flex items-center gap-1.5 shrink-0">
           {!singleSelect && selectedValues.length > 0 && (
-            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-brand-500/20 px-1.5 text-[10px] font-semibold text-brand-300">
+            <span className="inline-flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-black/20 px-1.5 text-[10px] font-bold text-white">
               {selectedValues.length}
             </span>
           )}
           <ChevronDown
-            className={`h-3.5 w-3.5 text-zinc-400 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={`h-3.5 w-3.5 transition-transform duration-200 ${
+              selectedValues.length > 0 ? "text-white/80" : "text-[var(--admin-muted)]"
+            } ${isOpen ? "rotate-180" : ""}`}
           />
         </div>
       </button>
@@ -248,7 +248,7 @@ export function StockMultiSelectFilter({
           id={listboxId}
           aria-multiselectable={!singleSelect}
           className={cn(
-            "absolute top-full z-50 mt-1.5 rounded-xl border border-white/10 bg-zinc-900 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95",
+            "absolute top-full z-50 mt-1.5 rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] p-2 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95",
             align === "full-mobile"
               ? "left-0 right-0 w-full sm:left-auto sm:right-0 sm:w-72 origin-top sm:origin-top-right"
               : align === "left"
@@ -259,7 +259,7 @@ export function StockMultiSelectFilter({
           {/* Mini Search Input if enabled */}
           {enableSearch && (
             <div className="relative mb-2 flex items-center">
-              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--admin-muted)]" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -269,18 +269,18 @@ export function StockMultiSelectFilter({
                   setActiveIndex(0);
                 }}
                 placeholder={`Cari ${title.toLowerCase()}...`}
-                className="w-full rounded-md border border-white/5 bg-zinc-950/70 py-1.5 pl-8 pr-2.5 text-xs text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-1 focus:ring-brand-500/40"
+                className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] py-1.5 pl-8 pr-2.5 text-xs text-[var(--admin-text-main)] placeholder-[var(--admin-muted)] outline-none transition-colors focus:border-brand-500/60 focus:ring-1 focus:ring-brand-500/40"
               />
             </div>
           )}
 
           {/* Quick Actions Bar (Hanya tampil untuk multi-select) */}
           {!singleSelect && (
-            <div className="mb-1.5 flex items-center justify-between border-b border-white/5 px-1 pb-1.5 text-xs">
+            <div className="mb-1.5 flex items-center justify-between border-b border-[var(--admin-border)] px-1 pb-1.5 text-xs">
               <button
                 type="button"
                 onClick={handleSelectAll}
-                className="cursor-pointer text-[11px] font-medium text-brand-400 transition-colors hover:text-brand-300"
+                className="cursor-pointer text-[11px] font-medium text-brand-600 dark:text-brand-400 transition-colors hover:text-brand-500"
               >
                 Pilih Semua
               </button>
@@ -288,7 +288,7 @@ export function StockMultiSelectFilter({
                 type="button"
                 onClick={handleResetFilter}
                 disabled={selectedValues.length === 0}
-                className="cursor-pointer text-[11px] font-medium text-zinc-400 transition-colors hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
+                className="cursor-pointer text-[11px] font-medium text-[var(--admin-muted)] transition-colors hover:text-[var(--admin-text-main)] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Reset Filter
               </button>
@@ -297,7 +297,7 @@ export function StockMultiSelectFilter({
 
           {/* Create / Add Action (e.g. + Buka Periode Baru) */}
           {createAction && (
-            <div className="mb-1.5 pb-1 border-b border-white/5">
+            <div className="mb-1.5 pb-1 border-b border-[var(--admin-border)]">
               <button
                 type="button"
                 onClick={(e) => {
@@ -305,12 +305,12 @@ export function StockMultiSelectFilter({
                   closeDropdown();
                   createAction.onClick();
                 }}
-                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-300 transition-colors cursor-pointer border border-emerald-500/20"
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 hover:text-emerald-500 transition-colors cursor-pointer border border-emerald-500/20"
               >
                 {createAction.icon ? (
                   <span className="shrink-0">{createAction.icon}</span>
                 ) : (
-                  <span className="shrink-0 text-emerald-400 text-sm font-bold leading-none">+</span>
+                  <span className="shrink-0 text-emerald-500 text-sm font-bold leading-none">+</span>
                 )}
                 <span className="truncate">{createAction.label}</span>
               </button>
@@ -323,7 +323,7 @@ export function StockMultiSelectFilter({
             className="max-h-56 space-y-0.5 overflow-y-auto pr-0.5 scrollbar-thin"
           >
             {filteredOptions.length === 0 ? (
-              <div className="py-4 text-center text-xs text-zinc-500">
+              <div className="py-4 text-center text-xs text-[var(--admin-muted)]">
                 Pilihan tidak ditemukan
               </div>
             ) : (
@@ -340,10 +340,10 @@ export function StockMultiSelectFilter({
                     onMouseEnter={() => setActiveIndex(index)}
                     className={`flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition-colors ${
                       isHighlighted
-                        ? "bg-white/10 text-white"
+                        ? "bg-[var(--admin-hover-bg)]"
                         : isSelected
-                        ? "bg-brand-500/10 text-brand-200"
-                        : "text-zinc-300 hover:bg-white/5 hover:text-white"
+                        ? "bg-brand-500/10 text-brand-600 dark:text-brand-200 font-medium"
+                        : "text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)]"
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
@@ -354,7 +354,7 @@ export function StockMultiSelectFilter({
                         } ${
                           isSelected
                             ? "border-brand-500 bg-brand-600 text-white"
-                            : "border-zinc-700 bg-zinc-950/50"
+                            : "border-[var(--admin-border)] bg-[var(--admin-hover-bg)]"
                         }`}
                       >
                         {isSelected && <Check className="h-2.5 w-2.5 stroke-[3]" />}
@@ -372,7 +372,7 @@ export function StockMultiSelectFilter({
 
                     {/* Count Badge */}
                     {opt.count !== undefined && (
-                      <span className="ml-2 shrink-0 rounded-full bg-zinc-800/80 px-1.5 py-0.5 text-[10px] font-mono text-zinc-400">
+                      <span className="ml-2 shrink-0 rounded-full border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-1.5 py-0.5 text-[10px] font-mono text-[var(--admin-muted)]">
                         {opt.count}
                       </span>
                     )}
@@ -383,7 +383,7 @@ export function StockMultiSelectFilter({
           </div>
 
           {footerAction && (
-            <div className="mt-1 border-t border-white/5 p-1">
+            <div className="mt-1 border-t border-[var(--admin-border)] p-1">
               <button
                 type="button"
                 disabled={footerAction.disabled}
@@ -395,8 +395,8 @@ export function StockMultiSelectFilter({
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors cursor-pointer",
                   footerAction.variant === "danger"
-                    ? "text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
-                    : "text-zinc-300 hover:bg-white/10 hover:text-white",
+                    ? "text-rose-500 hover:bg-rose-500/10 hover:text-rose-600"
+                    : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]",
                   footerAction.disabled && "cursor-not-allowed opacity-50"
                 )}
               >

@@ -85,17 +85,17 @@ export function ArticlePreviewModal({
       aria-labelledby="preview-modal-title"
     >
       {/* Container Dialog */}
-      <div className="flex h-full max-h-[95vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-2xl">
+      <div className="flex h-full max-h-[95vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] shadow-2xl">
         {/* ── Toolbar Header ─────────────────────────────────────────── */}
-        <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-zinc-900/80 px-4 py-3 sm:px-6">
+        <div className="flex shrink-0 items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-brand-500/30 bg-brand-500/10 text-brand-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-400">
               <Eye className="h-4 w-4" />
             </div>
             <div>
               <h2
                 id="preview-modal-title"
-                className="text-sm font-semibold text-white sm:text-base"
+                className="text-sm font-semibold text-[var(--admin-text-main)] sm:text-base"
               >
                 Pratinjau Artikel
               </h2>
@@ -103,13 +103,13 @@ export function ArticlePreviewModal({
                 <span
                   className={`inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
                     data.isPublished
-                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                      : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                      ? "bg-emerald-700 text-white font-bold"
+                      : "bg-amber-700 text-white font-bold"
                   }`}
                 >
                   {data.isPublished ? "Status: Publikasi" : "Status: Draf"}
                 </span>
-                <span className="hidden text-xs text-zinc-400 sm:inline">
+                <span className="hidden text-xs text-[var(--admin-muted)] sm:inline">
                   Simulasi Tampilan Pengunjung
                 </span>
               </div>
@@ -118,14 +118,14 @@ export function ArticlePreviewModal({
 
           {/* Viewport Switcher & Close */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center rounded-lg border border-white/10 bg-zinc-900 p-0.5">
+            <div className="flex items-center rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-0.5">
               <button
                 type="button"
                 onClick={() => setViewportMode("desktop")}
                 className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   viewportMode === "desktop"
-                    ? "bg-brand-600 text-white shadow-sm"
-                    : "text-zinc-400 hover:text-white"
+                    ? "bg-[#455a26] text-white font-bold shadow-xs"
+                    : "text-[var(--admin-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
                 title="Tampilan Desktop"
               >
@@ -137,8 +137,8 @@ export function ArticlePreviewModal({
                 onClick={() => setViewportMode("mobile")}
                 className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                   viewportMode === "mobile"
-                    ? "bg-brand-600 text-white shadow-sm"
-                    : "text-zinc-400 hover:text-white"
+                    ? "bg-[#455a26] text-white font-bold shadow-xs"
+                    : "text-[var(--admin-muted)] hover:text-[var(--admin-text-main)]"
                 }`}
                 title="Tampilan Mobile (HP 390px)"
               >
@@ -150,7 +150,7 @@ export function ArticlePreviewModal({
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)] transition-colors hover:text-[var(--admin-text-main)]"
               title="Tutup Pratinjau (Esc)"
             >
               <X className="h-4 w-4" />
@@ -159,7 +159,7 @@ export function ArticlePreviewModal({
         </div>
 
         {/* ── Scrollable Preview Area ─────────────────────────────────── */}
-        <ModalScrollArea className="bg-zinc-900/50 p-3 sm:p-6">
+        <ModalScrollArea className="bg-[var(--admin-bg)] p-3 sm:p-6">
           <div
             className={`mx-auto transition-all duration-300 ${
               viewportMode === "desktop"
@@ -255,14 +255,14 @@ export function ArticlePreviewModal({
         </ModalScrollArea>
 
         {/* ── Footer Modal ────────────────────────────────────────────── */}
-        <div className="flex shrink-0 items-center justify-between border-t border-white/10 bg-zinc-900/80 px-4 py-2.5 text-xs text-zinc-400 sm:px-6">
+        <div className="flex shrink-0 items-center justify-between border-t border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 py-2.5 text-xs text-[var(--admin-muted)] sm:px-6">
           <span>
-            Tekan <kbd className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] text-zinc-300">Esc</kbd> untuk kembali ke editor formulir
+            Tekan <kbd className="rounded border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--admin-text-main)]">Esc</kbd> untuk kembali ke editor formulir
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white"
+            className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-3 py-1 text-xs font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)]"
           >
             Tutup Pratinjau
           </button>

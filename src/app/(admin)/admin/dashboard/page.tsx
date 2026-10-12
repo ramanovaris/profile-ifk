@@ -143,10 +143,10 @@ export default async function AdminDashboardPage() {
       {/* Header section with quick action */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
             Dashboard
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[var(--admin-muted)]">
             Ringkasan status publikasi, inventaris obat, dan aktivitas portal IFK Kotabaru.
           </p>
         </div>
@@ -171,13 +171,13 @@ export default async function AdminDashboardPage() {
           <Link
             key={stat.label}
             href={stat.href}
-            className={`group relative overflow-hidden rounded-xl border border-white/5 bg-zinc-900/60 p-4 sm:p-5 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40 cursor-pointer ${
+            className={`group relative overflow-hidden rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-4 sm:p-5 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/40 cursor-pointer ${
               stat.borderHover
             } ${
               isSuperAdmin && idx === 4 ? "col-span-2 sm:col-span-1" : ""
             }`}
           >
-            {/* Ornamen Watermark Icon Samar (Dark Ethereal Depth) */}
+            {/* Ornamen Watermark Icon Samar (Depth Effect) */}
             <div
               className={`pointer-events-none absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 ${stat.watermark}`}
             >
@@ -191,16 +191,16 @@ export default async function AdminDashboardPage() {
                 >
                   <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
-                <div className="flex items-center gap-0.5 text-zinc-500 transition-colors group-hover:text-zinc-300">
+                <div className="flex items-center gap-0.5 text-[var(--admin-muted)] transition-colors group-hover:text-[var(--admin-text-main)]">
                   <span className="text-[10px] font-medium opacity-0 sm:group-hover:opacity-100 transition-opacity">Buka</span>
                   <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </div>
               </div>
               <div className="mt-3 sm:mt-4">
-                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--admin-text-main)]">
                   {stat.value}
                 </p>
-                <p className="mt-1 text-[11px] sm:text-xs font-medium text-zinc-400">
+                <p className="mt-1 text-[11px] sm:text-xs font-medium text-[var(--admin-muted)]">
                   {stat.label}
                 </p>
               </div>
@@ -210,29 +210,29 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Tabel 5 Artikel Terakhir Sistem */}
-      <div className="mt-8 rounded-xl border border-white/5 bg-zinc-900/60 p-5 backdrop-blur-xl">
+      <div className="mt-8 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-5 backdrop-blur-xl">
         <div className="flex items-center justify-between pb-4">
           <div>
-            <h2 className="text-base font-semibold text-white sm:text-lg">
+            <h2 className="text-base font-semibold text-[var(--admin-text-main)] sm:text-lg">
               Artikel Terakhir
             </h2>
-            <p className="text-xs text-zinc-400">
+            <p className="text-xs text-[var(--admin-muted)]">
               5 artikel yang baru saja diperbarui atau dipublikasikan
             </p>
           </div>
           <Link
             href="/admin/berita/"
-            className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 hover:text-brand-300"
+            className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-500"
           >
             <span>Semua Berita</span>
             <ArrowUpRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        <div className="overflow-x-auto rounded-lg border border-white/5">
+        <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-white/5 bg-white/[0.02] text-xs font-medium uppercase tracking-wider text-zinc-400">
+              <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)] text-xs font-medium uppercase tracking-wider text-[var(--admin-muted)]">
                 <th className="px-4 py-3">Judul Artikel</th>
                 <th className="px-4 py-3">Kategori</th>
                 <th className="px-4 py-3">Penulis</th>
@@ -241,12 +241,12 @@ export default async function AdminDashboardPage() {
                 <th className="px-4 py-3 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {recentArticles.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-4 py-8 text-center text-sm text-zinc-400"
+                    className="px-4 py-8 text-center text-sm text-[var(--admin-muted)]"
                   >
                     Belum ada rekaman artikel berita pada sistem.
                   </td>
@@ -255,31 +255,31 @@ export default async function AdminDashboardPage() {
                 recentArticles.map((article) => (
                   <tr
                     key={article.id}
-                    className="transition-colors hover:bg-white/[0.02]"
+                    className="transition-colors hover:bg-[var(--admin-hover-bg)]"
                   >
-                    <td className="px-4 py-3 font-medium text-zinc-200">
+                    <td className="px-4 py-3 font-medium text-[var(--admin-text-main)]">
                       {article.title}
                     </td>
-                    <td className="px-4 py-3 text-zinc-400">
-                      <span className="rounded-md border border-white/5 bg-white/[0.03] px-2 py-1 text-xs">
+                    <td className="px-4 py-3 text-[var(--admin-muted)]">
+                      <span className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2 py-1 text-xs">
                         {article.category?.name || "-"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-zinc-300">
+                    <td className="px-4 py-3 text-xs text-[var(--admin-muted)]">
                       {article.author?.name || article.author?.username || "-"}
                     </td>
                     <td className="px-4 py-3">
                       {article.isPublished ? (
-                        <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400">
+                        <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
                           Terbit
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
+                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
                           Draft
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-zinc-400">
+                    <td className="px-4 py-3 text-xs text-[var(--admin-muted)]">
                       {article.publishedAt
                         ? new Date(article.publishedAt).toLocaleDateString(
                             "id-ID",
@@ -294,7 +294,7 @@ export default async function AdminDashboardPage() {
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/berita/${article.id}/edit/`}
-                        className="inline-flex items-center gap-1 text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+                        className="inline-flex items-center gap-1 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:text-[var(--admin-text-main)]"
                       >
                         <span>Edit</span>
                         <ExternalLink className="h-3 w-3" />
@@ -311,19 +311,19 @@ export default async function AdminDashboardPage() {
       {/* Bagian Bawah Berbasis Peran (RBAC) */}
       {isSuperAdmin ? (
         /* Tampilan Super Admin: Pengelola Akun Aktif */
-        <div className="mt-8 rounded-xl border border-white/5 bg-zinc-900/60 p-5 backdrop-blur-xl">
+        <div className="mt-8 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-5 backdrop-blur-xl">
           <div className="flex items-center justify-between pb-4">
             <div>
-              <h2 className="text-base font-semibold text-white sm:text-lg">
+              <h2 className="text-base font-semibold text-[var(--admin-text-main)] sm:text-lg">
                 Pengelola Akun Aktif
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[var(--admin-muted)]">
                 Daftar staf dan pengelola akun admin portal
               </p>
             </div>
             <Link
               href="/admin/pengguna/"
-              className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 hover:text-brand-300"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-500"
             >
               <span>Kelola Pengguna</span>
               <ArrowUpRight className="h-3.5 w-3.5" />
@@ -334,14 +334,14 @@ export default async function AdminDashboardPage() {
             {superAdminUsers.map((user) => (
               <div
                 key={user.id}
-                className="flex items-center gap-3.5 rounded-lg border border-white/5 bg-zinc-900/40 p-3.5 transition-colors hover:border-white/10"
+                className="flex items-center gap-3.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3.5 transition-colors hover:border-brand-500/30"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-500/30 bg-brand-500/20 text-sm font-bold text-brand-300">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-500/30 bg-brand-500/20 text-sm font-bold text-brand-600 dark:text-brand-300">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="truncate text-sm font-medium text-zinc-200">
+                    <p className="truncate text-sm font-medium text-[var(--admin-text-main)]">
                       {user.name}
                     </p>
                   </div>
@@ -349,13 +349,13 @@ export default async function AdminDashboardPage() {
                     <span
                       className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
                         user.role === "SUPER_ADMIN"
-                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-                          : "border-white/10 bg-white/5 text-zinc-400"
+                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : "border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)]"
                       }`}
                     >
                       {user.role}
                     </span>
-                    <span className="text-[11px] text-zinc-400">
+                    <span className="text-[11px] text-[var(--admin-muted)]">
                       {user._count.articles} artikel ditulis
                     </span>
                   </div>
@@ -366,19 +366,19 @@ export default async function AdminDashboardPage() {
         </div>
       ) : (
         /* Tampilan Staf: Ringkasan Artikel Saya */
-        <div className="mt-8 rounded-xl border border-white/5 bg-zinc-900/60 p-5 backdrop-blur-xl">
+        <div className="mt-8 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-5 backdrop-blur-xl">
           <div className="flex items-center justify-between pb-4">
             <div>
-              <h2 className="text-base font-semibold text-white sm:text-lg">
+              <h2 className="text-base font-semibold text-[var(--admin-text-main)] sm:text-lg">
                 Artikel Saya
               </h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-[var(--admin-muted)]">
                 Daftar artikel yang baru saja Anda kelola atau buat
               </p>
             </div>
             <Link
               href="/admin/berita/baru/"
-              className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 hover:text-brand-300"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-500"
             >
               <span>Tulis Berita Baru</span>
               <Plus className="h-3.5 w-3.5" />
@@ -386,18 +386,18 @@ export default async function AdminDashboardPage() {
           </div>
 
           {staffArticles.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-white/10 bg-white/[0.01] p-8 text-center">
-              <PenLine className="mx-auto h-8 w-8 text-zinc-400" />
-              <p className="mt-2 text-sm font-medium text-zinc-300">
+            <div className="rounded-lg border border-dashed border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-8 text-center">
+              <PenLine className="mx-auto h-8 w-8 text-[var(--admin-muted)]" />
+              <p className="mt-2 text-sm font-medium text-[var(--admin-text-main)]">
                 Anda belum memiliki rekaman naskah artikel
               </p>
-              <p className="mt-1 text-xs text-zinc-400">
+              <p className="mt-1 text-xs text-[var(--admin-muted)]">
                 Mulai publikasikan informasi, agenda kegiatan, atau sosialisasi kefarmasian.
               </p>
               <div className="mt-4">
                 <Link
                   href="/admin/berita/baru/"
-                  className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-brand-600/20 px-3 py-1.5 text-xs font-medium text-brand-300 transition-colors hover:bg-brand-600/30"
+                  className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-brand-600/20 px-3 py-1.5 text-xs font-medium text-brand-600 dark:text-brand-300 transition-colors hover:bg-brand-600/30"
                 >
                   <Plus className="h-3.5 w-3.5" />
                   <span>Buat Artikel Pertama</span>
@@ -409,30 +409,30 @@ export default async function AdminDashboardPage() {
               {staffArticles.map((article) => (
                 <div
                   key={article.id}
-                  className="flex flex-col justify-between rounded-lg border border-white/5 bg-zinc-900/40 p-4 transition-colors hover:border-white/10"
+                  className="flex flex-col justify-between rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-4 transition-colors hover:border-brand-500/30"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="rounded-md border border-white/5 bg-white/[0.03] px-2 py-0.5 text-[11px] text-zinc-400">
+                      <span className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2 py-0.5 text-[11px] text-[var(--admin-muted)]">
                         {article.category?.name || "Umum"}
                       </span>
                       {article.isPublished ? (
-                        <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+                        <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
                           Terbit
                         </span>
                       ) : (
-                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
                           Draft
                         </span>
                       )}
                     </div>
-                    <h3 className="mt-2 line-clamp-2 text-sm font-medium text-zinc-200">
+                    <h3 className="mt-2 line-clamp-2 text-sm font-medium text-[var(--admin-text-main)]">
                       {article.title}
                     </h3>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
-                    <span className="flex items-center gap-1 text-[11px] text-zinc-400">
+                  <div className="mt-4 flex items-center justify-between border-t border-[var(--admin-border)] pt-3">
+                    <span className="flex items-center gap-1 text-[11px] text-[var(--admin-muted)]">
                       <Clock className="h-3 w-3" />
                       {new Date(article.updatedAt).toLocaleDateString("id-ID", {
                         day: "numeric",
@@ -442,7 +442,7 @@ export default async function AdminDashboardPage() {
                     </span>
                     <Link
                       href={`/admin/berita/${article.id}/edit/`}
-                      className="inline-flex items-center gap-1 text-xs font-medium text-brand-400 transition-colors hover:text-brand-300"
+                      className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 transition-colors hover:text-brand-500"
                     >
                       <span>Lanjutkan Edit</span>
                       <ExternalLink className="h-3 w-3" />

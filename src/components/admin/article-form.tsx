@@ -317,7 +317,7 @@ export function ArticleForm({
       <div className="pb-2">
         <Link
           href="/admin/berita/"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-zinc-400 backdrop-blur-md transition-colors hover:border-white/10 hover:bg-white/5 hover:text-white"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-3 py-1.5 text-xs font-medium text-[var(--admin-muted)] backdrop-blur-md transition-colors hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Kembali ke Kelola Berita</span>
@@ -325,14 +325,14 @@ export function ArticleForm({
       </div>
 
       {/* Main Form Container Card */}
-      <div className="rounded-2xl border border-white/5 bg-zinc-900/60 p-4 sm:p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6 w-full min-w-0 max-w-full overflow-hidden">
+      <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-4 sm:p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6 w-full min-w-0 max-w-full overflow-hidden">
         {/* Judul Artikel & Slug */}
         <div className="space-y-2">
           <Label
             htmlFor="title"
-            className="text-sm font-medium text-zinc-200 flex items-center gap-1.5"
+            className="text-sm font-medium text-[var(--admin-text-main)] flex items-center gap-1.5"
           >
-            <Type className="h-3.5 w-3.5 text-brand-400" />
+            <Type className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
             <span>Judul Artikel</span> <span className="text-red-400">*</span>
           </Label>
           <Input
@@ -360,13 +360,13 @@ export function ArticleForm({
               }
             }}
             placeholder="Misal: Sosialisasi Pelayanan Kefarmasian Puskesmas Se-Kotabaru"
-            className="border-white/10 bg-zinc-950/60 text-white placeholder-zinc-500 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+            className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] placeholder-[var(--admin-muted)] outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
           />
           {title && (
-            <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-400 pt-1 min-w-0 max-w-full">
-              <Globe className="h-3.5 w-3.5 text-brand-400 shrink-0" />
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--admin-muted)] pt-1 min-w-0 max-w-full">
+              <Globe className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400 shrink-0" />
               <span className="shrink-0">Preview URL:</span>
-              <code className="rounded bg-black/40 px-1.5 py-0.5 text-brand-300 font-mono break-all">
+              <code className="rounded border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-1.5 py-0.5 text-[#455a26] dark:text-brand-300 font-mono break-all">
                 /berita/{generatedSlug}
               </code>
             </div>
@@ -377,8 +377,8 @@ export function ArticleForm({
         <div className="grid gap-4 sm:gap-6 sm:grid-cols-2 w-full min-w-0">
           {/* Combobox Kategori */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
-              <Tag className="h-3.5 w-3.5 text-brand-400" />
+            <Label className="text-sm font-medium text-[var(--admin-text-main)] flex items-center gap-1.5">
+              <Tag className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
               <span>Kategori</span> <span className="text-red-400">*</span>
             </Label>
             <div ref={comboboxRef} className="relative">
@@ -432,35 +432,35 @@ export function ArticleForm({
                 aria-expanded={isComboboxOpen}
                 aria-haspopup="listbox"
                 className={cn(
-                  "flex h-10 w-full items-center justify-between rounded-lg border bg-zinc-950/60 px-3.5 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
+                  "flex h-10 w-full items-center justify-between rounded-lg border bg-[var(--admin-surface)] px-3.5 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
                   isComboboxOpen
                     ? "border-brand-500/60 ring-2 ring-brand-500/40"
-                    : "border-white/10 hover:border-white/20"
+                    : "border-[var(--admin-border)] hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)]"
                 )}
               >
                 <div className="flex items-center gap-2">
                   {selectedCategoryData ? (
-                    <span className="text-white">
+                    <span className="text-[var(--admin-text-main)] font-medium">
                       {selectedCategoryData.name}
                     </span>
                   ) : (
-                    <span className="text-zinc-500">Pilih kategori...</span>
+                    <span className="text-[var(--admin-muted)]">Pilih kategori...</span>
                   )}
                 </div>
                 <ChevronDown
                   className={cn(
-                    "h-4 w-4 text-zinc-400 transition-transform",
+                    "h-4 w-4 text-[var(--admin-muted)] transition-transform",
                     isComboboxOpen && "rotate-180"
                   )}
                 />
               </button>
 
               {isComboboxOpen && (
-                <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-2xl backdrop-blur-2xl">
+                <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] shadow-2xl backdrop-blur-2xl">
                   {/* Search Input inside Dropdown */}
-                  <div className="border-b border-white/5 p-2">
+                  <div className="border-b border-[var(--admin-border)] p-2">
                     <div className="relative">
-                      <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+                      <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--admin-muted)]" />
                       <input
                         type="text"
                         placeholder="Cari kategori..."
@@ -515,7 +515,7 @@ export function ArticleForm({
                             triggerButtonRef.current?.focus();
                           }
                         }}
-                        className="w-full rounded-lg border border-white/10 bg-zinc-900/80 py-1.5 pl-8 pr-3 text-xs text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
+                        className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] py-1.5 pl-8 pr-3 text-xs text-[var(--admin-text-main)] placeholder-[var(--admin-muted)] outline-none focus:border-brand-500/50"
                         autoFocus
                       />
                     </div>
@@ -528,7 +528,7 @@ export function ArticleForm({
                     className="max-h-48 overflow-y-auto p-1.5 focus:outline-none"
                   >
                     {filteredCategories.length === 0 ? (
-                      <div className="p-3 text-center text-xs text-zinc-500">
+                      <div className="p-3 text-center text-xs text-[var(--admin-muted)]">
                         Tidak ada kategori yang cocok.
                       </div>
                     ) : (
@@ -546,15 +546,15 @@ export function ArticleForm({
                             className={cn(
                               "flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors",
                               isHighlighted
-                                ? "bg-brand-500/20 text-white"
+                                ? "bg-[var(--admin-hover-bg)] text-[var(--admin-text-main)]"
                                 : isSelected
-                                ? "bg-white/5 text-brand-300"
-                                : "text-zinc-300 hover:bg-white/5"
+                                ? "bg-[#455a26]/10 text-[#455a26] dark:bg-white/5 dark:text-brand-300 font-semibold"
+                                : "text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)]"
                             )}
                           >
                             <span className="font-medium">{cat.name}</span>
                             {isSelected && (
-                              <Check className="h-3.5 w-3.5 text-brand-400" />
+                              <Check className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                             )}
                           </div>
                         );
@@ -570,7 +570,7 @@ export function ArticleForm({
           <div className="space-y-2">
             <Label
               htmlFor="status-publikasi"
-              className="text-sm font-medium text-zinc-200"
+              className="text-sm font-medium text-[var(--admin-text-main)]"
             >
               Status Publikasi
             </Label>
@@ -592,8 +592,8 @@ export function ArticleForm({
               className={cn(
                 "flex h-10 w-full cursor-pointer items-center justify-between rounded-lg border px-3.5 text-left transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
                 isPublished
-                  ? "border-brand-500/30 bg-brand-500/10 text-brand-300"
-                  : "border-white/10 bg-zinc-950/60 text-zinc-400"
+                  ? "border-emerald-600/30 bg-emerald-50 text-emerald-800 dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300 font-semibold"
+                  : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)]"
               )}
             >
               <span className="text-sm font-medium">
@@ -603,8 +603,8 @@ export function ArticleForm({
                 className={cn(
                   "flex h-5 w-5 items-center justify-center rounded-full border transition-all",
                   isPublished
-                    ? "border-brand-400 bg-brand-500 text-black"
-                    : "border-zinc-600 bg-zinc-800"
+                    ? "border-emerald-700 bg-emerald-700 text-white"
+                    : "border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-transparent"
                 )}
               >
                 {isPublished && <Check className="h-3 w-3 stroke-[3]" />}
@@ -615,12 +615,12 @@ export function ArticleForm({
           {/* Penulis Naskah (Author Selector) */}
           {currentUserRole === "SUPER_ADMIN" ? (
             <div className="sm:col-span-2 space-y-2 min-w-0">
-              <Label className="text-sm font-medium text-zinc-200 flex flex-wrap items-center justify-between gap-1">
+              <Label className="text-sm font-medium text-[var(--admin-text-main)] flex flex-wrap items-center justify-between gap-1">
                 <span className="flex items-center gap-1.5">
-                  <Users className="h-3.5 w-3.5 text-brand-400" />
+                  <Users className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                   <span>Penulis Naskah (Author)</span>
                 </span>
-                <span className="text-[11px] text-zinc-400 font-normal">
+                <span className="text-[11px] text-[var(--admin-muted)] font-normal">
                   Khusus Super Admin
                 </span>
               </Label>
@@ -650,31 +650,31 @@ export function ArticleForm({
                   aria-expanded={isAuthorComboboxOpen}
                   aria-haspopup="listbox"
                   className={cn(
-                    "flex min-h-12 w-full items-center justify-between rounded-xl border bg-zinc-950/60 px-3.5 py-2 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
+                    "flex min-h-12 w-full items-center justify-between rounded-xl border bg-[var(--admin-surface)] px-3.5 py-2 text-sm transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40",
                     isAuthorComboboxOpen
                       ? "border-brand-500/60 ring-2 ring-brand-500/40"
-                      : "border-white/10 hover:border-white/20"
+                      : "border-[var(--admin-border)] hover:border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)]"
                   )}
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-300 ring-1 ring-brand-500/30">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#455a26]/10 text-[11px] font-bold text-[#455a26] dark:bg-brand-500/20 dark:text-brand-300 ring-1 ring-[#455a26]/20 dark:ring-brand-500/30">
                       {getInitials(displayAuthorName)}
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0 flex-1 overflow-hidden text-left">
-                      <span className="font-medium text-white text-xs sm:text-sm truncate block">
+                      <span className="font-medium text-[var(--admin-text-main)] text-xs sm:text-sm truncate block">
                         {displayAuthorName}
                       </span>
                       {selectedAuthorData && (
                         <div className="flex items-center gap-1.5 min-w-0 shrink-0">
-                          <span className="font-mono text-[11px] text-zinc-400 truncate max-w-[110px] sm:max-w-[150px]">
+                          <span className="font-mono text-[11px] text-[var(--admin-muted)] truncate max-w-[110px] sm:max-w-[150px]">
                             @{selectedAuthorData.username}
                           </span>
                           <span
                             className={cn(
                               "rounded-full px-1.5 py-0.2 text-[9px] sm:text-[10px] font-semibold shrink-0",
                               selectedAuthorData.role === "SUPER_ADMIN"
-                                ? "border border-amber-500/30 bg-amber-500/10 text-amber-300"
-                                : "border border-brand-500/30 bg-brand-500/10 text-brand-300"
+                                ? "border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                                : "border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/30 dark:bg-brand-500/10 dark:text-brand-300"
                             )}
                           >
                             {selectedAuthorData.role === "SUPER_ADMIN"
@@ -687,18 +687,18 @@ export function ArticleForm({
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 shrink-0 text-zinc-400 transition-transform ml-2",
+                      "h-4 w-4 shrink-0 text-[var(--admin-muted)] transition-transform ml-2",
                       isAuthorComboboxOpen && "rotate-180"
                     )}
                   />
                 </button>
 
                 {isAuthorComboboxOpen && (
-                  <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-2xl backdrop-blur-2xl">
+                  <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] shadow-2xl backdrop-blur-2xl">
                     {/* Search Input inside Dropdown */}
-                    <div className="border-b border-white/5 p-2">
+                    <div className="border-b border-[var(--admin-border)] p-2">
                       <div className="relative">
-                        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+                        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--admin-muted)]" />
                         <input
                           type="text"
                           placeholder="Cari nama atau username staf..."
@@ -744,7 +744,7 @@ export function ArticleForm({
                               authorTriggerButtonRef.current?.focus();
                             }
                           }}
-                          className="w-full rounded-lg border border-white/10 bg-zinc-900/80 py-1.5 pl-8 pr-3 text-xs text-white placeholder-zinc-500 outline-none focus:border-brand-500/50"
+                          className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] py-1.5 pl-8 pr-3 text-xs text-[var(--admin-text-main)] placeholder-[var(--admin-muted)] outline-none focus:border-brand-500/50"
                           autoFocus
                         />
                       </div>
@@ -757,7 +757,7 @@ export function ArticleForm({
                       className="max-h-48 overflow-y-auto p-1.5 focus:outline-none"
                     >
                       {filteredAuthors.length === 0 ? (
-                        <div className="p-3 text-center text-xs text-zinc-500">
+                        <div className="p-3 text-center text-xs text-[var(--admin-muted)]">
                           Tidak ada staf aktif yang cocok.
                         </div>
                       ) : (
@@ -779,27 +779,27 @@ export function ArticleForm({
                               className={cn(
                                 "flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs transition-colors",
                                 isHighlighted
-                                  ? "bg-brand-500/20 text-white"
+                                  ? "bg-[var(--admin-hover-bg)] text-[var(--admin-text-main)]"
                                   : isSelected
-                                  ? "bg-white/5 text-brand-300"
-                                  : "text-zinc-300 hover:bg-white/5"
+                                  ? "bg-[#455a26]/10 text-[#455a26] dark:bg-white/5 dark:text-brand-300 font-semibold"
+                                  : "text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)]"
                               )}
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
-                                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-bold text-white ring-1 ring-white/10">
+                                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--admin-hover-bg)] text-[10px] font-bold text-[var(--admin-text-main)] ring-1 ring-[var(--admin-border)]">
                                   {getInitials(author.name)}
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="font-medium text-white truncate">
+                                  <p className="font-medium text-[var(--admin-text-main)] truncate">
                                     {author.name}
                                   </p>
-                                  <p className="text-[11px] text-zinc-400 font-mono truncate">
+                                  <p className="text-[11px] text-[var(--admin-muted)] font-mono truncate">
                                     @{author.username} &bull;{" "}
                                     <span
                                       className={
                                         author.role === "SUPER_ADMIN"
-                                          ? "text-amber-400"
-                                          : "text-zinc-400"
+                                          ? "text-amber-600 dark:text-amber-400 font-semibold"
+                                          : "text-[var(--admin-muted)]"
                                       }
                                     >
                                       {author.role === "SUPER_ADMIN"
@@ -810,7 +810,7 @@ export function ArticleForm({
                                 </div>
                               </div>
                               {isSelected && (
-                                <Check className="h-4 w-4 shrink-0 text-brand-400 ml-2" />
+                                <Check className="h-4 w-4 shrink-0 text-[#455a26] dark:text-brand-400 ml-2" />
                               )}
                             </div>
                           );
@@ -823,21 +823,21 @@ export function ArticleForm({
             </div>
           ) : (
             <div className="sm:col-span-2 space-y-2 min-w-0">
-              <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5 text-brand-400" />
+              <Label className="text-sm font-medium text-[var(--admin-text-main)] flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                 <span>Penulis Naskah (Author)</span>
               </Label>
-              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-zinc-950/40 p-3 w-full min-w-0 overflow-hidden">
+              <div className="flex items-center justify-between rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-3 w-full min-w-0 overflow-hidden">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[11px] font-bold text-white ring-1 ring-white/10">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--admin-hover-bg)] text-[11px] font-bold text-[var(--admin-text-main)] ring-1 ring-[var(--admin-border)]">
                     {getInitials(displayAuthorName)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-white truncate">
+                    <p className="text-xs font-semibold text-[var(--admin-text-main)] truncate">
                       {displayAuthorName}
                     </p>
-                    <p className="text-[11px] text-zinc-400 flex items-center gap-1 mt-0.5 truncate">
-                      <Lock className="h-3 w-3 text-zinc-500 shrink-0" />
+                    <p className="text-[11px] text-[var(--admin-muted)] flex items-center gap-1 mt-0.5 truncate">
+                      <Lock className="h-3 w-3 text-[var(--admin-muted)] shrink-0" />
                       <span className="truncate">
                         Penulis naskah hanya dapat dialihkan oleh Super Admin.
                       </span>
@@ -851,21 +851,21 @@ export function ArticleForm({
 
         {/* Cover Image Upload Area */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium text-zinc-200 flex items-center gap-1.5">
-            <ImageIcon className="h-3.5 w-3.5 text-brand-400" />
+          <Label className="text-sm font-medium text-[var(--admin-text-main)] flex items-center gap-1.5">
+            <ImageIcon className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
             <span>Gambar Sampul (Cover Image)</span>
           </Label>
 
           <div className="grid gap-4 sm:grid-cols-2 sm:items-center">
             <label
               htmlFor="cover-image"
-              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-white/15 bg-zinc-950/40 p-6 text-center hover:border-brand-500/50 hover:bg-zinc-950/70 cursor-pointer transition-colors group focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/40 focus-within:bg-zinc-950/70"
+              className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-surface)] p-6 text-center hover:border-[#455a26] hover:bg-[var(--admin-hover-bg)] cursor-pointer transition-colors group focus-within:border-brand-500/60 focus-within:ring-2 focus-within:ring-brand-500/40 focus-within:bg-[var(--admin-hover-bg)]"
             >
-              <Upload className="h-7 w-7 text-zinc-400 group-hover:text-brand-400 group-focus-within:text-brand-400 transition-colors" />
-              <p className="mt-2 text-xs font-medium text-zinc-300">
+              <Upload className="h-7 w-7 text-[var(--admin-muted)] group-hover:text-[#455a26] dark:group-hover:text-brand-400 transition-colors" />
+              <p className="mt-2 text-xs font-medium text-[var(--admin-text-main)]">
                 Klik untuk unggah foto artikel
               </p>
-              <p className="mt-1 text-[11px] text-zinc-500">
+              <p className="mt-1 text-[11px] text-[var(--admin-muted)]">
                 PNG, JPG, WebP (Maks. 10MB)
               </p>
               <input
@@ -879,99 +879,99 @@ export function ArticleForm({
                     e.preventDefault();
                     const editorEl =
                       document.querySelector<HTMLElement>(".ProseMirror");
-                    editorEl?.focus();
-                  } else if (e.key === "ArrowUp") {
-                    e.preventDefault();
-                    document.getElementById("status-publikasi")?.focus();
-                  }
-                }}
-                className="sr-only"
+                  editorEl?.focus();
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  document.getElementById("status-publikasi")?.focus();
+                }
+              }}
+              className="sr-only"
+            />
+          </label>
+
+          {/* Preview container */}
+          <div className="relative h-36 w-full overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)]">
+            {preview || article?.coverImage ? (
+              <Image
+                src={preview ?? getAssetUrl(article?.coverImage)}
+                alt="Preview Sampul"
+                fill
+                unoptimized
+                className="object-cover"
               />
-            </label>
-
-            {/* Preview container */}
-            <div className="relative h-36 w-full overflow-hidden rounded-xl border border-white/10 bg-zinc-950/80">
-              {preview || article?.coverImage ? (
-                <Image
-                  src={preview ?? getAssetUrl(article?.coverImage)}
-                  alt="Preview Sampul"
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center text-xs text-zinc-500">
-                  <ImageIcon className="h-6 w-6 text-zinc-600 mb-1" />
-                  <span>Belum ada gambar sampul</span>
-                </div>
-              )}
-            </div>
+            ) : (
+              <div className="flex h-full w-full flex-col items-center justify-center text-xs text-[var(--admin-muted)]">
+                <ImageIcon className="h-6 w-6 text-[var(--admin-muted)] mb-1" />
+                <span>Belum ada gambar sampul</span>
+              </div>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Konten Artikel */}
-        <div className="space-y-2">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <Label
-              htmlFor="content"
-              className="text-sm font-medium text-zinc-200 flex items-center gap-1.5"
-            >
-              <FileText className="h-3.5 w-3.5 text-brand-400" />
-              <span>Isi Konten Artikel</span> <span className="text-red-400">*</span>
-            </Label>
-            <span className="text-[11px] text-zinc-500">
-              Mendukung formatting visual &amp; shortcut (Ctrl+B, Ctrl+I, Ctrl+Enter)
-            </span>
-          </div>
-          <RichTextEditor
-            value={content}
-            onChange={setContent}
-            placeholder="Tuliskan berita, informasi kegiatan, atau sosialisasi obat dan perbekalan kesehatan di sini..."
-            onKeyDown={(e) => {
-              if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit(e as unknown as React.FormEvent);
-              }
-            }}
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-3 pt-4 border-t border-white/5 sm:flex-row sm:items-center">
-          <button
-            type="submit"
-            disabled={isPending}
-            className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
+      {/* Konten Artikel */}
+      <div className="space-y-2">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <Label
+            htmlFor="content"
+            className="text-sm font-medium text-[var(--admin-text-main)] flex items-center gap-1.5"
           >
-            {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-            <span>
-              {isPending
-                ? "Menyimpan..."
-                : article
-                ? "Simpan Perubahan"
-                : "Publikasikan Artikel"}
-            </span>
-          </button>
-          <div className="grid grid-cols-2 gap-3 w-full sm:flex sm:w-auto sm:items-center">
-            <button
-              type="button"
-              onClick={() => setIsPreviewOpen(true)}
-              className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 text-sm font-medium text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-200 transition-colors outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/40"
-              title="Lihat Pratinjau Tampilan Artikel"
-            >
-              <Eye className="h-4 w-4" />
-              <span>Pratinjau</span>
-            </button>
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={() => router.push("/admin/berita/")}
-              className="inline-flex h-10 w-full sm:w-auto items-center justify-center rounded-lg border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 hover:bg-white/10 hover:text-white transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
-            >
-              Batal
-            </button>
-          </div>
+            <FileText className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
+            <span>Isi Konten Artikel</span> <span className="text-red-400">*</span>
+          </Label>
+          <span className="text-[11px] text-[var(--admin-muted)]">
+            Mendukung formatting visual &amp; shortcut (Ctrl+B, Ctrl+I, Ctrl+Enter)
+          </span>
         </div>
+        <RichTextEditor
+          value={content}
+          onChange={setContent}
+          placeholder="Tuliskan berita, informasi kegiatan, atau sosialisasi obat dan perbekalan kesehatan di sini..."
+          onKeyDown={(e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+              e.preventDefault();
+              handleSubmit(e as unknown as React.FormEvent);
+            }
+          }}
+        />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-3 pt-4 border-t border-[var(--admin-border)] sm:flex-row sm:items-center">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
+        >
+          {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+          <span>
+            {isPending
+              ? "Menyimpan..."
+              : article
+              ? "Simpan Perubahan"
+              : "Publikasikan Artikel"}
+          </span>
+        </button>
+        <div className="grid grid-cols-2 gap-3 w-full sm:flex sm:w-auto sm:items-center">
+          <button
+            type="button"
+            onClick={() => setIsPreviewOpen(true)}
+            className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-emerald-600/30 bg-emerald-500/10 px-4 text-sm font-medium text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/20 hover:text-emerald-900 dark:hover:text-emerald-200 transition-colors outline-none focus:border-emerald-500/60 focus:ring-2 focus:ring-emerald-500/40"
+            title="Lihat Pratinjau Tampilan Artikel"
+          >
+            <Eye className="h-4 w-4" />
+            <span>Pratinjau</span>
+          </button>
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={() => router.push("/admin/berita/")}
+            className="inline-flex h-10 w-full sm:w-auto items-center justify-center rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] transition-colors outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 disabled:opacity-50"
+          >
+            Batal
+          </button>
+        </div>
+      </div>
       </div>
 
       <ArticlePreviewModal

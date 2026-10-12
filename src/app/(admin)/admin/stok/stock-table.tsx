@@ -858,10 +858,10 @@ export function StockTable({
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
             Kelola Stok Obat
           </h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="mt-1 text-sm text-[var(--admin-muted)]">
             Manajemen dan pembaruan data stok fisik IFK per akhir bulan
           </p>
         </div>
@@ -876,15 +876,15 @@ export function StockTable({
               className={cn(
                 "inline-flex h-9 w-full sm:w-auto items-center justify-center gap-2 rounded-lg border px-3.5 text-sm font-medium transition-all active:scale-95 cursor-pointer whitespace-nowrap",
                 isFileMenuOpen
-                  ? "border-emerald-500/50 bg-white/10 text-white shadow-sm"
-                  : "border-white/10 bg-white/5 text-zinc-300 shadow-sm hover:border-white/20 hover:bg-white/10 hover:text-white"
+                  ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 shadow-xs"
+                  : "border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] shadow-xs hover:bg-[var(--admin-hover-bg)]"
               )}
             >
-              <FileSpreadsheet className="h-4 w-4 text-emerald-400 shrink-0" />
+              <FileSpreadsheet className="h-4 w-4 text-emerald-500 shrink-0" />
               <span>Kelola Berkas</span>
               <ChevronDown
                 className={cn(
-                  "h-3.5 w-3.5 text-zinc-400 transition-transform duration-200 shrink-0",
+                  "h-3.5 w-3.5 text-[var(--admin-muted)] transition-transform duration-200 shrink-0",
                   isFileMenuOpen && "rotate-180"
                 )}
               />
@@ -893,9 +893,9 @@ export function StockTable({
             {isFileMenuOpen && (
               <div
                 role="menu"
-                className="absolute left-0 sm:left-auto sm:right-0 top-full z-50 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-white/10 bg-zinc-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
+                className="absolute left-0 sm:left-auto sm:right-0 top-full z-50 mt-2 w-60 max-w-[calc(100vw-2rem)] rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in-0 zoom-in-95"
               >
-                <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+                <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--admin-muted)]">
                   Aksi Impor &amp; Ekspor
                 </div>
 
@@ -907,12 +907,12 @@ export function StockTable({
                     setIsFileMenuOpen(false);
                     handleExportExcel();
                   }}
-                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
                 >
-                  <FileSpreadsheet className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <FileSpreadsheet className="h-4 w-4 text-emerald-500 shrink-0" />
                   <div className="flex flex-col">
-                    <span className="text-zinc-200 font-medium">Ekspor Data Excel</span>
-                    <span className="text-[10px] text-zinc-400">Unduh data (.xlsx)</span>
+                    <span className="font-medium text-[var(--admin-text-main)]">Ekspor Data Excel</span>
+                    <span className="text-[10px] text-[var(--admin-muted)]">Unduh data (.xlsx)</span>
                   </div>
                 </button>
 
@@ -924,16 +924,16 @@ export function StockTable({
                     setIsFileMenuOpen(false);
                     setIsImportOpen(true);
                   }}
-                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
                 >
-                  <Upload className="h-4 w-4 text-sky-400 shrink-0" />
+                  <Upload className="h-4 w-4 text-sky-500 shrink-0" />
                   <div className="flex flex-col">
-                    <span className="text-zinc-200 font-medium">Import CSV / Excel</span>
-                    <span className="text-[10px] text-zinc-400">Unggah berkas logistik</span>
+                    <span className="font-medium text-[var(--admin-text-main)]">Import CSV / Excel</span>
+                    <span className="text-[10px] text-[var(--admin-muted)]">Unggah berkas logistik</span>
                   </div>
                 </button>
 
-                <div className="my-1 border-t border-white/5" />
+                <div className="my-1 border-t border-[var(--admin-border)]" />
 
                 {/* Unduh Template */}
                 <button
@@ -943,12 +943,12 @@ export function StockTable({
                     setIsFileMenuOpen(false);
                     handleDownloadTemplate();
                   }}
-                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
                 >
-                  <Download className="h-4 w-4 text-zinc-400 shrink-0" />
+                  <Download className="h-4 w-4 text-[var(--admin-muted)] shrink-0" />
                   <div className="flex flex-col">
-                    <span className="text-zinc-200 font-medium">Unduh Template CSV</span>
-                    <span className="text-[10px] text-zinc-400">Format standar impor</span>
+                    <span className="font-medium text-[var(--admin-text-main)]">Unduh Template CSV</span>
+                    <span className="text-[10px] text-[var(--admin-muted)]">Format standar impor</span>
                   </div>
                 </button>
               </div>
@@ -976,19 +976,19 @@ export function StockTable({
           className={cn(
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isAllActive
-              ? "border-brand-500/60 bg-brand-500/15 ring-2 ring-brand-500/40"
-              : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-900/60"
+              ? "border-[#455a26] bg-[#455a26]/10 ring-2 ring-[#455a26]/40 dark:border-brand-500/60 dark:bg-brand-500/15 dark:ring-brand-500/40"
+              : "border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] hover:bg-[var(--admin-hover-bg)]"
           )}
         >
-          <div className="flex items-center gap-2 text-zinc-400">
-            <Package className="h-4 w-4 sm:h-5 sm:w-5 text-brand-400" />
+          <div className="flex items-center gap-2 text-[var(--admin-muted)]">
+            <Package className="h-4 w-4 sm:h-5 sm:w-5 text-[#455a26] dark:text-brand-500" />
             <span className="text-xs sm:text-sm font-medium">Total Item</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-zinc-100 truncate">{summary.totalItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[var(--admin-text-main)] truncate">{summary.totalItems}</p>
             {isAllActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-brand-500/30 bg-brand-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-brand-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full bg-[#455a26] px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-white" />
                 Aktif
               </span>
             )}
@@ -1003,19 +1003,19 @@ export function StockTable({
           className={cn(
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isAvailableActive
-              ? "border-emerald-500/60 bg-emerald-950/40 ring-2 ring-emerald-500/40"
-              : "border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10"
+              ? "border-emerald-600 bg-emerald-500/20 ring-2 ring-emerald-500/40"
+              : "border-emerald-500/20 bg-emerald-500/10 hover:border-emerald-500/40 hover:bg-emerald-500/15"
           )}
         >
-          <div className="flex items-center gap-2 text-emerald-400">
+          <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
             <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-xs sm:text-sm font-medium">Stok Aman</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-emerald-400 truncate">{summary.availableItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-700 dark:text-emerald-400 truncate">{summary.availableItems}</p>
             {isAvailableActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full bg-emerald-700 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-white" />
                 Aktif
               </span>
             )}
@@ -1030,19 +1030,19 @@ export function StockTable({
           className={cn(
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isLowActive
-              ? "border-amber-500/60 bg-amber-950/40 ring-2 ring-amber-500/40"
-              : "border-amber-500/20 bg-amber-500/5 hover:border-amber-500/40 hover:bg-amber-500/10"
+              ? "border-amber-600 bg-amber-500/20 ring-2 ring-amber-500/40"
+              : "border-amber-500/20 bg-amber-500/10 hover:border-amber-500/40 hover:bg-amber-500/15"
           )}
         >
-          <div className="flex items-center gap-2 text-amber-400">
+          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
             <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-xs sm:text-sm font-medium">Menipis</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-amber-400 truncate">{summary.lowItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-amber-700 dark:text-amber-400 truncate">{summary.lowItems}</p>
             {isLowActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-amber-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full bg-amber-700 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-white" />
                 Aktif
               </span>
             )}
@@ -1057,19 +1057,19 @@ export function StockTable({
           className={cn(
             "group relative w-full text-left rounded-xl border p-3.5 sm:p-5 backdrop-blur-sm transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
             isEmptyActive
-              ? "border-rose-500/60 bg-rose-950/40 ring-2 ring-rose-500/40"
-              : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
+              ? "border-rose-600 bg-rose-500/20 ring-2 ring-rose-500/40"
+              : "border-rose-500/20 bg-rose-500/10 hover:border-rose-500/40 hover:bg-rose-500/15"
           )}
         >
-          <div className="flex items-center gap-2 text-rose-400">
+          <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400">
             <XCircle className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="text-xs sm:text-sm font-medium">Kosong</span>
           </div>
           <div className="mt-2 flex items-center justify-between gap-1.5">
-            <p className="text-2xl sm:text-3xl font-bold text-rose-400 truncate">{summary.emptyItems}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-rose-700 dark:text-rose-400 truncate">{summary.emptyItems}</p>
             {isEmptyActive && (
-              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+              <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full bg-rose-700 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-white" />
                 Aktif
               </span>
             )}
@@ -1078,23 +1078,23 @@ export function StockTable({
       </div>
 
       {/* ── Toolbar Pencarian & Filter Terpadu ────────────────────────── */}
-      <div className="relative z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-white/5 bg-zinc-900/60 p-3.5 backdrop-blur-xl">
+      <div className="relative z-30 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-3.5 backdrop-blur-xl">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
           <input
             type="text"
             placeholder="Cari nama obat, kode barang, atau kategori..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-white/5 bg-zinc-950/60 py-2 pl-9 pr-9 text-sm text-white placeholder-zinc-500 outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
+            className="w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] py-2 pl-9 pr-9 text-sm text-[var(--admin-text-main)] placeholder-[var(--admin-muted)] outline-none transition-colors focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/40"
           />
           {search && (
             <button
               type="button"
               onClick={handleClearSearch}
               aria-label="Bersihkan pencarian"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center rounded-md text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -1115,15 +1115,15 @@ export function StockTable({
               }}
               enableSearch={true}
               singleSelect={true}
-              icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-400" />}
+              icon={<Calendar className="h-3.5 w-3.5 shrink-0 text-brand-500" />}
               createAction={{
                 label: "Buka Periode Baru",
-                icon: <CalendarPlus className="h-3.5 w-3.5 text-emerald-400 shrink-0" />,
+                icon: <CalendarPlus className="h-3.5 w-3.5 text-emerald-500 shrink-0" />,
                 onClick: handleOpenCreatePeriod,
               }}
               footerAction={{
                 label: "Hapus Periode Ini",
-                icon: <Trash2 className="h-3.5 w-3.5 text-rose-400 shrink-0" />,
+                icon: <Trash2 className="h-3.5 w-3.5 text-rose-500 shrink-0" />,
                 variant: "danger",
                 onClick: () => setIsDeletePeriodOpen(true),
               }}
@@ -1161,58 +1161,58 @@ export function StockTable({
       </div>
 
       {/* ── Tabel Stok ──────────────────────────────────────────────────── */}
-      <div className="relative z-10 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-sm overflow-hidden">
+      <div className="relative z-10 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] backdrop-blur-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[980px] text-left text-sm text-zinc-300">
+          <table className="w-full min-w-[980px] text-left text-sm text-[var(--admin-text-main)]">
             <thead>
-              <tr className="border-b border-zinc-800 bg-zinc-900">
-                <th className="px-4 py-3 font-medium text-zinc-400 w-12">No</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Nama Obat / Kode</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Kategori</th>
-                <th className="px-4 py-3 font-medium text-zinc-400">Satuan</th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-right">Stok Fisik</th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-right">
+              <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)]">
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] w-12">No</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Nama Obat / Kode</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Kategori</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)]">Satuan</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Stok Fisik</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">
                   <div>Rata-rata Pemakaian</div>
-                  <div className="text-[10px] font-normal normal-case text-zinc-500">RPB (Tren 12 Bln)</div>
+                  <div className="text-[10px] font-normal normal-case text-[var(--admin-muted)]">RPB (Tren 12 Bln)</div>
                 </th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-center">Status</th>
-                <th className="px-4 py-3 font-medium text-zinc-400 text-right">Aksi</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-center">Status</th>
+                <th className="px-4 py-3 font-medium text-[var(--admin-muted)] text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800">
+            <tbody className="divide-y divide-[var(--admin-border)]">
               {paginatedItems.map((item, index) => (
-                <tr key={item.id} className="transition-colors hover:bg-zinc-800/30">
-                  <td className="px-4 py-3 text-zinc-500 font-mono text-xs">
+                <tr key={item.id} className="transition-colors hover:bg-[var(--admin-hover-bg)]">
+                  <td className="px-4 py-3 text-[var(--admin-muted)] font-mono text-xs">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="font-medium text-zinc-100">{item.name}</div>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-zinc-400">
-                      <span className="font-mono text-zinc-500">{item.code}</span>
+                    <div className="font-medium text-[var(--admin-text-main)]">{item.name}</div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-[var(--admin-muted)]">
+                      <span className="font-mono text-[var(--admin-muted)]">{item.code}</span>
                       {item.nomenklatur && (
                         <>
-                          <span className="text-zinc-600">•</span>
-                          <span className="inline-block truncate max-w-[180px] text-zinc-400" title={item.nomenklatur}>
+                          <span className="text-[var(--admin-muted)]">•</span>
+                          <span className="inline-block truncate max-w-[180px] text-[var(--admin-muted)]" title={item.nomenklatur}>
                             {item.nomenklatur}
                           </span>
                         </>
                       )}
                       {item.expiryDate && (
                         <>
-                          <span className="text-zinc-600">•</span>
-                          <span className="text-amber-400/90 font-medium">
+                          <span className="text-[var(--admin-muted)]">•</span>
+                          <span className="text-amber-500 font-medium">
                             ED: {item.expiryDate}
                           </span>
                         </>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3">{item.category}</td>
-                  <td className="px-4 py-3">{item.unit}</td>
-                  <td className="px-4 py-3 text-right font-mono font-semibold text-zinc-100">
+                  <td className="px-4 py-3 text-[var(--admin-muted)]">{item.category}</td>
+                  <td className="px-4 py-3 text-[var(--admin-muted)]">{item.unit}</td>
+                  <td className="px-4 py-3 text-right font-mono font-semibold text-[var(--admin-text-main)]">
                     {item.quantity.toLocaleString("id-ID")}
                   </td>
-                  <td className="px-4 py-3 text-right font-mono text-zinc-400 text-xs">
+                  <td className="px-4 py-3 text-right font-mono text-[var(--admin-muted)] text-xs">
                     {item.avgUsage !== null && item.avgUsage !== undefined && item.avgUsage > 0
                       ? item.avgUsage.toLocaleString("id-ID", {
                           minimumFractionDigits: item.avgUsage % 1 !== 0 ? 1 : 0,
@@ -1224,25 +1224,26 @@ export function StockTable({
                     {(() => {
                       const mosInfo = getMosBadgeInfo(item.quantity, item.mos, item.status);
                       const badgeClasses: Record<string, string> = {
-                        empty: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-                        critical: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-                        low: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                        safe: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                        abundant: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-                        unknown: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+                        empty: "bg-rose-700 text-white font-semibold shadow-xs border-transparent",
+                        critical: "bg-rose-700 text-white font-semibold shadow-xs border-transparent",
+                        low: "bg-amber-700 text-white font-semibold shadow-xs border-transparent",
+                        safe: "bg-emerald-700 text-white font-semibold shadow-xs border-transparent",
+                        abundant: "bg-sky-700 text-white font-semibold shadow-xs border-transparent",
+                        unknown: "border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]",
                       };
                       const dotClasses: Record<string, string> = {
-                        empty: "bg-rose-400",
-                        critical: "bg-rose-400",
-                        low: "bg-amber-400",
-                        safe: "bg-emerald-400",
-                        abundant: "bg-sky-400",
+                        empty: "bg-white",
+                        critical: "bg-white",
+                        low: "bg-white",
+                        safe: "bg-white",
+                        abundant: "bg-white",
                         unknown: "bg-zinc-400",
                       };
+
                       return (
                         <span
                           className={cn(
-                            "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium border",
+                            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
                             badgeClasses[mosInfo.variant] || badgeClasses.unknown
                           )}
                         >
@@ -1262,7 +1263,7 @@ export function StockTable({
                       <button 
                         type="button" 
                         onClick={() => handleOpenEdit(item)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-white/10 [@media(hover:hover)]:hover:bg-white/5 [@media(hover:hover)]:hover:text-white active:bg-white/10 active:text-white cursor-pointer"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-[var(--admin-border)] [@media(hover:hover)]:hover:bg-[var(--admin-hover-bg)] [@media(hover:hover)]:hover:text-[var(--admin-text-main)] active:bg-[var(--admin-hover-bg)] cursor-pointer"
                         title="Edit Item"
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -1270,7 +1271,7 @@ export function StockTable({
                       <button 
                         type="button" 
                         onClick={() => setDeleteItem(item)}
-                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-white/5 bg-white/[0.02] text-zinc-400 transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-400 active:bg-red-500/20 active:text-red-400 cursor-pointer"
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)] transition-colors [@media(hover:hover)]:hover:border-red-500/20 [@media(hover:hover)]:hover:bg-red-500/10 [@media(hover:hover)]:hover:text-red-500 active:bg-red-500/20 cursor-pointer"
                         title="Hapus Item"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -1285,13 +1286,13 @@ export function StockTable({
 
         {/* ── Pagination ──────────────────────────────────────────────── */}
         {filtered.length > itemsPerPage && (
-          <div className="flex flex-col items-center justify-between gap-4 border-t border-zinc-800 bg-zinc-900/50 px-4 py-3 sm:flex-row">
-            <p className="text-sm text-zinc-400">
-              Menampilkan <span className="font-medium text-zinc-200">{(currentPage - 1) * itemsPerPage + 1}</span> -{" "}
-              <span className="font-medium text-zinc-200">
+          <div className="flex flex-col items-center justify-between gap-4 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row">
+            <p className="text-sm text-[var(--admin-muted)]">
+              Menampilkan <span className="font-medium text-[var(--admin-text-main)]">{(currentPage - 1) * itemsPerPage + 1}</span> -{" "}
+              <span className="font-medium text-[var(--admin-text-main)]">
                 {Math.min(currentPage * itemsPerPage, filtered.length)}
               </span>{" "}
-              dari <span className="font-medium text-zinc-200">{filtered.length}</span> item
+              dari <span className="font-medium text-[var(--admin-text-main)]">{filtered.length}</span> item
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -1301,11 +1302,11 @@ export function StockTable({
                   })
                 }
                 disabled={currentPage <= 1}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 Sebelumnya
               </button>
-              <span className="text-sm text-zinc-400">
+              <span className="text-sm text-[var(--admin-muted)]">
                 Hal {currentPage} / {totalPages}
               </span>
               <button
@@ -1315,7 +1316,7 @@ export function StockTable({
                   })
                 }
                 disabled={currentPage >= totalPages}
-                className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+                className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-3 py-1.5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-border)] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
                 Selanjutnya
               </button>
@@ -1325,14 +1326,14 @@ export function StockTable({
       </div>
       
       {filtered.length === 0 && (
-        <div className="mt-8 text-center p-8 rounded-xl border border-dashed border-zinc-800 bg-zinc-900/30 max-w-lg mx-auto">
-          <Package className="mx-auto h-12 w-12 text-zinc-600" />
-          <h3 className="mt-3 text-base font-semibold text-zinc-200">
+        <div className="mt-8 text-center p-8 rounded-xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)] max-w-lg mx-auto">
+          <Package className="mx-auto h-12 w-12 text-[var(--admin-muted)]" />
+          <h3 className="mt-3 text-base font-semibold text-[var(--admin-text-main)]">
             {items.length === 0
               ? `Periode ${formatStockPeriodLabel(selectedPeriod)} Masih Kosong`
               : "Tidak ada data ditemukan"}
           </h3>
-          <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+          <p className="mt-1.5 text-xs text-[var(--admin-muted)] leading-relaxed">
             {items.length === 0
               ? "Belum ada data obat atau perbekalan farmasi pada periode ini. Klik '+ Tambah Obat' di atas atau lakukan impor berkas untuk mulai mengisi lembar stok."
               : "Coba ubah filter atau kata kunci pencarian Anda."}
@@ -1354,465 +1355,458 @@ export function StockTable({
 
       {/* ── Modal Tambah Item Baru ─────────────────────────────────────── */}
       <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[85dvh] md:max-h-[90vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
+        <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[85dvh] md:max-h-[90vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
           <DialogHeader className="space-y-1.5 px-5 pt-5 pb-3.5 sm:px-6 sm:pt-6 sm:pb-3.5 shrink-0 pr-12">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <Plus className="h-4 w-4" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
                   Tambah Data Obat Baru
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400">
+                <DialogDescription className="text-xs text-[var(--admin-muted)]">
                   Input data master dan stok fisik obat/perbekalan farmasi baru
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
 
-          <ModalScrollArea className="px-5 pb-5 pt-1.5 sm:px-6 sm:pb-6">
-            <form onSubmit={handleSaveAdd} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-                {/* ── Kolom Kiri (50%): Data Master & Kuantitas Fisik ── */}
-                <div className="space-y-3.5">
-                  <div className="space-y-1.5 relative">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="add-name" className="text-xs font-medium text-zinc-300">
-                        Nama Obat / Barang
-                      </Label>
-                      {isSearchingHistory && activeSearchField === "name" && (
-                        <span className="text-[10px] text-zinc-400 flex items-center gap-1">
-                          <Loader2 className="h-3 w-3 animate-spin text-brand-400" />
-                          <span>Mencari histori...</span>
-                        </span>
-                      )}
-                    </div>
-                    <Input
-                      id="add-name"
-                      value={addForm.name}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setAddForm((f) => ({ ...f, name: val }));
-                        triggerHistorySearch(val, "name");
-                      }}
-                      onFocus={() => {
-                        if (historySuggestions.length > 0) setShowSuggestions(true);
-                      }}
-                      onBlur={() => handleFieldBlur(addForm.name, "name")}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                      placeholder="Contoh: Paracetamol 500mg Tablet"
-                      required
-                      autoComplete="off"
-                    />
-
-                    {/* Dropdown Suggestions */}
-                    {showSuggestions && historySuggestions.length > 0 && activeSearchField === "name" && (
-                      <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-white/15 bg-zinc-950 shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-white/5">
-                        <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 bg-white/[0.02] flex items-center justify-between sticky top-0 backdrop-blur-md">
-                          <span>Saran Riwayat Obat IFK</span>
-                          <span className="text-brand-400">Pilih untuk Auto-fill</span>
-                        </div>
-                        {historySuggestions.map((item) => (
-                          <button
-                            key={item.code}
-                            type="button"
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              handleSelectSuggestion(item);
-                            }}
-                            className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-brand-500/10 cursor-pointer group flex flex-col gap-0.5"
-                          >
+                  <ModalScrollArea className="px-5 pb-5 pt-1.5 sm:px-6 sm:pb-6">
+                    <form onSubmit={handleSaveAdd} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+                        {/* ── Kolom Kiri (50%): Data Master & Kuantitas Fisik ── */}
+                        <div className="space-y-3.5">
+                          <div className="space-y-1.5 relative">
                             <div className="flex items-center justify-between">
-                              <span className="font-medium text-white group-hover:text-brand-300">
-                                {item.name}
-                              </span>
-                              <span className="font-mono text-[10px] text-zinc-400 bg-white/5 px-1.5 py-0.5 rounded">
-                                {item.code}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2 text-[10px] text-zinc-400">
-                              <span>{item.category}</span>
-                              <span>•</span>
-                              <span>{item.unit}</span>
-                              {item.historicalAvgUsage > 0 && (
-                                <>
-                                  <span>•</span>
-                                  <span className="text-emerald-400 font-medium">
-                                    RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}/bln ({item.sampleCount} bln lalu)
-                                  </span>
-                                </>
+                              <Label htmlFor="add-name" className="text-xs font-medium text-[var(--admin-text-main)]">
+                                Nama Obat / Barang
+                              </Label>
+                              {isSearchingHistory && activeSearchField === "name" && (
+                                <span className="text-[10px] text-[var(--admin-muted)] flex items-center gap-1">
+                                  <Loader2 className="h-3 w-3 animate-spin text-[#455a26] dark:text-brand-400" />
+                                  <span>Mencari histori...</span>
+                                </span>
                               )}
                             </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1.5 relative">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="add-code" className="text-xs font-medium text-zinc-300">
-                          Kode Barang / Barcode
-                        </Label>
-                        {isSearchingHistory && activeSearchField === "code" && (
-                          <span className="text-[10px] text-zinc-400 flex items-center gap-1">
-                            <Loader2 className="h-3 w-3 animate-spin text-brand-400" />
-                          </span>
-                        )}
-                      </div>
-                      <Input
-                        id="add-code"
-                        value={addForm.code}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setAddForm((f) => ({ ...f, code: val }));
-                          triggerHistorySearch(val, "code");
-                        }}
-                        onFocus={() => {
-                          if (historySuggestions.length > 0) setShowSuggestions(true);
-                        }}
-                        onBlur={() => handleFieldBlur(addForm.code, "code")}
-                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                        placeholder="Contoh: OBG-999"
-                        required
-                        autoComplete="off"
-                      />
-
-                      {/* Dropdown Suggestions for Code */}
-                      {showSuggestions && historySuggestions.length > 0 && activeSearchField === "code" && (
-                        <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-white/15 bg-zinc-950 shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-white/5">
-                          <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-zinc-400 bg-white/[0.02] flex items-center justify-between sticky top-0 backdrop-blur-md">
-                            <span>Saran Riwayat Obat</span>
-                            <span className="text-brand-400">Pilih</span>
-                          </div>
-                          {historySuggestions.map((item) => (
-                            <button
-                              key={item.code}
-                              type="button"
-                              onMouseDown={(e) => {
-                                e.preventDefault();
-                                handleSelectSuggestion(item);
+                            <Input
+                              id="add-name"
+                              value={addForm.name}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setAddForm((f) => ({ ...f, name: val }));
+                                triggerHistorySearch(val, "name");
                               }}
-                              className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-brand-500/10 cursor-pointer group flex flex-col gap-0.5"
+                              onFocus={() => {
+                                if (historySuggestions.length > 0) setShowSuggestions(true);
+                              }}
+                              onBlur={() => handleFieldBlur(addForm.name, "name")}
+                              className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                              placeholder="Contoh: Paracetamol 500mg Tablet"
+                              required
+                              autoComplete="off"
+                            />
+
+                            {/* Dropdown Suggestions */}
+                            {showSuggestions && historySuggestions.length > 0 && activeSearchField === "name" && (
+                              <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-[var(--admin-border)]">
+                                <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--admin-muted)] bg-[var(--admin-hover-bg)] flex items-center justify-between sticky top-0 backdrop-blur-md">
+                                  <span>Saran Riwayat Obat IFK</span>
+                                  <span className="text-[#455a26] dark:text-brand-400 font-bold">Pilih untuk Auto-fill</span>
+                                </div>
+                                {historySuggestions.map((item) => (
+                                  <button
+                                    key={item.code}
+                                    type="button"
+                                    onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      handleSelectSuggestion(item);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer group flex flex-col gap-0.5"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-medium text-[var(--admin-text-main)] group-hover:text-[#455a26] dark:group-hover:text-brand-300">
+                                        {item.name}
+                                      </span>
+                                      <span className="font-mono text-[11px] text-[var(--admin-muted)]">
+                                        {item.code}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] text-[var(--admin-muted)]">
+                                      <span>{item.category}</span>
+                                      <span>•</span>
+                                      <span>{item.unit}</span>
+                                      {item.historicalAvgUsage > 0 && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
+                                            RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}
+                                          </span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1.5 relative">
+                              <Label htmlFor="add-code" className="text-xs font-medium text-[var(--admin-text-main)]">
+                                Kode Barang
+                              </Label>
+                              <Input
+                                id="add-code"
+                                value={addForm.code}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setAddForm((f) => ({ ...f, code: val }));
+                                  triggerHistorySearch(val, "code");
+                                }}
+                                onFocus={() => {
+                                  if (historySuggestions.length > 0) setShowSuggestions(true);
+                                }}
+                                onBlur={() => handleFieldBlur(addForm.code, "code")}
+                                className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] font-mono placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                                placeholder="Contoh: OBG-999"
+                                required
+                                autoComplete="off"
+                              />
+
+                              {/* Dropdown Suggestions for Code */}
+                              {showSuggestions && historySuggestions.length > 0 && activeSearchField === "code" && (
+                                <div className="absolute left-0 right-0 top-full mt-1.5 z-50 rounded-xl border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] shadow-2xl backdrop-blur-2xl overflow-hidden max-h-56 overflow-y-auto divide-y divide-[var(--admin-border)]">
+                                  <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--admin-muted)] bg-[var(--admin-hover-bg)] flex items-center justify-between sticky top-0 backdrop-blur-md">
+                                    <span>Saran Riwayat Obat</span>
+                                    <span className="text-[#455a26] dark:text-brand-400 font-bold">Pilih</span>
+                                  </div>
+                                  {historySuggestions.map((item) => (
+                                    <button
+                                      key={item.code}
+                                      type="button"
+                                      onMouseDown={(e) => {
+                                      e.preventDefault();
+                                      handleSelectSuggestion(item);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer group flex flex-col gap-0.5"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-medium text-[var(--admin-text-main)] group-hover:text-[#455a26] dark:group-hover:text-brand-300">
+                                        {item.code}
+                                      </span>
+                                      <span className="text-[10px] text-[var(--admin-muted)] truncate max-w-[120px]">
+                                        {item.name}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 text-[10px] text-[var(--admin-muted)]">
+                                      <span>{item.unit}</span>
+                                      {item.historicalAvgUsage > 0 && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
+                                            RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}
+                                          </span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label htmlFor="add-category" className="text-xs font-medium text-[var(--admin-text-main)]">
+                              Kategori
+                            </Label>
+                            <select
+                              id="add-category"
+                              value={addForm.category}
+                              onChange={(e) =>
+                                setAddForm((f) => ({ ...f, category: e.target.value as MedicineCategory }))
+                              }
+                              className="h-10 w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
                             >
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-white group-hover:text-brand-300">
-                                  {item.code}
-                                </span>
-                                <span className="text-[10px] text-zinc-400 truncate max-w-[120px]">
-                                  {item.name}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-1.5 text-[10px] text-zinc-400">
-                                <span>{item.unit}</span>
-                                {item.historicalAvgUsage > 0 && (
-                                  <>
-                                    <span>•</span>
-                                    <span className="text-emerald-400">
-                                      RPB: {item.historicalAvgUsage.toLocaleString("id-ID")}
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            </button>
-                          ))}
+                              <option value="Obat Generik">Obat Generik</option>
+                              <option value="Obat Program">Obat Program</option>
+                              <option value="Obat Emergensi">Obat Emergensi</option>
+                              <option value="BMHP / Alkes">BMHP / Alkes</option>
+                              <option value="Vaksin & Serum">Vaksin & Serum</option>
+                            </select>
+                          </div>
                         </div>
-                      )}
-                    </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="add-category" className="text-xs font-medium text-zinc-300">
-                        Kategori
-                      </Label>
-                      <select
-                        id="add-category"
-                        value={addForm.category}
-                        onChange={(e) =>
-                          setAddForm((f) => ({ ...f, category: e.target.value as MedicineCategory }))
-                        }
-                        className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
-                      >
-                        <option value="Obat Generik">Obat Generik</option>
-                        <option value="Obat Program">Obat Program</option>
-                        <option value="Obat Emergensi">Obat Emergensi</option>
-                        <option value="BMHP / Alkes">BMHP / Alkes</option>
-                        <option value="Vaksin & Serum">Vaksin & Serum</option>
-                      </select>
-                    </div>
-                  </div>
+                        {historyHint && (
+                          <div
+                            className={cn(
+                              "rounded-lg px-3 py-2 text-xs flex items-center gap-2 border transition-all animate-in fade-in",
+                              historyHint.type === "match"
+                                ? "border-emerald-500/25 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-semibold"
+                                : historyHint.type === "warning"
+                                ? "border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 font-semibold"
+                                : "border-sky-500/25 bg-sky-50 dark:bg-sky-500/10 text-sky-800 dark:text-sky-300 font-semibold"
+                            )}
+                          >
+                            {historyHint.type === "warning" ? (
+                              <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                            ) : (
+                              <Sparkles className="h-4 w-4 shrink-0 text-[#455a26] dark:text-brand-400" />
+                            )}
+                            <span className="leading-snug">{historyHint.message}</span>
+                          </div>
+                        )}
 
-                  {historyHint && (
-                    <div
-                      className={cn(
-                        "rounded-lg px-3 py-2 text-xs flex items-center gap-2 border transition-all animate-in fade-in",
-                        historyHint.type === "match"
-                          ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-300"
-                          : historyHint.type === "warning"
-                          ? "border-amber-500/30 bg-amber-500/10 text-amber-300"
-                          : "border-sky-500/25 bg-sky-500/10 text-sky-300"
-                      )}
-                    >
-                      {historyHint.type === "warning" ? (
-                        <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" />
-                      ) : (
-                        <Sparkles className="h-4 w-4 shrink-0 text-brand-400" />
-                      )}
-                      <span className="leading-snug">{historyHint.message}</span>
-                    </div>
-                  )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label htmlFor="add-unit" className="text-xs font-medium text-[var(--admin-text-main)]">
+                              Satuan Kemasan
+                            </Label>
+                            <Input
+                              id="add-unit"
+                              value={addForm.unit}
+                              onChange={(e) => setAddForm((f) => ({ ...f, unit: e.target.value }))}
+                              className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                              placeholder="Tablet / Botol / Box"
+                              required
+                            />
+                          </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="add-unit" className="text-xs font-medium text-zinc-300">
-                        Satuan Kemasan
-                      </Label>
-                      <Input
-                        id="add-unit"
-                        value={addForm.unit}
-                        onChange={(e) => setAddForm((f) => ({ ...f, unit: e.target.value }))}
-                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                        placeholder="Tablet / Botol / Box"
-                        required
-                      />
-                    </div>
+                          <div className="space-y-1.5">
+                            <Label htmlFor="add-quantity" className="text-xs font-medium text-[var(--admin-text-main)]">
+                              Jumlah Stok Fisik
+                            </Label>
+                            <Input
+                              id="add-quantity"
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              value={addForm.quantity}
+                              onFocus={(e) => {
+                                if (e.target.value === "0") e.target.select();
+                              }}
+                              onChange={(e) => {
+                                const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                                const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
+                                const usage = addForm.avgUsage !== "" ? Number(addForm.avgUsage) : 0;
+                                const newMos = calculateMos(qty, usage);
+                                const newStatus = determineStockStatus(qty, newMos, addForm.status);
+                                setAddForm((f) => ({
+                                  ...f,
+                                  quantity: cleaned,
+                                  mos: newMos !== null ? String(newMos) : "",
+                                  status: newStatus,
+                                }));
+                              }}
+                              className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] font-semibold placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              required
+                            />
+                          </div>
+                        </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="add-quantity" className="text-xs font-medium text-zinc-300">
-                        Jumlah Stok Fisik
-                      </Label>
-                      <Input
-                        id="add-quantity"
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        value={addForm.quantity}
-                        onFocus={(e) => {
-                          if (e.target.value === "0") e.target.select();
-                        }}
-                        onChange={(e) => {
-                          const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
-                          const qty = cleaned === "" ? 0 : parseInt(cleaned, 10) || 0;
-                          const usage = addForm.avgUsage !== "" ? Number(addForm.avgUsage) : 0;
-                          const newMos = calculateMos(qty, usage);
-                          const newStatus = determineStockStatus(qty, newMos, addForm.status);
-                          setAddForm((f) => ({
-                            ...f,
-                            quantity: cleaned,
-                            mos: newMos !== null ? String(newMos) : "",
-                            status: newStatus,
-                          }));
-                        }}
-                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="add-status" className="text-xs font-medium text-zinc-300">
-                      Status Ketersediaan
-                    </Label>
-                    <select
-                      id="add-status"
-                      value={addForm.status}
-                      onChange={(e) =>
-                        setAddForm((f) => ({ ...f, status: e.target.value as StockStatus }))
-                      }
-                      className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
-                    >
-                      <option value="AVAILABLE">Tersedia (Aman)</option>
-                      <option value="LOW">Menipis (Perlu Pengadaan)</option>
-                      <option value="EMPTY">Kosong (Habis)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* ── Kolom Kanan (50%): Logistik & Perencanaan (Opsional) ── */}
-                <div className="flex flex-col justify-between space-y-3.5 pt-3 border-t border-white/10 md:pt-0 md:border-t-0 md:border-l md:border-white/10 md:pl-6">
-                  <div className="space-y-3.5">
-                    <div className="flex items-center justify-between pb-1">
-                      <p className="text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-brand-400" />
-                        <span>Logistik & Perencanaan</span>
-                      </p>
-                      <span className="text-[10px] text-zinc-400 font-normal">Opsional</span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="add-avg-usage" className="text-xs font-medium text-zinc-300">
-                          Rata-rata Pemakaian / Bln
-                        </Label>
-                        <Input
-                          id="add-avg-usage"
-                          type="number"
-                          min="0"
-                          placeholder="Contoh: 1200"
-                          value={addForm.avgUsage}
-                          onChange={(e) => {
-                            const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
-                            const usage = cleaned === "" ? 0 : Number(cleaned) || 0;
-                            const qty = Number(addForm.quantity) || 0;
-                            const newMos = calculateMos(qty, usage);
-                            const newStatus = determineStockStatus(qty, newMos, addForm.status);
-                            setAddForm((f) => ({
-                              ...f,
-                              avgUsage: cleaned,
-                              mos: newMos !== null ? String(newMos) : "",
-                              status: newStatus,
-                            }));
-                            if (historyHint && (historyHint.type === "match" || historyHint.type === "warning")) {
-                              setHistoryHint({
-                                message: `⚡ Nilai RPB disesuaikan manual (${cleaned ? Number(cleaned).toLocaleString("id-ID") : "0"}/bln)`,
-                                type: "match",
-                              });
+                        <div className="space-y-1.5">
+                          <Label htmlFor="add-status" className="text-xs font-medium text-[var(--admin-text-main)]">
+                            Status Ketersediaan
+                          </Label>
+                          <select
+                            id="add-status"
+                            value={addForm.status}
+                            onChange={(e) =>
+                              setAddForm((f) => ({ ...f, status: e.target.value as StockStatus }))
                             }
-                          }}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
+                            className="h-10 w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                          >
+                            <option value="AVAILABLE">Tersedia (Aman)</option>
+                            <option value="LOW">Menipis (Perlu Pengadaan)</option>
+                            <option value="EMPTY">Kosong (Habis)</option>
+                          </select>
+                        </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <Label htmlFor="add-mos" className="text-xs font-medium text-zinc-300">
-                          Kecukupan Stok (Bulan)
-                        </Label>
-                        <Input
-                          id="add-mos"
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          placeholder="Contoh: 12.5"
-                          value={addForm.mos}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            const mosNum = val === "" ? null : Number(val);
-                            const qty = Number(addForm.quantity) || 0;
-                            const newStatus = determineStockStatus(qty, mosNum, addForm.status);
-                            setAddForm((f) => ({
-                              ...f,
-                              mos: val,
-                              status: newStatus,
-                            }));
-                          }}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
+                      {/* ── Kolom Kanan (50%): Logistik & Perencanaan (Opsional) ── */}
+                      <div className="flex flex-col justify-between space-y-3.5 pt-3 border-t border-[var(--admin-border)] md:pt-0 md:border-t-0 md:border-l md:border-[var(--admin-border)] md:pl-6">
+                        <div className="space-y-3.5">
+                          <div className="flex items-center justify-between pb-1">
+                            <p className="text-xs font-semibold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
+                              <span>Logistik & Perencanaan</span>
+                            </p>
+                            <span className="text-[10px] text-[var(--admin-muted)] font-normal">Opsional</span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="add-avg-usage" className="text-xs font-medium text-[var(--admin-text-main)]">
+                                Rata-rata Pemakaian / Bln
+                              </Label>
+                              <Input
+                                id="add-avg-usage"
+                                type="number"
+                                min="0"
+                                placeholder="Contoh: 1200"
+                                value={addForm.avgUsage}
+                                onChange={(e) => {
+                                  const cleaned = e.target.value.replace(/^0+(?=\d)/, "");
+                                  const usage = cleaned === "" ? 0 : Number(cleaned) || 0;
+                                  const qty = Number(addForm.quantity) || 0;
+                                  const newMos = calculateMos(qty, usage);
+                                  const newStatus = determineStockStatus(qty, newMos, addForm.status);
+                                  setAddForm((f) => ({
+                                    ...f,
+                                    avgUsage: cleaned,
+                                    mos: newMos !== null ? String(newMos) : "",
+                                    status: newStatus,
+                                  }));
+                                  if (historyHint && (historyHint.type === "match" || historyHint.type === "warning")) {
+                                    setHistoryHint({
+                                      message: `⚡ Nilai RPB disesuaikan manual (${cleaned ? Number(cleaned).toLocaleString("id-ID") : "0"}/bln)`,
+                                      type: "match",
+                                    });
+                                  }
+                                }}
+                                className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <Label htmlFor="add-mos" className="text-xs font-medium text-[var(--admin-text-main)]">
+                                Kecukupan Stok (Bulan)
+                              </Label>
+                              <Input
+                                id="add-mos"
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                placeholder="Contoh: 12.5"
+                                value={addForm.mos}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  const mosNum = val === "" ? null : Number(val);
+                                  const qty = Number(addForm.quantity) || 0;
+                                  const newStatus = determineStockStatus(qty, mosNum, addForm.status);
+                                  setAddForm((f) => ({
+                                    ...f,
+                                    mos: val,
+                                    status: newStatus,
+                                  }));
+                                }}
+                                className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <Label htmlFor="add-ed" className="text-xs font-medium text-[var(--admin-text-main)]">
+                                Tanggal Kedaluwarsa (ED)
+                              </Label>
+                              <Input
+                                id="add-ed"
+                                placeholder="Contoh: 2028-06"
+                                value={addForm.expiryDate}
+                                onChange={(e) => setAddForm((f) => ({ ...f, expiryDate: e.target.value }))}
+                                className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <Label htmlFor="add-nomenklatur" className="text-xs font-medium text-[var(--admin-text-main)]">
+                                Nomenklatur / Sub-Kelas
+                              </Label>
+                              <Input
+                                id="add-nomenklatur"
+                                placeholder="Contoh: Analgesik & Antipiretik"
+                                value={addForm.nomenklatur}
+                                onChange={(e) => setAddForm((f) => ({ ...f, nomenklatur: e.target.value }))}
+                                className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Quick Insight Box */}
+                        <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3 text-xs text-[var(--admin-text-main)] space-y-2 mt-2">
+                          <div className="flex items-center justify-between text-[var(--admin-muted)]">
+                            <span className="font-medium text-[11px] flex items-center gap-1.5 text-[var(--admin-text-main)]">
+                              <Sparkles className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
+                              <span>Pratinjau Status Logistik</span>
+                            </span>
+                            {(() => {
+                              const q = Number(addForm.quantity) || 0;
+                              const m = addForm.mos !== "" ? Number(addForm.mos) : null;
+                              const info = getMosBadgeInfo(q, m, addForm.status);
+                              const badgeBg: Record<string, string> = {
+                                empty: "bg-rose-700 text-white font-semibold shadow-xs",
+                                critical: "bg-rose-700 text-white font-semibold shadow-xs",
+                                low: "bg-amber-700 text-white font-semibold shadow-xs",
+                                safe: "bg-emerald-700 text-white font-semibold shadow-xs",
+                                abundant: "bg-sky-700 text-white font-semibold shadow-xs",
+                                unknown: "border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)]",
+                              };
+                              return (
+                                <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold", badgeBg[info.variant] || badgeBg.unknown)}>
+                                  <span className={cn("h-1.5 w-1.5 rounded-full", info.variant === "unknown" ? "bg-zinc-400" : "bg-white")} />
+                                  <span>{info.label}</span>
+                                </span>
+                              );
+                            })()}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[var(--admin-border)] text-[11px]">
+                            <div className="text-[var(--admin-muted)]">
+                              Stok Fisik: <strong className="text-[var(--admin-text-main)] font-mono">{addForm.quantity ? Number(addForm.quantity).toLocaleString("id-ID") : "0"}</strong> {addForm.unit || "unit"}
+                            </div>
+                            <div className="text-[var(--admin-muted)] text-right">
+                              Kecukupan: <strong className="text-[#455a26] dark:text-brand-400 font-mono">{addForm.mos ? `${addForm.mos} bln` : "-"}</strong>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="add-ed" className="text-xs font-medium text-zinc-300">
-                          Tanggal Kedaluwarsa (ED)
-                        </Label>
-                        <Input
-                          id="add-ed"
-                          placeholder="Contoh: 2028-06"
-                          value={addForm.expiryDate}
-                          onChange={(e) => setAddForm((f) => ({ ...f, expiryDate: e.target.value }))}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label htmlFor="add-nomenklatur" className="text-xs font-medium text-zinc-300">
-                          Nomenklatur / Sub-Kelas
-                        </Label>
-                        <Input
-                          id="add-nomenklatur"
-                          placeholder="Contoh: Analgesik & Antipiretik"
-                          value={addForm.nomenklatur}
-                          onChange={(e) => setAddForm((f) => ({ ...f, nomenklatur: e.target.value }))}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
-                        />
-                      </div>
+                    <div className="mt-6 grid grid-cols-2 md:flex md:justify-end gap-3 pt-3 border-t border-[var(--admin-border)]">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddOpen(false)}
+                        className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isPending}
+                        className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+                      >
+                        {isPending ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Menyimpan...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4" />
+                            <span>Simpan Obat</span>
+                          </>
+                        )}
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Quick Insight Box */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-2 mt-2">
-                    <div className="flex items-center justify-between text-zinc-400">
-                      <span className="font-medium text-[11px] flex items-center gap-1.5 text-zinc-300">
-                        <Sparkles className="h-3.5 w-3.5 text-brand-400" />
-                        <span>Pratinjau Status Logistik</span>
-                      </span>
-                      {(() => {
-                        const q = Number(addForm.quantity) || 0;
-                        const m = addForm.mos !== "" ? Number(addForm.mos) : null;
-                        const info = getMosBadgeInfo(q, m, addForm.status);
-                        const dotColors: Record<string, string> = {
-                          empty: "bg-rose-400",
-                          critical: "bg-rose-400",
-                          low: "bg-amber-400",
-                          safe: "bg-emerald-400",
-                          abundant: "bg-sky-400",
-                          unknown: "bg-zinc-400",
-                        };
-                        return (
-                          <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border border-white/10 bg-white/5">
-                            <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[info.variant] || "bg-zinc-400")} />
-                            <span>{info.label}</span>
-                          </span>
-                        );
-                      })()}
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px]">
-                      <div className="text-zinc-400">
-                        Stok Fisik: <strong className="text-white font-mono">{addForm.quantity ? Number(addForm.quantity).toLocaleString("id-ID") : "0"}</strong> {addForm.unit || "unit"}
-                      </div>
-                      <div className="text-zinc-400 text-right">
-                        Kecukupan: <strong className="text-brand-400 font-mono">{addForm.mos ? `${addForm.mos} bln` : "-"}</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-2 md:flex md:justify-end gap-3 pt-3 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => setIsAddOpen(false)}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-5 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 hover:brightness-110 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
-                >
-                  {isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Menyimpan...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4" />
-                      <span>Simpan Obat</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </ModalScrollArea>
-        </DialogContent>
-      </Dialog>
+                  </form>
+                </ModalScrollArea>
+              </DialogContent>
+              </Dialog>
 
       {/* ── Modal Edit Item ────────────────────────────────────────────── */}
       <Dialog open={!!editItem} onOpenChange={(open) => !open && setEditItem(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[85dvh] md:max-h-[90vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
+        <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-lg md:max-w-3xl lg:max-w-4xl max-h-[85dvh] md:max-h-[90vh] shadow-2xl rounded-2xl p-0 gap-0 overflow-hidden flex flex-col">
           <DialogHeader className="space-y-1.5 px-5 pt-5 pb-3.5 sm:px-6 sm:pt-6 sm:pb-3.5 shrink-0 pr-12">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-brand-500/20 bg-brand-500/10 text-brand-400">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
                 <Pencil className="h-4 w-4" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
                   Edit Data Stok
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400">
+                <DialogDescription className="text-xs text-[var(--admin-muted)]">
                   Sesuaikan informasi dan kuantitas fisik obat atau BMHP
                 </DialogDescription>
               </div>
@@ -1825,14 +1819,14 @@ export function StockTable({
                 {/* ── Kolom Kiri (50%): Data Master & Kuantitas Fisik ── */}
                 <div className="space-y-3.5">
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-name" className="text-xs font-medium text-zinc-300">
+                    <Label htmlFor="edit-name" className="text-xs font-medium text-[var(--admin-text-main)]">
                       Nama Obat / Barang
                     </Label>
                     <Input
                       id="edit-name"
                       value={editForm.name}
                       onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
-                      className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                      className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                       placeholder="Contoh: Paracetamol 500mg Tablet"
                       required
                     />
@@ -1840,21 +1834,21 @@ export function StockTable({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-code" className="text-xs font-medium text-zinc-300">
+                      <Label htmlFor="edit-code" className="text-xs font-medium text-[var(--admin-text-main)]">
                         Kode Barang / Barcode
                       </Label>
                       <Input
                         id="edit-code"
                         value={editForm.code}
                         onChange={(e) => setEditForm((f) => ({ ...f, code: e.target.value }))}
-                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] font-mono placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                         placeholder="Contoh: OBT-001"
                         required
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-category" className="text-xs font-medium text-zinc-300">
+                      <Label htmlFor="edit-category" className="text-xs font-medium text-[var(--admin-text-main)]">
                         Kategori
                       </Label>
                       <select
@@ -1863,7 +1857,7 @@ export function StockTable({
                         onChange={(e) =>
                           setEditForm((f) => ({ ...f, category: e.target.value as MedicineCategory }))
                         }
-                        className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                        className="h-10 w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
                       >
                         <option value="Obat Generik">Obat Generik</option>
                         <option value="Obat Program">Obat Program</option>
@@ -1876,21 +1870,21 @@ export function StockTable({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-unit" className="text-xs font-medium text-zinc-300">
+                      <Label htmlFor="edit-unit" className="text-xs font-medium text-[var(--admin-text-main)]">
                         Satuan Kemasan
                       </Label>
                       <Input
                         id="edit-unit"
                         value={editForm.unit}
                         onChange={(e) => setEditForm((f) => ({ ...f, unit: e.target.value }))}
-                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                        className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                         placeholder="Tablet / Botol / Vial / Box"
                         required
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-quantity" className="text-xs font-medium text-zinc-300">
+                      <Label htmlFor="edit-quantity" className="text-xs font-medium text-[var(--admin-text-main)]">
                         Jumlah Stok Fisik
                       </Label>
                       <Input
@@ -1915,14 +1909,14 @@ export function StockTable({
                             status: newStatus,
                           }));
                         }}
-                        className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white font-semibold placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] font-semibold placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="edit-status" className="text-xs font-medium text-zinc-300">
+                    <Label htmlFor="edit-status" className="text-xs font-medium text-[var(--admin-text-main)]">
                       Status Ketersediaan
                     </Label>
                     <select
@@ -1931,7 +1925,7 @@ export function StockTable({
                       onChange={(e) =>
                         setEditForm((f) => ({ ...f, status: e.target.value as StockStatus }))
                       }
-                      className="h-10 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                      className="h-10 w-full rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
                     >
                       <option value="AVAILABLE">Tersedia (Aman)</option>
                       <option value="LOW">Menipis (Perlu Pengadaan)</option>
@@ -1941,20 +1935,20 @@ export function StockTable({
                 </div>
 
                 {/* ── Kolom Kanan (50%): Logistik & Perencanaan (Opsional) ── */}
-                <div className="flex flex-col justify-between space-y-3.5 pt-3 border-t border-white/10 md:pt-0 md:border-t-0 md:border-l md:border-white/10 md:pl-6">
+                <div className="flex flex-col justify-between space-y-3.5 pt-3 border-t border-[var(--admin-border)] md:pt-0 md:border-t-0 md:border-l md:border-[var(--admin-border)] md:pl-6">
                   <div className="space-y-3.5">
                     <div className="flex items-center justify-between pb-1">
-                      <p className="text-xs font-semibold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 text-brand-400" />
+                      <p className="text-xs font-semibold text-[var(--admin-text-main)] uppercase tracking-wider flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                         <span>Logistik & Perencanaan</span>
                       </p>
-                      <span className="text-[10px] text-zinc-400 font-normal">Opsional</span>
+                      <span className="text-[10px] text-[var(--admin-muted)] font-normal">Opsional</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-zinc-300">
+                          <Label htmlFor="edit-avg-usage" className="text-xs font-medium text-[var(--admin-text-main)]">
                             Rata-rata Pemakaian / Bln
                           </Label>
                           <button
@@ -1984,7 +1978,7 @@ export function StockTable({
                                 toast.info("Tidak ditemukan riwayat obat di periode sebelumnya");
                               }
                             }}
-                            className="text-[10px] text-brand-400 hover:text-brand-300 transition-colors flex items-center gap-1 cursor-pointer"
+                            className="text-[10px] text-[#455a26] dark:text-brand-400 hover:underline transition-colors flex items-center gap-1 cursor-pointer font-medium"
                           >
                             <Sparkles className="h-3 w-3" />
                             <span>Tarik RPB Histori</span>
@@ -2009,12 +2003,12 @@ export function StockTable({
                               status: newStatus,
                             }));
                           }}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label htmlFor="edit-mos" className="text-xs font-medium text-zinc-300">
+                        <Label htmlFor="edit-mos" className="text-xs font-medium text-[var(--admin-text-main)]">
                           Kecukupan Stok (Bulan)
                         </Label>
                         <Input
@@ -2035,14 +2029,14 @@ export function StockTable({
                               status: newStatus,
                             }));
                           }}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <Label htmlFor="edit-ed" className="text-xs font-medium text-zinc-300">
+                        <Label htmlFor="edit-ed" className="text-xs font-medium text-[var(--admin-text-main)]">
                           Tanggal Kedaluwarsa (ED)
                         </Label>
                         <Input
@@ -2050,12 +2044,12 @@ export function StockTable({
                           placeholder="Contoh: 2028-06"
                           value={editForm.expiryDate}
                           onChange={(e) => setEditForm((f) => ({ ...f, expiryDate: e.target.value }))}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                          className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                         />
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label htmlFor="edit-nomenklatur" className="text-xs font-medium text-zinc-300">
+                        <Label htmlFor="edit-nomenklatur" className="text-xs font-medium text-[var(--admin-text-main)]">
                           Nomenklatur / Sub-Kelas
                         </Label>
                         <Input
@@ -2063,56 +2057,56 @@ export function StockTable({
                           placeholder="Contoh: Analgesik & Antipiretik"
                           value={editForm.nomenklatur}
                           onChange={(e) => setEditForm((f) => ({ ...f, nomenklatur: e.target.value }))}
-                          className="h-10 rounded-lg border border-white/10 bg-zinc-900/80 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
+                          className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Insight Box */}
-                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-zinc-300 space-y-2 mt-2">
-                    <div className="flex items-center justify-between text-zinc-400">
-                      <span className="font-medium text-[11px] flex items-center gap-1.5 text-zinc-300">
-                        <Sparkles className="h-3.5 w-3.5 text-brand-400" />
+                  <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3 text-xs text-[var(--admin-text-main)] space-y-2 mt-2">
+                    <div className="flex items-center justify-between text-[var(--admin-muted)]">
+                      <span className="font-medium text-[11px] flex items-center gap-1.5 text-[var(--admin-text-main)]">
+                        <Sparkles className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                         <span>Pratinjau Status Logistik</span>
                       </span>
                       {(() => {
                         const q = Number(editForm.quantity) || 0;
                         const m = editForm.mos !== "" ? Number(editForm.mos) : null;
                         const info = getMosBadgeInfo(q, m, editForm.status);
-                        const dotColors: Record<string, string> = {
-                          empty: "bg-rose-400",
-                          critical: "bg-rose-400",
-                          low: "bg-amber-400",
-                          safe: "bg-emerald-400",
-                          abundant: "bg-sky-400",
-                          unknown: "bg-zinc-400",
+                        const badgeBg: Record<string, string> = {
+                          empty: "bg-rose-700 text-white font-semibold shadow-xs",
+                          critical: "bg-rose-700 text-white font-semibold shadow-xs",
+                          low: "bg-amber-700 text-white font-semibold shadow-xs",
+                          safe: "bg-emerald-700 text-white font-semibold shadow-xs",
+                          abundant: "bg-sky-700 text-white font-semibold shadow-xs",
+                          unknown: "border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)]",
                         };
                         return (
-                          <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium border border-white/10 bg-white/5">
-                            <span className={cn("h-1.5 w-1.5 rounded-full", dotColors[info.variant] || "bg-zinc-400")} />
+                          <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold", badgeBg[info.variant] || badgeBg.unknown)}>
+                            <span className={cn("h-1.5 w-1.5 rounded-full", info.variant === "unknown" ? "bg-zinc-400" : "bg-white")} />
                             <span>{info.label}</span>
                           </span>
                         );
                       })()}
                     </div>
-                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5 text-[11px]">
-                      <div className="text-zinc-400">
-                        Stok Fisik: <strong className="text-white font-mono">{editForm.quantity ? Number(editForm.quantity).toLocaleString("id-ID") : "0"}</strong> {editForm.unit || "unit"}
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[var(--admin-border)] text-[11px]">
+                      <div className="text-[var(--admin-muted)]">
+                        Stok Fisik: <strong className="text-[var(--admin-text-main)] font-mono">{editForm.quantity ? Number(editForm.quantity).toLocaleString("id-ID") : "0"}</strong> {editForm.unit || "unit"}
                       </div>
-                      <div className="text-zinc-400 text-right">
-                        Kecukupan: <strong className="text-brand-400 font-mono">{editForm.mos ? `${editForm.mos} bln` : "-"}</strong>
+                      <div className="text-[var(--admin-muted)] text-right">
+                        Kecukupan: <strong className="text-[#455a26] dark:text-brand-400 font-mono">{editForm.mos ? `${editForm.mos} bln` : "-"}</strong>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-2 md:flex md:justify-end gap-3 pt-3 border-t border-white/10">
+              <div className="mt-6 grid grid-cols-2 md:flex md:justify-end gap-3 pt-3 border-t border-[var(--admin-border)]">
                 <button
                   type="button"
                   onClick={() => setEditItem(null)}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-5 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
                 >
                   Batal
                 </button>
@@ -2141,17 +2135,17 @@ export function StockTable({
 
       {/* ── Modal Konfirmasi Hapus ─────────────────────────────────────── */}
       <Dialog open={!!deleteItem} onOpenChange={(open) => !open && setDeleteItem(null)}>
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
+        <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
           <DialogHeader className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
                 <AlertTriangle className="h-5 w-5" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
                   Hapus Item Stok?
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                <DialogDescription className="text-xs text-[var(--admin-muted)] mt-0.5">
                   Tindakan ini permanen dan data obat akan dihapus dari sistem.
                 </DialogDescription>
               </div>
@@ -2159,19 +2153,19 @@ export function StockTable({
           </DialogHeader>
 
           {deleteItem && (
-            <div className="mt-3 rounded-lg border border-white/5 bg-white/[0.02] p-3 space-y-2">
+            <div className="mt-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3 space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-semibold text-zinc-100 text-sm">{deleteItem.name}</p>
-                  <p className="font-mono text-xs text-zinc-400 mt-0.5">{deleteItem.code}</p>
+                  <p className="font-semibold text-[var(--admin-text-main)] text-sm">{deleteItem.name}</p>
+                  <p className="font-mono text-xs text-[var(--admin-muted)] mt-0.5">{deleteItem.code}</p>
                 </div>
-                <span className="rounded bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300 font-medium shrink-0">
+                <span className="rounded border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2 py-0.5 text-xs text-[var(--admin-text-main)] font-medium shrink-0">
                   {deleteItem.category}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5">
+              <div className="flex items-center justify-between text-xs text-[var(--admin-muted)] pt-2 border-t border-[var(--admin-border)]">
                 <span>Stok Fisik Saat Ini:</span>
-                <span className="font-medium text-zinc-200">
+                <span className="font-semibold text-[var(--admin-text-main)]">
                   {deleteItem.quantity.toLocaleString("id-ID")} {deleteItem.unit}
                 </span>
               </div>
@@ -2182,7 +2176,7 @@ export function StockTable({
             <button
               type="button"
               onClick={() => setDeleteItem(null)}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer"
             >
               Batal
             </button>
@@ -2208,37 +2202,37 @@ export function StockTable({
         open={isDeletePeriodOpen}
         onOpenChange={(open) => !open && !isDeletingPeriod && setIsDeletePeriodOpen(false)}
       >
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
+        <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
           <DialogHeader className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
                 <AlertTriangle className="h-5 w-5" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
                   Hapus Data Periode?
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                <DialogDescription className="text-xs text-[var(--admin-muted)] mt-0.5">
                   Tindakan ini permanen. Seluruh data stok obat pada periode ini akan dihapus dari sistem.
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
 
-          <div className="mt-3 rounded-lg border border-white/5 bg-white/[0.02] p-3.5 space-y-2.5">
+          <div className="mt-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3.5 space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-zinc-400">Periode Data:</span>
-              <span className="font-semibold text-zinc-100 text-sm">
+              <span className="text-xs text-[var(--admin-muted)]">Periode Data:</span>
+              <span className="font-semibold text-[var(--admin-text-main)] text-sm">
                 {formatStockPeriodLabel(selectedPeriod)}
               </span>
             </div>
-            <div className="flex items-center justify-between text-xs text-zinc-400 pt-2 border-t border-white/5">
+            <div className="flex items-center justify-between text-xs text-[var(--admin-muted)] pt-2 border-t border-[var(--admin-border)]">
               <span>Total Obat Terpengaruh:</span>
-              <span className="font-semibold text-rose-400">
+              <span className="font-semibold text-rose-600 dark:text-rose-400">
                 {items.length.toLocaleString("id-ID")} item
               </span>
             </div>
-            <div className="text-[11px] text-zinc-400 pt-1 leading-relaxed">
+            <div className="text-[11px] text-[var(--admin-muted)] pt-1 leading-relaxed">
               Catatan: Data arsip periode lainnya tetap aman dan tidak berubah.
             </div>
           </div>
@@ -2248,7 +2242,7 @@ export function StockTable({
               type="button"
               disabled={isDeletingPeriod}
               onClick={() => setIsDeletePeriodOpen(false)}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:opacity-50"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer disabled:opacity-50"
             >
               Batal
             </button>
@@ -2274,17 +2268,17 @@ export function StockTable({
         open={isCreatePeriodOpen}
         onOpenChange={(open) => !open && !isCreatingPeriod && setIsCreatePeriodOpen(false)}
       >
-        <DialogContent className="border border-white/10 bg-zinc-950/95 text-white backdrop-blur-2xl max-w-lg shadow-2xl rounded-2xl p-5 sm:p-6">
+        <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-lg shadow-2xl rounded-2xl p-5 sm:p-6">
           <DialogHeader className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400">
                 <CalendarPlus className="h-5 w-5" />
               </div>
               <div>
-                <DialogTitle className="text-lg font-bold text-white tracking-tight">
+                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
                   Buka Periode Stok Baru
                 </DialogTitle>
-                <DialogDescription className="text-xs text-zinc-400 mt-0.5">
+                <DialogDescription className="text-xs text-[var(--admin-muted)] mt-0.5">
                   Inisialisasi lembar pelaporan obat bulanan untuk pencatatan stok fisik.
                 </DialogDescription>
               </div>
@@ -2294,14 +2288,14 @@ export function StockTable({
           <div className="mt-4 space-y-4">
             {/* Pemilihan Bulan & Tahun */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-zinc-300">
+              <Label className="text-xs font-medium text-[var(--admin-text-main)]">
                 Pilih Periode Bulan & Tahun
               </Label>
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={createPeriodMonth}
                   onChange={(e) => setCreatePeriodMonth(e.target.value)}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                  className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
                 >
                   <option value="01">Januari</option>
                   <option value="02">Februari</option>
@@ -2320,7 +2314,7 @@ export function StockTable({
                 <select
                   value={createPeriodYear}
                   onChange={(e) => setCreatePeriodYear(e.target.value)}
-                  className="h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
+                  className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/40 cursor-pointer"
                 >
                   <option value="2025">2025</option>
                   <option value="2026">2026</option>
@@ -2335,16 +2329,16 @@ export function StockTable({
                 const isDuplicate = periodsList.includes(target);
                 if (isDuplicate) {
                   return (
-                    <div className="flex items-center gap-1.5 pt-1 text-xs text-amber-400">
+                    <div className="flex items-center gap-1.5 pt-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
                       <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                       <span>Periode {formatStockPeriodLabel(target)} ({target}) sudah terdaftar di sistem.</span>
                     </div>
                   );
                 }
                 return (
-                  <div className="flex items-center justify-between pt-1 text-[11px] text-zinc-400">
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-[var(--admin-muted)]">
                     <span>Format target sistem:</span>
-                    <span className="font-mono font-semibold text-emerald-400">
+                    <span className="font-mono font-semibold text-emerald-700 dark:text-emerald-400">
                       {formatStockPeriodLabel(target)} ({target})
                     </span>
                   </div>
@@ -2353,8 +2347,8 @@ export function StockTable({
             </div>
 
             {/* Metode Inisialisasi Data Obat */}
-            <div className="space-y-2 pt-2 border-t border-white/10">
-              <Label className="text-xs font-medium text-zinc-300">
+            <div className="space-y-2 pt-2 border-t border-[var(--admin-border)]">
+              <Label className="text-xs font-medium text-[var(--admin-text-main)]">
                 Metode Inisialisasi Data Obat
               </Label>
               
@@ -2365,8 +2359,8 @@ export function StockTable({
                   className={cn(
                     "flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all",
                     createPeriodMode === "COPY"
-                      ? "border-emerald-500/40 bg-emerald-500/10 ring-1 ring-emerald-500/40"
-                      : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                      ? "border-emerald-500/40 bg-emerald-50 dark:bg-emerald-500/10 ring-1 ring-emerald-500/40"
+                      : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-hover-bg)]"
                   )}
                 >
                   <input
@@ -2374,31 +2368,31 @@ export function StockTable({
                     name="create-period-mode"
                     checked={createPeriodMode === "COPY"}
                     onChange={() => setCreatePeriodMode("COPY")}
-                    className="mt-0.5 h-4 w-4 text-emerald-500 focus:ring-emerald-500 bg-zinc-900 border-white/20"
+                    className="mt-0.5 h-4 w-4 text-emerald-600 focus:ring-emerald-500 bg-[var(--admin-surface)] border-[var(--admin-border)]"
                   />
                   <div className="space-y-1 flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-zinc-100 flex items-center gap-1.5">
-                        <Copy className="h-3.5 w-3.5 text-emerald-400" />
+                      <span className="text-xs font-semibold text-[var(--admin-text-main)] flex items-center gap-1.5">
+                        <Copy className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                         <span>Salin Master Obat dari Periode Terakhir</span>
                       </span>
-                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-medium text-emerald-300">
+                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[9px] font-semibold text-emerald-800 dark:text-emerald-300">
                         Disarankan
                       </span>
                     </div>
-                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                    <p className="text-[11px] text-[var(--admin-muted)] leading-relaxed">
                       Menyalin seluruh daftar obat, kode, kategori, dan satuan. Kuantitas fisik di-reset ke 0 (status Kosong) dan RPB histori otomatis terhubung.
                     </p>
 
                     {createPeriodMode === "COPY" && (
                       <div className="pt-2">
-                        <label className="text-[10px] text-zinc-400 block mb-1">
+                        <label className="text-[10px] text-[var(--admin-muted)] block mb-1">
                           Sumber Master Obat:
                         </label>
                         <select
                           value={createPeriodSource}
                           onChange={(e) => setCreatePeriodSource(e.target.value)}
-                          className="h-8 w-full rounded-md border border-white/10 bg-zinc-900 px-2.5 text-xs text-zinc-200 focus:border-brand-500/60 focus:outline-none"
+                          className="h-8 w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-surface)] px-2.5 text-xs text-[var(--admin-text-main)] focus:border-brand-500/60 focus:outline-none"
                         >
                           {periodsList.map((p) => (
                             <option key={p} value={p}>
@@ -2417,8 +2411,8 @@ export function StockTable({
                   className={cn(
                     "flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all",
                     createPeriodMode === "BLANK"
-                      ? "border-brand-500/40 bg-brand-500/10 ring-1 ring-brand-500/40"
-                      : "border-white/10 bg-white/[0.02] hover:bg-white/[0.05]"
+                      ? "border-brand-500/40 bg-brand-50 dark:bg-brand-500/10 ring-1 ring-brand-500/40"
+                      : "border-[var(--admin-border)] bg-[var(--admin-surface)] hover:bg-[var(--admin-hover-bg)]"
                   )}
                 >
                   <input
@@ -2426,14 +2420,14 @@ export function StockTable({
                     name="create-period-mode"
                     checked={createPeriodMode === "BLANK"}
                     onChange={() => setCreatePeriodMode("BLANK")}
-                    className="mt-0.5 h-4 w-4 text-brand-500 focus:ring-brand-500 bg-zinc-900 border-white/20"
+                    className="mt-0.5 h-4 w-4 text-brand-600 focus:ring-brand-500 bg-[var(--admin-surface)] border-[var(--admin-border)]"
                   />
                   <div className="space-y-1 flex-1">
-                    <span className="text-xs font-semibold text-zinc-100 flex items-center gap-1.5">
-                      <FileText className="h-3.5 w-3.5 text-brand-400" />
+                    <span className="text-xs font-semibold text-[var(--admin-text-main)] flex items-center gap-1.5">
+                      <FileText className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                       <span>Lembar Kosong Murni (Blank Sheet)</span>
                     </span>
-                    <p className="text-[11px] text-zinc-400 leading-relaxed">
+                    <p className="text-[11px] text-[var(--admin-muted)] leading-relaxed">
                       Membuka periode baru dengan 0 obat. Petugas dapat menginput obat satu per satu secara manual atau mengimpor data Excel nanti.
                     </p>
                   </div>
@@ -2442,12 +2436,12 @@ export function StockTable({
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-3 pt-3 border-t border-white/10">
+          <div className="mt-6 grid grid-cols-2 gap-3 pt-3 border-t border-[var(--admin-border)]">
             <button
               type="button"
               disabled={isCreatingPeriod}
               onClick={() => setIsCreatePeriodOpen(false)}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-medium text-zinc-300 transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:opacity-50"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] px-4 text-sm font-medium text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] cursor-pointer disabled:opacity-50"
             >
               Batal
             </button>
