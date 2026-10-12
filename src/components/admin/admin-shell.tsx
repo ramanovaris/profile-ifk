@@ -163,18 +163,33 @@ export type AdminShellProps = {
 // Module-level persistent cache across route navigations
 let activeClientTheme: ThemeSetting | null = null;
 let activeSystemIsDark: boolean | null = null;
-let hasHydrated = false;
 
 function getInitialAdminTheme(): ThemeSetting {
-  if (hasHydrated && activeClientTheme) {
-    return activeClientTheme;
+  if (activeClientTheme) return activeClientTheme;
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
+      if (stored === "light" || stored === "dark" || stored === "system") {
+        activeClientTheme = stored;
+        return stored;
+      }
+    } catch {
+      // ignore
+    }
   }
   return "light";
 }
 
 function getInitialSystemDark(): boolean {
-  if (hasHydrated && activeSystemIsDark !== null) {
-    return activeSystemIsDark;
+  if (activeSystemIsDark !== null) return activeSystemIsDark;
+  if (typeof window !== "undefined") {
+    try {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      activeSystemIsDark = isDark;
+      return isDark;
+    } catch {
+      // ignore
+    }
   }
   return false;
 }
@@ -188,7 +203,6 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   const [systemIsDark, setSystemIsDark] = useState<boolean>(getInitialSystemDark);
 
   useEffect(() => {
-    hasHydrated = true;
     if (typeof window === "undefined") return;
 
     try {

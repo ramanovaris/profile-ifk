@@ -247,6 +247,7 @@ input[type="number"] {
 
 /* ── Admin Semantic Theme Variables ────────────────────────────── */
 :root[data-admin-theme="light"],
+:root[data-admin-theme="light"] .admin-root,
 .admin-root[data-admin-theme="light"] {
   --admin-bg: #f8fafc;
   --admin-surface: #ffffff;
@@ -270,6 +271,7 @@ input[type="number"] {
 }
 
 :root[data-admin-theme="dark"],
+:root[data-admin-theme="dark"] .admin-root,
 .admin-root[data-admin-theme="dark"] {
   --admin-bg: #09090b;
   --admin-surface: rgba(24, 24, 27, 0.6);
