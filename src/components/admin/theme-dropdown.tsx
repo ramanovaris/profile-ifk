@@ -43,8 +43,13 @@ export function ThemeDropdown({
   onThemeChange,
   className,
 }: ThemeDropdownProps) {
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -73,8 +78,9 @@ export function ThemeDropdown({
     };
   }, [isOpen]);
 
-  const activeOption =
-    themeOptions.find((opt) => opt.value === themeSetting) || themeOptions[0];
+  const activeOption = mounted
+    ? themeOptions.find((opt) => opt.value === themeSetting) || themeOptions[0]
+    : themeOptions[0];
   const ActiveIcon = activeOption.icon;
 
   return (
