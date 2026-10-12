@@ -11,10 +11,10 @@ export default async function AdminPengaturanPage() {
         {/* Header Halaman */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
               Pengaturan Website
             </h1>
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="mt-1 text-sm text-[var(--admin-muted)]">
               Kelola identitas instansi, kontak pelayanan, konten profil lembaga, dan integrasi tautan publik.
             </p>
           </div>
