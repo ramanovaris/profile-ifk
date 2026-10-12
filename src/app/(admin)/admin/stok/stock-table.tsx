@@ -22,7 +22,9 @@ import {
   FileText,
   FileSpreadsheet,
   ChevronDown,
-  Sparkles
+  Activity,
+  History,
+  Info
 } from "lucide-react";
 import { 
   Dialog, 
@@ -1551,7 +1553,7 @@ export function StockTable({
                             {historyHint.type === "warning" ? (
                               <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                             ) : (
-                              <Sparkles className="h-4 w-4 shrink-0 text-[#455a26] dark:text-brand-400" />
+                              <Info className="h-4 w-4 shrink-0 text-[#455a26] dark:text-brand-400" />
                             )}
                             <span className="leading-snug">{historyHint.message}</span>
                           </div>
@@ -1728,7 +1730,7 @@ export function StockTable({
                         <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3 text-xs text-[var(--admin-text-main)] space-y-2 mt-2">
                           <div className="flex items-center justify-between text-[var(--admin-muted)]">
                             <span className="font-medium text-[11px] flex items-center gap-1.5 text-[var(--admin-text-main)]">
-                              <Sparkles className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
+                              <Activity className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                               <span>Pratinjau Status Logistik</span>
                             </span>
                             {(() => {
@@ -1980,7 +1982,7 @@ export function StockTable({
                             }}
                             className="text-[10px] text-[#455a26] dark:text-brand-400 hover:underline transition-colors flex items-center gap-1 cursor-pointer font-medium"
                           >
-                            <Sparkles className="h-3 w-3" />
+                            <History className="h-3 w-3" />
                             <span>Tarik RPB Histori</span>
                           </button>
                         </div>
@@ -2067,7 +2069,7 @@ export function StockTable({
                   <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3 text-xs text-[var(--admin-text-main)] space-y-2 mt-2">
                     <div className="flex items-center justify-between text-[var(--admin-muted)]">
                       <span className="font-medium text-[11px] flex items-center gap-1.5 text-[var(--admin-text-main)]">
-                        <Sparkles className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
+                        <Activity className="h-3.5 w-3.5 text-[#455a26] dark:text-brand-400" />
                         <span>Pratinjau Status Logistik</span>
                       </span>
                       {(() => {
