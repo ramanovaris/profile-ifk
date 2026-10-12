@@ -36,7 +36,7 @@ export default async function AdminBeritaBaruPage() {
   ]);
 
   return (
-    <AdminShell>
+    <AdminShell currentUser={session?.user}>
       <div className="mx-auto max-w-4xl w-full min-w-0">
         <div className="mb-6">
           <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">

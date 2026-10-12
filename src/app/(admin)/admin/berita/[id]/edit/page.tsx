@@ -63,7 +63,7 @@ export default async function AdminBeritaEditPage(props: {
 
   if (!article) {
     return (
-      <AdminShell>
+      <AdminShell currentUser={session?.user}>
         <div className="mx-auto max-w-4xl rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-8 text-center backdrop-blur-xl">
           <p className="text-base text-[var(--admin-text-main)]">Artikel tidak ditemukan.</p>
           <Link
@@ -79,7 +79,7 @@ export default async function AdminBeritaEditPage(props: {
   }
 
   return (
-    <AdminShell>
+    <AdminShell currentUser={session?.user}>
       <div className="mx-auto max-w-4xl w-full min-w-0">
         <div className="mb-6">
           <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
