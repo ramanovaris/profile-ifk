@@ -1,12 +1,14 @@
 import { Suspense } from "react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { db } from "@/lib/db";
+import { getCurrentSession } from "@/lib/auth";
 import { ArticleTable } from "./article-table";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminBeritaPage() {
-  const [articles, categories] = await Promise.all([
+  const [session, articles, categories] = await Promise.all([
+    getCurrentSession(),
     db.article.findMany({
       include: {
         category: {
@@ -40,7 +42,7 @@ export default async function AdminBeritaPage() {
   ]);
 
   return (
-    <AdminShell>
+    <AdminShell currentUser={session?.user}>
       <Suspense fallback={null}>
         <ArticleTable initialArticles={articles} categories={categories} />
       </Suspense>
