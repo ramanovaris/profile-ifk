@@ -324,7 +324,7 @@ export function CategoryTable({
                       <td className="px-2 sm:px-4 py-3 text-center align-middle whitespace-nowrap">
                         <button
                           type="button"
-                          onClick={() => handleToggleStatus(cat)}
+                          onClick={() => toggleStatus(cat)}
                           disabled={isPending}
                           className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors cursor-pointer ${
                             cat.status === "ACTIVE"
