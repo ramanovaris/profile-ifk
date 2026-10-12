@@ -550,8 +550,15 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
               {paginatedArticles.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-[var(--admin-muted)]">
-                    <Newspaper className="mx-auto h-8 w-8 text-[var(--admin-muted)]/80 mb-2" />
-                    <p className="text-sm">Tidak ada artikel yang cocok dengan pencarian.</p>
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]">
+                      <Newspaper className="h-6 w-6" />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-[var(--admin-text-main)]">
+                      Tidak ada artikel yang ditemukan
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--admin-muted)]">
+                      Coba sesuaikan kata kunci pencarian atau filter status dan kategori.
+                    </p>
                   </td>
                 </tr>
               ) : (

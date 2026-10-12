@@ -300,11 +300,18 @@ export function CategoryTable({
               {paginatedCategories.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="py-12 text-center text-[var(--admin-muted)]">
-                    <Tags className="mx-auto h-8 w-8 text-[var(--admin-muted)]/80 mb-2" />
-                    <p className="text-sm">
+                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]">
+                      <Tags className="h-6 w-6" />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-[var(--admin-text-main)]">
                       {categories.length === 0
-                        ? "Belum ada kategori yang ditambahkan."
-                        : "Tidak ada kategori yang cocok dengan pencarian."}
+                        ? "Belum ada kategori yang ditambahkan"
+                        : "Tidak ada kategori yang cocok dengan pencarian"}
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--admin-muted)]">
+                      {categories.length === 0
+                        ? "Tambahkan kategori baru untuk mulai mengelompokkan artikel."
+                        : "Coba sesuaikan kata kunci pencarian Anda."}
                     </p>
                   </td>
                 </tr>
