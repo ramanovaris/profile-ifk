@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Sun, Moon, Laptop, Check } from "lucide-react";
+import { useState, useRef, useEffect, useSyncExternalStore } from "react";
+import { Laptop, Moon, Sun, Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type ThemeSetting = "light" | "dark" | "system";
@@ -15,20 +15,20 @@ interface ThemeDropdownProps {
 const themeOptions: {
   value: ThemeSetting;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: typeof Sun;
   iconClass: string;
 }[] = [
   {
     value: "light",
     label: "Terang",
     icon: Sun,
-    iconClass: "text-amber-500",
+    iconClass: "text-amber-400",
   },
   {
     value: "dark",
     label: "Gelap",
     icon: Moon,
-    iconClass: "text-brand-400",
+    iconClass: "text-indigo-400",
   },
   {
     value: "system",
@@ -38,18 +38,16 @@ const themeOptions: {
   },
 ];
 
+const emptySubscribe = () => () => {};
+
 export function ThemeDropdown({
   themeSetting,
   onThemeChange,
   className,
 }: ThemeDropdownProps) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

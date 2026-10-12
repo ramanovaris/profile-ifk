@@ -205,19 +205,7 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    try {
-      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
-      if (stored === "light" || stored === "dark" || stored === "system") {
-        activeClientTheme = stored;
-        setThemeSetting(stored);
-      }
-    } catch {
-      // ignore
-    }
-
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    activeSystemIsDark = media.matches;
-    setSystemIsDark(media.matches);
 
     const listener = (e: MediaQueryListEvent) => {
       activeSystemIsDark = e.matches;

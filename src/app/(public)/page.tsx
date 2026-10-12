@@ -172,7 +172,7 @@ export default async function HomePage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden />
                 Dinas Kesehatan Kabupaten Kotabaru
               </span>
-              <h1 className="mt-5 text-[clamp(2.1rem,4.6vw,4.5rem)] font-bold leading-[1.04] tracking-tighter [@media(max-height:759px)]:text-[clamp(2rem,4vw,3rem)] lg:mt-8">
+              <h1 className="mt-5 text-[clamp(2.1rem,4.6vw,4.5rem)] font-bold leading-[1.04] tracking-tighter text-white [@media(max-height:759px)]:text-[clamp(2rem,4vw,3rem)] lg:mt-8">
                 UPTD Instalasi{" "}
                 <span className="italic text-brand-400">Farmasi</span>
                 <span className="block">Kabupaten Kotabaru</span>
