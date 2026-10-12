@@ -583,7 +583,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               variant="outline"
               disabled={isPending}
               onClick={handleIdentityReset}
-              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -661,7 +661,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => headPhotoInputRef.current?.click()}
-                  className="w-full max-w-[180px] gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)]"
+                  className="w-full max-w-[180px] gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   Upload Foto (3:4)
@@ -794,7 +794,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => orgPhotoInputRef.current?.click()}
-                className="gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)]"
+                className="gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
               >
                 <Upload className="h-3.5 w-3.5" />
                 <span>Upload Bagan Baru</span>
@@ -843,7 +843,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleProfileReset}
-              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -1109,7 +1109,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleLinksReset}
-              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -1215,7 +1215,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleDocsReset}
-              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
@@ -1420,7 +1420,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               type="button"
               variant="outline"
               onClick={handleStatsReset}
-              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] active:scale-[0.98]"
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
             >
               <RotateCcw className="h-4 w-4" />
               <span>Reset Form</span>
