@@ -56,7 +56,6 @@ export type SiteConfig = {
   whatsappLink: string;
   googleMapsEmbedUrl: string;
   operationalHours: string;
-  sp4nLaporUrl: string;
   motto: string;
   tagline: string;
 };
@@ -75,7 +74,6 @@ export const siteConfig: SiteConfig = {
     "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.402205111195!2d116.22363550000001!3d-3.2497904999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2def302cb3e8dcff%3A0xb7c86d7dc7737d8c!2sInstalasi%20Farmasi!5e0!3m2!1sen!2sid!4v1788250580948!5m2!1sen!2sid",
   operationalHours:
     "Senin - Kamis: 08.00 - 16.30 WITA\nJumat: 08.00 - 11.00 WITA",
-  sp4nLaporUrl: "https://www.lapor.go.id",
   motto:
     "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat",
   tagline: "Stok Valid, Team Solid",
