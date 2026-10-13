@@ -420,15 +420,15 @@ export function StockTable({
 
     if (isAlreadyInCurrentPeriod) {
       setHistoryHint({
-        message: `⚠️ Obat '${item.name}' (${item.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel jika ingin mengubah stok.`,
+        message: `Obat '${item.name}' (${item.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel jika ingin mengubah stok.`,
         type: "warning",
       });
     } else {
       setHistoryHint({
         message:
           item.historicalAvgUsage > 0
-            ? `⚡ RPB ${item.historicalAvgUsage.toLocaleString("id-ID")}/bln ditarik dari tren ${item.sampleCount} bulan sebelumnya`
-            : `⚡ Data master obat (${item.category}, ${item.unit}) berhasil disinkronkan`,
+            ? `RPB ${item.historicalAvgUsage.toLocaleString("id-ID")}/bln ditarik dari tren ${item.sampleCount} bulan sebelumnya`
+            : `Data master obat (${item.category}, ${item.unit}) berhasil disinkronkan`,
         type: "match",
       });
     }
@@ -490,15 +490,15 @@ export function StockTable({
 
             if (isAlreadyInCurrentPeriod) {
               setHistoryHint({
-                message: `⚠️ Obat '${matched.name}' (${matched.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel.`,
+                message: `Obat '${matched.name}' (${matched.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel.`,
                 type: "warning",
               });
             } else {
               setHistoryHint({
                 message:
                   matched.historicalAvgUsage > 0
-                    ? `⚡ Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
-                    : `⚡ Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
+                    ? `Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
+                    : `Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
                 type: "match",
               });
             }
@@ -508,7 +508,7 @@ export function StockTable({
 
         setAutofilledSource(null);
         setHistoryHint({
-          message: "🆕 Obat baru (belum ada riwayat pemakaian di periode sebelumnya)",
+          message: "Obat baru (belum ada riwayat pemakaian di periode sebelumnya)",
           type: "new",
         });
       } catch (err) {
@@ -1573,20 +1573,40 @@ export function StockTable({
                         {historyHint && (
                           <div
                             className={cn(
-                              "rounded-lg px-3 py-2 text-xs flex items-center gap-2 border transition-all animate-in fade-in",
-                              historyHint.type === "match"
-                                ? "border-emerald-500/25 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-semibold"
-                                : historyHint.type === "warning"
-                                ? "border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-300 font-semibold"
-                                : "border-sky-500/25 bg-sky-50 dark:bg-sky-500/10 text-sky-800 dark:text-sky-300 font-semibold"
+                              "rounded-xl p-3 text-xs flex items-start gap-2.5 border transition-all animate-in fade-in",
+                              historyHint.type === "warning"
+                                ? "border-amber-400/80 bg-amber-50/90 text-amber-950 dark:border-amber-500/40 dark:bg-amber-950/40 dark:text-amber-200"
+                                : historyHint.type === "match"
+                                ? "border-emerald-400/80 bg-emerald-50/90 text-emerald-950 dark:border-emerald-500/40 dark:bg-emerald-950/40 dark:text-emerald-200"
+                                : "border-sky-400/80 bg-sky-50/90 text-sky-950 dark:border-sky-500/40 dark:bg-sky-950/40 dark:text-sky-200"
                             )}
                           >
-                            {historyHint.type === "warning" ? (
-                              <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                            ) : (
-                              <Info className="h-4 w-4 shrink-0 text-[#455a26] dark:text-brand-400" />
-                            )}
-                            <span className="leading-snug">{historyHint.message}</span>
+                            <div
+                              className={cn(
+                                "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg mt-0.5",
+                                historyHint.type === "warning"
+                                  ? "bg-amber-200/80 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300"
+                                  : historyHint.type === "match"
+                                  ? "bg-emerald-200/80 text-emerald-900 dark:bg-emerald-500/20 dark:text-emerald-300"
+                                  : "bg-sky-200/80 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300"
+                              )}
+                            >
+                              {historyHint.type === "warning" ? (
+                                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                              ) : (
+                                <Info className="h-3.5 w-3.5 shrink-0" />
+                              )}
+                            </div>
+                            <div className="flex-1 space-y-0.5">
+                              {historyHint.type === "warning" && (
+                                <p className="font-bold text-[11px] uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                                  Obat Sudah Terdaftar
+                                </p>
+                              )}
+                              <p className="leading-relaxed font-medium">
+                                {historyHint.message}
+                              </p>
+                            </div>
                           </div>
                         )}
 
@@ -1692,7 +1712,7 @@ export function StockTable({
                                   }));
                                   if (historyHint && (historyHint.type === "match" || historyHint.type === "warning")) {
                                     setHistoryHint({
-                                      message: `⚡ Nilai RPB disesuaikan manual (${cleaned ? Number(cleaned).toLocaleString("id-ID") : "0"}/bln)`,
+                                      message: `Nilai RPB disesuaikan manual (${cleaned ? Number(cleaned).toLocaleString("id-ID") : "0"}/bln)`,
                                       type: "match",
                                     });
                                   }
