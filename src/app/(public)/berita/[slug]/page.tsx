@@ -11,6 +11,7 @@ import { dummyArticles } from "@/lib/dummy-data";
 import { db } from "@/lib/db";
 import { getCurrentSession } from "@/lib/auth";
 import { stripHtmlAndTruncate } from "@/lib/string";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -353,7 +354,7 @@ export default async function BeritaDetailPage(props: {
           <div className="mx-auto max-w-3xl">
             <div
               className="prose prose-zinc max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-800"
-              dangerouslySetInnerHTML={{ __html: content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
             />
 
             {/* Bilah Berbagi Lengkap di Bawah Naskah */}

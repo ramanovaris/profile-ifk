@@ -36,6 +36,8 @@ import {
   CategoryMultiSelectFilter,
   type CategoryFilterItem,
 } from "@/components/admin/category-multi-select-filter";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { AdminTablePagination } from "@/components/admin/admin-table-pagination";
 import {
   toggleArticlePublishAction,
   deleteArticleAction,
@@ -257,16 +259,10 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
   return (
     <>
       {/* Header section */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
-            Kelola Berita
-          </h1>
-          <p className="mt-1 text-sm text-[var(--admin-muted)]">
-            Daftar publikasi, pengumuman, dan artikel informasi farmasi.
-          </p>
-        </div>
-        <div>
+      <AdminPageHeader
+        title="Kelola Berita"
+        description="Daftar publikasi, pengumuman, dan artikel informasi farmasi."
+        action={
           <Link
             href="/admin/berita/baru/"
             className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
@@ -274,8 +270,8 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
             <Plus className="h-4 w-4" />
             <span>Tambah Artikel</span>
           </Link>
-        </div>
-      </div>
+        }
+      />
 
       {/* Status Filter Tabs (Semua / Terbit / Draft) */}
       <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1">
@@ -665,75 +661,16 @@ export function ArticleTable({ initialArticles, categories }: ArticleTableProps)
         </div>
 
         {/* Pagination Bar */}
-        {sortedArticles.length > 0 && (
-          <div className="flex flex-col gap-3 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--admin-muted)]">
-              <p>
-                Menampilkan{" "}
-                <span className="font-medium text-[var(--admin-text-main)]">
-                  {startIndex + 1}–{Math.min(startIndex + itemsPerPage, sortedArticles.length)}
-                </span>{" "}
-                dari <span className="font-medium text-[var(--admin-text-main)]">{sortedArticles.length}</span> artikel
-              </p>
-
-              {/* Selector Baris Per Halaman */}
-              <div className="flex items-center gap-1.5 border-l border-[var(--admin-border)] pl-3">
-                <span className="text-[var(--admin-muted)]">Baris:</span>
-                <select
-                  value={itemsPerPage}
-                  onChange={(e) => {
-                    setItemsPerPage(Number(e.target.value));
-                    handlePageChange(1);
-                  }}
-                  className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2 py-1 text-xs text-[var(--admin-text-main)] outline-none transition-colors hover:border-[var(--admin-border)] focus:border-brand-500/50"
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 self-end sm:self-auto">
-              <button
-                type="button"
-                disabled={validPage <= 1}
-                onClick={() => handlePageChange(Math.max(1, validPage - 1))}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-                <span>Sebelumnya</span>
-              </button>
-
-              <div className="flex items-center gap-1 px-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    type="button"
-                    onClick={() => handlePageChange(page)}
-                    className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
-                      validPage === page
-                        ? "border border-brand-500/30 bg-brand-500/15 text-brand-600 dark:text-brand-300 font-semibold shadow-xs shadow-brand-500/10"
-                        : "border border-transparent text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                type="button"
-                disabled={validPage >= totalPages}
-                onClick={() => handlePageChange(Math.min(totalPages, validPage + 1))}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
-              >
-                <span>Selanjutnya</span>
-                <ChevronRight className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          </div>
-        )}
+        <AdminTablePagination
+          totalItems={sortedArticles.length}
+          startIndex={startIndex}
+          itemsPerPage={itemsPerPage}
+          currentPage={validPage}
+          totalPages={totalPages}
+          itemLabel="artikel"
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={(limit) => setItemsPerPage(limit)}
+        />
       </div>
     ) : (
       <div className="mt-6 rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)]/80 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-sm">

@@ -7,6 +7,7 @@ import { X, Monitor, Smartphone, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumb } from "@/components/public/breadcrumb";
 import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 export interface ArticlePreviewData {
   title: string;
@@ -239,7 +240,7 @@ export function ArticlePreviewModal({
                   {hasContent ? (
                     <div
                       className="prose prose-zinc max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-800"
-                      dangerouslySetInnerHTML={{ __html: data.content }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.content) }}
                     />
                   ) : (
                     <div className="rounded-xl border border-dashed border-border p-8 text-center text-muted">
