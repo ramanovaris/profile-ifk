@@ -20,6 +20,7 @@ import { StokHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
 import { PublicStockFilter } from "@/components/public/public-stock-filter";
 import { exportStockToExcel } from "@/lib/stock-exporter";
+import { matchMedicineSearch } from "@/lib/medicine-search";
 import {
   getStockSummary,
   getMosBadgeInfo,
@@ -193,14 +194,7 @@ export function PublicStockClientView({
           selectedStatuses.length === 0 ||
           selectedStatuses.includes(getItemEffectiveStatus(item))
       )
-      .filter((item) => {
-        const query = search.toLowerCase();
-        return (
-          item.name.toLowerCase().includes(query) ||
-          item.code.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query)
-        );
-      });
+      .filter((item) => matchMedicineSearch(item, search));
   }, [initialItems, search, selectedCategories, selectedStatuses]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
