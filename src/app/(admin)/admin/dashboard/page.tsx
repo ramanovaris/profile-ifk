@@ -13,6 +13,7 @@ import {
   PenLine,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { getCurrentSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 
@@ -141,16 +142,10 @@ export default async function AdminDashboardPage() {
   return (
     <AdminShell currentUser={session.user}>
       {/* Header section with quick action */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--admin-text-main)] sm:text-3xl">
-            Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-[var(--admin-muted)]">
-            Ringkasan status publikasi, inventaris obat, dan aktivitas portal IFK Kotabaru.
-          </p>
-        </div>
-        <div>
+      <AdminPageHeader
+        title="Dashboard"
+        description="Ringkasan status publikasi, inventaris obat, dan aktivitas portal IFK Kotabaru."
+        action={
           <Link
             href="/admin/berita/baru/"
             className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
@@ -158,8 +153,8 @@ export default async function AdminDashboardPage() {
             <Plus className="h-4 w-4" />
             <span>Tulis Berita Baru</span>
           </Link>
-        </div>
-      </div>
+        }
+      />
 
       {/* Responsive Stat KPI cards (Grid 2 Kolom Mobile, 5 untuk Super Admin, 4 untuk Staf) */}
       <div

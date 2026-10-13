@@ -24,6 +24,7 @@ import {
 import { PageHero } from "@/components/public/page-hero";
 import { ProfilHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
+import { PublicSectionHeader } from "@/components/public/public-section-header";
 
 export const metadata: Metadata = {
   title: "Profil & Struktur Organisasi",
@@ -326,20 +327,11 @@ export default async function ProfilPage() {
       {/* ── Sumber Daya Manusia ───────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Kapasitas SDM</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Sumber Daya Manusia
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Didukung oleh 24 personel tenaga kefarmasian profesional dan tenaga pendukung
-                teknis yang berdedikasi menjaga ketahanan rantai pasok obat Kabupaten Kotabaru.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Kapasitas SDM"
+            title="Sumber Daya Manusia"
+            description="Didukung oleh 24 personel tenaga kefarmasian profesional dan tenaga pendukung teknis yang berdedikasi menjaga ketahanan rantai pasok obat Kabupaten Kotabaru."
+          />
 
           {/* Banner total kapasitas */}
           <Reveal delay={60} className="mt-8 block">
@@ -405,20 +397,11 @@ export default async function ProfilPage() {
       {/* ── Siklus Pengelolaan Perbekalan Farmasi (Rantai Pasok) ─────── */}
       <section className="border-t border-border bg-white py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Rantai Pasok</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Siklus Pengelolaan Perbekalan Farmasi
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Empat tahapan terpadu dalam tata kelola logistik kefarmasian UPTD IFK Kotabaru untuk menjamin
-                efektivitas, mutu, dan kesinambungan ketersediaan obat.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Rantai Pasok"
+            title="Siklus Pengelolaan Perbekalan Farmasi"
+            description="Empat tahapan terpadu dalam tata kelola logistik kefarmasian UPTD IFK Kotabaru untuk menjamin efektivitas, mutu, dan kesinambungan ketersediaan obat."
+          />
 
           {/* Kontainer terpadu: divide-y di mobile, 4 kolom di desktop */}
           <div className="mt-8 divide-y divide-border rounded-2xl border border-border bg-surface lg:grid lg:grid-cols-4 lg:divide-x lg:divide-y-0 shadow-xs">
@@ -453,20 +436,11 @@ export default async function ProfilPage() {
       {/* ── Perencanaan (RKO) & Sumber Anggaran ──────────────────────── */}
       <section className="border-t border-border bg-surface py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Perencanaan Terpadu</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Perencanaan Obat (RKO) &amp; Penganggaran
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Penyusunan Rencana Kebutuhan Obat (RKO) secara ilmiah, transparan, dan terkoordinasi
-                lintas sumber pembiayaan daerah maupun nasional.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Perencanaan Terpadu"
+            title={<>Perencanaan Obat (RKO) &amp; Penganggaran</>}
+            description="Penyusunan Rencana Kebutuhan Obat (RKO) secara ilmiah, transparan, dan terkoordinasi lintas sumber pembiayaan daerah maupun nasional."
+          />
 
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
             {/* Box 1: Metodologi RKO */}
@@ -543,20 +517,11 @@ export default async function ProfilPage() {
       {/* ── Kebijakan Satu Pintu & Relokasi Antar-Faskes ─────────────── */}
       <section className="border-t border-border bg-white py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Tata Kelola &amp; Pengendalian</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Satu Pintu &amp; Relokasi Aktif
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Strategi pengendalian terpusat untuk menjaga pemerataan stok, mencegah pemborosan obat,
-                dan mengeliminasi risiko kekosongan di faskes binaan.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Tata Kelola &amp; Pengendalian"
+            title={<>Satu Pintu &amp; Relokasi Aktif</>}
+            description="Strategi pengendalian terpusat untuk menjaga pemerataan stok, mencegah pemborosan obat, dan mengeliminasi risiko kekosongan di faskes binaan."
+          />
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:gap-8">
             <Reveal delay={80} className="block h-full">
@@ -611,20 +576,11 @@ export default async function ProfilPage() {
       {/* ── Sarana & Prasarana Fasilitas ──────────────────────────── */}
       <section className="border-t border-border bg-surface py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Infrastruktur</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Sarana &amp; Fasilitas Gudang
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Fasilitas penyimpanan terstandarisasi, sistem pendingin bersertifikasi, dan pengawasan
-                berkelanjutan untuk menjaga stabilitas perbekalan farmasi.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Infrastruktur"
+            title={<>Sarana &amp; Fasilitas Gudang</>}
+            description="Fasilitas penyimpanan terstandarisasi, sistem pendingin bersertifikasi, dan pengawasan berkelanjutan untuk menjaga stabilitas perbekalan farmasi."
+          />
 
           {/* ── Featured Hero Card: Cold Room ── */}
           <Reveal delay={80} className="mt-8 block">

@@ -38,6 +38,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
 import { StockMultiSelectFilter } from "@/components/admin/stock-multi-select-filter";
+import { AdminDeleteDialogHeader } from "@/components/admin/admin-delete-dialog-header";
 import { 
   getStockSummary, 
   getMosBadgeInfo,
@@ -2189,21 +2190,10 @@ export function StockTable({
       {/* ── Modal Konfirmasi Hapus ─────────────────────────────────────── */}
       <Dialog open={!!deleteItem} onOpenChange={(open) => !open && setDeleteItem(null)}>
         <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
-                <AlertTriangle className="h-5 w-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
-                  Hapus Item Stok?
-                </DialogTitle>
-                <DialogDescription className="text-xs text-[var(--admin-muted)] mt-0.5">
-                  Tindakan ini permanen dan data obat akan dihapus dari sistem.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+          <AdminDeleteDialogHeader
+            title="Hapus Item Stok?"
+            description="Tindakan ini permanen dan data obat akan dihapus dari sistem."
+          />
 
           {deleteItem && (
             <div className="mt-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3 space-y-2">
@@ -2256,21 +2246,10 @@ export function StockTable({
         onOpenChange={(open) => !open && !isDeletingPeriod && setIsDeletePeriodOpen(false)}
       >
         <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
-                <AlertTriangle className="h-5 w-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
-                  Hapus Data Periode?
-                </DialogTitle>
-                <DialogDescription className="text-xs text-[var(--admin-muted)] mt-0.5">
-                  Tindakan ini permanen. Seluruh data stok obat pada periode ini akan dihapus dari sistem.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+          <AdminDeleteDialogHeader
+            title="Hapus Data Periode?"
+            description="Tindakan ini permanen. Seluruh data stok obat pada periode ini akan dihapus dari sistem."
+          />
 
           <div className="mt-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3.5 space-y-2.5">
             <div className="flex items-center justify-between">

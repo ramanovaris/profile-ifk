@@ -29,6 +29,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
+import { AdminTablePagination } from "@/components/admin/admin-table-pagination";
+import { AdminDeleteDialogHeader } from "@/components/admin/admin-delete-dialog-header";
 import {
   createCategoryAction,
   updateCategoryAction,
@@ -370,75 +372,16 @@ export function CategoryTable({
           </div>
 
           {/* Pagination Bar */}
-          {filteredCategories.length > 0 && (
-            <div className="flex flex-col gap-3 border-t border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--admin-muted)]">
-                <p>
-                  Menampilkan{" "}
-                  <span className="font-medium text-[var(--admin-text-main)]">
-                    {startIndex + 1}–{Math.min(startIndex + itemsPerPage, filteredCategories.length)}
-                  </span>{" "}
-                  dari <span className="font-medium text-[var(--admin-text-main)]">{filteredCategories.length}</span> kategori
-                </p>
-
-                {/* Selector Baris Per Halaman */}
-                <div className="flex items-center gap-1.5 border-l border-[var(--admin-border)] pl-3">
-                  <span className="text-[var(--admin-muted)]">Baris:</span>
-                  <select
-                    value={itemsPerPage}
-                    onChange={(e) => {
-                      setItemsPerPage(Number(e.target.value));
-                      setCurrentPage(1);
-                    }}
-                    className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2 py-1 text-xs text-[var(--admin-text-main)] outline-none transition-colors hover:border-[var(--admin-border)] focus:border-brand-500/50"
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 self-end sm:self-auto">
-                <button
-                  type="button"
-                  disabled={validPage <= 1}
-                  onClick={() => setCurrentPage(Math.max(1, validPage - 1))}
-                  className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                  <span>Sebelumnya</span>
-                </button>
-
-                <div className="flex items-center gap-1 px-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      type="button"
-                      onClick={() => setCurrentPage(page)}
-                      className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-all ${
-                        validPage === page
-                          ? "border border-brand-500/30 bg-brand-500/15 text-brand-600 dark:text-brand-300 font-semibold shadow-xs shadow-brand-500/10"
-                          : "border border-transparent text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  disabled={validPage >= totalPages}
-                  onClick={() => setCurrentPage(Math.min(totalPages, validPage + 1))}
-                  className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2.5 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] disabled:pointer-events-none disabled:opacity-40"
-                >
-                  <span>Selanjutnya</span>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-          )}
+          <AdminTablePagination
+            totalItems={filteredCategories.length}
+            startIndex={startIndex}
+            itemsPerPage={itemsPerPage}
+            currentPage={validPage}
+            totalPages={totalPages}
+            itemLabel="kategori"
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(limit) => setItemsPerPage(limit)}
+          />
         </div>
       ) : (
         <div className="mt-6 rounded-2xl border border-dashed border-[var(--admin-border)] bg-[var(--admin-card-bg)]/80 p-8 sm:p-12 text-center max-w-lg mx-auto shadow-sm">
@@ -615,21 +558,10 @@ export function CategoryTable({
       {/* Dialog Konfirmasi Hapus */}
       <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="border border-[var(--admin-popover-border)] bg-[var(--admin-popover-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
-                <AlertTriangle className="h-5 w-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
-                  Hapus Kategori?
-                </DialogTitle>
-                <DialogDescription className="text-xs text-[var(--admin-muted)] mt-0.5">
-                  Tindakan ini permanen dan akan menghapus kategori dari sistem.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+          <AdminDeleteDialogHeader
+            title="Hapus Kategori?"
+            description="Tindakan ini permanen dan akan menghapus kategori dari sistem."
+          />
 
           {catToDelete && (
             <div className="space-y-3 mt-2">

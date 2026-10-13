@@ -38,6 +38,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
+import { AdminDeleteDialogHeader } from "@/components/admin/admin-delete-dialog-header";
 import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
 import {
   createUserAction,
@@ -1216,21 +1217,10 @@ export function UserTable({
         }}
       >
         <DialogContent className="border border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-text-main)] backdrop-blur-2xl max-w-md shadow-2xl rounded-2xl p-6">
-          <DialogHeader className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-500">
-                <AlertTriangle className="h-5 w-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-lg font-bold text-[var(--admin-text-main)] tracking-tight">
-                  Hapus Akun Pengguna
-                </DialogTitle>
-                <DialogDescription className="text-xs text-[var(--admin-muted)] mt-0.5">
-                  Konfirmasi penghapusan akun pengguna dari sistem.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
+          <AdminDeleteDialogHeader
+            title="Hapus Akun Pengguna"
+            description="Konfirmasi penghapusan akun pengguna dari sistem."
+          />
 
           <div className="space-y-4 my-2">
             {/* Info Card Pengguna Target */}
