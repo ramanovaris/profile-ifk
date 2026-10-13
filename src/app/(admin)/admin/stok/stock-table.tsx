@@ -60,6 +60,13 @@ import {
 import { calculateMos, determineStockStatus } from "@/lib/stock-calc";
 import { exportStockToExcel } from "@/lib/stock-exporter";
 import { matchMedicineSearch } from "@/lib/medicine-search";
+import {
+  applyAutofillSelection,
+  handleNameInputChange,
+  handleCodeInputChange,
+  type AutofilledSource,
+  type AddStockFormData,
+} from "@/lib/stock-autofill";
 import { StockForm } from "./stock-form";
 import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
 
@@ -283,6 +290,7 @@ export function StockTable({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSearchField, setActiveSearchField] = useState<"name" | "code" | null>(null);
   const [historyHint, setHistoryHint] = useState<{ message: string; type: "match" | "new" | "warning" } | null>(null);
+  const [autofilledSource, setAutofilledSource] = useState<AutofilledSource | null>(null);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // State Modal Tambah Periode Baru Manual
@@ -402,24 +410,13 @@ export function StockTable({
       (i) => i.code.trim().toUpperCase() === item.code.trim().toUpperCase()
     );
 
-    setAddForm((prev) => {
-      const qty = Number(prev.quantity) || 0;
-      const usage = item.historicalAvgUsage > 0 ? item.historicalAvgUsage : 0;
-      const newMos = calculateMos(qty, usage);
-      const newStatus = determineStockStatus(qty, newMos, prev.status);
+    const { form: nextForm, autofilledSource: nextSource } = applyAutofillSelection(
+      item,
+      addForm as AddStockFormData
+    );
 
-      return {
-        ...prev,
-        code: item.code,
-        name: item.name,
-        category: (item.category as MedicineCategory) || prev.category,
-        unit: item.unit || prev.unit,
-        nomenklatur: item.nomenklatur || prev.nomenklatur,
-        avgUsage: usage > 0 ? String(usage) : "",
-        mos: newMos !== null ? String(newMos) : "",
-        status: newStatus,
-      };
-    });
+    setAddForm(nextForm);
+    setAutofilledSource(nextSource);
 
     if (isAlreadyInCurrentPeriod) {
       setHistoryHint({
@@ -441,81 +438,83 @@ export function StockTable({
   };
 
   // Handler onBlur jika user mengetik manual tanpa klik dropdown
-  const handleFieldBlur = (query: string) => {
+  const handleFieldBlur = (query: string, field: "name" | "code" = "name") => {
     setTimeout(async () => {
       setShowSuggestions(false);
       setActiveSearchField(null);
 
       const trimmed = query.trim();
-      if (!trimmed || trimmed.length < 2) return;
-
-      if (addForm.avgUsage === "" || !historyHint) {
-        setIsSearchingHistory(true);
-        try {
-          const res = await searchMedicineHistoryAction({
-            query: trimmed,
-            currentPeriod: selectedPeriod,
-          });
-
-          if (res.success && res.data && res.data.length > 0) {
-            const matched =
-              res.data.find(
-                (m) =>
-                  m.code.toLowerCase() === trimmed.toLowerCase() ||
-                  m.name.toLowerCase() === trimmed.toLowerCase()
-              ) || res.data[0];
-
-            if (matched) {
-              const isAlreadyInCurrentPeriod = items.some(
-                (i) => i.code.trim().toUpperCase() === matched.code.trim().toUpperCase()
-              );
-
-              setAddForm((prev) => {
-                const qty = Number(prev.quantity) || 0;
-                const usage = matched.historicalAvgUsage > 0 ? matched.historicalAvgUsage : 0;
-                const newMos = calculateMos(qty, usage);
-                const newStatus = determineStockStatus(qty, newMos, prev.status);
-
-                return {
-                  ...prev,
-                  code: prev.code || matched.code,
-                  name: prev.name || matched.name,
-                  category: prev.category === "Obat Generik" ? (matched.category as MedicineCategory) : prev.category,
-                  unit: prev.unit === "Tablet" ? matched.unit : prev.unit,
-                  nomenklatur: prev.nomenklatur || matched.nomenklatur || "",
-                  avgUsage: prev.avgUsage === "" && usage > 0 ? String(usage) : prev.avgUsage,
-                  mos: newMos !== null ? String(newMos) : prev.mos,
-                  status: newStatus,
-                };
-              });
-
-              if (isAlreadyInCurrentPeriod) {
-                setHistoryHint({
-                  message: `⚠️ Obat '${matched.name}' (${matched.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel.`,
-                  type: "warning",
-                });
-              } else {
-                setHistoryHint({
-                  message:
-                    matched.historicalAvgUsage > 0
-                      ? `⚡ Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
-                      : `⚡ Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
-                  type: "match",
-                });
-              }
-              return;
-            }
-          }
-
-          setHistoryHint({
-            message: "🆕 Obat baru (belum ada riwayat pemakaian di periode sebelumnya)",
-            type: "new",
-          });
-        } catch (err) {
-          console.error("Error on blur check:", err);
-        } finally {
-          setIsSearchingHistory(false);
+      if (!trimmed || trimmed.length < 2) {
+        if (!autofilledSource) {
+          setHistoryHint(null);
         }
+        return;
+      }
+
+      // Jika query sudah sama persis dengan yang sedang aktif di autofill, tidak perlu cari ulang
+      if (
+        autofilledSource &&
+        ((field === "name" && autofilledSource.name.toLowerCase() === trimmed.toLowerCase()) ||
+          (field === "code" && autofilledSource.code.toUpperCase() === trimmed.toUpperCase()))
+      ) {
+        return;
+      }
+
+      setIsSearchingHistory(true);
+      try {
+        const res = await searchMedicineHistoryAction({
+          query: trimmed,
+          currentPeriod: selectedPeriod,
+        });
+
+        if (res.success && res.data && res.data.length > 0) {
+          const matched =
+            res.data.find(
+              (m) =>
+                m.code.toLowerCase() === trimmed.toLowerCase() ||
+                m.name.toLowerCase() === trimmed.toLowerCase()
+            ) || res.data[0];
+
+          if (matched) {
+            const isAlreadyInCurrentPeriod = items.some(
+              (i) => i.code.trim().toUpperCase() === matched.code.trim().toUpperCase()
+            );
+
+            const { form: nextForm, autofilledSource: nextSource } = applyAutofillSelection(
+              matched,
+              addForm as AddStockFormData
+            );
+
+            setAddForm(nextForm);
+            setAutofilledSource(nextSource);
+
+            if (isAlreadyInCurrentPeriod) {
+              setHistoryHint({
+                message: `⚠️ Obat '${matched.name}' (${matched.code}) sudah terdaftar pada periode ${formatStockPeriodLabel(selectedPeriod)}. Silakan gunakan tombol Edit di tabel.`,
+                type: "warning",
+              });
+            } else {
+              setHistoryHint({
+                message:
+                  matched.historicalAvgUsage > 0
+                    ? `⚡ Ditemukan riwayat obat IFK: RPB ${matched.historicalAvgUsage.toLocaleString("id-ID")}/bln otomatis diisikan`
+                    : `⚡ Data master obat (${matched.category}, ${matched.unit}) ditemukan`,
+                type: "match",
+              });
+            }
+            return;
+          }
+        }
+
+        setAutofilledSource(null);
+        setHistoryHint({
+          message: "🆕 Obat baru (belum ada riwayat pemakaian di periode sebelumnya)",
+          type: "new",
+        });
+      } catch (err) {
+        console.error("Error on blur check:", err);
+      } finally {
+        setIsSearchingHistory(false);
       }
     }, 200);
   };
@@ -537,6 +536,7 @@ export function StockTable({
     setShowSuggestions(false);
     setActiveSearchField(null);
     setHistoryHint(null);
+    setAutofilledSource(null);
     setIsAddOpen(true);
   };
 
@@ -1415,13 +1415,19 @@ export function StockTable({
                               value={addForm.name}
                               onChange={(e) => {
                                 const val = e.target.value;
-                                setAddForm((f) => ({ ...f, name: val }));
+                                const { form: nextForm, autofilledSource: nextSource, resetHint } =
+                                  handleNameInputChange(val, addForm as AddStockFormData, autofilledSource);
+                                setAddForm(nextForm);
+                                setAutofilledSource(nextSource);
+                                if (resetHint) {
+                                  setHistoryHint(null);
+                                }
                                 triggerHistorySearch(val, "name");
                               }}
                               onFocus={() => {
                                 if (historySuggestions.length > 0) setShowSuggestions(true);
                               }}
-                              onBlur={() => handleFieldBlur(addForm.name)}
+                              onBlur={() => handleFieldBlur(addForm.name, "name")}
                               className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                               placeholder="Contoh: Paracetamol 500mg Tablet"
                               required
@@ -1482,13 +1488,19 @@ export function StockTable({
                                 value={addForm.code}
                                 onChange={(e) => {
                                   const val = e.target.value;
-                                  setAddForm((f) => ({ ...f, code: val }));
+                                  const { form: nextForm, autofilledSource: nextSource, resetHint } =
+                                    handleCodeInputChange(val, addForm as AddStockFormData, autofilledSource);
+                                  setAddForm(nextForm);
+                                  setAutofilledSource(nextSource);
+                                  if (resetHint) {
+                                    setHistoryHint(null);
+                                  }
                                   triggerHistorySearch(val, "code");
                                 }}
                                 onFocus={() => {
                                   if (historySuggestions.length > 0) setShowSuggestions(true);
                                 }}
-                                onBlur={() => handleFieldBlur(addForm.code)}
+                                onBlur={() => handleFieldBlur(addForm.code, "code")}
                                 className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm text-[var(--admin-text-main)] font-mono placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all"
                                 placeholder="Contoh: OBG-999"
                                 required
