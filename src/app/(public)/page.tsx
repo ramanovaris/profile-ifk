@@ -13,6 +13,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/public/reveal";
+import { PublicSectionHeader } from "@/components/public/public-section-header";
 import { dummyArticles } from "@/lib/dummy-data";
 import { db } from "@/lib/db";
 import { placeholderImage } from "@/lib/placeholder";
@@ -292,20 +293,11 @@ export default async function HomePage() {
       {/* ── Pilar Komitmen Pelayanan (Editorial Numbered Strip) ───────── */}
       <section className="border-b border-border bg-white py-14 sm:py-20">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Pilar Pelayanan</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Prinsip Tata Kelola Farmasi Daerah
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Landasan UPTD Instalasi Farmasi Kabupaten Kotabaru dalam memastikan rantai pasok
-                perbekalan farmasi yang andal, merata, dan bermutu tinggi.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Pilar Pelayanan"
+            title="Prinsip Tata Kelola Farmasi Daerah"
+            description="Landasan UPTD Instalasi Farmasi Kabupaten Kotabaru dalam memastikan rantai pasok perbekalan farmasi yang andal, merata, dan bermutu tinggi."
+          />
 
           {/* Kontainer tunggal editorial: divide-y di mobile, 3 kolom di desktop */}
           <div className="mt-6 sm:mt-8 divide-y divide-border rounded-2xl border border-border bg-surface lg:grid lg:grid-cols-3 lg:divide-x lg:divide-y-0 shadow-xs">

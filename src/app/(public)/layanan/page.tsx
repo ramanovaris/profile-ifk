@@ -17,6 +17,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/public/page-hero";
 import { LayananHeroIllustration } from "@/components/public/hero-illustrations";
 import { Reveal } from "@/components/public/reveal";
+import { PublicSectionHeader } from "@/components/public/public-section-header";
 import { SuratPengantarModalButton } from "@/components/public/surat-pengantar-modal";
 import { getSiteSettings } from "@/actions/setting";
 
@@ -156,20 +157,11 @@ export default async function LayananPage() {
       {/* ── Mekanisme Pengajuan Permintaan Perbekalan ───────────────── */}
       <section className="border-t border-border bg-surface py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Prosedur Pengajuan</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Mekanisme Pengajuan Permintaan
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Dua opsi alur resmi bagi Puskesmas dan fasilitas kesehatan jejaring untuk pengajuan
-                LPLPO berkala maupun perbekalan insidental sewaktu.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Prosedur Pengajuan"
+            title="Mekanisme Pengajuan Permintaan"
+            description="Dua opsi alur resmi bagi Puskesmas dan fasilitas kesehatan jejaring untuk pengajuan LPLPO berkala maupun perbekalan insidental sewaktu."
+          />
 
           {/* 2 Kolom Alur: Hardcopy vs Softcopy */}
           <div className="mt-8 grid gap-8 lg:grid-cols-2">
@@ -291,20 +283,11 @@ export default async function LayananPage() {
       {/* ── Pusat Unduhan Formulir & Format Resmi ───────────────────── */}
       <section className="border-t border-border bg-white py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Pusat Unduhan</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Formulir &amp; Format Resmi
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Akses dan unduh formulir standar dinas untuk pengajuan distribusi LPLPO rutin maupun
-                kebutuhan perbekalan sewaktu.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Pusat Unduhan"
+            title={<>Formulir &amp; Format Resmi</>}
+            description="Akses dan unduh formulir standar dinas untuk pengajuan distribusi LPLPO rutin maupun kebutuhan perbekalan sewaktu."
+          />
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {downloadTemplates.map((item, idx) => (
@@ -355,20 +338,11 @@ export default async function LayananPage() {
       {/* ── Standar Mutu & Penyimpanan ────────────────────────────── */}
       <section className="border-t border-border bg-surface py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Kualitas &amp; Keamanan</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Standar Mutu &amp; Penyimpanan
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Protokol ketat penjagaan mutu sediaan farmasi selama masa simpan di instalasi
-                hingga didistribusikan ke fasilitas pelayanan kesehatan.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Kualitas &amp; Keamanan"
+            title={<>Standar Mutu &amp; Penyimpanan</>}
+            description="Protokol ketat penjagaan mutu sediaan farmasi selama masa simpan di instalasi hingga didistribusikan ke fasilitas pelayanan kesehatan."
+          />
           <div className="mt-6 sm:mt-8 space-y-0 divide-y divide-border">
             {[
               { icon: PackageCheck, title: "FEFO (First Expired First Out)", desc: "Sediaan farmasi dengan masa kedaluwarsa lebih dekat diprioritaskan untuk didistribusikan terlebih dahulu guna mencegah penumpukan obat kedaluwarsa di gudang faskes." },
@@ -460,20 +434,11 @@ export default async function LayananPage() {
       {/* ── Jam Pelayanan ─────────────────────────────────────────── */}
       <section className="border-t border-border bg-surface py-20 sm:py-24">
         <div className="section-container">
-          <Reveal>
-            <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
-              <div>
-                <span className="eyebrow bg-brand-50 text-brand-700">Operasional Loket</span>
-                <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
-                  Jam Pelayanan
-                </h2>
-              </div>
-              <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Jadwal resmi pelayanan administrasi, penerimaan berkas permohonan, dan pengambilan fisik
-                perbekalan farmasi di UPTD Instalasi Farmasi.
-              </p>
-            </div>
-          </Reveal>
+          <PublicSectionHeader
+            eyebrow="Operasional Loket"
+            title="Jam Pelayanan"
+            description="Jadwal resmi pelayanan administrasi, penerimaan berkas permohonan, dan pengambilan fisik perbekalan farmasi di UPTD Instalasi Farmasi."
+          />
 
           <Reveal delay={80}>
             <div className="mt-8 overflow-hidden rounded-2xl border border-border bg-white shadow-xs">
