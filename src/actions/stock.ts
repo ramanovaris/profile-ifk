@@ -6,6 +6,7 @@ import { getCurrentSession } from "../lib/auth";
 import { calculateStockStatus } from "../lib/dummy-data";
 import { calculateMos, determineStockStatus, aggregateHistoricalUsage } from "../lib/stock-calc";
 import { parseStockWorkbook, type StockItemInput } from "../lib/stock-parser";
+import { expandMedicineSearchQueries } from "../lib/medicine-search";
 import type { MedicineStock, StockStatus } from "@prisma/client";
 
 export type { StockItemInput };
@@ -668,11 +669,17 @@ export async function searchMedicineHistoryAction(params: {
   }
 
   try {
+    const searchTerms = expandMedicineSearchQueries(trimmed);
+    const orConditions: Array<Record<string, unknown>> = [
+      { code: { contains: trimmed, mode: "insensitive" } },
+    ];
+    for (const term of searchTerms) {
+      orConditions.push({ name: { contains: term, mode: "insensitive" } });
+      orConditions.push({ nomenklatur: { contains: term, mode: "insensitive" } });
+    }
+
     const whereClause: Record<string, unknown> = {
-      OR: [
-        { code: { contains: trimmed, mode: "insensitive" } },
-        { name: { contains: trimmed, mode: "insensitive" } },
-      ],
+      OR: orConditions,
     };
 
     if (params.currentPeriod) {
