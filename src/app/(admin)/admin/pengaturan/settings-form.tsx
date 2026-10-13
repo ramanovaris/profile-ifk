@@ -1,0 +1,1424 @@
+"use client";
+
+import { useState, useRef, useTransition, type FormEvent, type ChangeEvent } from "react";
+import Image from "next/image";
+import type { SiteSetting } from "@prisma/client";
+import {
+  Building2,
+  FileText,
+  Link2,
+  Save,
+  RotateCcw,
+  Phone,
+  Mail,
+  ExternalLink,
+  Camera,
+  Upload,
+  Globe,
+  Radio,
+  Share2,
+  Megaphone,
+  Network,
+  FileSpreadsheet,
+  BarChart3,
+  Users,
+  AlertTriangle,
+  Info,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/toast";
+import { placeholderImage } from "@/lib/placeholder";
+import { cn, getAssetUrl } from "@/lib/utils";
+import {
+  updateSiteIdentityAction,
+  updateSiteProfileAction,
+  updateSiteLinksAction,
+  updateSiteServiceDocsAction,
+  updateSitePublicStatsAction,
+} from "@/actions/setting";
+
+type TabKey = "identitas" | "profil" | "tautan" | "dokumen" | "statistik";
+
+interface SettingsFormProps {
+  initialSettings: SiteSetting;
+}
+
+export function SettingsForm({ initialSettings }: SettingsFormProps) {
+  const [activeTab, setActiveTab] = useState<TabKey>("identitas");
+  const [isPending, startTransition] = useTransition();
+
+  // ── Tab 1: Identitas & Kontak State ───────────────────────────────────────
+  const initialIdentity = {
+    name: initialSettings.name,
+    shortName: initialSettings.shortName,
+    tagline: initialSettings.tagline,
+    motto: initialSettings.motto,
+    address: initialSettings.address,
+    operationalHours: initialSettings.operationalHours,
+    phone: initialSettings.phone,
+    whatsappLink: initialSettings.whatsappLink,
+    email: initialSettings.email,
+    googleMapsEmbedUrl: initialSettings.googleMapsEmbedUrl,
+  };
+  const [identityForm, setIdentityForm] = useState(initialIdentity);
+
+  // ── Tab 2: Konten Profil UPTD State ───────────────────────────────────────
+  const initialProfile = {
+    headName: initialSettings.headName || "apt. H. Muhammad Yusuf, S.Farm",
+    headRole:
+      initialSettings.headRole || "Kepala UPTD Instalasi Farmasi Kab. Kotabaru",
+    headPhoto: initialSettings.headPhoto || null,
+    orgStructurePhoto: initialSettings.orgStructurePhoto || null,
+    greeting: initialSettings.greeting || "",
+    vision: initialSettings.vision || "",
+    mission: initialSettings.mission || "",
+    tupoksi: initialSettings.tupoksi || "",
+  };
+  const [profileForm, setProfileForm] = useState(initialProfile);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(
+    initialSettings.headPhoto ? getAssetUrl(initialSettings.headPhoto) : null
+  );
+  const headPhotoInputRef = useRef<HTMLInputElement>(null);
+
+  const [orgPhotoFile, setOrgPhotoFile] = useState<File | null>(null);
+  const [orgPhotoPreview, setOrgPhotoPreview] = useState<string | null>(
+    initialSettings.orgStructurePhoto
+      ? getAssetUrl(initialSettings.orgStructurePhoto)
+      : null
+  );
+  const orgPhotoInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Tab 3: Tautan & Layanan State ─────────────────────────────────────────
+  const initialLinks = {
+    dinkesUrl: initialSettings.dinkesUrl || "",
+    instagramUrl: initialSettings.instagramUrl || "",
+    facebookUrl: initialSettings.facebookUrl || "",
+    youtubeUrl: initialSettings.youtubeUrl || "",
+    announcementEnabled: initialSettings.announcementEnabled || false,
+    announcementType: (initialSettings.announcementType || "info") as "info" | "warning" | "important",
+    announcementText: initialSettings.announcementText || "",
+  };
+  const [linksForm, setLinksForm] = useState(initialLinks);
+
+  // ── Tab 4: Dokumen Layanan State ──────────────────────────────────────────
+  const initialDocs = {
+    lplpoUrl: initialSettings.lplpoUrl || "",
+    permintaanSewaktuUrl: initialSettings.permintaanSewaktuUrl || "",
+  };
+  const [docsForm, setDocsForm] = useState(initialDocs);
+
+  // ── Tab 5: Statistik & SDM State ──────────────────────────────────────────
+  const initialStats = {
+    statsFaskesCount: initialSettings.statsFaskesCount || "30 Faskes",
+    statsFaskesLabel: initialSettings.statsFaskesLabel || "28 Puskesmas & 2 RSUD",
+    statsPulauCount: initialSettings.statsPulauCount || "45 Pulau",
+    statsPulauLabel: initialSettings.statsPulauLabel || "Jangkauan Kepulauan",
+    statsMasyarakatCount: initialSettings.statsMasyarakatCount || "334 Ribu+",
+    statsMasyarakatLabel: initialSettings.statsMasyarakatLabel || "Masyarakat Terlayani",
+    sdmTotalCount: initialSettings.sdmTotalCount || "24 Orang",
+    sdmApotekerCount: initialSettings.sdmApotekerCount || "5 Orang",
+    sdmTtkCount: initialSettings.sdmTtkCount || "7 Orang",
+    sdmPendukungCount: initialSettings.sdmPendukungCount || "11 Orang",
+    saranaGudangLuas: initialSettings.saranaGudangLuas || "690 m²",
+  };
+  const [statsForm, setStatsForm] = useState(initialStats);
+
+  // ── Handlers ─────────────────────────────────────────────────────────────
+  const handleIdentitySave = (e: FormEvent) => {
+    e.preventDefault();
+    if (!identityForm.name.trim() || !identityForm.shortName.trim()) {
+      toast.error("Nama instansi dan nama singkat tidak boleh kosong.");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await updateSiteIdentityAction(identityForm);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan identitas instansi.");
+        return;
+      }
+      toast.success("Identitas dan kontak lembaga berhasil disimpan.");
+    });
+  };
+
+  const handleIdentityReset = () => {
+    setIdentityForm(initialIdentity);
+    toast.info("Form identitas dikembalikan ke data awal.");
+  };
+
+  const handleProfilePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Format berkas harus berupa gambar (PNG, JPG, WebP).");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Ukuran foto pimpinan tidak boleh melebihi 5MB.");
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      setPhotoFile(file);
+      setPhotoPreview(url);
+      toast.success("Foto pimpinan berhasil dipilih untuk disimpan.");
+    }
+  };
+
+  const handleOrgPhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Format berkas harus berupa gambar (PNG, JPG, WebP).");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Ukuran berkas bagan struktur tidak boleh melebihi 5MB.");
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      setOrgPhotoFile(file);
+      setOrgPhotoPreview(url);
+      toast.success("Gambar bagan struktur organisasi berhasil dipilih.");
+    }
+  };
+
+  const handleProfileSave = (e: FormEvent) => {
+    e.preventDefault();
+    if (!profileForm.headName.trim()) {
+      toast.error("Nama Kepala UPTD tidak boleh kosong.");
+      return;
+    }
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append("headName", profileForm.headName);
+      formData.append("headRole", profileForm.headRole);
+      formData.append("greeting", profileForm.greeting);
+      formData.append("vision", profileForm.vision);
+      formData.append("mission", profileForm.mission);
+      formData.append("tupoksi", profileForm.tupoksi);
+      if (photoFile) {
+        formData.append("headPhoto", photoFile);
+      }
+      if (orgPhotoFile) {
+        formData.append("orgStructurePhoto", orgPhotoFile);
+      }
+
+      const res = await updateSiteProfileAction(formData);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan konten profil UPTD.");
+        return;
+      }
+
+      toast.success("Konten profil UPTD berhasil disimpan.");
+      setPhotoFile(null);
+      setOrgPhotoFile(null);
+      if (res.data?.headPhoto) {
+        setPhotoPreview(getAssetUrl(res.data.headPhoto));
+      }
+      if (res.data?.orgStructurePhoto) {
+        setOrgPhotoPreview(getAssetUrl(res.data.orgStructurePhoto));
+      }
+    });
+  };
+
+  const handleProfileReset = () => {
+    setProfileForm(initialProfile);
+    setPhotoFile(null);
+    setPhotoPreview(
+      initialSettings.headPhoto ? getAssetUrl(initialSettings.headPhoto) : null
+    );
+    setOrgPhotoFile(null);
+    setOrgPhotoPreview(
+      initialSettings.orgStructurePhoto
+        ? getAssetUrl(initialSettings.orgStructurePhoto)
+        : null
+    );
+    toast.info("Form konten profil dikembalikan ke data awal.");
+  };
+
+  const handleLinksSave = (e: FormEvent) => {
+    e.preventDefault();
+    startTransition(async () => {
+      const res = await updateSiteLinksAction(linksForm);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan tautan layanan.");
+        return;
+      }
+      toast.success("Tautan layanan & pengumuman berhasil disimpan.");
+    });
+  };
+
+  const handleLinksReset = () => {
+    setLinksForm(initialLinks);
+    toast.info("Form tautan layanan dikembalikan ke data default.");
+  };
+
+  const handleDocsSave = (e: FormEvent) => {
+    e.preventDefault();
+    startTransition(async () => {
+      const res = await updateSiteServiceDocsAction(docsForm);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan tautan dokumen.");
+        return;
+      }
+      toast.success("Tautan dokumen layanan berhasil disimpan.");
+    });
+  };
+
+  const handleDocsReset = () => {
+    setDocsForm(initialDocs);
+    toast.info("Form tautan dokumen dikembalikan ke data awal.");
+  };
+
+  const handleStatsSave = (e: FormEvent) => {
+    e.preventDefault();
+    startTransition(async () => {
+      const res = await updateSitePublicStatsAction(statsForm);
+      if (!res.success) {
+        toast.error(res.error || "Gagal menyimpan statistik & SDM.");
+        return;
+      }
+      toast.success("Statistik publik & SDM berhasil disimpan.");
+    });
+  };
+
+  const handleStatsReset = () => {
+    setStatsForm(initialStats);
+    toast.info("Form statistik dikembalikan ke data awal.");
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Horizontal Segmented Tab Bar */}
+      <div className="inline-flex max-w-full gap-1.5 overflow-x-auto rounded-xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-1.5 backdrop-blur-xl scrollbar-none">
+        <button
+          type="button"
+          onClick={() => setActiveTab("identitas")}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
+            activeTab === "identitas"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
+          )}
+        >
+          <Building2 className="h-4 w-4" />
+          <span>Identitas &amp; Kontak</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("profil")}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
+            activeTab === "profil"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
+          )}
+        >
+          <FileText className="h-4 w-4" />
+          <span>Konten Profil UPTD</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("tautan")}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
+            activeTab === "tautan"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
+          )}
+        >
+          <Link2 className="h-4 w-4" />
+          <span>Tautan &amp; Layanan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("dokumen")}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
+            activeTab === "dokumen"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
+          )}
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          <span>Dokumen Layanan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("statistik")}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2 text-xs font-medium transition-all duration-200 sm:text-sm active:scale-[0.98] cursor-pointer",
+            activeTab === "statistik"
+              ? "bg-[#455a26] text-white font-bold shadow-xs"
+              : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
+          )}
+        >
+          <BarChart3 className="h-4 w-4" />
+          <span>Statistik &amp; SDM</span>
+        </button>
+      </div>
+
+      {/* ── TAB 1: IDENTITAS & KONTAK ────────────────────────────────────── */}
+      {activeTab === "identitas" && (
+        <form onSubmit={handleIdentitySave} className="space-y-6">
+          {/* Kartu Identitas Lembaga */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
+
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <Building2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Identitas Instansi</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Nama resmi, inisial lembaga, motto pelayanan, dan slogan publik.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="instansi-name" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Nama Lengkap Instansi <span className="text-rose-400">*</span>
+                </Label>
+                <Input
+                  id="instansi-name"
+                  value={identityForm.name}
+                  onChange={(e) => setIdentityForm({ ...identityForm, name: e.target.value })}
+                  placeholder="Contoh: UPTD Instalasi Farmasi Kab. Kotabaru"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="instansi-short" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Nama Pendek / Inisial <span className="text-rose-400">*</span>
+                </Label>
+                <Input
+                  id="instansi-short"
+                  value={identityForm.shortName}
+                  onChange={(e) => setIdentityForm({ ...identityForm, shortName: e.target.value })}
+                  placeholder="Contoh: IFK Kotabaru"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="instansi-tagline" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Tagline Ringkas
+                </Label>
+                <Input
+                  id="instansi-tagline"
+                  value={identityForm.tagline}
+                  onChange={(e) => setIdentityForm({ ...identityForm, tagline: e.target.value })}
+                  placeholder="Contoh: Stok Valid, Team Solid"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="instansi-motto" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Motto Pelayanan
+                </Label>
+                <Textarea
+                  id="instansi-motto"
+                  rows={2}
+                  value={identityForm.motto}
+                  onChange={(e) => setIdentityForm({ ...identityForm, motto: e.target.value })}
+                  placeholder="Contoh: Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Kartu Kontak & Lokasi Pelayanan */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <Phone className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Kontak &amp; Alamat Pelayanan</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Alamat kantor, nomor kontak resmi, jam buka pelayanan, dan integrasi Google Maps.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="contact-address" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Alamat Lengkap Kantor
+                </Label>
+                <Textarea
+                  id="contact-address"
+                  rows={2}
+                  value={identityForm.address}
+                  onChange={(e) => setIdentityForm({ ...identityForm, address: e.target.value })}
+                  placeholder="Jl. Kenanga Desa Dirgahayu, Kotabaru 72116. Telp/Fax (0518) 21603"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="contact-hours" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Jam Operasional Pelayanan (Format Baris Baru)
+                </Label>
+                <Textarea
+                  id="contact-hours"
+                  rows={2}
+                  value={identityForm.operationalHours}
+                  onChange={(e) => setIdentityForm({ ...identityForm, operationalHours: e.target.value })}
+                  placeholder="Senin - Kamis: 08.00 - 16.30 WITA&#10;Jumat: 08.00 - 11.00 WITA"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact-phone" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Nomor Telepon Kantor
+                </Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
+                  <Input
+                    id="contact-phone"
+                    value={identityForm.phone}
+                    onChange={(e) => setIdentityForm({ ...identityForm, phone: e.target.value })}
+                    placeholder="(0518) 21603"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact-wa" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Tautan WhatsApp Layanan
+                </Label>
+                <Input
+                  id="contact-wa"
+                  value={identityForm.whatsappLink}
+                  onChange={(e) => setIdentityForm({ ...identityForm, whatsappLink: e.target.value })}
+                  placeholder="https://wa.me/6281234567890"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="contact-email" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Email Resmi Dinas
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
+                  <Input
+                    id="contact-email"
+                    type="email"
+                    value={identityForm.email}
+                    onChange={(e) => setIdentityForm({ ...identityForm, email: e.target.value })}
+                    placeholder="instalasifarmasi4@gmail.com"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="contact-maps" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  URL Iframe Embed Google Maps
+                </Label>
+                <Input
+                  id="contact-maps"
+                  value={identityForm.googleMapsEmbedUrl}
+                  onChange={(e) => setIdentityForm({ ...identityForm, googleMapsEmbedUrl: e.target.value })}
+                  placeholder="https://www.google.com/maps/embed?pb=..."
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs font-mono text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+                <p className="text-[11px] text-[var(--admin-muted)]">
+                  Salin URL dari atribut <code className="text-[var(--admin-text-main)]">src</code> pada menu Google Maps &gt; Bagikan &gt; Sematkan Peta.
+                </p>
+              </div>
+
+              {/* Mini Live Map Preview */}
+              <div className="space-y-2 md:col-span-2">
+                <span className="text-xs font-medium text-[var(--admin-muted)]">Pratinjau Peta Google Maps</span>
+                <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)]">
+                  {identityForm.googleMapsEmbedUrl ? (
+                    <iframe
+                      src={identityForm.googleMapsEmbedUrl}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen={false}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      className="h-full w-full grayscale contrast-125 opacity-80 transition-opacity hover:opacity-100"
+                      title="Pratinjau Lokasi IFK"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-xs text-[var(--admin-muted)]">
+                      URL Peta Belum Diisi
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isPending}
+              onClick={handleIdentityReset}
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Reset Form</span>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {isPending ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Menyimpan...</span>
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  <span>Simpan Perubahan</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      )}
+
+      {/* ── TAB 2: KONTEN PROFIL UPTD ───────────────────────────────────── */}
+      {activeTab === "profil" && (
+        <form onSubmit={handleProfileSave} className="space-y-6">
+          {/* Kartu Pimpinan & Sambutan */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
+
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Sambutan Kepala UPTD</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Foto pimpinan, identitas Kepala UPTD, dan naskah sambutan resmi di halaman profil.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-6 md:grid-cols-[180px_1fr]">
+              {/* Kolom Foto Kepala UPTD */}
+              <div className="flex flex-col items-center gap-3">
+                <div className="group relative aspect-[3/4] w-full max-w-[180px] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-md">
+                  <Image
+                    src={photoPreview || placeholderImage(300, 400, "Kepala IFK", "Profil")}
+                    alt="Kepala UPTD IFK"
+                    fill
+                    unoptimized
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  <button
+                    type="button"
+                    onClick={() => headPhotoInputRef.current?.click()}
+                    className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full border border-white/20 bg-zinc-900/90 px-3 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg backdrop-blur-sm transition-opacity group-hover:opacity-100 flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    <Camera className="h-3.5 w-3.5" />
+                    Ganti Foto
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  ref={headPhotoInputRef}
+                  onChange={handleProfilePhotoChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => headPhotoInputRef.current?.click()}
+                  className="w-full max-w-[180px] gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  Upload Foto (3:4)
+                </Button>
+              </div>
+
+              {/* Kolom Data Pimpinan & Sambutan */}
+              <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="head-name" className="text-xs font-medium text-[var(--admin-text-main)]">
+                      Nama &amp; Gelar Kepala UPTD <span className="text-rose-400">*</span>
+                    </Label>
+                    <Input
+                      id="head-name"
+                      value={profileForm.headName}
+                      onChange={(e) => setProfileForm({ ...profileForm, headName: e.target.value })}
+                      placeholder="Contoh: apt. H. Muhammad Yusuf, S.Farm"
+                      className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="head-role" className="text-xs font-medium text-[var(--admin-text-main)]">
+                      Jabatan Resmi
+                    </Label>
+                    <Input
+                      id="head-role"
+                      value={profileForm.headRole}
+                      onChange={(e) => setProfileForm({ ...profileForm, headRole: e.target.value })}
+                      placeholder="Kepala UPTD Instalasi Farmasi Kab. Kotabaru"
+                      className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="head-greeting" className="text-xs font-medium text-[var(--admin-text-main)]">
+                    Naskah Sambutan
+                  </Label>
+                  <Textarea
+                    id="head-greeting"
+                    rows={6}
+                    value={profileForm.greeting}
+                    onChange={(e) => setProfileForm({ ...profileForm, greeting: e.target.value })}
+                    placeholder="Tuliskan naskah sambutan resmi Kepala UPTD..."
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm leading-relaxed text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Kartu Visi, Misi & Tupoksi */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <FileText className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Visi, Misi &amp; Tupoksi</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Arah haluan, pilar pelayanan, dan tugas pokok fungsi UPTD Instalasi Farmasi.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="profile-vision" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Pernyataan Visi Lembaga
+                </Label>
+                <Textarea
+                  id="profile-vision"
+                  rows={2}
+                  value={profileForm.vision}
+                  onChange={(e) => setProfileForm({ ...profileForm, vision: e.target.value })}
+                  placeholder="Pernyataan visi instansi..."
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="profile-mission" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Butir-Butir Misi (Pisahkan Tiap Nomor/Baris)
+                </Label>
+                <Textarea
+                  id="profile-mission"
+                  rows={5}
+                  value={profileForm.mission}
+                  onChange={(e) => setProfileForm({ ...profileForm, mission: e.target.value })}
+                  placeholder="1. Butir misi pertama&#10;2. Butir misi kedua..."
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm leading-relaxed text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="profile-tupoksi" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Tugas Pokok &amp; Fungsi (Tupoksi)
+                </Label>
+                <Textarea
+                  id="profile-tupoksi"
+                  rows={4}
+                  value={profileForm.tupoksi}
+                  onChange={(e) => setProfileForm({ ...profileForm, tupoksi: e.target.value })}
+                  placeholder="Uraian tugas pokok dan fungsi instansi..."
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm leading-relaxed text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Kartu Bagan Struktur Organisasi */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--admin-border)] pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                  <Network className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Bagan Struktur Organisasi</h2>
+                  <p className="text-xs text-[var(--admin-muted)]">
+                    Bagan hierarki struktur organisasi UPTD Instalasi Farmasi untuk halaman profil.
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => orgPhotoInputRef.current?.click()}
+                className="gap-2 border border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] cursor-pointer"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                <span>Upload Bagan Baru</span>
+              </Button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              <div className="group relative aspect-[16/9] w-full max-h-[380px] overflow-hidden rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] shadow-md">
+                <Image
+                  src={
+                    orgPhotoPreview ||
+                    placeholderImage(800, 500, "Struktur Organisasi", "Profil")
+                  }
+                  alt="Struktur Organisasi UPTD IFK"
+                  fill
+                  unoptimized
+                  className="object-contain transition-transform duration-300 group-hover:scale-[1.01]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100 flex items-end justify-center pb-4">
+                  <button
+                    type="button"
+                    onClick={() => orgPhotoInputRef.current?.click()}
+                    className="rounded-full border border-white/20 bg-zinc-900/90 px-4 py-2 text-xs font-medium text-white shadow-lg backdrop-blur-sm transition-transform active:scale-95 flex items-center gap-2"
+                  >
+                    <Camera className="h-4 w-4" />
+                    Ganti Gambar Bagan
+                  </button>
+                </div>
+              </div>
+              <input
+                type="file"
+                ref={orgPhotoInputRef}
+                onChange={handleOrgPhotoChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <p className="text-[11px] text-[var(--admin-muted)]">
+                Format yang didukung: PNG, JPG, WebP. Disarankan diagram berorientasi landscape dengan ukuran file maksimal 5MB.
+              </p>
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleProfileReset}
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Reset Form</span>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
+            >
+              <Save className="h-4 w-4" />
+              <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
+            </Button>
+          </div>
+        </form>
+      )}
+
+      {/* ── TAB 3: TAUTAN & LAYANAN ─────────────────────────────────────── */}
+      {activeTab === "tautan" && (
+        <form onSubmit={handleLinksSave} className="space-y-6">
+          {/* Kartu Portal Eksternal & Media Sosial */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
+
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <Share2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Integrasi Portal &amp; Media Sosial</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Tautan portal dinas induk dan jejaring sosial resmi.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="link-dinkes" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  URL Portal Dinas Kesehatan
+                </Label>
+                <div className="relative">
+                  <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
+                  <Input
+                    id="link-dinkes"
+                    value={linksForm.dinkesUrl}
+                    onChange={(e) => setLinksForm({ ...linksForm, dinkesUrl: e.target.value })}
+                    placeholder="https://dinkes.kotabarukab.go.id"
+                    className="border-[var(--admin-border)] bg-[var(--admin-surface)] pl-9 text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="link-ig" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Akun Instagram Resmi
+                </Label>
+                <Input
+                  id="link-ig"
+                  value={linksForm.instagramUrl}
+                  onChange={(e) => setLinksForm({ ...linksForm, instagramUrl: e.target.value })}
+                  placeholder="https://instagram.com/ifk_kotabaru"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="link-fb" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Halaman Facebook Resmi
+                </Label>
+                <Input
+                  id="link-fb"
+                  value={linksForm.facebookUrl}
+                  onChange={(e) => setLinksForm({ ...linksForm, facebookUrl: e.target.value })}
+                  placeholder="https://facebook.com/ifk.kotabaru"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="link-yt" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Kanal YouTube Resmi
+                </Label>
+                <Input
+                  id="link-yt"
+                  value={linksForm.youtubeUrl}
+                  onChange={(e) => setLinksForm({ ...linksForm, youtubeUrl: e.target.value })}
+                  placeholder="https://youtube.com/@ifkkotabaru"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Kartu Banner Pengumuman Darurat */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center justify-between border-b border-[var(--admin-border)] pb-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <Megaphone className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Banner Pengumuman Publik</h2>
+                  <p className="text-xs text-[var(--admin-muted)]">
+                    Tampilkan pengumuman penting atau darurat tepat di bagian teratas halaman publik.
+                  </p>
+                </div>
+              </div>
+
+              {/* Sliding Toggle Switch */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={linksForm.announcementEnabled}
+                onClick={() =>
+                  setLinksForm({
+                    ...linksForm,
+                    announcementEnabled: !linksForm.announcementEnabled,
+                  })
+                }
+                className={cn(
+                  "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-500/40",
+                  linksForm.announcementEnabled ? "bg-amber-600 dark:bg-amber-500" : "bg-zinc-400 dark:bg-zinc-800"
+                )}
+              >
+                <span
+                  className={cn(
+                    "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out",
+                    linksForm.announcementEnabled ? "translate-x-5" : "translate-x-0"
+                  )}
+                />
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="text-xs font-semibold text-[var(--admin-muted)]">Tipe Badge:</span>
+                <div className="flex flex-wrap gap-2">
+                  {(["info", "warning", "important"] as const).map((type) => {
+                    const isSelected = linksForm.announcementType === type;
+                    return (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setLinksForm({ ...linksForm, announcementType: type })}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-all active:scale-95 cursor-pointer",
+                          isSelected
+                            ? type === "warning"
+                              ? "bg-amber-700 text-white font-bold shadow-xs border border-amber-800"
+                              : type === "important"
+                              ? "bg-rose-700 text-white font-bold shadow-xs border border-rose-800"
+                              : "bg-sky-700 text-white font-bold shadow-xs border border-sky-800"
+                            : "bg-[var(--admin-surface)] text-[var(--admin-muted)] border border-[var(--admin-border)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] font-medium"
+                        )}
+                      >
+                        {type === "warning" ? (
+                          <Megaphone className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-amber-600 dark:text-amber-400")} />
+                        ) : type === "important" ? (
+                          <AlertTriangle className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-rose-600 dark:text-rose-400")} />
+                        ) : (
+                          <Info className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-sky-600 dark:text-sky-400")} />
+                        )}
+                        <span>{type === "info" ? "Informasi" : type === "warning" ? "Peringatan" : "Penting"}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="banner-text" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Isi Pesan Pengumuman
+                </Label>
+                <Textarea
+                  id="banner-text"
+                  rows={2}
+                  value={linksForm.announcementText}
+                  onChange={(e) => setLinksForm({ ...linksForm, announcementText: e.target.value })}
+                  placeholder="Contoh: Layanan farmasi libur nasional..."
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40"
+                />
+              </div>
+
+              {/* Pratinjau Banner */}
+              {linksForm.announcementEnabled && (
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between text-xs font-semibold text-[var(--admin-muted)]">
+                    <span className="flex items-center gap-1.5">
+                      <Radio className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                      Pratinjau Banner di Halaman Publik
+                    </span>
+                    <span className="text-[11px] font-normal text-[var(--admin-muted)]">
+                      Tampil di bagian paling atas website
+                    </span>
+                  </div>
+
+                  <div
+                    className={cn(
+                      "rounded-xl border p-3.5 transition-colors shadow-xs flex flex-col sm:flex-row sm:items-center gap-3",
+                      linksForm.announcementType === "warning"
+                        ? "border-amber-300 bg-amber-50/90 dark:border-amber-800/60 dark:bg-amber-950/40"
+                        : linksForm.announcementType === "important"
+                        ? "border-rose-300 bg-rose-50/90 dark:border-rose-800/60 dark:bg-rose-950/40"
+                        : "border-sky-300 bg-sky-50/90 dark:border-sky-800/60 dark:bg-sky-950/40"
+                    )}
+                  >
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold text-white shadow-xs uppercase tracking-wider",
+                          linksForm.announcementType === "warning"
+                            ? "bg-amber-700"
+                            : linksForm.announcementType === "important"
+                            ? "bg-rose-700"
+                            : "bg-sky-700"
+                        )}
+                      >
+                        {linksForm.announcementType === "important" ? (
+                          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                        ) : linksForm.announcementType === "warning" ? (
+                          <Megaphone className="h-3.5 w-3.5 shrink-0" />
+                        ) : (
+                          <Info className="h-3.5 w-3.5 shrink-0" />
+                        )}
+                        <span>
+                          {linksForm.announcementType === "warning"
+                            ? "Peringatan"
+                            : linksForm.announcementType === "important"
+                            ? "Penting"
+                            : "Informasi"}
+                        </span>
+                      </span>
+                    </div>
+
+                    <p className="min-w-0 flex-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-snug break-words">
+                      {linksForm.announcementText || "(Pesan pengumuman belum diisi)"}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleLinksReset}
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Reset Form</span>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
+            >
+              <Save className="h-4 w-4" />
+              <span>{isPending ? "Menyimpan..." : "Simpan Perubahan"}</span>
+            </Button>
+          </div>
+        </form>
+      )}
+
+      {/* ── TAB 4: DOKUMEN LAYANAN ───────────────────────────────────────── */}
+      {activeTab === "dokumen" && (
+        <form onSubmit={handleDocsSave} className="space-y-6">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
+
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <FileSpreadsheet className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Tautan Dokumen &amp; Formulir Layanan</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Kelola tautan Google Sheets atau Drive untuk formulir LPLPO rutin dan formulir permintaan sewaktu bagi Puskesmas.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 space-y-5">
+              {/* LPLPO */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="doc-lplpo" className="text-xs font-medium text-[var(--admin-text-main)]">
+                    URL Formulir LPLPO (Lembar Permintaan &amp; Pemakaian Obat)
+                  </Label>
+                  {docsForm.lplpoUrl && (
+                    <a
+                      href={docsForm.lplpoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#455a26] dark:text-brand-400 hover:underline transition-colors"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      <span>Uji Buka Tautan</span>
+                    </a>
+                  )}
+                </div>
+                <Input
+                  id="doc-lplpo"
+                  type="url"
+                  value={docsForm.lplpoUrl}
+                  onChange={(e) => setDocsForm({ ...docsForm, lplpoUrl: e.target.value })}
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                />
+                <p className="text-[11px] text-[var(--admin-muted)]">
+                  Digunakan pada tombol &quot;Buka Dokumen Resmi&quot; kartu LPLPO di halaman <code>/layanan</code>.
+                </p>
+              </div>
+
+              {/* Permintaan Sewaktu */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="doc-sewaktu" className="text-xs font-medium text-[var(--admin-text-main)]">
+                    URL Formulir Permintaan Sewaktu (Program &amp; Non-Program)
+                  </Label>
+                  {docsForm.permintaanSewaktuUrl && (
+                    <a
+                      href={docsForm.permintaanSewaktuUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-[#455a26] dark:text-brand-400 hover:underline transition-colors"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      <span>Uji Buka Tautan</span>
+                    </a>
+                  )}
+                </div>
+                <Input
+                  id="doc-sewaktu"
+                  type="url"
+                  value={docsForm.permintaanSewaktuUrl}
+                  onChange={(e) => setDocsForm({ ...docsForm, permintaanSewaktuUrl: e.target.value })}
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-sm text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 font-mono text-xs"
+                />
+                <p className="text-[11px] text-[var(--admin-muted)]">
+                  Digunakan pada tombol &quot;Buka Dokumen Resmi&quot; kartu Permintaan Sewaktu di halaman <code>/layanan</code>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDocsReset}
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Reset Form</span>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
+            >
+              <Save className="h-4 w-4" />
+              <span>{isPending ? "Menyimpan..." : "Simpan Dokumen"}</span>
+            </Button>
+          </div>
+        </form>
+      )}
+
+      {/* ── TAB 5: STATISTIK & SDM ───────────────────────────────────────── */}
+      {activeTab === "statistik" && (
+        <form onSubmit={handleStatsSave} className="space-y-6">
+          {/* Kartu Metrik Wilayah Beranda */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-gradient-to-b from-brand-500/10 via-emerald-500/5 to-transparent blur-2xl" />
+
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <BarChart3 className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Indikator Wilayah Beranda</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Tiga kartu metrik utama yang tampil pada bagian hero halaman depan portal publik.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 grid gap-6 sm:grid-cols-3">
+              {/* Metrik 1: Faskes */}
+              <div className="space-y-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+                <div className="text-xs font-semibold text-[#455a26] dark:text-brand-400">Indikator 1 (Faskes)</div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-faskes-count" className="text-[11px] text-[var(--admin-muted)]">Jumlah / Angka</Label>
+                  <Input
+                    id="stat-faskes-count"
+                    value={statsForm.statsFaskesCount}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsFaskesCount: e.target.value })}
+                    placeholder="30 Faskes"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-faskes-label" className="text-[11px] text-[var(--admin-muted)]">Keterangan Label</Label>
+                  <Input
+                    id="stat-faskes-label"
+                    value={statsForm.statsFaskesLabel}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsFaskesLabel: e.target.value })}
+                    placeholder="28 Puskesmas &amp; 2 RSUD"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
+                  />
+                </div>
+              </div>
+
+              {/* Metrik 2: Pulau */}
+              <div className="space-y-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+                <div className="text-xs font-semibold text-[#455a26] dark:text-brand-400">Indikator 2 (Pulau)</div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-pulau-count" className="text-[11px] text-[var(--admin-muted)]">Jumlah / Angka</Label>
+                  <Input
+                    id="stat-pulau-count"
+                    value={statsForm.statsPulauCount}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsPulauCount: e.target.value })}
+                    placeholder="45 Pulau"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-pulau-label" className="text-[11px] text-[var(--admin-muted)]">Keterangan Label</Label>
+                  <Input
+                    id="stat-pulau-label"
+                    value={statsForm.statsPulauLabel}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsPulauLabel: e.target.value })}
+                    placeholder="Jangkauan Kepulauan"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
+                  />
+                </div>
+              </div>
+
+              {/* Metrik 3: Masyarakat */}
+              <div className="space-y-3 rounded-xl border border-[var(--admin-border)] bg-[var(--admin-surface)] p-4">
+                <div className="text-xs font-semibold text-[#455a26] dark:text-brand-400">Indikator 3 (Masyarakat)</div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-masyarakat-count" className="text-[11px] text-[var(--admin-muted)]">Jumlah / Angka</Label>
+                  <Input
+                    id="stat-masyarakat-count"
+                    value={statsForm.statsMasyarakatCount}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsMasyarakatCount: e.target.value })}
+                    placeholder="334 Ribu+"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stat-masyarakat-label" className="text-[11px] text-[var(--admin-muted)]">Keterangan Label</Label>
+                  <Input
+                    id="stat-masyarakat-label"
+                    value={statsForm.statsMasyarakatLabel}
+                    onChange={(e) => setStatsForm({ ...statsForm, statsMasyarakatLabel: e.target.value })}
+                    placeholder="Masyarakat Terlayani"
+                    className="border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-xs text-[var(--admin-text-main)]"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Kartu Komposisi SDM & Fasilitas Profil */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card-bg)] p-6 shadow-xl backdrop-blur-xl">
+            <div className="relative flex items-center gap-3 border-b border-[var(--admin-border)] pb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#455a26]/30 bg-[#455a26]/10 text-[#455a26] dark:border-brand-500/20 dark:bg-brand-500/10 dark:text-brand-400">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--admin-text-main)]">Ketenagaan SDM &amp; Fasilitas Gudang</h2>
+                <p className="text-xs text-[var(--admin-muted)]">
+                  Statistik jumlah personel farmasi dan luasan gudang pada halaman Profil lembaga.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="space-y-2">
+                <Label htmlFor="sdm-total" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Total SDM Keseluruhan
+                </Label>
+                <Input
+                  id="sdm-total"
+                  value={statsForm.sdmTotalCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmTotalCount: e.target.value })}
+                  placeholder="24 Orang"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sdm-apoteker" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Tenaga Apoteker
+                </Label>
+                <Input
+                  id="sdm-apoteker"
+                  value={statsForm.sdmApotekerCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmApotekerCount: e.target.value })}
+                  placeholder="5 Orang"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sdm-ttk" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Tenaga Teknis (TTK)
+                </Label>
+                <Input
+                  id="sdm-ttk"
+                  value={statsForm.sdmTtkCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmTtkCount: e.target.value })}
+                  placeholder="7 Orang"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sdm-pendukung" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Tenaga Pendukung / Operasional
+                </Label>
+                <Input
+                  id="sdm-pendukung"
+                  value={statsForm.sdmPendukungCount}
+                  onChange={(e) => setStatsForm({ ...statsForm, sdmPendukungCount: e.target.value })}
+                  placeholder="11 Orang"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)]"
+                />
+              </div>
+
+              <div className="space-y-2 sm:col-span-2 lg:col-span-4">
+                <Label htmlFor="sarana-luas" className="text-xs font-medium text-[var(--admin-text-main)]">
+                  Kapasitas / Luas Gudang Farmasi
+                </Label>
+                <Input
+                  id="sarana-luas"
+                  value={statsForm.saranaGudangLuas}
+                  onChange={(e) => setStatsForm({ ...statsForm, saranaGudangLuas: e.target.value })}
+                  placeholder="690 m²"
+                  className="border-[var(--admin-border)] bg-[var(--admin-surface)] text-xs text-[var(--admin-text-main)] max-w-sm"
+                />
+                <p className="text-[11px] text-[var(--admin-muted)]">
+                  Tampil pada kartu &quot;Gudang Farmasi&quot; di seksi Sarana &amp; Fasilitas Gudang.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleStatsReset}
+              className="gap-2 border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-text-main)] transition-colors hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] active:scale-[0.98] cursor-pointer"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Reset Form</span>
+            </Button>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="gap-2 bg-gradient-to-r from-brand-600 to-emerald-600 text-white font-semibold shadow-lg shadow-brand-500/20 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
+            >
+              <Save className="h-4 w-4" />
+              <span>{isPending ? "Menyimpan..." : "Simpan Statistik"}</span>
+            </Button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}

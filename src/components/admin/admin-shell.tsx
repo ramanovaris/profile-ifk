@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Newspaper,
   Users,
   UserCog,
+  Settings,
   LogOut,
   Menu,
-  Pill,
+  Tags,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,15 +23,29 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, getAssetUrl } from "@/lib/utils";
+import { Toaster } from "@/components/ui/toast";
+import { logoutAction, getCurrentUserAction, type AuthUserInfo } from "@/actions/auth";
+import { ThemeDropdown, type ThemeSetting } from "@/components/admin/theme-dropdown";
+import type { Role } from "@prisma/client";
 
-const sidebarLinks = [
-  { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/berita", label: "Berita", icon: Newspaper },
-  { href: "/admin/pengguna", label: "Pengguna", icon: Users },
-  { href: "/admin/profil", label: "Profil", icon: UserCog },
+type SidebarItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  superAdminOnly?: boolean;
+};
+
+const sidebarLinks: SidebarItem[] = [
+  { href: "/admin/dashboard/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/berita/", label: "Berita", icon: Newspaper },
+  { href: "/admin/kategori/", label: "Kategori", icon: Tags },
+  { href: "/admin/stok/", label: "Stok Obat", icon: Package },
+  { href: "/admin/pengguna/", label: "Pengguna", icon: Users, superAdminOnly: true },
+  { href: "/admin/profil/", label: "Profil", icon: UserCog },
+  { href: "/admin/pengaturan/", label: "Pengaturan", icon: Settings },
 ];
 
 function SidebarLink({
@@ -46,29 +63,65 @@ function SidebarLink({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition",
+        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
         active
-          ? "bg-blue-50 text-blue-700"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          ? "bg-[#455a26] text-white shadow-xs font-semibold"
+          : "text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
       )}
     >
-      <Icon className="h-4 w-4" />
-      {label}
+      <Icon
+        className={cn(
+          "h-4 w-4 transition-colors",
+          active
+            ? "text-white"
+            : "text-[var(--admin-muted)] group-hover:text-[var(--admin-text-main)]"
+        )}
+      />
+      <span>{label}</span>
     </Link>
   );
 }
 
-function SidebarContent({ pathname }: { pathname: string }) {
-  const router = useRouter();
+function SidebarContent({
+  pathname,
+  user,
+}: {
+  pathname: string;
+  user: AuthUserInfo | null;
+}) {
+  const visibleLinks = sidebarLinks.filter(
+    (link) => !link.superAdminOnly || user?.role === "SUPER_ADMIN"
+  );
+
   return (
-    <>
-      <div className="flex items-center gap-2 px-3 py-4">
-        <Pill className="h-5 w-5 text-blue-700" />
-        <span className="text-sm font-bold text-slate-900">Admin IFK</span>
+    <div className="flex h-full flex-col">
+      {/* Brand Header */}
+      <div className="flex items-center gap-3 px-4 py-4">
+        <div className="relative">
+          <Image
+            src="/images/logo-ifk.jpg"
+            alt="Logo IFK Kotabaru"
+            width={32}
+            height={32}
+            unoptimized
+            className="h-8 w-8 rounded-full ring-1 ring-[var(--admin-border)]"
+          />
+        </div>
+        <div className="flex flex-col">
+          <span className="text-sm font-bold tracking-tight text-[var(--admin-text-main)]">
+            Admin IFK
+          </span>
+          <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--admin-muted)]">
+            Kotabaru
+          </span>
+        </div>
       </div>
-      <Separator />
-      <nav className="mt-4 flex flex-col gap-1 px-2">
-        {sidebarLinks.map((link) => (
+
+      <Separator className="bg-[var(--admin-border)]" />
+
+      {/* Navigation */}
+      <nav className="mt-4 flex flex-col gap-1 px-3">
+        {visibleLinks.map((link) => (
           <SidebarLink
             key={link.href}
             {...link}
@@ -76,63 +129,233 @@ function SidebarContent({ pathname }: { pathname: string }) {
           />
         ))}
       </nav>
-      <div className="mt-auto px-2 pb-4">
-        <Separator className="mb-4" />
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-slate-600"
-          onClick={() => router.push("/")}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Keluar
-        </Button>
+
+      {/* Bottom section */}
+      <div className="mt-auto px-3 pb-4">
+        <Separator className="mb-4 bg-[var(--admin-border)]" />
+        <form action={logoutAction}>
+          <Button
+            type="submit"
+            variant="ghost"
+            className="w-full justify-start text-[var(--admin-muted)] hover:bg-red-500/10 hover:text-red-500 transition-colors"
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Keluar Sesi
+          </Button>
+        </form>
       </div>
-    </>
+    </div>
   );
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export type AdminShellProps = {
+  children: React.ReactNode;
+  currentUser?: {
+    id?: string;
+    name: string;
+    username: string;
+    role: Role;
+    email?: string | null;
+    avatar?: string | null;
+  };
+};
+
+// Module-level persistent cache across route navigations
+let activeClientTheme: ThemeSetting | null = null;
+let activeSystemIsDark: boolean | null = null;
+
+function getInitialAdminTheme(): ThemeSetting {
+  if (activeClientTheme) return activeClientTheme;
+  if (typeof window !== "undefined") {
+    try {
+      const stored = localStorage.getItem("admin-theme") as ThemeSetting | null;
+      if (stored === "light" || stored === "dark" || stored === "system") {
+        activeClientTheme = stored;
+        return stored;
+      }
+    } catch {
+      // ignore
+    }
+  }
+  return "light";
+}
+
+function getInitialSystemDark(): boolean {
+  if (activeSystemIsDark !== null) return activeSystemIsDark;
+  if (typeof window !== "undefined") {
+    try {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      activeSystemIsDark = isDark;
+      return isDark;
+    } catch {
+      // ignore
+    }
+  }
+  return false;
+}
+
+export function AdminShell({ children, currentUser }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
+
+  const [themeSetting, setThemeSetting] = useState<ThemeSetting>(getInitialAdminTheme);
+  const [systemIsDark, setSystemIsDark] = useState<boolean>(getInitialSystemDark);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const listener = (e: MediaQueryListEvent) => {
+      activeSystemIsDark = e.matches;
+      setSystemIsDark(e.matches);
+    };
+
+    media.addEventListener("change", listener);
+    return () => media.removeEventListener("change", listener);
+  }, []);
+
+  const handleThemeChange = (newTheme: ThemeSetting) => {
+    activeClientTheme = newTheme;
+    setThemeSetting(newTheme);
+    try {
+      localStorage.setItem("admin-theme", newTheme);
+    } catch {
+      // ignore
+    }
+  };
+
+  const resolvedTheme: "light" | "dark" =
+    themeSetting === "system"
+      ? systemIsDark
+        ? "dark"
+        : "light"
+      : themeSetting;
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.setAttribute("data-admin-theme", resolvedTheme);
+  }, [resolvedTheme]);
+
+  const user: AuthUserInfo | null = currentUser
+    ? {
+        id: currentUser.id || "",
+        name: currentUser.name,
+        username: currentUser.username,
+        role: currentUser.role,
+        email: currentUser.email,
+        avatar: currentUser.avatar,
+      }
+    : fetchedUser;
+
+  useEffect(() => {
+    if (!currentUser) {
+      getCurrentUserAction().then((u) => {
+        if (u) setFetchedUser(u);
+      });
+    }
+  }, [currentUser]);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
+  const displayName = user?.name || (user?.username ? `@${user.username}` : "Admin");
+  const initials = user?.name ? getInitials(user.name) : "AD";
+  const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50">
+    <div
+      data-admin-theme={resolvedTheme}
+      suppressHydrationWarning
+      className="admin-root relative flex h-dvh min-h-dvh overflow-hidden bg-[var(--admin-bg)] text-[var(--admin-text-main)] selection:bg-brand-500/30 transition-colors duration-200"
+    >
+      {/* Subtle Ambient Background Mesh Glows */}
+      <div
+        className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full blur-3xl opacity-70 transition-opacity"
+        style={{ background: "var(--admin-ambient-glow-1)" }}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -bottom-32 -left-32 h-80 w-80 rounded-full blur-3xl opacity-70 transition-opacity"
+        style={{ background: "var(--admin-ambient-glow-2)" }}
+        aria-hidden="true"
+      />
+
       {/* Desktop sidebar */}
-      <aside className="hidden w-60 shrink-0 border-r bg-white md:flex md:flex-col">
-        <SidebarContent pathname={pathname} />
+      <aside className="relative z-10 hidden w-64 shrink-0 border-r border-[var(--admin-border)] bg-[var(--admin-sidebar-bg)] backdrop-blur-xl md:flex md:flex-col transition-colors duration-200">
+        <SidebarContent pathname={pathname} user={user} />
       </aside>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-14 shrink-0 items-center justify-between border-b bg-white px-4">
+        <header className="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-header-bg)] px-4 backdrop-blur-xl sm:px-6 transition-colors duration-200">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-900 md:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] md:hidden transition-colors"
               aria-label="Buka menu"
             >
               <Menu className="h-5 w-5" />
             </SheetTrigger>
-            <SheetContent side="left" className="w-60 p-0">
+            <SheetContent
+              side="left"
+              className="w-64 border-r border-[var(--admin-border)] bg-[var(--admin-sheet-bg)] p-0 text-[var(--admin-text-main)] backdrop-blur-2xl"
+            >
               <SheetHeader>
                 <SheetTitle className="sr-only">Menu Admin</SheetTitle>
               </SheetHeader>
-              <SidebarContent pathname={pathname} />
+              <SidebarContent pathname={pathname} user={user} />
             </SheetContent>
           </Sheet>
 
-          <div className="md:hidden" />
+          {/* Right Header Admin Info */}
+          <div className="ml-auto flex items-center gap-3">
+            <ThemeDropdown
+              themeSetting={themeSetting}
+              onThemeChange={handleThemeChange}
+            />
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-700">Admin</span>
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-blue-100 text-xs text-blue-700">AD</AvatarFallback>
-            </Avatar>
+            {user && (
+              <span
+                className={cn(
+                  "hidden items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium sm:inline-flex",
+                  isSuperAdmin
+                    ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                    : "border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-400"
+                )}
+              >
+                {isSuperAdmin ? "Super Admin" : "Staff"}
+              </span>
+            )}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-[var(--admin-text-main)] max-w-[150px] truncate sm:max-w-xs">
+                {displayName}
+              </span>
+              <Avatar className="h-8 w-8 ring-1 ring-brand-500/30">
+                {user?.avatar ? (
+                  <AvatarImage src={getAssetUrl(user.avatar)} alt={displayName} />
+                ) : null}
+                <AvatarFallback className="bg-brand-500/20 text-xs font-semibold text-brand-600 dark:text-brand-300">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+            </div>
           </div>
         </header>
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
+        {/* Main scrollable content */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto max-w-7xl w-full min-w-0">{children}</div>
+        </main>
       </div>
+      <Toaster />
     </div>
   );
 }

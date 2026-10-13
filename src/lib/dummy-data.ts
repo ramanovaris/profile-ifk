@@ -1,10 +1,35 @@
-// ── Types ──────────────────────────────────────────────────────────────────────
+import { placeholderImage } from "./placeholder";
+
+// ── Types & Constants ────────────────────────────────────────────────────────
+
+export const ARTICLE_CATEGORIES = ["Kegiatan", "Informasi", "Sosialisasi"] as const;
+export type ArticleCategory = (typeof ARTICLE_CATEGORIES)[number];
+
+// Simulasi data master kategori dengan status aktif/non-aktif
+export type CategoryStatus = "ACTIVE" | "INACTIVE";
+
+export type Category = {
+  id: string;
+  name: ArticleCategory;
+  slug: string;
+  status: CategoryStatus;
+};
+
+export const initialCategories: Category[] = [
+  { id: "cat-1", name: "Kegiatan", slug: "kegiatan", status: "ACTIVE" },
+  { id: "cat-2", name: "Informasi", slug: "informasi", status: "ACTIVE" },
+  { id: "cat-3", name: "Sosialisasi", slug: "sosialisasi", status: "ACTIVE" },
+];
+
+export function getArticleCountByCategory(categoryName: ArticleCategory, articles: Article[]): number {
+  return articles.filter((a) => a.category === categoryName).length;
+}
 
 export type Article = {
   id: string;
   title: string;
   slug: string;
-  category: "Kegiatan" | "Informasi" | "Sosialisasi";
+  category: ArticleCategory;
   content: string; // HTML string
   coverImage: string;
   isPublished: boolean;
@@ -18,6 +43,7 @@ export type User = {
   username: string;
   name: string;
   role: "SUPER_ADMIN" | "STAFF";
+  status: "ACTIVE" | "INACTIVE";
   createdAt: string;
 };
 
@@ -30,8 +56,8 @@ export type SiteConfig = {
   whatsappLink: string;
   googleMapsEmbedUrl: string;
   operationalHours: string;
-  sp4nLaporUrl: string;
   motto: string;
+  tagline: string;
 };
 
 // ── Site Config ───────────────────────────────────────────────────────────────
@@ -40,17 +66,17 @@ export const siteConfig: SiteConfig = {
   name: "UPTD Instalasi Farmasi Kab. Kotabaru",
   shortName: "IFK Kotabaru",
   address:
-    "Jl. Veteran No. 17, Kotabaru, Kalimantan Selatan 72112",
-  phone: "(0518) 62107",
-  email: "ifk.kotabaru@gmail.com",
+    "Jl. Kenanga Desa Dirgahayu, Kotabaru 72116. Telp/Fax (0518) 21603",
+  phone: "(0518) 21603",
+  email: "instalasifarmasi4@gmail.com",
   whatsappLink: "https://wa.me/6281234567890",
   googleMapsEmbedUrl:
-    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.19449070628!2d116.149!3d-3.3!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df67f1e2f6f1f1f%3A0x1234567890abcdef!2sKotabaru%2C+Kalimantan+Selatan!5e0!3m2!1sid!2sid!4v1234567890123!5m2!1sid!2sid",
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.402205111195!2d116.22363550000001!3d-3.2497904999999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2def302cb3e8dcff%3A0xb7c86d7dc7737d8c!2sInstalasi%20Farmasi!5e0!3m2!1sen!2sid!4v1788250580948!5m2!1sen!2sid",
   operationalHours:
     "Senin - Kamis: 08.00 - 16.30 WITA\nJumat: 08.00 - 11.00 WITA",
-  sp4nLaporUrl: "https://www.lapor.go.id",
   motto:
     "Melayani dengan Integritas, Menjamin Mutu Obat untuk Kesehatan Masyarakat",
+  tagline: "Stok Valid, Team Solid",
 };
 
 // ── Dummy Users ───────────────────────────────────────────────────────────────
@@ -61,6 +87,7 @@ export const dummyUsers: User[] = [
     username: "admin",
     name: "Administrator",
     role: "SUPER_ADMIN",
+    status: "ACTIVE",
     createdAt: "2024-01-15T08:00:00.000Z",
   },
   {
@@ -68,6 +95,7 @@ export const dummyUsers: User[] = [
     username: "staff1",
     name: "Siti Nurhaliza, S.Farm",
     role: "STAFF",
+    status: "ACTIVE",
     createdAt: "2024-03-10T08:00:00.000Z",
   },
   {
@@ -75,6 +103,7 @@ export const dummyUsers: User[] = [
     username: "staff2",
     name: "Ahmad Rizky, S.Farm",
     role: "STAFF",
+    status: "ACTIVE",
     createdAt: "2024-06-01T08:00:00.000Z",
   },
 ];
@@ -92,8 +121,7 @@ export const dummyArticles: Article[] = [
       <p>Kegiatan ini bertujuan untuk memastikan setiap faskes dapat menggunakan sistem dengan baik dalam pengelolaan distribusi dan pemantauan stok obat. Para peserta mendapatkan penjelasan lengkap mulai dari cara login, input data stok, hingga laporan penggunaan obat.</p>
       <p>Selain itu, sosialisasi ini juga menjadi wadah untuk menampung masukan dan kendala yang dihadapi oleh para apoteker faskes dalam penggunaan sistem informasi kefarmasian.</p>
     `,
-    coverImage:
-      "https://placehold.co/1200x630/1e3a5f/ffffff?text=Kegiatan+IFK",
+    coverImage: placeholderImage(1200, 630, "Sosialisasi Sistem Informasi Kefarmasian", "Kegiatan"),
     isPublished: true,
     authorId: "usr-1",
     authorName: "Administrator",
@@ -109,8 +137,7 @@ export const dummyArticles: Article[] = [
       <p>Evaluasi ini mencakup analisis ketersediaan obat di seluruh faskes binaan, tingkat pemenuhan permintaan, serta efektivitas proses distribusi yang telah dilaksanakan selama periode tersebut.</p>
       <p>Hasil evaluasi menunjukkan bahwa tingkat pemenuhan permintaan obat mencapai 95%, dengan beberapa catatan perbaikan untuk obat-obatan yang mengalami keterlambatan pengadaan dari pemasok.</p>
     `,
-    coverImage:
-      "https://placehold.co/1200x630/1e3a5f/ffffff?text=Evaluasi+Distribusi+Obat",
+    coverImage: placeholderImage(1200, 630, "Evaluasi Distribusi Obat Triwulan IV", "Kegiatan"),
     isPublished: true,
     authorId: "usr-2",
     authorName: "Siti Nurhaliza, S.Farm",
@@ -126,8 +153,7 @@ export const dummyArticles: Article[] = [
       <p>Selama libur nasional, pelayanan distribusi obat akan dititipkan pada jadwal pengajuan sebelum masa libur. Faskes binaan diimbau untuk mengajuan permintaan obat paling lambat H-7 sebelum hari libur nasional dimulai.</p>
       <p>Pelayanan normal akan kembali beroperasi sesuai jam kerja yang berlaku setelah masa libur nasional berakhir.</p>
     `,
-    coverImage:
-      "https://placehold.co/1200x630/2d5a27/ffffff?text=Informasi+Pelayanan",
+    coverImage: placeholderImage(1200, 630, "Jadwal Pelayanan Libur Nasional", "Informasi"),
     isPublished: true,
     authorId: "usr-1",
     authorName: "Administrator",
@@ -143,8 +169,7 @@ export const dummyArticles: Article[] = [
       <p>Beberapa obat yang mengalami perubahan meliputi penambahan obat generik baru, penghapusan obat yang sudah tidak diproduksi, serta penyesuaian harga obat berdasarkan keputusan terbaru dari Kementerian Kesehatan.</p>
       <p>Faskes binaan diimbau untuk memperbarui referensi formularium di masing-masing institusi agar sesuai dengan daftar terbaru yang berlaku.</p>
     `,
-    coverImage:
-      "https://placehold.co/1200x630/2d5a27/ffffff?text=e-Formularium",
+    coverImage: placeholderImage(1200, 630, "Pembaruan e-Formularium Nasional", "Informasi"),
     isPublished: true,
     authorId: "usr-2",
     authorName: "Siti Nurhaliza, S.Farm",
@@ -160,8 +185,7 @@ export const dummyArticles: Article[] = [
       <p>Kegiatan ini bertujuan untuk meningkatkan kesadaran masyarakat tentang pentingnya menggunakan obat yang aman, berkhasiat, dan berkualitas. Masyarakat diedukasi untuk mengenali obat-obatan yang tidak memiliki izin edar dari BPOM.</p>
       <p>Sosialisasi dilakukan melalui pertemuan langsung dengan warga di beberapa kecamatan, serta penyebaran brosur dan materi edukasi tentang penggunaan obat yang bijak.</p>
     `,
-    coverImage:
-      "https://placehold.co/1200x630/5a3a1e/ffffff?text=Sosialisasi+Masyarakat",
+    coverImage: placeholderImage(1200, 630, "Pelibatan Masyarakat Pengawasan Obat", "Sosialisasi"),
     isPublished: true,
     authorId: "usr-3",
     authorName: "Ahmad Rizky, S.Farm",
@@ -177,8 +201,7 @@ export const dummyArticles: Article[] = [
       <p>Kampanye ini menekankan pentingnya tidak menggunakan antibiotik tanpa resep dokter, serta bahaya resistensi antibiotik yang dapat mengancam kesehatan masyarakat secara luas.</p>
       <p>Pesan utama kampanye: "Gunakan Antibiotik Sesuai Resep Dokter, Selamatkan Masa Depan Kesehatan Kita." Kegiatan ini mendapat sambutan positif dari masyarakat dan tenaga kesehatan di Kabupaten Kotabaru.</p>
     `,
-    coverImage:
-      "https://placehold.co/1200x630/5a3a1e/ffffff?text=Kampanye+Antibiotik",
+    coverImage: placeholderImage(1200, 630, "Kampanye Antibiotik Bijak", "Sosialisasi"),
     isPublished: false,
     authorId: "usr-1",
     authorName: "Administrator",
@@ -186,6 +209,207 @@ export const dummyArticles: Article[] = [
   },
 ];
 
+// ── Types & Constants: Medicine Stock ──────────────────────────────────────────
+export type StockStatus = "AVAILABLE" | "LOW" | "EMPTY";
+
+export type MedicineCategory =
+  | "Obat Generik"
+  | "Obat Program"
+  | "Obat Emergensi"
+  | "BMHP / Alkes"
+  | "Vaksin & Serum";
+
+export type MedicineStockItem = {
+  id: string;
+  code: string;
+  name: string;
+  category: MedicineCategory;
+  unit: string;
+  quantity: number;
+  status: StockStatus;
+  updatedAt: string; // ISO date string
+  avgUsage?: number | null;
+  mos?: number | null;
+  expiryDate?: string | null;
+  nomenklatur?: string | null;
+  source?: string | null;
+  period?: string;
+};
+
+export function formatStockPeriodLabel(period: string): string {
+  const [year, month] = period.split("-");
+  const monthNames: Record<string, string> = {
+    "01": "Januari",
+    "02": "Februari",
+    "03": "Maret",
+    "04": "April",
+    "05": "Mei",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "Agustus",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Desember",
+  };
+  const mName = monthNames[month] || month;
+  return `${mName} ${year}`;
+}
+
+export function formatStockCutoffDate(period: string): string {
+  const [year, month] = period.split("-");
+  const y = parseInt(year, 10);
+  const m = parseInt(month, 10);
+  const lastDay = new Date(y, m, 0).getDate();
+  const monthNames: Record<string, string> = {
+    "01": "Januari",
+    "02": "Februari",
+    "03": "Maret",
+    "04": "April",
+    "05": "Mei",
+    "06": "Juni",
+    "07": "Juli",
+    "08": "Agustus",
+    "09": "September",
+    "10": "Oktober",
+    "11": "November",
+    "12": "Desember",
+  };
+  return `Cut-off ${lastDay} ${monthNames[month] || month} ${year}`;
+}
+
+export type MosBadgeVariant = "empty" | "critical" | "low" | "safe" | "abundant" | "unknown";
+
+export type MosBadgeInfo = {
+  label: string;
+  variant: MosBadgeVariant;
+  badgeClass: string;
+  dotClass: string;
+};
+
+export function getMosBadgeInfo(
+  quantity: number,
+  mos?: number | null,
+  fallbackStatus?: StockStatus | string
+): MosBadgeInfo {
+  if (quantity <= 0 || fallbackStatus === "EMPTY") {
+    return {
+      label: "Kosong (0 bln)",
+      variant: "empty",
+      badgeClass: "border-rose-500/20 bg-rose-500/10 text-rose-700 dark:text-rose-400 dark:border-rose-500/20",
+      dotClass: "bg-rose-500",
+    };
+  }
+  if (mos === undefined || mos === null || isNaN(mos)) {
+    if (fallbackStatus === "AVAILABLE") {
+      return {
+        label: "Tersedia",
+        variant: "safe",
+        badgeClass: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 dark:border-emerald-500/20",
+        dotClass: "bg-emerald-500",
+      };
+    }
+    if (fallbackStatus === "LOW") {
+      return {
+        label: "Menipis",
+        variant: "low",
+        badgeClass: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 dark:border-amber-500/20",
+        dotClass: "bg-amber-500",
+      };
+    }
+    return {
+      label: "-",
+      variant: "unknown",
+      badgeClass: "border-zinc-500/20 bg-zinc-500/10 text-zinc-600 dark:text-zinc-400",
+      dotClass: "bg-zinc-400",
+    };
+  }
+  if (mos < 1) {
+    return {
+      label: `Kritis (${mos.toFixed(1)} bln)`,
+      variant: "critical",
+      badgeClass: "border-rose-500/20 bg-rose-500/10 text-rose-700 dark:text-rose-400 dark:border-rose-500/20",
+      dotClass: "bg-rose-500",
+    };
+  }
+  if (mos < 3) {
+    return {
+      label: `Menipis (${mos.toFixed(1)} bln)`,
+      variant: "low",
+      badgeClass: "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400 dark:border-amber-500/20",
+      dotClass: "bg-amber-500",
+    };
+  }
+  if (mos <= 18) {
+    return {
+      label: `Aman (${mos.toFixed(1)} bln)`,
+      variant: "safe",
+      badgeClass: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 dark:border-emerald-500/20",
+      dotClass: "bg-emerald-500",
+    };
+  }
+  return {
+    label: `Melimpah (> 18 bln)`,
+    variant: "abundant",
+    badgeClass: "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-400 dark:border-sky-500/20",
+    dotClass: "bg-sky-500",
+  };
+}
+
+export type StockSummary = {
+  totalItems: number;
+  availableItems: number;
+  lowItems: number;
+  emptyItems: number;
+  lastUpdated: string;
+};
+
+export function getItemEffectiveStatus(item: {
+  quantity: number;
+  mos?: number | null;
+  status?: StockStatus | string;
+}): StockStatus {
+  if (item.quantity <= 0 || item.status === "EMPTY") return "EMPTY";
+  if (item.mos !== undefined && item.mos !== null && !isNaN(item.mos)) {
+    return item.mos < 3 ? "LOW" : "AVAILABLE";
+  }
+  if (item.status === "AVAILABLE" || item.status === "LOW") {
+    return item.status as StockStatus;
+  }
+  return item.quantity < 500 ? "LOW" : "AVAILABLE";
+}
+
+export function getStockSummary(items: MedicineStockItem[]): StockSummary {
+  return {
+    totalItems: items.length,
+    availableItems: items.filter((i) => getItemEffectiveStatus(i) === "AVAILABLE").length,
+    lowItems: items.filter((i) => getItemEffectiveStatus(i) === "LOW").length,
+    emptyItems: items.filter((i) => getItemEffectiveStatus(i) === "EMPTY").length,
+    lastUpdated: items.length > 0 ? items[0].updatedAt : "-",
+  };
+}
+
+/**
+ * Kalkulasi otomatis status stok berdasarkan jumlah fisik atau MOS:
+ * - quantity <= 0 => EMPTY
+ * - mos < 3 => LOW, mos >= 3 => AVAILABLE (kaidah logistik buffer stock farmasi)
+ * - manualStatus dihormati jika tidak ada nilai MOS
+ * - quantity < 500 => LOW
+ * - lainnya => AVAILABLE
+ */
+export function calculateStockStatus(
+  quantity: number,
+  manualStatus?: StockStatus,
+  mos?: number | null
+): StockStatus {
+  if (quantity <= 0) return "EMPTY";
+  if (mos !== undefined && mos !== null && !isNaN(mos)) {
+    return mos < 3 ? "LOW" : "AVAILABLE";
+  }
+  if (manualStatus && manualStatus !== "EMPTY") return manualStatus;
+  if (quantity < 500) return "LOW";
+  return "AVAILABLE";
+}
 // ── Dummy Stats ───────────────────────────────────────────────────────────────
 
 export const dummyStats = {
@@ -194,3 +418,7 @@ export const dummyStats = {
   draft: dummyArticles.filter((a) => !a.isPublished).length,
   totalUsers: dummyUsers.length,
 };
+
+// ── Data Stok Perbekalan Farmasi (Real Data IFK Kotabaru Juni 2026) ───────────
+import { realMedicineStock } from "./real-stock-data";
+export const initialMedicineStock: MedicineStockItem[] = realMedicineStock;

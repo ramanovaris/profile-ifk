@@ -1,90 +1,431 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Breadcrumb } from "@/components/public/breadcrumb";
+import { ArticlePreviewBanner } from "@/components/public/article-preview-banner";
+import { ArticleShareBar } from "@/components/public/article-share-bar";
 import { dummyArticles } from "@/lib/dummy-data";
+import { db } from "@/lib/db";
+import { getCurrentSession } from "@/lib/auth";
+import { stripHtmlAndTruncate } from "@/lib/string";
+import { sanitizeHtml } from "@/lib/sanitize";
 
-export function generateStaticParams() {
-  return dummyArticles.map((a) => ({ slug: a.slug }));
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await props.params;
+
+  const dbArticle = await db.article.findUnique({
+    where: { slug },
+    select: {
+      title: true,
+      content: true,
+      coverImage: true,
+      publishedAt: true,
+      isPublished: true,
+      author: {
+        select: { name: true },
+      },
+      category: {
+        select: { name: true },
+      },
+    },
+  });
+
+  if (dbArticle) {
+    const rawCover = dbArticle.coverImage;
+    const coverImageUrl =
+      rawCover && !rawCover.startsWith("data:")
+        ? rawCover
+        : "/images/kantor-ifk.jpg";
+    const description = stripHtmlAndTruncate(dbArticle.content, 160);
+    const publishedTime = dbArticle.publishedAt
+      ? new Date(dbArticle.publishedAt).toISOString()
+      : undefined;
+    const authorName = dbArticle.author?.name || "Administrator";
+    const title = dbArticle.title;
+
+    return {
+      title,
+      description,
+      alternates: {
+        canonical: `/berita/${slug}`,
+      },
+      robots: dbArticle.isPublished ? undefined : { index: false, follow: false },
+      openGraph: {
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        url: `/berita/${slug}`,
+        type: "article",
+        publishedTime,
+        authors: [authorName],
+        images: [
+          {
+            url: coverImageUrl,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        images: [coverImageUrl],
+      },
+    };
+  }
+
+  const dummy = dummyArticles.find((a) => a.slug === slug);
+  if (dummy) {
+    const rawCover = dummy.coverImage;
+    const coverImageUrl =
+      rawCover && !rawCover.startsWith("data:")
+        ? rawCover
+        : "/images/kantor-ifk.jpg";
+    const description = stripHtmlAndTruncate(dummy.content, 160);
+    const publishedTime = dummy.publishedAt
+      ? new Date(dummy.publishedAt).toISOString()
+      : undefined;
+    const authorName = dummy.authorName || "Administrator";
+    const title = dummy.title;
+
+    return {
+      title,
+      description,
+      alternates: {
+        canonical: `/berita/${slug}`,
+      },
+      openGraph: {
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        url: `/berita/${slug}`,
+        type: "article",
+        publishedTime,
+        authors: [authorName],
+        images: [
+          {
+            url: coverImageUrl,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | UPTD Instalasi Farmasi Kab. Kotabaru`,
+        description,
+        images: [coverImageUrl],
+      },
+    };
+  }
+
+  return {
+    title: "Artikel Tidak Ditemukan | UPTD Instalasi Farmasi Kab. Kotabaru",
+    description: "Artikel yang Anda cari tidak ditemukan atau telah dihapus.",
+  };
 }
 
-export default async function BeritaDetailPage(props: { params: Promise<{ slug: string }> }) {
+export default async function BeritaDetailPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await props.params;
-  const article = dummyArticles.find((a) => a.slug === slug);
 
-  if (!article) notFound();
+  // 1. Coba cari artikel dari basis data PostgreSQL
+  const dbArticle = await db.article.findUnique({
+    where: { slug },
+    include: {
+      category: {
+        select: { id: true, name: true },
+      },
+      author: {
+        select: { id: true, name: true },
+      },
+    },
+  });
 
-  const otherArticles = dummyArticles
-    .filter((a) => a.id !== article.id && a.isPublished)
-    .slice(0, 2);
+  let articleId: string | undefined;
+  let title = "";
+  let content = "";
+  let coverImage: string | null = null;
+  let categoryName = "";
+  let authorName = "";
+  let publishedAt = new Date();
+  let isPublished = false;
+
+  if (dbArticle) {
+    articleId = dbArticle.id;
+    title = dbArticle.title;
+    content = dbArticle.content;
+    coverImage = dbArticle.coverImage;
+    categoryName = dbArticle.category?.name || "Umum";
+    authorName = dbArticle.author?.name || "Administrator";
+    publishedAt = dbArticle.publishedAt;
+    isPublished = dbArticle.isPublished;
+  } else {
+    // Fallback ke dummy data untuk kompatibilitas data awal
+    const dummy = dummyArticles.find((a) => a.slug === slug);
+    if (!dummy) {
+      notFound();
+    }
+    articleId = dummy.id;
+    title = dummy.title;
+    content = dummy.content;
+    coverImage = dummy.coverImage;
+    categoryName = dummy.category;
+    authorName = dummy.authorName;
+    publishedAt = new Date(dummy.publishedAt);
+    isPublished = dummy.isPublished;
+  }
+
+  // 2. Proteksi Akses Draf:
+  // Jika artikel berstatus DRAFT, hanya admin yang sedang login yang boleh mengakses.
+  // Pengunjung publik / anonim akan mendapatkan 404 Not Found.
+  let isPreview = false;
+  if (!isPublished) {
+    const sessionData = await getCurrentSession();
+    if (!sessionData?.user) {
+      notFound();
+    }
+    isPreview = true;
+  }
+
+  // 3. Estimasi Waktu Baca (Reading Time: rata-rata 200 kata/menit)
+  const plainText = content.replace(/<[^>]*>/g, " ").trim();
+  const wordCount = plainText ? plainText.split(/\s+/).filter(Boolean).length : 0;
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+  // 4. Ambil Berita Terkait (Hanya yang sudah terbit)
+  let otherArticles: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    category: string;
+    coverImage: string | null;
+    publishedAt: Date | string;
+  }> = [];
+
+  try {
+    const relatedDb = await db.article.findMany({
+      where: {
+        isPublished: true,
+        ...(articleId ? { id: { not: articleId } } : {}),
+      },
+      include: {
+        category: {
+          select: { name: true },
+        },
+      },
+      orderBy: {
+        publishedAt: "desc",
+      },
+      take: 2,
+    });
+
+    otherArticles = relatedDb.map((item) => ({
+      id: item.id,
+      slug: item.slug,
+      title: item.title,
+      category: item.category?.name || "Umum",
+      coverImage: item.coverImage,
+      publishedAt: item.publishedAt,
+    }));
+  } catch {
+    // Abaikan jika query relasi bermasalah
+  }
+
+  // Fallback related articles ke dummy data jika db kosong
+  if (otherArticles.length === 0) {
+    otherArticles = dummyArticles
+      .filter((a) => a.id !== articleId && a.isPublished)
+      .slice(0, 2);
+  }
 
   return (
-    <>
-      {/* ── Cover Image ────────────────────────────────────────────── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={article.coverImage}
-        alt={article.title}
-        className="h-64 w-full object-cover sm:h-80"
-      />
+    <article className="min-h-screen bg-surface text-foreground">
+      {/* ── 1. Header Artikel: Breadcrumb, Badge, Judul, Metadata ───── */}
+      <header className="pt-28 sm:pt-32 pb-4 sm:pb-6">
+        <div className="section-container">
+          <div className="mx-auto max-w-4xl">
+            {isPreview && (
+              <div className="mb-6">
+                <ArticlePreviewBanner articleId={articleId} />
+              </div>
+            )}
 
-      {/* ── Article ────────────────────────────────────────────────── */}
-      <section className="bg-white py-12">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <p className="text-sm text-slate-500">
-            Beranda / Berita / {article.category}
-          </p>
-          <Badge variant="secondary" className="mt-4">
-            {article.category}
-          </Badge>
-          <h1 className="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">
-            {article.title}
-          </h1>
-          <p className="mt-2 text-sm text-slate-500">
-            {new Date(article.publishedAt).toLocaleDateString("id-ID", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}{" "}
-            &middot; {article.authorName}
-          </p>
-          <div
-            className="prose prose-slate mt-6 max-w-none text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: article.content }}
-          />
+            <Breadcrumb
+              items={[
+                { label: "Beranda", href: "/" },
+                { label: "Berita", href: "/berita" },
+                { label: categoryName },
+              ]}
+            />
+
+            <Badge
+              variant="default"
+              className="mt-5 inline-flex bg-brand-50 text-brand-700 border border-brand-200/60 font-medium px-3 py-1 rounded-full text-xs"
+            >
+              {categoryName}
+            </Badge>
+
+            <h1 className="mt-4 text-2xl font-extrabold tracking-tight text-heading sm:text-3xl md:text-4xl lg:text-5xl leading-tight sm:leading-tight md:leading-tight">
+              {title}
+            </h1>
+
+            <div className="mt-5 flex flex-wrap items-center gap-y-2 text-sm text-zinc-600">
+              <div className="flex items-center gap-2 font-medium text-zinc-800">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-50 border border-brand-200 text-[11px] font-semibold text-brand-700">
+                  {authorName.charAt(0).toUpperCase()}
+                </span>
+                <span>{authorName}</span>
+              </div>
+              <span className="mx-2.5 text-zinc-400">&middot;</span>
+              <time
+                dateTime={new Date(publishedAt).toISOString()}
+                className="font-mono text-xs sm:text-sm text-zinc-600"
+              >
+                {new Date(publishedAt).toLocaleDateString("id-ID", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </time>
+              <span className="mx-2.5 text-zinc-400">&middot;</span>
+              <span className="font-mono text-xs sm:text-sm text-zinc-600">
+                {readingMinutes} menit baca
+              </span>
+            </div>
+
+            {/* Bilah Berbagi Ringkas Atas */}
+            <ArticleShareBar
+              title={title}
+              slug={slug}
+              variant="compact"
+              className="mt-5"
+            />
+          </div>
+        </div>
+      </header>
+
+      {/* ── 2. Foto Sampul Ekspansif (Full-Width Container, 16:9) ───── */}
+      <section className="my-4 sm:my-8">
+        <div className="section-container">
+          <div className="mx-auto max-w-5xl">
+            <div className="relative aspect-video w-full overflow-hidden rounded-2xl md:rounded-3xl border border-border/80 bg-zinc-100 shadow-xl">
+              {coverImage ? (
+                <Image
+                  src={coverImage}
+                  alt={title}
+                  fill
+                  unoptimized={
+                    coverImage.startsWith("https://picsum.photos/") ||
+                    coverImage.startsWith("http://") ||
+                    coverImage.startsWith("https://")
+                  }
+                  sizes="(min-width: 1280px) 1024px, 100vw"
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <div className="flex h-full w-full flex-col items-center justify-center bg-zinc-100 p-6 text-center text-zinc-600">
+                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-white text-brand-700 shadow-xs">
+                    <span className="text-sm font-bold">IFK</span>
+                  </div>
+                  <span className="text-sm font-medium text-zinc-600">
+                    UPTD Instalasi Farmasi Kabupaten Kotabaru
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Berita Lainnya ─────────────────────────────────────────── */}
+      {/* ── 3. Tubuh Naskah Artikel (Prose Terpusat & Nyaman) ───────── */}
+      <section className="pb-16 sm:pb-24 pt-2 sm:pt-4">
+        <div className="section-container">
+          <div className="mx-auto max-w-3xl">
+            <div
+              className="prose prose-zinc max-w-none text-base sm:text-lg leading-relaxed md:leading-8 text-zinc-800"
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }}
+            />
+
+            {/* Bilah Berbagi Lengkap di Bawah Naskah */}
+            <ArticleShareBar
+              title={title}
+              slug={slug}
+              variant="card"
+              className="mt-12 sm:mt-16"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── 4. Rekomendasi Berita Terkait ──────────────────────────── */}
       {otherArticles.length > 0 && (
-        <section className="bg-slate-50 py-12">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-xl font-bold text-slate-900">Berita Lainnya</h2>
-            <div className="mt-6 grid gap-6 sm:grid-cols-2">
-              {otherArticles.map((a) => (
-                <Link key={a.id} href={`/berita/${a.slug}`}>
-                  <Card className="h-full overflow-hidden transition hover:shadow-md">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={a.coverImage}
-                      alt={a.title}
-                      className="h-36 w-full object-cover"
-                    />
-                    <CardContent className="pt-3">
-                      <Badge variant="secondary" className="text-xs">
-                        {a.category}
-                      </Badge>
-                      <h3 className="mt-2 line-clamp-2 font-semibold text-slate-900">
-                        {a.title}
-                      </h3>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+        <section className="border-t border-border bg-surface-alt/50 py-16 sm:py-20">
+          <div className="section-container">
+            <div className="mx-auto max-w-5xl">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-heading">
+                Berita Lainnya
+              </h2>
+              <div className="mt-8 grid gap-6 sm:grid-cols-2">
+                {otherArticles.map((a) => (
+                  <Link key={a.id} href={`/berita/${a.slug}`} className="group block">
+                    <Card className="h-full overflow-hidden border-border bg-white transition-all duration-300 hover:border-brand-300 hover:shadow-md">
+                      <div className="relative aspect-video w-full overflow-hidden bg-zinc-100">
+                        {a.coverImage ? (
+                          <Image
+                            src={a.coverImage}
+                            alt={a.title}
+                            fill
+                            unoptimized={
+                              a.coverImage.startsWith("https://picsum.photos/") ||
+                              a.coverImage.startsWith("http://") ||
+                              a.coverImage.startsWith("https://")
+                            }
+                            sizes="(min-width: 768px) 50vw, 100vw"
+                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-zinc-400">
+                            <span className="text-xs">UPTD IFK</span>
+                          </div>
+                        )}
+                      </div>
+                      <CardContent className="p-5">
+                        <Badge
+                          variant="default"
+                          className="mb-2.5 inline-flex bg-brand-50 text-brand-700 border border-brand-200/60 font-medium text-xs"
+                        >
+                          {a.category}
+                        </Badge>
+                        <h3 className="line-clamp-2 text-base font-semibold text-heading group-hover:text-brand-800 transition-colors">
+                          {a.title}
+                        </h3>
+                        <p className="mt-2 font-mono text-xs text-zinc-500">
+                          {new Date(a.publishedAt).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>
       )}
-    </>
+    </article>
   );
 }

@@ -1,90 +1,454 @@
-import { FileText, CheckCircle, FilePen, Users } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import {
+  FileText,
+  CheckCircle,
+  FilePen,
+  Users,
+  Plus,
+  ArrowUpRight,
+  ExternalLink,
+  Package,
+  Clock,
+  PenLine,
+} from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { dummyArticles, dummyUsers, dummyStats } from "@/lib/dummy-data";
+import { AdminPageHeader } from "@/components/admin/admin-page-header";
+import { getCurrentSession } from "@/lib/auth";
+import { db } from "@/lib/db";
 
-const statCards = [
-  { label: "Total Artikel", value: dummyStats.totalArticles, icon: FileText, color: "text-blue-700" },
-  { label: "Terbit", value: dummyStats.published, icon: CheckCircle, color: "text-green-600" },
-  { label: "Draft", value: dummyStats.draft, icon: FilePen, color: "text-amber-600" },
-  { label: "Total Pengguna", value: dummyStats.totalUsers, icon: Users, color: "text-purple-600" },
-];
+export const dynamic = "force-dynamic";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const session = await getCurrentSession();
+
+  if (!session) {
+    redirect("/admin/login");
+  }
+
+  const isSuperAdmin = session.user.role === "SUPER_ADMIN";
+  const currentUserId = session.user.id;
+
+  // Mengambil seluruh metrik statistik, artikel terbaru, dan ringkasan hak akses secara konkuren
+  const [
+    totalArticles,
+    publishedArticles,
+    draftArticles,
+    totalStock,
+    recentArticles,
+    superAdminUsers,
+    staffArticles,
+  ] = await Promise.all([
+    db.article.count(),
+    db.article.count({ where: { isPublished: true } }),
+    db.article.count({ where: { isPublished: false } }),
+    db.medicineStock.count(),
+    db.article.findMany({
+      take: 5,
+      orderBy: { updatedAt: "desc" },
+      include: {
+        category: {
+          select: { id: true, name: true, slug: true },
+        },
+        author: {
+          select: { id: true, name: true, username: true },
+        },
+      },
+    }),
+    isSuperAdmin
+      ? db.user.findMany({
+          where: { status: "ACTIVE" },
+          select: {
+            id: true,
+            name: true,
+            username: true,
+            role: true,
+            _count: {
+              select: { articles: true },
+            },
+          },
+          orderBy: [
+            { role: "asc" },
+            { name: "asc" },
+          ],
+        })
+      : Promise.resolve([]),
+    !isSuperAdmin
+      ? db.article.findMany({
+          where: { authorId: currentUserId },
+          take: 5,
+          orderBy: { updatedAt: "desc" },
+          include: {
+            category: {
+              select: { id: true, name: true, slug: true },
+            },
+          },
+        })
+      : Promise.resolve([]),
+  ]);
+
+  const statCards = [
+    {
+      label: "Total Artikel",
+      value: totalArticles,
+      href: "/admin/berita/",
+      icon: FileText,
+      glow: "bg-brand-500/15 text-brand-400 border-brand-500/30",
+      watermark: "text-brand-500/[0.05] group-hover:text-brand-500/[0.10]",
+      borderHover: "hover:border-brand-500/30",
+    },
+    {
+      label: "Artikel Terbit",
+      value: publishedArticles,
+      href: "/admin/berita/?status=terbit",
+      icon: CheckCircle,
+      glow: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+      watermark: "text-emerald-500/[0.05] group-hover:text-emerald-500/[0.10]",
+      borderHover: "hover:border-emerald-500/30",
+    },
+    {
+      label: "Artikel Draf",
+      value: draftArticles,
+      href: "/admin/berita/?status=draft",
+      icon: FilePen,
+      glow: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+      watermark: "text-amber-500/[0.05] group-hover:text-amber-500/[0.10]",
+      borderHover: "hover:border-amber-500/30",
+    },
+    {
+      label: "Master Stok Obat",
+      value: totalStock,
+      href: "/admin/stok/",
+      icon: Package,
+      glow: "bg-sky-500/15 text-sky-400 border-sky-500/30",
+      watermark: "text-sky-500/[0.05] group-hover:text-sky-500/[0.10]",
+      borderHover: "hover:border-sky-500/30",
+    },
+    ...(isSuperAdmin
+      ? [
+          {
+            label: "Pengguna Aktif",
+            value: superAdminUsers.length,
+            href: "/admin/pengguna/",
+            icon: Users,
+            glow: "bg-purple-500/15 text-purple-400 border-purple-500/30",
+            watermark: "text-purple-500/[0.05] group-hover:text-purple-500/[0.10]",
+            borderHover: "hover:border-purple-500/30",
+          },
+        ]
+      : []),
+  ];
+
   return (
-    <AdminShell>
-      <h1 className="text-xl font-bold text-slate-900">Dashboard</h1>
+    <AdminShell currentUser={session.user}>
+      {/* Header section with quick action */}
+      <AdminPageHeader
+        title="Dashboard"
+        description="Ringkasan status publikasi, inventaris obat, dan aktivitas portal IFK Kotabaru."
+        action={
+          <Link
+            href="/admin/berita/baru/"
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-500/30 bg-gradient-to-r from-brand-600 to-emerald-600 px-3.5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition-all hover:brightness-110"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Tulis Berita Baru</span>
+          </Link>
+        }
+      />
 
-      {/* Stat cards */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="flex items-center gap-4 pt-4">
-              <stat.icon className={`h-8 w-8 ${stat.color}`} />
-              <div>
-                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                <p className="text-sm text-slate-500">{stat.label}</p>
+      {/* Responsive Stat KPI cards (Grid 2 Kolom Mobile, 5 untuk Super Admin, 4 untuk Staf) */}
+      <div
+        className={`mt-6 grid grid-cols-2 gap-3 sm:gap-4 ${
+          isSuperAdmin ? "lg:grid-cols-3 xl:grid-cols-5" : "lg:grid-cols-4"
+        }`}
+      >
+        {statCards.map((stat, idx) => (
+          <Link
+            key={stat.label}
+            href={stat.href}
+            className={`group relative overflow-hidden rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-4 sm:p-5 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/40 cursor-pointer ${
+              stat.borderHover
+            } ${
+              isSuperAdmin && idx === 4 ? "col-span-2 sm:col-span-1" : ""
+            }`}
+          >
+            {/* Ornamen Watermark Icon Samar (Depth Effect) */}
+            <div
+              className={`pointer-events-none absolute -bottom-3 -right-3 transition-all duration-300 group-hover:scale-110 ${stat.watermark}`}
+            >
+              <stat.icon className="h-20 w-20 sm:h-24 sm:w-24 -rotate-12" />
+            </div>
+
+            <div className="relative z-10 flex h-full flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <div
+                  className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl border ${stat.glow}`}
+                >
+                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                </div>
+                <div className="flex items-center gap-0.5 text-[var(--admin-muted)] transition-colors group-hover:text-[var(--admin-text-main)]">
+                  <span className="text-[10px] font-medium opacity-0 sm:group-hover:opacity-100 transition-opacity">Buka</span>
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+              <div className="mt-3 sm:mt-4">
+                <p className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--admin-text-main)]">
+                  {stat.value}
+                </p>
+                <p className="mt-1 text-[11px] sm:text-xs font-medium text-[var(--admin-muted)]">
+                  {stat.label}
+                </p>
+              </div>
+            </div>
+          </Link>
         ))}
       </div>
 
-      {/* Tabel Artikel Terakhir */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-slate-900">Artikel Terakhir</h2>
-        <div className="mt-3 overflow-x-auto rounded-lg border bg-white">
-          <table className="w-full text-sm">
+      {/* Tabel 5 Artikel Terakhir Sistem */}
+      <div className="mt-8 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-5 backdrop-blur-xl">
+        <div className="flex items-center justify-between pb-4">
+          <div>
+            <h2 className="text-base font-semibold text-[var(--admin-text-main)] sm:text-lg">
+              Artikel Terakhir
+            </h2>
+            <p className="text-xs text-[var(--admin-muted)]">
+              5 artikel yang baru saja diperbarui atau dipublikasikan
+            </p>
+          </div>
+          <Link
+            href="/admin/berita/"
+            className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-500"
+          >
+            <span>Semua Berita</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border border-[var(--admin-border)]">
+          <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b bg-slate-50 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
-                <th className="px-4 py-3">Judul</th>
+              <tr className="border-b border-[var(--admin-border)] bg-[var(--admin-table-header-bg)] text-xs font-medium uppercase tracking-wider text-[var(--admin-muted)]">
+                <th className="px-4 py-3">Judul Artikel</th>
                 <th className="px-4 py-3">Kategori</th>
+                <th className="px-4 py-3">Penulis</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Tanggal</th>
+                <th className="px-4 py-3">Tanggal Terbit</th>
+                <th className="px-4 py-3 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody>
-              {dummyArticles.slice(0, 5).map((article) => (
-                <tr key={article.id} className="border-b last:border-b-0">
-                  <td className="px-4 py-3 font-medium text-slate-900">{article.title}</td>
-                  <td className="px-4 py-3 text-slate-600">{article.category}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={article.isPublished ? "default" : "secondary"}>
-                      {article.isPublished ? "Terbit" : "Draft"}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">
-                    {new Date(article.publishedAt).toLocaleDateString("id-ID")}
+            <tbody className="divide-y divide-[var(--admin-border)]">
+              {recentArticles.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-4 py-8 text-center text-sm text-[var(--admin-muted)]"
+                  >
+                    Belum ada rekaman artikel berita pada sistem.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                recentArticles.map((article) => (
+                  <tr
+                    key={article.id}
+                    className="transition-colors hover:bg-[var(--admin-hover-bg)]"
+                  >
+                    <td className="px-4 py-3 font-medium text-[var(--admin-text-main)]">
+                      {article.title}
+                    </td>
+                    <td className="px-4 py-3 text-[var(--admin-muted)]">
+                      <span className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] px-2 py-1 text-xs">
+                        {article.category?.name || "-"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-[var(--admin-muted)]">
+                      {article.author?.name || article.author?.username || "-"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {article.isPublished ? (
+                        <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                          Terbit
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+                          Draft
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-[var(--admin-muted)]">
+                      {article.publishedAt
+                        ? new Date(article.publishedAt).toLocaleDateString(
+                            "id-ID",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Link
+                        href={`/admin/berita/${article.id}/edit/`}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-[var(--admin-muted)] transition-colors hover:text-[var(--admin-text-main)]"
+                      >
+                        <span>Edit</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Daftar Pengguna Aktif */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-slate-900">Pengguna Aktif</h2>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {dummyUsers.map((user) => (
-            <Card key={user.id}>
-              <CardContent className="flex items-center gap-3 pt-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                  {user.name.charAt(0)}
+      {/* Bagian Bawah Berbasis Peran (RBAC) */}
+      {isSuperAdmin ? (
+        /* Tampilan Super Admin: Pengelola Akun Aktif */
+        <div className="mt-8 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between pb-4">
+            <div>
+              <h2 className="text-base font-semibold text-[var(--admin-text-main)] sm:text-lg">
+                Pengelola Akun Aktif
+              </h2>
+              <p className="text-xs text-[var(--admin-muted)]">
+                Daftar staf dan pengelola akun admin portal
+              </p>
+            </div>
+            <Link
+              href="/admin/pengguna/"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-500"
+            >
+              <span>Kelola Pengguna</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {superAdminUsers.map((user) => (
+              <div
+                key={user.id}
+                className="flex items-center gap-3.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-3.5 transition-colors hover:border-brand-500/30"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-brand-500/30 bg-brand-500/20 text-sm font-bold text-brand-600 dark:text-brand-300">
+                  {user.name.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                  <Badge variant={user.role === "SUPER_ADMIN" ? "default" : "secondary"} className="mt-0.5 text-xs">
-                    {user.role}
-                  </Badge>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-sm font-medium text-[var(--admin-text-main)]">
+                      {user.name}
+                    </p>
+                  </div>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                        user.role === "SUPER_ADMIN"
+                          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : "border-[var(--admin-border)] bg-[var(--admin-card-bg)] text-[var(--admin-muted)]"
+                      }`}
+                    >
+                      {user.role}
+                    </span>
+                    <span className="text-[11px] text-[var(--admin-muted)]">
+                      {user._count.articles} artikel ditulis
+                    </span>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Tampilan Staf: Ringkasan Artikel Saya */
+        <div className="mt-8 rounded-xl border border-[var(--admin-card-border)] bg-[var(--admin-card-bg)] p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between pb-4">
+            <div>
+              <h2 className="text-base font-semibold text-[var(--admin-text-main)] sm:text-lg">
+                Artikel Saya
+              </h2>
+              <p className="text-xs text-[var(--admin-muted)]">
+                Daftar artikel yang baru saja Anda kelola atau buat
+              </p>
+            </div>
+            <Link
+              href="/admin/berita/baru/"
+              className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-500"
+            >
+              <span>Tulis Berita Baru</span>
+              <Plus className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {staffArticles.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-8 text-center">
+              <PenLine className="mx-auto h-8 w-8 text-[var(--admin-muted)]" />
+              <p className="mt-2 text-sm font-medium text-[var(--admin-text-main)]">
+                Anda belum memiliki rekaman naskah artikel
+              </p>
+              <p className="mt-1 text-xs text-[var(--admin-muted)]">
+                Mulai publikasikan informasi, agenda kegiatan, atau sosialisasi kefarmasian.
+              </p>
+              <div className="mt-4">
+                <Link
+                  href="/admin/berita/baru/"
+                  className="inline-flex items-center gap-2 rounded-lg border border-brand-500/30 bg-brand-600/20 px-3 py-1.5 text-xs font-medium text-brand-600 dark:text-brand-300 transition-colors hover:bg-brand-600/30"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Buat Artikel Pertama</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {staffArticles.map((article) => (
+                <div
+                  key={article.id}
+                  className="flex flex-col justify-between rounded-lg border border-[var(--admin-border)] bg-[var(--admin-hover-bg)] p-4 transition-colors hover:border-brand-500/30"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-2 py-0.5 text-[11px] text-[var(--admin-muted)]">
+                        {article.category?.name || "Umum"}
+                      </span>
+                      {article.isPublished ? (
+                        <span className="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                          Terbit
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                          Draft
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="mt-2 line-clamp-2 text-sm font-medium text-[var(--admin-text-main)]">
+                      {article.title}
+                    </h3>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between border-t border-[var(--admin-border)] pt-3">
+                    <span className="flex items-center gap-1 text-[11px] text-[var(--admin-muted)]">
+                      <Clock className="h-3 w-3" />
+                      {new Date(article.updatedAt).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <Link
+                      href={`/admin/berita/${article.id}/edit/`}
+                      className="inline-flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 transition-colors hover:text-brand-500"
+                    >
+                      <span>Lanjutkan Edit</span>
+                      <ExternalLink className="h-3 w-3" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </AdminShell>
   );
 }
