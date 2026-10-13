@@ -59,6 +59,7 @@ import {
 } from "@/actions/stock";
 import { calculateMos, determineStockStatus } from "@/lib/stock-calc";
 import { exportStockToExcel } from "@/lib/stock-exporter";
+import { matchMedicineSearch } from "@/lib/medicine-search";
 import { StockForm } from "./stock-form";
 import { ModalScrollArea } from "@/components/ui/modal-scroll-area";
 
@@ -349,15 +350,7 @@ export function StockTable({
           selectedStatuses.length === 0 ||
           selectedStatuses.includes(getItemEffectiveStatus(item))
       )
-      .filter((item) => {
-        const query = search.toLowerCase();
-        return (
-          item.name.toLowerCase().includes(query) ||
-          item.code.toLowerCase().includes(query) ||
-          item.category.toLowerCase().includes(query) ||
-          (item.nomenklatur && item.nomenklatur.toLowerCase().includes(query))
-        );
-      });
+      .filter((item) => matchMedicineSearch(item, search));
   }, [items, search, selectedCategories, selectedStatuses]);
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
