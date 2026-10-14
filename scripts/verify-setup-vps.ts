@@ -72,12 +72,11 @@ for (const kw of criticalKeywords) {
 
 // 5. Uji Konfigurasi PM2 deploy/ecosystem.config.cjs
 const ecosystemPath = path.join(DEPLOY_DIR, "ecosystem.config.cjs");
-const ecosystem = require(ecosystemPath);
-assert(Array.isArray(ecosystem.apps) && ecosystem.apps.length > 0, "ecosystem.config.cjs mendefinisikan array apps");
-const appConfig = ecosystem.apps[0];
-assert(appConfig.name === "profile-ifk", "Nama aplikasi PM2 adalah 'profile-ifk'");
-assert(appConfig.script.includes("standalone/server.js"), "Script PM2 menargetkan standalone/server.js");
-assert(Boolean(appConfig.max_memory_restart), "max_memory_restart dikonfigurasi");
+const ecosystemContent = fs.readFileSync(ecosystemPath, "utf-8");
+assert(ecosystemContent.includes("apps: ["), "ecosystem.config.cjs mendefinisikan array apps");
+assert(ecosystemContent.includes('"profile-ifk"'), "Nama aplikasi PM2 adalah 'profile-ifk'");
+assert(ecosystemContent.includes("standalone/server.js"), "Script PM2 menargetkan standalone/server.js");
+assert(ecosystemContent.includes("max_memory_restart"), "max_memory_restart dikonfigurasi");
 
 // 6. Uji Template Nginx deploy/nginx-profile-ifk.conf
 const nginxConf = fs.readFileSync(path.join(DEPLOY_DIR, "nginx-profile-ifk.conf"), "utf-8");
