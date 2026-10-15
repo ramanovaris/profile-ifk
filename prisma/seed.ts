@@ -78,17 +78,17 @@ async function main() {
     // Fallback minimal jika berkas snapshot tidak ditemukan
     const fallbackPassword = await bcrypt.hash("AdminIFK2026!", 10);
     const admin = await prisma.user.upsert({
-      where: { username: "admin" },
+      where: { username: "superadmin" },
       update: {},
       create: {
-        username: "admin",
+        username: "superadmin",
         password: fallbackPassword,
         name: "Administrator IFK Kotabaru",
         role: Role.SUPER_ADMIN,
         status: UserStatus.ACTIVE,
       },
     });
-    userMap["admin"] = admin.id;
+    userMap["superadmin"] = admin.id;
   }
 
   // 3. Sinkronisasi Kategori Berita (Category)

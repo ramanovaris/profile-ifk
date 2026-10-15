@@ -193,11 +193,17 @@ export async function updateUserAction(
     }
 
     // Proteksi akun super admin utama
-    if (targetUser.username === "admin") {
-      if (trimmedUsername !== "admin") {
+    const isTargetRootAdmin =
+      targetUser.username.toLowerCase() === "superadmin" ||
+      targetUser.username.toLowerCase() === "admin";
+    if (isTargetRootAdmin) {
+      if (
+        trimmedUsername !== "superadmin" &&
+        trimmedUsername !== targetUser.username.toLowerCase()
+      ) {
         return {
           success: false,
-          error: "Username akun Super Admin utama ('admin') tidak dapat diubah.",
+          error: "Username akun Super Admin utama ('superadmin') tidak dapat diubah.",
         };
       }
       if (data.role !== "SUPER_ADMIN") {
@@ -314,7 +320,10 @@ export async function toggleUserStatusAction(
       };
     }
 
-    if (targetUser.username === "admin") {
+    if (
+      targetUser.username.toLowerCase() === "superadmin" ||
+      targetUser.username.toLowerCase() === "admin"
+    ) {
       return {
         success: false,
         error: "Status akun Super Admin utama tidak dapat dinonaktifkan.",
@@ -481,10 +490,13 @@ export async function deleteUserAction(
       };
     }
 
-    if (targetUser.username.toLowerCase() === "admin") {
+    if (
+      targetUser.username.toLowerCase() === "superadmin" ||
+      targetUser.username.toLowerCase() === "admin"
+    ) {
       return {
         success: false,
-        error: "Akun Super Admin utama ('admin') dilindungi sistem dan tidak dapat dihapus.",
+        error: "Akun Super Admin utama ('superadmin') dilindungi sistem dan tidak dapat dihapus.",
       };
     }
 
