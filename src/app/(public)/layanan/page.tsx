@@ -369,13 +369,13 @@ export default async function LayananPage() {
           <Reveal>
             <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
               <div>
-                <span className="eyebrow bg-red-50 text-red-700">Karantina &amp; Retur</span>
+                <span className="eyebrow bg-red-50 text-red-700">Karantina &amp; Pemusnahan</span>
                 <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
                   Penanganan Obat Rusak &amp; Kedaluwarsa
                 </h2>
               </div>
               <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Tata cara pelaporan, pengembalian, dan karantina perbekalan farmasi rusak atau kedaluwarsa
+                Tata cara pelaporan, serah terima, dan karantina perbekalan farmasi rusak atau kedaluwarsa
                 dari fasilitas kesehatan untuk dimusnahkan sesuai regulasi.
               </p>
             </div>
@@ -389,7 +389,7 @@ export default async function LayananPage() {
                 </span>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-red-950">
-                    Prosedur Pengembalian Obat Rusak / Kedaluwarsa
+                    Prosedur Penanganan Obat Rusak / Kedaluwarsa
                   </h3>
                   <p className="text-xs text-red-800">Karantina terpusat demi mencegah penyalahgunaan obat kedaluwarsa</p>
                 </div>
