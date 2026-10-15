@@ -14,6 +14,8 @@ import {
   Menu,
   Tags,
   Package,
+  Globe,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -132,6 +134,16 @@ function SidebarContent({
 
       {/* Bottom section */}
       <div className="mt-auto px-3 pb-4">
+        <Link
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group mb-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[var(--admin-muted)] transition-all duration-200 hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)]"
+        >
+          <Globe className="h-4 w-4 text-[var(--admin-muted)] group-hover:text-[var(--admin-text-main)] transition-colors shrink-0" />
+          <span className="flex-1">Lihat Website</span>
+          <ExternalLink className="h-3.5 w-3.5 opacity-60 group-hover:opacity-100 transition-opacity shrink-0" />
+        </Link>
         <Separator className="mb-4 bg-[var(--admin-border)]" />
         <form action={logoutAction}>
           <Button
@@ -316,7 +328,20 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
           </Sheet>
 
           {/* Right Header Admin Info */}
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-9 w-9 sm:w-auto sm:px-3 items-center justify-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] shadow-xs transition-all hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] focus:outline-none focus:ring-2 focus:ring-brand-500/40"
+              title="Lihat Website Publik (Buka di tab baru)"
+              aria-label="Lihat Website Publik"
+            >
+              <Globe className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline text-xs sm:text-sm font-medium">Lihat Website</span>
+              <ExternalLink className="hidden sm:inline h-3 w-3 shrink-0 opacity-60" />
+            </Link>
+
             <ThemeDropdown
               themeSetting={themeSetting}
               onThemeChange={handleThemeChange}
