@@ -72,12 +72,12 @@ export function PublicStockClientView({
 
   // URL query status
   const rawStatus = searchParams.get("status");
-  const selectedStatuses = useMemo(() => {
+  const selectedStatuses = useMemo<StockStatus[]>(() => {
     return rawStatus
-      ? rawStatus
+      ? (rawStatus
           .split(",")
           .map((s) => s.trim().toUpperCase())
-          .filter((s) => s === "AVAILABLE" || s === "LOW")
+          .filter((s) => s === "AVAILABLE" || s === "LOW") as StockStatus[])
       : [];
   }, [rawStatus]);
 
