@@ -142,6 +142,14 @@ export const getSiteSettings = cache(async (): Promise<SiteSetting> => {
 });
 
 /**
+ * Mendapatkan tautan bantuan teknis WhatsApp untuk panel admin.
+ */
+export async function getAdminSupportWhatsAppAction(): Promise<string> {
+  const setting = await getSiteSettings();
+  return setting.whatsappLink || siteConfig.whatsappLink || "https://wa.me/6281234567890";
+}
+
+/**
  * Memperbarui data identitas & kontak instansi di PostgreSQL.
  * Memerlukan otentikasi sesi aktif dengan peran SUPER_ADMIN.
  */
