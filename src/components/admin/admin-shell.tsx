@@ -248,26 +248,29 @@ export function AdminShell({ children, currentUser, whatsappLink }: AdminShellPr
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [fetchedUser, setFetchedUser] = useState<AuthUserInfo | null>(null);
-  const [supportWhatsAppUrl, setSupportWhatsAppUrl] = useState<string>(() =>
-    formatWhatsAppSupportUrl(whatsappLink)
-  );
+  const [asyncSupportUrl, setAsyncSupportUrl] = useState<string | null>(null);
 
   const [themeSetting, setThemeSetting] = useState<ThemeSetting>(getInitialAdminTheme);
   const [systemIsDark, setSystemIsDark] = useState<boolean>(getInitialSystemDark);
 
   useEffect(() => {
-    if (whatsappLink) {
-      setSupportWhatsAppUrl(formatWhatsAppSupportUrl(whatsappLink));
-      return;
-    }
+    if (whatsappLink) return;
+    let mounted = true;
     getAdminSupportWhatsAppAction()
       .then((link) => {
-        if (link) setSupportWhatsAppUrl(formatWhatsAppSupportUrl(link));
+        if (mounted && link) setAsyncSupportUrl(formatWhatsAppSupportUrl(link));
       })
       .catch(() => {
         // Fallback default
       });
+    return () => {
+      mounted = false;
+    };
   }, [whatsappLink]);
+
+  const supportWhatsAppUrl = whatsappLink
+    ? formatWhatsAppSupportUrl(whatsappLink)
+    : asyncSupportUrl || formatWhatsAppSupportUrl(siteConfig.whatsappLink);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
