@@ -7,7 +7,6 @@ import {
   Package,
   CheckCircle2,
   AlertTriangle,
-  XCircle,
   Calendar,
   ChevronLeft,
   ChevronRight,
@@ -73,12 +72,12 @@ export function PublicStockClientView({
 
   // URL query status
   const rawStatus = searchParams.get("status");
-  const selectedStatuses = useMemo(() => {
+  const selectedStatuses = useMemo<StockStatus[]>(() => {
     return rawStatus
-      ? rawStatus
+      ? (rawStatus
           .split(",")
           .map((s) => s.trim().toUpperCase())
-          .filter(Boolean)
+          .filter((s) => s === "AVAILABLE" || s === "LOW") as StockStatus[])
       : [];
   }, [rawStatus]);
 
@@ -167,12 +166,6 @@ export function PublicStockClientView({
       indicatorColor: "bg-amber-500",
       count: summary.lowItems,
     },
-    {
-      value: "EMPTY",
-      label: "Kosong",
-      indicatorColor: "bg-rose-500",
-      count: summary.emptyItems,
-    },
   ], [summary]);
 
   const periodOptions = useMemo(() => {
@@ -207,7 +200,6 @@ export function PublicStockClientView({
   const isAllActive = selectedStatuses.length === 0;
   const isAvailableActive = selectedStatuses.includes("AVAILABLE");
   const isLowActive = selectedStatuses.includes("LOW");
-  const isEmptyActive = selectedStatuses.includes("EMPTY");
 
   // Handler interaksi kartu ringkasan
   const handleCardStatusClick = (statusKey?: StockStatus) => {
@@ -232,7 +224,7 @@ export function PublicStockClientView({
     }
     if (selectedStatuses.length > 0) {
       const statusNames = selectedStatuses.map((s) =>
-        s === "AVAILABLE" ? "Aman" : s === "LOW" ? "Menipis" : "Kosong"
+        s === "AVAILABLE" ? "Aman" : "Menipis"
       );
       activeFilters.push(`Status: ${statusNames.join(", ")}`);
     }
@@ -315,7 +307,7 @@ export function PublicStockClientView({
 
           {/* ── Kartu Metrik Ringkasan Interaktif ─────────────────── */}
           <Reveal delay={60} className="relative z-10">
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            <div className="mt-8 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-3">
               {/* Total Item */}
               <button
                 type="button"
@@ -404,36 +396,6 @@ export function PublicStockClientView({
                   )}
                 </div>
                 <p className="mt-1 text-xs text-amber-700/80">Di bawah batas buffer</p>
-              </button>
-
-              {/* Stok Kosong */}
-              <button
-                type="button"
-                onClick={() => handleCardStatusClick("EMPTY")}
-                aria-pressed={isEmptyActive}
-                className={cn(
-                  "group relative w-full text-left rounded-2xl border p-3.5 sm:p-5 shadow-xs transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]",
-                  isEmptyActive
-                    ? "border-rose-500/60 bg-rose-500/15 ring-2 ring-rose-500/30"
-                    : "border-rose-500/20 bg-rose-500/5 hover:border-rose-500/40 hover:bg-rose-500/10"
-                )}
-              >
-                <div className="flex items-center gap-2 text-rose-700">
-                  <XCircle className="h-4 w-4" />
-                  <span className="text-xs font-medium">Stok Kosong</span>
-                </div>
-                <div className="mt-2 flex items-center justify-between gap-1.5">
-                  <p className="text-2xl sm:text-3xl font-bold tracking-tight text-rose-800 truncate">
-                    {summary.emptyItems}
-                  </p>
-                  {isEmptyActive && (
-                    <span className="inline-flex shrink-0 whitespace-nowrap items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">
-                      <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                      Aktif
-                    </span>
-                  )}
-                </div>
-                <p className="mt-1 text-xs text-rose-700/80">Dalam proses pengadaan</p>
               </button>
             </div>
           </Reveal>
@@ -718,16 +680,6 @@ export function PublicStockClientView({
                       </span>
                       <p className="text-xs text-muted leading-snug">
                         Stok sangat minim di bawah 1 bulan pemakaian (&lt; 1 bln).
-                      </p>
-                    </div>
-
-                    <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-surface/80 p-2.5">
-                      <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-full border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-700 dark:text-rose-400">
-                        <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                        Kosong
-                      </span>
-                      <p className="text-xs text-muted leading-snug">
-                        Sisa stok fisik di gudang 0 (dalam proses pengadaan).
                       </p>
                     </div>
 
