@@ -83,7 +83,7 @@ async function main() {
       create: {
         username: "superadmin",
         password: fallbackPassword,
-        name: "Administrator IFK Kotabaru",
+        name: "Super Admin IFK",
         role: Role.SUPER_ADMIN,
         status: UserStatus.ACTIVE,
       },
