@@ -35,4 +35,10 @@ assert.strictEqual(
   `Found unexpected 'pengembalian' occurrence: ${pengembalianMatches}`
 );
 
-console.log("✓ All content assertions passed: section is clean of 'retur' & 'pengembalian'.");
+// 5. Check item with 'berat'
+assert.ok(
+  content.includes("Rincian nama, jumlah, berat, batch, ED"),
+  "Must include 'Rincian nama, jumlah, berat, batch, ED'"
+);
+
+console.log("✓ All content assertions passed: section is clean of 'retur' & 'pengembalian', includes 'berat'.");

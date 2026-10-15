@@ -412,7 +412,7 @@ export default async function LayananPage() {
                   <ul className="mt-2 list-inside list-disc space-y-1 text-xs sm:text-sm text-red-950/80">
                     <li>Surat pengantar Kepala Faskes</li>
                     <li>Berita Acara Serah Terima (BAST)</li>
-                    <li>Rincian nama, jumlah, batch, ED</li>
+                    <li>Rincian nama, jumlah, berat, batch, ED</li>
                     <li>Dokumentasi foto fisik obat</li>
                   </ul>
                 </div>
