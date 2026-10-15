@@ -41,4 +41,18 @@ assert.ok(
   "Must include 'Rincian nama, jumlah, berat, batch, ED'"
 );
 
-console.log("✓ All content assertions passed: section is clean of 'retur' & 'pengembalian', includes 'berat'.");
+// 6. Check Mei & H-1 mechanism
+assert.ok(
+  content.includes("Periode &amp; Konfirmasi"),
+  "Must include 'Periode &amp; Konfirmasi'"
+);
+assert.ok(
+  content.includes("bulan Mei"),
+  "Must mention 'bulan Mei'"
+);
+assert.ok(
+  content.includes("minimal H-1"),
+  "Must mention 'minimal H-1'"
+);
+
+console.log("✓ All content assertions passed: section is clean of 'retur' & 'pengembalian', includes 'berat', 'bulan Mei', and 'H-1'.");

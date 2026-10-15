@@ -398,10 +398,10 @@ export default async function LayananPage() {
               <div className="mt-6 grid gap-6 border-t border-red-200/60 pt-6 sm:grid-cols-3">
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-red-900">
-                    Waktu Pelaporan
+                    Periode &amp; Konfirmasi
                   </h4>
                   <p className="mt-2 text-xs sm:text-sm leading-relaxed text-red-950/80">
-                    Laporan diajukan paling lambat <strong>7 hari kerja</strong> sejak ditemukannya perbekalan rusak atau kedaluwarsa di unit faskes.
+                    Penerimaan dibuka <strong>1 kali setahun khusus bulan Mei</strong> (selama 1 bulan penuh). Faskes wajib konfirmasi jadwal kedatangan <strong>minimal H-1</strong> agar petugas menyiapkan tempat karantina.
                   </p>
                 </div>
 
