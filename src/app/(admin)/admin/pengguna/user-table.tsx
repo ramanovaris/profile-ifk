@@ -70,6 +70,11 @@ type UserFormData = {
   status: UserStatus;
 };
 
+const isRootAdminAccount = (username?: string | null) => {
+  const u = username?.toLowerCase();
+  return u === "superadmin" || u === "admin";
+};
+
 export function UserTable({
   initialUsers,
   currentUserId,
@@ -273,7 +278,7 @@ export function UserTable({
 
   // Handler Toggle Status Akun
   const handleOpenToggleStatus = (user: UserItem) => {
-    if (user.username.toLowerCase() === "admin") {
+    if (isRootAdminAccount(user.username)) {
       toast.error("Status Administrator Utama selalu aktif.");
       return;
     }
@@ -376,7 +381,7 @@ export function UserTable({
 
   // Target Hapus Pengguna
   const userToDelete = users.find((u) => u.id === deleteId);
-  const isRootAdmin = userToDelete?.username.toLowerCase() === "admin";
+  const isRootAdmin = isRootAdminAccount(userToDelete?.username);
   const isSelf = userToDelete?.id === currentUserId;
   const hasArticles = (userToDelete?.articleCount ?? 0) > 0;
   const isProtectedFromDelete = isRootAdmin || isSelf;
@@ -654,11 +659,11 @@ export function UserTable({
                           onClick={() => handleOpenToggleStatus(user)}
                           disabled={
                             isPending ||
-                            user.username.toLowerCase() === "admin" ||
+                            isRootAdminAccount(user.username) ||
                             user.id === currentUserId
                           }
                           title={
-                            user.username.toLowerCase() === "admin"
+                            isRootAdminAccount(user.username)
                               ? "Status Administrator Utama selalu aktif"
                               : user.id === currentUserId
                               ? "Tidak dapat menonaktifkan akun sendiri"
@@ -669,7 +674,7 @@ export function UserTable({
                               ? "border-emerald-700 bg-emerald-700 text-white shadow-xs"
                               : "border-[var(--admin-border)] bg-[var(--admin-hover-bg)] text-[var(--admin-muted)]"
                           } ${
-                            user.username.toLowerCase() === "admin" ||
+                            isRootAdminAccount(user.username) ||
                             user.id === currentUserId
                               ? "cursor-not-allowed opacity-80"
                               : ""
@@ -720,7 +725,7 @@ export function UserTable({
                             type="button"
                             onClick={() => setDeleteId(user.id)}
                             title={
-                              user.username.toLowerCase() === "admin"
+                              isRootAdminAccount(user.username)
                                 ? "Akun Administrator Utama tidak dapat dihapus"
                                 : user.id === currentUserId
                                 ? "Tidak dapat menghapus akun sendiri"
@@ -910,7 +915,7 @@ export function UserTable({
               <Input
                 id="userUsername"
                 value={formData.username}
-                disabled={editUser?.username.toLowerCase() === "admin"}
+                disabled={isRootAdminAccount(editUser?.username)}
                 onChange={(e) => {
                   setFormData((prev) => ({
                     ...prev,
@@ -921,7 +926,7 @@ export function UserTable({
                 placeholder="Contoh: sitinur"
                 className="h-10 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] px-3 py-2 text-sm font-mono text-[var(--admin-text-main)] placeholder:text-[var(--admin-muted)] focus-visible:border-brand-500/60 focus-visible:ring-2 focus-visible:ring-brand-500/40 outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               />
-              {editUser?.username.toLowerCase() === "admin" && (
+              {isRootAdminAccount(editUser?.username) && (
                 <p className="text-[11px] text-amber-600 dark:text-amber-400">
                   Username akun Administrator Utama tidak dapat diubah.
                 </p>
@@ -937,13 +942,13 @@ export function UserTable({
               <div className="grid grid-cols-2 gap-2.5">
                 <button
                   type="button"
-                  disabled={editUser?.username.toLowerCase() === "admin"}
+                  disabled={isRootAdminAccount(editUser?.username)}
                   onClick={() => setFormData((prev) => ({ ...prev, role: "STAFF" }))}
                   className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all cursor-pointer ${
                     formData.role === "STAFF"
                       ? "border-sky-500/50 bg-sky-50 dark:bg-sky-500/10 text-sky-800 dark:text-sky-200 shadow-sm"
                       : "border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)]"
-                  } ${editUser?.username.toLowerCase() === "admin" ? "cursor-not-allowed opacity-50" : ""}`}
+                  } ${isRootAdminAccount(editUser?.username) ? "cursor-not-allowed opacity-50" : ""}`}
                 >
                   <span className="font-semibold text-xs text-[var(--admin-text-main)]">Staff</span>
                   <span className="text-[11px] text-[var(--admin-muted)]">
@@ -986,7 +991,7 @@ export function UserTable({
                 type="button"
                 role="switch"
                 disabled={
-                  editUser?.username.toLowerCase() === "admin" ||
+                  isRootAdminAccount(editUser?.username) ||
                   editUser?.id === currentUserId
                 }
                 aria-checked={formData.status === "ACTIVE"}
@@ -997,7 +1002,7 @@ export function UserTable({
                   }))
                 }
                 title={
-                  editUser?.username.toLowerCase() === "admin"
+                  isRootAdminAccount(editUser?.username)
                     ? "Status Administrator Utama selalu aktif"
                     : editUser?.id === currentUserId
                     ? "Tidak dapat mengubah status akun sendiri"
@@ -1006,7 +1011,7 @@ export function UserTable({
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-opacity-75 ${
                   formData.status === "ACTIVE" ? "bg-emerald-600" : "bg-zinc-400 dark:bg-zinc-700"
                 } ${
-                  editUser?.username.toLowerCase() === "admin" ||
+                  isRootAdminAccount(editUser?.username) ||
                   editUser?.id === currentUserId
                     ? "cursor-not-allowed opacity-60"
                     : ""

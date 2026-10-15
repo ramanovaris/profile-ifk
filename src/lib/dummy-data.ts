@@ -84,7 +84,7 @@ export const siteConfig: SiteConfig = {
 export const dummyUsers: User[] = [
   {
     id: "usr-1",
-    username: "admin",
+    username: "superadmin",
     name: "Administrator",
     role: "SUPER_ADMIN",
     status: "ACTIVE",
