@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { 
   initialMedicineStock, 
+  getItemEffectiveStatus,
   type MedicineStockItem, 
   type MedicineCategory, 
   type StockStatus 
@@ -90,29 +91,35 @@ export default async function StokPublikPage({ searchParams }: StokPublikPagePro
     }
 
     const dbStocks = await db.medicineStock.findMany({
-      where: { period: activePeriod },
+      where: {
+        period: activePeriod,
+        status: { not: "EMPTY" },
+        quantity: { gt: 0 },
+      },
       orderBy: {
         name: "asc",
       },
     });
 
     if (dbStocks.length > 0) {
-      items = dbStocks.map((s) => ({
-        id: s.id,
-        period: s.period,
-        code: s.code,
-        name: s.name,
-        category: s.category as MedicineCategory,
-        unit: s.unit,
-        quantity: s.quantity,
-        status: s.status as StockStatus,
-        updatedAt: s.updatedAt.toISOString(),
-        avgUsage: s.avgUsage,
-        mos: s.mos,
-        expiryDate: s.expiryDate,
-        nomenklatur: s.nomenklatur,
-        source: s.source,
-      }));
+      items = dbStocks
+        .map((s) => ({
+          id: s.id,
+          period: s.period,
+          code: s.code,
+          name: s.name,
+          category: s.category as MedicineCategory,
+          unit: s.unit,
+          quantity: s.quantity,
+          status: s.status as StockStatus,
+          updatedAt: s.updatedAt.toISOString(),
+          avgUsage: s.avgUsage,
+          mos: s.mos,
+          expiryDate: s.expiryDate,
+          nomenklatur: s.nomenklatur,
+          source: s.source,
+        }))
+        .filter((item) => getItemEffectiveStatus(item) !== "EMPTY");
     }
   } catch (err) {
     console.error("[StokPublikPage] Gagal mengambil data stok dari basis data:", err);
@@ -120,7 +127,7 @@ export default async function StokPublikPage({ searchParams }: StokPublikPagePro
 
   // Graceful fallback ke initialMedicineStock jika basis data kosong
   if (items.length === 0) {
-    items = initialMedicineStock;
+    items = initialMedicineStock.filter((s) => getItemEffectiveStatus(s) !== "EMPTY");
   }
 
   return (
