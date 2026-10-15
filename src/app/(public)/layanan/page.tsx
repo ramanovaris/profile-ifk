@@ -369,13 +369,13 @@ export default async function LayananPage() {
           <Reveal>
             <div className="flex flex-col gap-3 pb-8 sm:flex-row sm:items-end sm:justify-between sm:border-b sm:border-border sm:pb-10">
               <div>
-                <span className="eyebrow bg-red-50 text-red-700">Karantina &amp; Retur</span>
+                <span className="eyebrow bg-red-50 text-red-700">Karantina &amp; Pemusnahan</span>
                 <h2 className="mt-3 text-2xl font-bold tracking-tight text-heading sm:text-3xl lg:text-4xl">
                   Penanganan Obat Rusak &amp; Kedaluwarsa
                 </h2>
               </div>
               <p className="max-w-[48ch] text-xs sm:text-sm leading-relaxed text-zinc-600">
-                Tata cara pelaporan, pengembalian, dan karantina perbekalan farmasi rusak atau kedaluwarsa
+                Tata cara pelaporan, serah terima, dan karantina perbekalan farmasi rusak atau kedaluwarsa
                 dari fasilitas kesehatan untuk dimusnahkan sesuai regulasi.
               </p>
             </div>
@@ -389,7 +389,7 @@ export default async function LayananPage() {
                 </span>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-red-950">
-                    Prosedur Pengembalian Obat Rusak / Kedaluwarsa
+                    Prosedur Penanganan Obat Rusak / Kedaluwarsa
                   </h3>
                   <p className="text-xs text-red-800">Karantina terpusat demi mencegah penyalahgunaan obat kedaluwarsa</p>
                 </div>
@@ -398,10 +398,10 @@ export default async function LayananPage() {
               <div className="mt-6 grid gap-6 border-t border-red-200/60 pt-6 sm:grid-cols-3">
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-red-900">
-                    Waktu Pelaporan
+                    Periode &amp; Konfirmasi
                   </h4>
                   <p className="mt-2 text-xs sm:text-sm leading-relaxed text-red-950/80">
-                    Laporan diajukan paling lambat <strong>7 hari kerja</strong> sejak ditemukannya perbekalan rusak atau kedaluwarsa di unit faskes.
+                    Penerimaan dibuka <strong>1 kali setahun khusus bulan Mei</strong> (selama 1 bulan penuh). Faskes wajib konfirmasi jadwal kedatangan <strong>minimal H-1</strong> agar petugas menyiapkan tempat karantina.
                   </p>
                 </div>
 
@@ -412,7 +412,7 @@ export default async function LayananPage() {
                   <ul className="mt-2 list-inside list-disc space-y-1 text-xs sm:text-sm text-red-950/80">
                     <li>Surat pengantar Kepala Faskes</li>
                     <li>Berita Acara Serah Terima (BAST)</li>
-                    <li>Rincian nama, jumlah, batch, ED</li>
+                    <li>Rincian nama, jumlah, berat, batch, ED</li>
                     <li>Dokumentasi foto fisik obat</li>
                   </ul>
                 </div>
