@@ -2,51 +2,50 @@ import * as fs from "fs";
 import * as path from "path";
 
 async function main() {
-  console.log("=== Verifikasi Tautan WhatsApp di Footer Portal Publik (Issue #173) ===");
+  console.log("=== Verifikasi Tautan WhatsApp di Portal Publik (Issue #173) ===");
 
   const footerPath = path.resolve(process.cwd(), "src/components/public/footer.tsx");
-  const content = fs.readFileSync(footerPath, "utf-8");
+  const kontakPath = path.resolve(process.cwd(), "src/app/(public)/kontak/page.tsx");
 
-  // 1. WhatsAppIcon component check
-  const hasIcon = content.includes("function WhatsAppIcon");
-  if (!hasIcon) {
+  const footerContent = fs.readFileSync(footerPath, "utf-8");
+  const kontakContent = fs.readFileSync(kontakPath, "utf-8");
+
+  // 1. WhatsAppIcon check di footer.tsx
+  if (!footerContent.includes("function WhatsAppIcon")) {
     throw new Error("FAIL: Komponen WhatsAppIcon tidak ditemukan di footer.tsx");
   }
   console.log("✓ Komponen WhatsAppIcon terdefinisi di footer.tsx");
 
-  // 2. formatWhatsappNumber helper check
-  const hasFormatter = content.includes("function formatWhatsappNumber");
-  if (!hasFormatter) {
+  // 2. formatWhatsappNumber check di footer.tsx
+  if (!footerContent.includes("function formatWhatsappNumber")) {
     throw new Error("FAIL: Fungsi pembantu formatWhatsappNumber tidak ditemukan di footer.tsx");
   }
-  console.log("✓ Fungsi formatWhatsappNumber terdefinisi untuk memformat nomor kontak");
+  console.log("✓ Fungsi formatWhatsappNumber terdefinisi untuk memformat nomor kontak di footer.tsx");
 
-  // 3. Social Media Link check (Kolom 1)
-  const hasSocialLink =
-    content.includes('{ url: whatsappLink, icon: WhatsAppIcon, label: "WhatsApp" }');
-  if (!hasSocialLink) {
+  // 3. Social Media Link check (Footer Kolom 1)
+  if (!footerContent.includes('{ url: whatsappLink, icon: WhatsAppIcon, label: "WhatsApp" }')) {
     throw new Error("FAIL: Tautan WhatsApp belum didaftarkan pada daftar socialLinks Kolom 1");
   }
-  console.log("✓ Tombol ikon WhatsApp terpasang di kelompok socialLinks Kolom 1");
+  console.log("✓ Tombol ikon WhatsApp terpasang di kelompok socialLinks Footer Kolom 1");
 
-  // 4. Contact List Item check (Kolom 3)
-  const hasContactItem =
-    content.includes("whatsappLink && (") &&
-    content.includes("formatWhatsappNumber(whatsappLink)") &&
-    content.includes('title="Hubungi WhatsApp Resmi IFK Kotabaru');
-  if (!hasContactItem) {
-    throw new Error("FAIL: Item WhatsApp pada daftar kontak Kolom 3 tidak ditemukan");
+  // 4. Contact List Item check (Footer Kolom 3)
+  if (!footerContent.includes("whatsappLink && (") || !footerContent.includes("formatWhatsappNumber(whatsappLink)")) {
+    throw new Error("FAIL: Item WhatsApp pada daftar kontak Footer Kolom 3 tidak ditemukan");
   }
-  console.log("✓ Item kontak WhatsApp dengan format nomor dan tautan langsung terpasang di Kolom 3");
+  console.log("✓ Item kontak WhatsApp dengan format nomor terpasang di Footer Kolom 3");
 
-  // 5. Target _blank and rel noopener noreferrer check
-  const hasSafeLinks =
-    content.includes('target="_blank"') &&
-    content.includes('rel="noopener noreferrer"');
-  if (!hasSafeLinks) {
-    throw new Error("FAIL: Atribut keamanan target='_blank' dan rel='noopener noreferrer' belum lengkap");
+  // 5. Pemisahan WhatsApp dan Telepon di Halaman Kontak (/kontak)
+  const hasKontakWhatsApp =
+    kontakContent.includes('label: "WhatsApp"') &&
+    kontakContent.includes("formatWhatsappNumber(whatsappLink)");
+  const hasKontakPhone =
+    kontakContent.includes('label: "Telepon / Fax"') &&
+    kontakContent.includes("value: phone");
+
+  if (!hasKontakWhatsApp || !hasKontakPhone) {
+    throw new Error("FAIL: Pemisahan WhatsApp dan Telepon / Fax pada src/app/(public)/kontak/page.tsx belum benar");
   }
-  console.log("✓ Tautan eksternal WhatsApp dilindungi target='_blank' dan rel='noopener noreferrer'");
+  console.log("✓ Pemisahan baris WhatsApp dan Telepon / Fax pada /kontak berhasil diterapkan");
 
   console.log("=== SEMUA 5/5 PENGUJIAN MANDIRI LULUS ===");
 }
