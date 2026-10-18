@@ -308,7 +308,7 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
 
       <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="relative z-30 flex h-14 shrink-0 items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-header-bg)] px-4 backdrop-blur-xl sm:px-6 transition-colors duration-200">
+        <header className="relative z-40 flex h-14 shrink-0 items-center justify-between border-b border-[var(--admin-border)] bg-[var(--admin-header-bg)] px-4 backdrop-blur-xl sm:px-6 transition-colors duration-200">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
               className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] md:hidden transition-colors"
@@ -376,7 +376,7 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
         </header>
 
         {/* Main scrollable content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
+        <main className="relative z-0 isolate flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8">
           <div className="mx-auto max-w-7xl w-full min-w-0">{children}</div>
         </main>
       </div>
