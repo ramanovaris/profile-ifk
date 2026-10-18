@@ -172,6 +172,8 @@ Pada setiap artikel, terdapat bilah tombol berbagi (*Social Share Bar*):
 - **WhatsApp:** Membuka aplikasi WhatsApp dan membuat pesan siap kirim berisi judul serta tautan artikel.
 - **Telegram:** Mengirimkan tautan artikel langsung ke kontak atau grup Telegram.
 - **Facebook:** Membuka jendela dialog berbagi Facebook.
+- **Instagram:** Menyalin tautan artikel ke papan klip (*clipboard*) secara otomatis dan membuka aplikasi/portal Instagram untuk dibagikan ke Story atau Direct Message.
+- **X (Twitter):** Membuka dialog penyusunan tweet dengan judul dan tautan artikel.
 - **Salin Tautan:** Menyalin alamat web artikel ke papan klip (*clipboard*). Setelah disalin, akan muncul tanda centang sebagai konfirmasi.
 
 ---

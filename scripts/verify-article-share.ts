@@ -16,11 +16,13 @@ async function verifyArticleShare() {
   assert.ok(html.includes("Bagikan ke WhatsApp"), "Tombol 'Bagikan ke WhatsApp' harus ada");
   assert.ok(html.includes("Bagikan ke Telegram"), "Tombol 'Bagikan ke Telegram' harus ada");
   assert.ok(html.includes("Bagikan ke Facebook"), "Tombol 'Bagikan ke Facebook' harus ada");
+  assert.ok(html.includes("Bagikan ke Instagram"), "Tombol 'Bagikan ke Instagram' harus ada");
   assert.ok(html.includes("Bagikan ke X"), "Tombol 'Bagikan ke X' harus ada");
   assert.ok(html.includes("Salin Tautan") || html.includes("Salin"), "Tombol 'Salin' harus ada");
 
   // 2. Verifikasi elemen varian card
   assert.ok(html.includes("Bagikan Informasi Ini"), "Judul 'Bagikan Informasi Ini' pada varian card harus ada");
+  assert.ok(html.includes(">Instagram<"), "Chip 'Instagram' pada varian card harus ada");
 
   // 3. Verifikasi tautan media sosial
   assert.ok(html.includes("https://api.whatsapp.com/send?text="), "Skema URL WhatsApp harus valid");
