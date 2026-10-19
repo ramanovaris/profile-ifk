@@ -14,22 +14,22 @@ async function main() {
   }
   console.log("✓ Icon Globe dan ExternalLink terimpor dari lucide-react");
 
-  // 2. Topbar link check
-  const hasTopbarLink =
+  // 2. Link check (must be in sidebar)
+  const hasSidebarLink =
     content.includes('href="/"') &&
     content.includes('target="_blank"') &&
     content.includes('rel="noopener noreferrer"');
-  if (!hasTopbarLink) {
+  if (!hasSidebarLink) {
     throw new Error("FAIL: Tautan href='/' target='_blank' rel='noopener noreferrer' tidak ditemukan");
   }
   console.log("✓ Tautan pintasan ke portal publik ('/') dengan target='_blank' dan rel='noopener noreferrer' ditemukan");
 
-  // 3. Header button check
+  // 3. Header check: verify "Lihat Website" is NOT in header (Issue #185)
   const headerSectionMatch = content.match(/{\/\* Right Header Admin Info \*\/}[\s\S]*?<ThemeDropdown/);
-  if (!headerSectionMatch || !headerSectionMatch[0].includes("Lihat Website")) {
-    throw new Error("FAIL: Tombol pintasan 'Lihat Website' tidak ditemukan di header dekat ThemeDropdown");
+  if (!headerSectionMatch || headerSectionMatch[0].includes("Lihat Website")) {
+    throw new Error("FAIL: Tombol pintasan 'Lihat Website' masih ada di header topbar (harus dihilangkan sesuai Issue #185)");
   }
-  console.log("✓ Tombol 'Lihat Website' ditemukan di header topbar di samping ThemeDropdown");
+  console.log("✓ Tombol redundan 'Lihat Website' berhasil dihilangkan dari header topbar (Issue #185)");
 
   // 4. Sidebar navigation check
   const sidebarSectionMatch = content.match(/{\/\* Bottom section \*\/}[\s\S]*?Keluar Sesi/);
