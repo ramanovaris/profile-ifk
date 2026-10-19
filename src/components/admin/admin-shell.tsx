@@ -329,19 +329,6 @@ export function AdminShell({ children, currentUser }: AdminShellProps) {
 
           {/* Right Header Admin Info */}
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-9 w-9 sm:w-auto sm:px-3 items-center justify-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-surface)] text-[var(--admin-muted)] shadow-xs transition-all hover:bg-[var(--admin-hover-bg)] hover:text-[var(--admin-text-main)] focus:outline-none focus:ring-2 focus:ring-brand-500/40"
-              title="Lihat Website Publik (Buka di tab baru)"
-              aria-label="Lihat Website Publik"
-            >
-              <Globe className="h-4 w-4 shrink-0" />
-              <span className="hidden sm:inline text-xs sm:text-sm font-medium">Lihat Website</span>
-              <ExternalLink className="hidden sm:inline h-3 w-3 shrink-0 opacity-60" />
-            </Link>
-
             <ThemeDropdown
               themeSetting={themeSetting}
               onThemeChange={handleThemeChange}
