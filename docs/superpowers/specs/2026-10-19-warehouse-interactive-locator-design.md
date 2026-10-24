@@ -41,15 +41,21 @@ model Warehouse {
   @@map("warehouses")
 }
 
-// Baris Rak Fisik di dalam Gedung
+// Baris Rak Fisik di dalam Gedung (Mendukung Posisi Spasial Dinamis Editor Canvas)
 model WarehouseRack {
   id           String               @id // "SJ-R01", "TD-R05"
   warehouseId  String
   rackCode     String               // "R01", "R05"
   name         String               // "Rak 01 - Tablet Generik"
-  svgElementId String               // ID elemen pada denah SVG: "rect-sj-r01"
+  svgElementId String               // ID elemen pada denah: "rect-sj-r01"
   totalLevels  Int                  @default(5) // Jumlah ambalan tingkat (1 s.d. 5)
   notes        String?              @db.Text
+  x            Float                @default(100) // Koordinat Spasial X
+  y            Float                @default(100) // Koordinat Spasial Y
+  width        Float                @default(240) // Lebar balok rak
+  height       Float                @default(60)  // Tinggi balok rak
+  rotation     Float                @default(0)   // Rotasi derajat: 0, 90, 180, 270
+  corridor     String?              @default("Lorong Gudang")
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
 
@@ -115,6 +121,10 @@ model WarehousePlacement {
 * **Halaman Meja Kerja Admin:** `/admin/gudang/kelola`
   * CRUD master rak, jumlah ambalan, dan form penempatan obat.
   * Fitur impor dan ekspor spreadsheet lokasi fisik.
+* **Halaman Editor Denah Interaktif (Drag & Drop Canvas):** `/admin/gudang/editor`
+  * Kanvas interaktif berbasis Konva dengan snap-to-grid (10px).
+  * Pengaturan posisi rak fisik: geser (drag), ubah ukuran (resize transformer), putar rotasi (90 derajat), serta simpan tata letak spasial langsung ke PostgreSQL.
+  * Tombol aksi: *Tambah Balok Rak*, *Putar 90°*, *Reset Posisi Bawaan*, dan *Simpan Tata Letak*.
 
 ### B. Komponen Antarmuka Navigasi Denah
 1. **Top Header & Selector Gedung:**
@@ -204,10 +214,10 @@ Skrip verifikasi otomatis `scripts/verify-warehouse-locator.ts` akan menguji:
 * **Termasuk dalam Rilis Ini (MVP Fase 1):**
   * Proteksi login internal staf/admin.
   * Denah visual 2D 3 gedung (Saijaan, Todak, Kantor).
-  * Gestur pan/zoom native zero-dependency.
+  * Gestur pan/zoom native zero-dependency pada perangkat seluler.
   * Pencarian cerdas obat & sorot rak target + animasi ambalan.
   * Manajemen rak, ambalan, dan penempatan barang via admin + impor Excel.
+  * **Editor Denah Interaktif Drag & Drop (Konva Canvas)** pada `/admin/gudang/editor` untuk kustomisasi denah bebas oleh admin tanpa edit kode.
 * **Di Luar Lingkup (Direncanakan pada Fase Lanjutan):**
   * Fitur panduan rute navigasi lorong terpendek (*indoor pathfinding*).
   * Integrasi sensor pemantauan suhu/kelembaban IoT rak.
-  * Editor denah interaktif *drag-and-drop* tata letak dinding bangunan.
