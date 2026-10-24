@@ -184,3 +184,74 @@ model SiteSetting {
 
   @@map("site_settings")
 }
+
+// ==========================================
+// MODUL DENAH INTERAKTIF & MASTER GUDANG IFK
+// ==========================================
+
+model Warehouse {
+  id          String          @id // "KT", "SJ", "TD"
+  name        String          // "Gedung Kantor", "Gedung Saijaan", "Gedung Todak"
+  description String?         @db.Text
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  racks       WarehouseRack[]
+
+  @@map("warehouses")
+}
+
+model WarehouseRack {
+  id           String               @id // "SJ-R01", "TD-R05", "KT-R01"
+  warehouseId  String
+  rackCode     String               // "R01", "R05"
+  name         String               // "Rak 01 - Obat Generik"
+  svgElementId String               // ID elemen pada denah SVG: "rect-sj-r01"
+  totalLevels  Int                  @default(5) // Jumlah ambalan tingkat (1 s.d. 5)
+  notes        String?              @db.Text
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  warehouse    Warehouse            @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  placements   WarehousePlacement[]
+
+  @@index([warehouseId])
+  @@map("warehouse_racks")
+}
+
+model WarehouseItem {
+  id          String               @id @default(cuid())
+  code        String               @unique // Kode barang unik / barcode
+  name        String               // Nama barang lengkap
+  unit        String               // "Tablet", "Botol", "Box", "Pcs"
+  category    String?              // "Obat Generik", "Alkes", "Vaksin", dll
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  placements  WarehousePlacement[]
+
+  @@index([name])
+  @@index([category])
+  @@map("warehouse_items")
+}
+
+model WarehousePlacement {
+  id           String        @id @default(cuid())
+  itemId       String
+  rackId       String
+  levelCode    String        // "T1", "T2", "T3", "T4", "T5"
+  locationCode String        // "SJ-R05-T2"
+  notes        String?       // Catatan khusus box/wadah atau posisi sisi
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  item         WarehouseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  rack         WarehouseRack @relation(fields: [rackId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, rackId, levelCode])
+  @@index([itemId])
+  @@index([rackId])
+  @@index([locationCode])
+  @@map("warehouse_placements")
+}
+
