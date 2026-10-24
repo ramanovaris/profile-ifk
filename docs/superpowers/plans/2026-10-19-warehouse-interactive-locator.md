@@ -212,7 +212,45 @@
 
 ---
 
-### Task 8: Skrip Uji Mandiri Komprehensif, Dev Server Verification & Pembuatan PR
+### Task 8: Editor Denah Interaktif Drag & Drop Berbasis Konva Canvas (`/admin/gudang/editor`)
+
+**Files:**
+- Modify: `prisma/schema.prisma:204-221`
+- Modify: `src/actions/warehouse.ts`
+- Create: `src/components/warehouse/warehouse-canvas-editor.tsx`
+- Create: `src/app/(admin)/admin/gudang/editor/page.tsx`
+- Create: `src/app/(admin)/admin/gudang/editor/editor-client-view.tsx`
+- Modify: `src/app/(admin)/admin/gudang/locator-client-view.tsx`
+- Create: `scripts/verify-warehouse-editor.ts`
+
+**Interfaces:**
+- Produces:
+  - Kolom koordinat dinamis `x, y, width, height, rotation, corridor` pada `WarehouseRack`.
+  - Server Action `saveWarehouseRackLayoutAction(racks: Array<{ id: string, x: number, y: number, width: number, height: number, rotation: number, corridor?: string }>)`.
+  - Komponen kanvas Konva interaktif dengan fitur: drag balok rak, snap to grid (10px), rotate 90°, ubah dimensi, dan simpan tata letak.
+  - Halaman editor denah visual di `/admin/gudang/editor` yang terhubung ke tombol di navigasi `/admin/gudang`.
+  - Sinkronisasi instan posisi denah dinamis pada tampilan HP.
+
+- [ ] **Step 1: Tambahkan koordinat spasial pada `prisma/schema.prisma` & sinkronkan DB**
+  - Kolom: `x Float @default(100)`, `y Float @default(100)`, `width Float @default(240)`, `height Float @default(60)`, `rotation Float @default(0)`, `corridor String? @default("Lorong Gudang")`.
+  - Jalankan `npx prisma db push` dan update `scripts/seed-warehouse.ts`.
+- [ ] **Step 2: Buat Server Action `saveWarehouseRackLayoutAction` di `src/actions/warehouse.ts`**
+  - Simpan array koordinat rak hasil drag & drop secara batch transaction di Prisma.
+- [ ] **Step 3: Implementasikan komponen kanvas editor `src/components/warehouse/warehouse-canvas-editor.tsx`**
+  - Menggunakan Konva (`Stage`, `Layer`, `Rect`, `Text`, `Group`, `Transformer`).
+  - Fitur snap-to-grid, drag limits, seleksi transformer untuk resize/rotate, dan status perubahan belum disimpan (*dirty state*).
+- [ ] **Step 4: Implementasikan halaman `/admin/gudang/editor`**
+  - Server component `page.tsx` + client component `editor-client-view.tsx`.
+  - Toolbar: Pilihan gedung, tombol *+ Tambah Balok Rak*, *Putar 90°*, *Reset Posisi Bawaan*, dan *Simpan Tata Letak*.
+- [ ] **Step 5: Hubungkan koordinat dinamis dari database ke tampilan peta lapangan `locator-client-view.tsx`**
+  - Denah lapangan membaca posisi `x, y, width, height` langsung dari database sehingga hasil editan editor seketika aktif.
+- [ ] **Step 6: Verifikasi mandiri editor dan commit**
+  - Skrip uji `scripts/verify-warehouse-editor.ts`.
+  - Command: `git add ... && git commit -m "feat(gudang): editor denah interaktif drag & drop dengan konva (#188)"`
+
+---
+
+### Task 9: Skrip Uji Mandiri Komprehensif, Dev Server Verification & Pembuatan PR
 
 **Files:**
 - Create: `scripts/verify-warehouse-locator.ts`
@@ -220,10 +258,10 @@
 **Interfaces:**
 - Produces:
   - Skrip uji end-to-end 100% PASS meliputi:
-    1. Integritas database 4 model denah.
-    2. Konsistensi koordinat layout SVG vs data rak gedung.
+    1. Integritas database 4 model denah + koordinat spasial.
+    2. Konsistensi koordinat dinamis Konva editor vs denah SVG mobile.
     3. Akurasi pencarian fonetik/alias `matchMedicineSearch`.
-    4. Validasi server action mutasi & query.
+    4. Validasi server action mutasi & query layout.
     5. Ukuran bundle komponen denah SVG <150 KB.
   - Pull Request #188 siap diuji dan direview di HP.
 
@@ -234,7 +272,7 @@
   - Command: `npx tsx scripts/verify-admin-theme-toggle.ts`
   - Command: `npx tsx scripts/verify-medicine-search.ts`
 - [ ] **Step 3: Verifikasi respons HTTP dev server port 3003**
-  - Pastikan halaman `/profile-ifk/admin/gudang` dan `/profile-ifk/admin/gudang/kelola` merespons HTTP 200/307.
+  - Pastikan halaman `/profile-ifk/admin/gudang`, `/profile-ifk/admin/gudang/kelola`, dan `/profile-ifk/admin/gudang/editor` merespons HTTP 200/307.
 - [ ] **Step 4: Push branch dan buat Pull Request ke `develop`**
   - Command: `git push -u origin feat/188-warehouse-interactive-locator`
   - Command: `gh pr create --base develop --title "feat(gudang): modul denah interaktif 2D dan pencari lokasi obat gudang IFK" --body "..."`
