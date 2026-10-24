@@ -1,4 +1,5 @@
 import { db } from "../src/lib/db";
+import { BUILDING_LAYOUTS } from "../src/lib/warehouse-map-data";
 
 async function main() {
   console.log("Seeding Master Denah Gudang IFK...");
@@ -34,7 +35,7 @@ async function main() {
   }
   console.log(`✓ Seeded ${warehouses.length} Gedung IFK`);
 
-  // 2. Seed Racks
+  // 2. Seed Racks with Spatial Coordinates
   const racksData: Array<{
     id: string;
     warehouseId: string;
@@ -43,48 +44,32 @@ async function main() {
     svgElementId: string;
     totalLevels: number;
     notes: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation: number;
+    corridor: string;
   }> = [];
 
-  // Saijaan: 12 Racks (R01..R12, 5 Levels)
-  for (let i = 1; i <= 12; i++) {
-    const code = `R${i.toString().padStart(2, "0")}`;
-    racksData.push({
-      id: `SJ-${code}`,
-      warehouseId: "SJ",
-      rackCode: code,
-      name: `Rak Saijaan ${code}`,
-      svgElementId: `rect-sj-${code.toLowerCase()}`,
-      totalLevels: 5,
-      notes: i <= 6 ? "Lorong Barat (Sediaan Padat/Tablet)" : "Lorong Timur (Sediaan Sirup & Cair)",
-    });
-  }
-
-  // Todak: 8 Racks (R01..R08, 4 Levels)
-  for (let i = 1; i <= 8; i++) {
-    const code = `R${i.toString().padStart(2, "0")}`;
-    racksData.push({
-      id: `TD-${code}`,
-      warehouseId: "TD",
-      rackCode: code,
-      name: `Rak Todak ${code}`,
-      svgElementId: `rect-td-${code.toLowerCase()}`,
-      totalLevels: 4,
-      notes: i <= 4 ? "Lorong Infus & Cairan Besar" : "Lorong Alkes Habis Pakai & BMHP",
-    });
-  }
-
-  // Kantor: 4 Racks (R01..R04, 4 Levels)
-  for (let i = 1; i <= 4; i++) {
-    const code = `R${i.toString().padStart(2, "0")}`;
-    racksData.push({
-      id: `KT-${code}`,
-      warehouseId: "KT",
-      rackCode: code,
-      name: `Rak Kantor ${code}`,
-      svgElementId: `rect-kt-${code.toLowerCase()}`,
-      totalLevels: 4,
-      notes: i <= 2 ? "Ruang Cold Chain / Chiller Vaksin" : "Area Transit & Karantina Obat Masuk",
-    });
+  for (const [buildingId, layout] of Object.entries(BUILDING_LAYOUTS)) {
+    for (const r of layout.racks) {
+      racksData.push({
+        id: r.id,
+        warehouseId: buildingId,
+        rackCode: r.rackCode,
+        name: r.name,
+        svgElementId: r.svgElementId,
+        totalLevels: r.totalLevels,
+        notes: r.corridor,
+        x: r.x,
+        y: r.y,
+        width: r.width,
+        height: r.height,
+        rotation: 0,
+        corridor: r.corridor,
+      });
+    }
   }
 
   for (const r of racksData) {
@@ -97,11 +82,17 @@ async function main() {
         svgElementId: r.svgElementId,
         totalLevels: r.totalLevels,
         notes: r.notes,
+        x: r.x,
+        y: r.y,
+        width: r.width,
+        height: r.height,
+        rotation: r.rotation,
+        corridor: r.corridor,
       },
       create: r,
     });
   }
-  console.log(`✓ Seeded ${racksData.length} baris rak fisik`);
+  console.log(`✓ Seeded ${racksData.length} baris rak fisik dengan koordinat spasial`);
 
   // 3. Seed Items & Placements
   const sampleItems = [

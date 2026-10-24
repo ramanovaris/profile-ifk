@@ -84,6 +84,12 @@ export async function getWarehouseMapDataAction(buildingId: string): Promise<
       totalLevels: number;
       notes: string | null;
       placementsCount: number;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      rotation: number;
+      corridor: string;
     }>;
     placements: Array<{
       id: string;
@@ -144,7 +150,7 @@ export async function getWarehouseMapDataAction(buildingId: string): Promise<
       };
     }> = [];
 
-    const racks = building.racks.map((r) => {
+    const dynamicRacks = building.racks.map((r) => {
       for (const p of r.placements) {
         allPlacements.push({
           id: p.id,
@@ -170,8 +176,34 @@ export async function getWarehouseMapDataAction(buildingId: string): Promise<
         totalLevels: r.totalLevels,
         notes: r.notes,
         placementsCount: r._count.placements,
+        x: r.x,
+        y: r.y,
+        width: r.width,
+        height: r.height,
+        rotation: r.rotation,
+        corridor: r.corridor || "Lorong Gudang",
       };
     });
+
+    // Dynamic layout dengan koordinat database
+    const dynamicLayout: BuildingLayout = {
+      ...layout,
+      racks: dynamicRacks.map((r) => ({
+        id: r.id,
+        rackCode: r.rackCode,
+        name: r.name,
+        svgElementId: r.svgElementId,
+        x: r.x,
+        y: r.y,
+        width: r.width,
+        height: r.height,
+        centerX: r.x + r.width / 2,
+        centerY: r.y + r.height / 2,
+        orientation: r.width >= r.height ? "horizontal" : "vertical",
+        corridor: r.corridor,
+        totalLevels: r.totalLevels,
+      })),
+    };
 
     return {
       success: true,
@@ -181,8 +213,8 @@ export async function getWarehouseMapDataAction(buildingId: string): Promise<
           name: building.name,
           description: building.description,
         },
-        layout,
-        racks,
+        layout: dynamicLayout,
+        racks: dynamicRacks,
         placements: allPlacements,
       },
     };
@@ -546,3 +578,64 @@ export async function importWarehouseSpreadsheetAction(
     },
   };
 }
+
+export interface RackLayoutUpdateInput {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation?: number;
+  corridor?: string;
+}
+
+/**
+ * Menyimpan pembaruan posisi spasial rak fisik hasil drag-and-drop editor canvas Konva.
+ */
+export async function saveWarehouseRackLayoutAction(
+  updates: RackLayoutUpdateInput[],
+  opts?: { _bypassAuth?: boolean }
+): Promise<WarehouseActionResult<{ updatedCount: number }>> {
+  if (!opts?._bypassAuth) {
+    const session = await getCurrentSession();
+    if (!session) {
+      return { success: false, error: "Sesi tidak valid atau telah kedaluwarsa." };
+    }
+  }
+
+  if (!Array.isArray(updates) || updates.length === 0) {
+    return { success: false, error: "Tidak ada data tata letak yang dikirim." };
+  }
+
+  try {
+    await db.$transaction(
+      updates.map((u) =>
+        db.warehouseRack.update({
+          where: { id: u.id },
+          data: {
+            x: Math.round(u.x),
+            y: Math.round(u.y),
+            width: Math.max(30, Math.round(u.width)),
+            height: Math.max(30, Math.round(u.height)),
+            rotation: u.rotation !== undefined ? Math.round(u.rotation) : 0,
+            corridor: u.corridor?.trim() || undefined,
+          },
+        })
+      )
+    );
+
+    try {
+      revalidatePath("/admin/gudang");
+      revalidatePath("/admin/gudang/kelola");
+      revalidatePath("/admin/gudang/editor");
+    } catch {
+      // Safe fallback
+    }
+
+    return { success: true, data: { updatedCount: updates.length } };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Gagal menyimpan tata letak denah";
+    return { success: false, error: message };
+  }
+}
+

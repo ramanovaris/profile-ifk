@@ -209,6 +209,12 @@ model WarehouseRack {
   svgElementId String               // ID elemen pada denah SVG: "rect-sj-r01"
   totalLevels  Int                  @default(5) // Jumlah ambalan tingkat (1 s.d. 5)
   notes        String?              @db.Text
+  x            Float                @default(100)
+  y            Float                @default(100)
+  width        Float                @default(240)
+  height       Float                @default(60)
+  rotation     Float                @default(0)
+  corridor     String?              @default("Lorong Gudang")
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
 

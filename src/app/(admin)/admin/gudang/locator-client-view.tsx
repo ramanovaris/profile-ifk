@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useTransition } from "react";
 import Link from "next/link";
-import { Building2, SlidersHorizontal, Compass, Layers, MapPin, RefreshCw } from "lucide-react";
+import { Building2, SlidersHorizontal, Compass, Layers, MapPin, RefreshCw, LayoutGrid } from "lucide-react";
 import { WarehouseSvgMap } from "@/components/warehouse/warehouse-svg-map";
 import { WarehouseSearchBox } from "@/components/warehouse/warehouse-search-box";
 import { WarehouseBottomDrawer, DrawerDetailData } from "@/components/warehouse/warehouse-bottom-drawer";
@@ -23,6 +23,7 @@ export function LocatorClientView({
 
   // Data pemetaan rak dan item dari server
   const [serverMapData, setServerMapData] = useState<{
+    layout?: BuildingLayout;
     racks: Array<{ id: string; name: string; totalLevels: number; placementsCount: number }>;
     placements: Array<{
       id: string;
@@ -34,7 +35,7 @@ export function LocatorClientView({
     }>;
   }>({ racks: [], placements: [] });
 
-  const activeLayout = BUILDING_LAYOUTS[activeBuildingId];
+  const activeLayout = serverMapData.layout || BUILDING_LAYOUTS[activeBuildingId];
 
   // Fetch data gedung saat activeBuildingId berubah
   useEffect(() => {
@@ -42,6 +43,7 @@ export function LocatorClientView({
       const res = await getWarehouseMapDataAction(activeBuildingId);
       if (res.success && res.data) {
         setServerMapData({
+          layout: res.data.layout,
           racks: res.data.racks,
           placements: res.data.placements,
         });
@@ -165,6 +167,14 @@ export function LocatorClientView({
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              href="/admin/gudang/editor"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#455a26] hover:bg-[#384a1e] text-white transition-colors shadow-sm"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Editor Denah</span>
+              <span className="sm:hidden">Edit</span>
+            </Link>
             <Link
               href="/admin/gudang/kelola"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
