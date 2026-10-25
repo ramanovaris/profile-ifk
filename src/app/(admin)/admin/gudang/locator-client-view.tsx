@@ -6,7 +6,7 @@ import { Building2, SlidersHorizontal, Compass, Layers, MapPin, RefreshCw, Layou
 import { WarehouseSvgMap } from "@/components/warehouse/warehouse-svg-map";
 import { WarehouseSearchBox } from "@/components/warehouse/warehouse-search-box";
 import { WarehouseBottomDrawer, DrawerDetailData } from "@/components/warehouse/warehouse-bottom-drawer";
-import { BUILDING_LAYOUTS, RackCoordinates } from "@/lib/warehouse-map-data";
+import { BUILDING_LAYOUTS, BuildingLayout, RackCoordinates } from "@/lib/warehouse-map-data";
 import { getWarehouseMapDataAction, SearchableWarehouseItem } from "@/actions/warehouse";
 
 interface LocatorClientViewProps {
@@ -83,7 +83,7 @@ export function LocatorClientView({
         unit: p.item.unit,
       }));
 
-    const rack = activeLayout.racks.find((r) => r.id === selectedPlacement.rackId);
+    const rack = activeLayout.racks.find((r: RackCoordinates) => r.id === selectedPlacement.rackId);
 
     setActivePlacementData({
       itemName: item.name,

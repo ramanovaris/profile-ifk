@@ -18,7 +18,6 @@ async function main() {
   }
 
   // 2. Cek keberadaan 3 Gedung IFK
-  // @ts-expect-error dynamic check before generation
   const buildings = await db.warehouse.findMany({ orderBy: { id: "asc" } });
   console.log(`- Jumlah gedung terdaftar: ${buildings.length}`);
   if (buildings.length < 3) {
@@ -34,7 +33,6 @@ async function main() {
   }
 
   // 3. Cek rak Saijaan, Todak, Kantor
-  // @ts-expect-error dynamic check
   const racks = await db.warehouseRack.findMany({ include: { warehouse: true } });
   console.log(`- Jumlah baris rak terdaftar: ${racks.length}`);
   if (racks.length < 24) {
@@ -42,7 +40,6 @@ async function main() {
   }
 
   // 4. Cek relasi item dan placement
-  // @ts-expect-error dynamic check
   const placements = await db.warehousePlacement.findMany({
     include: {
       item: true,

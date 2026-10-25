@@ -89,6 +89,7 @@ export function ManagementClientView({ initialBuildings }: ManagementClientViewP
       for (const p of r.placements) {
         list.push({
           ...p,
+          rackId: r.id,
           rackName: r.name,
         });
       }
