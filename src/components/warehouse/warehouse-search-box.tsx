@@ -27,13 +27,13 @@ export function WarehouseSearchBox({
   // Debounced search
   useEffect(() => {
     const trimmed = query.trim();
-    if (!trimmed) {
-      setResults([]);
-      setIsOpen(false);
-      return;
-    }
-
     const timer = setTimeout(() => {
+      if (!trimmed) {
+        setResults([]);
+        setIsOpen(false);
+        return;
+      }
+
       startTransition(async () => {
         const res = await searchWarehouseItemsAction(trimmed);
         if (res.success && res.data) {

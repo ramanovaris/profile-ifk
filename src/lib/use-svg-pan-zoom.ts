@@ -92,7 +92,10 @@ export function useSvgPanZoom({
 
   // Reset saat layout berganti
   useEffect(() => {
-    reset();
+    const timer = setTimeout(() => {
+      reset();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [layout.id, reset]);
 
   // Fokus ke target rak (Auto-Pan & Auto-Zoom)
@@ -172,7 +175,6 @@ export function useSvgPanZoom({
 
       if (activePointers.current.size === 1) {
         // Drag Pan 1 Jari
-        const initial = dragStartTransform.current;
         // Hitung perpindahan dari pointer saat down
         const pts = Array.from(activePointers.current.values())[0];
         const dx = e.clientX - pts.x;

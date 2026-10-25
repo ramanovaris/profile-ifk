@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useTransition } from "react";
 import Link from "next/link";
-import { Building2, SlidersHorizontal, Compass, Layers, MapPin, RefreshCw, LayoutGrid } from "lucide-react";
+import { SlidersHorizontal, RefreshCw, LayoutGrid } from "lucide-react";
 import { WarehouseSvgMap } from "@/components/warehouse/warehouse-svg-map";
 import { WarehouseSearchBox } from "@/components/warehouse/warehouse-search-box";
 import { WarehouseBottomDrawer, DrawerDetailData } from "@/components/warehouse/warehouse-bottom-drawer";

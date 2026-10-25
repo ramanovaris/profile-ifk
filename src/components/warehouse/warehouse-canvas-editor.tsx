@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Konva from "konva";
-import { Plus, Minus, RotateCcw, RotateCw, Trash2, Check, AlertCircle } from "lucide-react";
+import { Plus, Minus, RotateCcw, RotateCw, Check, AlertCircle } from "lucide-react";
 
 export interface EditableRackItem {
   id: string;
@@ -18,7 +18,7 @@ export interface EditableRackItem {
 }
 
 interface WarehouseCanvasEditorProps {
-  buildingId: string;
+  buildingId?: string;
   buildingName: string;
   initialRacks: EditableRackItem[];
   canvasWidth?: number;
@@ -29,7 +29,6 @@ interface WarehouseCanvasEditorProps {
 }
 
 export function WarehouseCanvasEditor({
-  buildingId,
   buildingName,
   initialRacks,
   canvasWidth = 1000,
@@ -44,16 +43,18 @@ export function WarehouseCanvasEditor({
   const trRef = useRef<Konva.Transformer | null>(null);
 
   const [racks, setRacks] = useState<EditableRackItem[]>(initialRacks);
+  const [prevRacks, setPrevRacks] = useState<EditableRackItem[]>(initialRacks);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
 
-  // Sinkronkan initialRacks jika props berubah
-  useEffect(() => {
+  // Sinkronkan racks jika initialRacks berubah saat render
+  if (initialRacks !== prevRacks) {
+    setPrevRacks(initialRacks);
     setRacks(initialRacks);
     setIsDirty(false);
-  }, [initialRacks, buildingId]);
+  }
 
   // Inisialisasi Konva Stage & Layers
   useEffect(() => {

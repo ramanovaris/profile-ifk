@@ -5,7 +5,6 @@ import {
   searchWarehouseItemsAction,
   saveWarehouseRackLayoutAction,
 } from "../src/actions/warehouse";
-import { BUILDING_LAYOUTS } from "../src/lib/warehouse-map-data";
 
 async function main() {
   console.log("==================================================================");
