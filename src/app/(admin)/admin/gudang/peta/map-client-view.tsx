@@ -14,7 +14,7 @@ import { WarehouseSearchBox } from "@/components/warehouse/warehouse-search-box"
 import { WarehouseBottomDrawer, DrawerDetailData } from "@/components/warehouse/warehouse-bottom-drawer";
 import { BUILDING_LAYOUTS, BuildingLayout, RackCoordinates } from "@/lib/warehouse-map-data";
 import { getWarehouseMapDataAction, SearchableWarehouseItem } from "@/actions/warehouse";
-import { groupRackPlacementsByLevel, TierItemPlacement } from "@/lib/warehouse-multi-item";
+import { groupRackPlacementsByLevel } from "@/lib/warehouse-multi-item";
 
 export function MapClientView() {
   const searchParams = useSearchParams();

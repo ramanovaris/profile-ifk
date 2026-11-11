@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   X,
   ChevronUp,
@@ -11,7 +11,6 @@ import {
   Tag,
   CheckCircle2,
   FolderOpen,
-  Layers,
 } from "lucide-react";
 import { RackTierVisualizer } from "./rack-tier-visualizer";
 import { TierItemPlacement } from "@/lib/warehouse-multi-item";
@@ -61,15 +60,20 @@ export function WarehouseBottomDrawer({
 
   const currentLevel = data?.activeLevelCode || data?.levelCode || "T1";
 
-  // Auto-buka accordion ambalan aktif saat data atau level aktif berubah
-  useEffect(() => {
-    if (currentLevel) {
-      setOpenLevels((prev) => ({
-        ...prev,
-        [currentLevel]: true,
-      }));
+  const isLevelOpen = (lvl: string) => {
+    if (openLevels[lvl] !== undefined) {
+      return openLevels[lvl];
     }
-  }, [currentLevel, data?.rackId]);
+    return lvl.toUpperCase() === currentLevel.toUpperCase();
+  };
+
+  const toggleAccordion = (lvl: string) => {
+    const currentlyOpen = isLevelOpen(lvl);
+    setOpenLevels((prev) => ({
+      ...prev,
+      [lvl]: !currentlyOpen,
+    }));
+  };
 
   if (!data) return null;
 
@@ -95,13 +99,6 @@ export function WarehouseBottomDrawer({
     const num = data.totalLevels - i;
     return `T${num}`;
   });
-
-  const toggleAccordion = (lvl: string) => {
-    setOpenLevels((prev) => ({
-      ...prev,
-      [lvl]: !prev[lvl],
-    }));
-  };
 
   // ponytail: Drawer compact 1 baris toggle statis; upgrade to swipe gesture sheet bila staf butuh drag touch.
   return (
@@ -248,7 +245,7 @@ export function WarehouseBottomDrawer({
               <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
                 {levelKeys.map((lvl) => {
                   const items = data.itemsByLevel?.[lvl] || [];
-                  const isOpen = Boolean(openLevels[lvl]);
+                  const isOpen = isLevelOpen(lvl);
                   const isCurrentActiveTier = currentLevel === lvl;
                   const levelNum = lvl.replace("T", "");
 
