@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Plus, Minus, RotateCcw, Compass } from "lucide-react";
 import { BuildingLayout, RackCoordinates } from "@/lib/warehouse-map-data";
 import { useSvgPanZoom } from "@/lib/use-svg-pan-zoom";

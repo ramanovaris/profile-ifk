@@ -8,7 +8,6 @@ import {
   RefreshCw,
   LayoutGrid,
   ArrowLeft,
-  Search,
 } from "lucide-react";
 import { WarehouseSvgMap } from "@/components/warehouse/warehouse-svg-map";
 import { WarehouseSearchBox } from "@/components/warehouse/warehouse-search-box";
@@ -132,24 +131,27 @@ export function MapClientView() {
         unit: p.item.unit,
       }));
 
-    setActiveRackId(paramRack);
-    setActivePlacementData({
-      itemName: matchedPlacement ? matchedPlacement.item.name : (paramItem || undefined),
-      itemCode: matchedPlacement ? matchedPlacement.item.code : undefined,
-      itemUnit: matchedPlacement ? matchedPlacement.item.unit : undefined,
-      itemCategory: matchedPlacement ? matchedPlacement.item.category : undefined,
-      buildingName: activeLayout.name,
-      rackId: rack.id,
-      rackName: rack.name,
-      corridor: rack.corridor || "Area Penyimpanan",
-      levelCode: paramLevel || matchedPlacement?.levelCode || "T1",
-      locationCode: matchedPlacement?.locationCode || `${rack.id}-${paramLevel || "T1"}`,
-      totalLevels: rack.totalLevels || 5,
-      notes: matchedPlacement?.notes || "Posisi rak fisik",
-      itemsOnSameRack: itemsInSameRack,
-    });
+    const timer = setTimeout(() => {
+      setActiveRackId(paramRack);
+      setActivePlacementData({
+        itemName: matchedPlacement ? matchedPlacement.item.name : (paramItem || undefined),
+        itemCode: matchedPlacement ? matchedPlacement.item.code : undefined,
+        itemUnit: matchedPlacement ? matchedPlacement.item.unit : undefined,
+        itemCategory: matchedPlacement ? matchedPlacement.item.category : undefined,
+        buildingName: activeLayout.name,
+        rackId: rack.id,
+        rackName: rack.name,
+        corridor: rack.corridor || "Area Penyimpanan",
+        levelCode: paramLevel || matchedPlacement?.levelCode || "T1",
+        locationCode: matchedPlacement?.locationCode || `${rack.id}-${paramLevel || "T1"}`,
+        totalLevels: rack.totalLevels || 5,
+        notes: matchedPlacement?.notes || "Posisi rak fisik",
+        itemsOnSameRack: itemsInSameRack,
+      });
+      hasAutoSelectedRef.current = true;
+    }, 0);
 
-    hasAutoSelectedRef.current = true;
+    return () => clearTimeout(timer);
   }, [paramRack, paramLevel, paramItem, serverMapData, activeLayout]);
 
   // Hitung jumlah item per rak untuk badge di denah SVG

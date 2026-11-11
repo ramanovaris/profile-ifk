@@ -49,7 +49,9 @@ export function useSvgPanZoom({
   const pinchStartScale = useRef<number>(1.0);
   const pinchStartFocal = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const currentTransformRef = useRef<TransformState>(transform);
-  currentTransformRef.current = transform;
+  useEffect(() => {
+    currentTransformRef.current = transform;
+  }, [transform]);
 
   // ResizeObserver untuk menyesuaikan batas container dinamis
   useEffect(() => {

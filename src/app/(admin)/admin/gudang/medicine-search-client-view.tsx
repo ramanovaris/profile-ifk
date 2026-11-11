@@ -9,14 +9,9 @@ import {
   LayoutGrid,
   SlidersHorizontal,
   Package,
-  Building2,
   X,
-  ExternalLink,
-  Tag,
-  Layers,
 } from "lucide-react";
 import { matchMedicineSearch } from "@/lib/medicine-search";
-import { AdminTablePagination } from "@/components/admin/admin-table-pagination";
 
 export interface PlacementWithDetails {
   id: string;
