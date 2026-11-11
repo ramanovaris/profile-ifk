@@ -14,6 +14,7 @@ import { WarehouseSearchBox } from "@/components/warehouse/warehouse-search-box"
 import { WarehouseBottomDrawer, DrawerDetailData } from "@/components/warehouse/warehouse-bottom-drawer";
 import { BUILDING_LAYOUTS, BuildingLayout, RackCoordinates } from "@/lib/warehouse-map-data";
 import { getWarehouseMapDataAction, SearchableWarehouseItem } from "@/actions/warehouse";
+import { groupRackPlacementsByLevel, TierItemPlacement } from "@/lib/warehouse-multi-item";
 
 export function MapClientView() {
   const searchParams = useSearchParams();
@@ -40,6 +41,7 @@ export function MapClientView() {
       rackId: initialRack.id,
       rackName: initialRack.name,
       corridor: initialRack.corridor || "Area Penyimpanan",
+      activeLevelCode: paramLevel || "T1",
       levelCode: paramLevel || "T1",
       locationCode: `${initialRack.id}-${paramLevel || "T1"}`,
       totalLevels: initialRack.totalLevels || 5,
@@ -110,43 +112,26 @@ export function MapClientView() {
     const rack = activeLayout.racks.find((r: RackCoordinates) => r.id === paramRack);
     if (!rack) return;
 
-    // Cari placement yang cocok dengan level atau nama item
-    const matchedPlacement =
-      serverMapData.placements.find(
-        (p) =>
-          p.rackId === paramRack &&
-          (!paramLevel || p.levelCode === paramLevel) &&
-          (!paramItem || p.item.name.toLowerCase().includes(paramItem.toLowerCase()))
-      ) ||
-      serverMapData.placements.find(
-        (p) => p.rackId === paramRack && (!paramLevel || p.levelCode === paramLevel)
-      ) ||
-      serverMapData.placements.find((p) => p.rackId === paramRack);
-
-    const itemsInSameRack = serverMapData.placements
-      .filter((p) => p.rackId === paramRack && (!matchedPlacement || p.item.id !== matchedPlacement.item.id))
-      .map((p) => ({
-        name: p.item.name,
-        levelCode: p.levelCode,
-        unit: p.item.unit,
-      }));
+    const rackPlacements = serverMapData.placements.filter((p) => p.rackId === paramRack);
+    const grouped = groupRackPlacementsByLevel(rackPlacements, rack.totalLevels || 5, {
+      levelCode: paramLevel,
+      targetItemName: paramItem,
+    });
 
     const timer = setTimeout(() => {
       setActiveRackId(paramRack);
       setActivePlacementData({
-        itemName: matchedPlacement ? matchedPlacement.item.name : (paramItem || undefined),
-        itemCode: matchedPlacement ? matchedPlacement.item.code : undefined,
-        itemUnit: matchedPlacement ? matchedPlacement.item.unit : undefined,
-        itemCategory: matchedPlacement ? matchedPlacement.item.category : undefined,
         buildingName: activeLayout.name,
         rackId: rack.id,
         rackName: rack.name,
         corridor: rack.corridor || "Area Penyimpanan",
-        levelCode: paramLevel || matchedPlacement?.levelCode || "T1",
-        locationCode: matchedPlacement?.locationCode || `${rack.id}-${paramLevel || "T1"}`,
         totalLevels: rack.totalLevels || 5,
-        notes: matchedPlacement?.notes || "Posisi rak fisik",
-        itemsOnSameRack: itemsInSameRack,
+        activeLevelCode: grouped.activeLevelCode,
+        activeItem: grouped.activeItem,
+        itemsByLevel: grouped.itemsByLevel,
+        countsByLevel: grouped.countsByLevel,
+        totalItemsCount: grouped.totalCount,
+        notes: grouped.activeItem?.notes || "Posisi rak fisik",
       });
       hasAutoSelectedRef.current = true;
     }, 0);
@@ -177,31 +162,28 @@ export function MapClientView() {
 
     setActiveRackId(selectedPlacement.rackId);
 
-    // Cari barang lain di rak yang sama
-    const itemsInSameRack = serverMapData.placements
-      .filter((p) => p.rackId === selectedPlacement.rackId && p.item.id !== item.id)
-      .map((p) => ({
-        name: p.item.name,
-        levelCode: p.levelCode,
-        unit: p.item.unit,
-      }));
-
+    const rackPlacements = serverMapData.placements.filter((p) => p.rackId === selectedPlacement.rackId);
     const rack = activeLayout.racks.find((r: RackCoordinates) => r.id === selectedPlacement.rackId);
+    const totalLevels = rack?.totalLevels || 5;
+
+    const grouped = groupRackPlacementsByLevel(rackPlacements, totalLevels, {
+      levelCode: selectedPlacement.levelCode,
+      targetItemId: item.id,
+      targetItemName: item.name,
+    });
 
     setActivePlacementData({
-      itemName: item.name,
-      itemCode: item.code,
-      itemUnit: item.unit,
-      itemCategory: item.category,
       buildingName: selectedPlacement.buildingName,
       rackId: selectedPlacement.rackId,
       rackName: selectedPlacement.rackName,
       corridor: rack?.corridor || "Area Penyimpanan",
-      levelCode: selectedPlacement.levelCode,
-      locationCode: selectedPlacement.locationCode,
-      totalLevels: rack?.totalLevels || 5,
-      notes: selectedPlacement.notes,
-      itemsOnSameRack: itemsInSameRack,
+      totalLevels,
+      activeLevelCode: grouped.activeLevelCode,
+      activeItem: grouped.activeItem,
+      itemsByLevel: grouped.itemsByLevel,
+      countsByLevel: grouped.countsByLevel,
+      totalItemsCount: grouped.totalCount,
+      notes: grouped.activeItem?.notes || selectedPlacement.notes,
     });
   };
 
@@ -209,30 +191,21 @@ export function MapClientView() {
   const handleSelectRackOnMap = (rack: RackCoordinates) => {
     setActiveRackId(rack.id);
 
-    // Ambil seluruh barang di rak ini
     const rackPlacements = serverMapData.placements.filter((p) => p.rackId === rack.id);
-
-    const firstItem = rackPlacements[0];
-    const otherItems = rackPlacements.slice(1).map((p) => ({
-      name: p.item.name,
-      levelCode: p.levelCode,
-      unit: p.item.unit,
-    }));
+    const grouped = groupRackPlacementsByLevel(rackPlacements, rack.totalLevels);
 
     setActivePlacementData({
-      itemName: firstItem ? firstItem.item.name : undefined,
-      itemCode: firstItem ? firstItem.item.code : undefined,
-      itemUnit: firstItem ? firstItem.item.unit : undefined,
-      itemCategory: firstItem ? firstItem.item.category : undefined,
       buildingName: activeLayout.name,
       rackId: rack.id,
       rackName: rack.name,
       corridor: rack.corridor,
-      levelCode: firstItem ? firstItem.levelCode : "T1",
-      locationCode: firstItem ? firstItem.locationCode : `${rack.id}-T1`,
       totalLevels: rack.totalLevels,
-      notes: firstItem?.notes || "Ketuk ambalan untuk melihat daftar barang",
-      itemsOnSameRack: otherItems,
+      activeLevelCode: grouped.activeLevelCode,
+      activeItem: grouped.activeItem,
+      itemsByLevel: grouped.itemsByLevel,
+      countsByLevel: grouped.countsByLevel,
+      totalItemsCount: grouped.totalCount,
+      notes: grouped.activeItem?.notes || "Ketuk ambalan untuk melihat daftar barang",
     });
   };
 
@@ -342,10 +315,23 @@ export function MapClientView() {
         }}
         onSelectLevel={(level) => {
           if (activePlacementData) {
+            const itemsInLevel = activePlacementData.itemsByLevel?.[level] || [];
+            const nextItem = itemsInLevel[0] || activePlacementData.activeItem;
             setActivePlacementData({
               ...activePlacementData,
-              levelCode: level,
+              activeLevelCode: level,
+              activeItem: nextItem,
               locationCode: `${activePlacementData.rackId}-${level}`,
+            });
+          }
+        }}
+        onSelectItem={(item) => {
+          if (activePlacementData) {
+            setActivePlacementData({
+              ...activePlacementData,
+              activeLevelCode: item.levelCode,
+              activeItem: item,
+              locationCode: item.locationCode,
             });
           }
         }}
