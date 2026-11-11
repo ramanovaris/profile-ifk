@@ -14,6 +14,7 @@ import {
   Menu,
   Tags,
   Package,
+  MapPin,
   Globe,
   ExternalLink,
 } from "lucide-react";
@@ -45,6 +46,7 @@ const sidebarLinks: SidebarItem[] = [
   { href: "/admin/berita/", label: "Berita", icon: Newspaper },
   { href: "/admin/kategori/", label: "Kategori", icon: Tags },
   { href: "/admin/stok/", label: "Stok Obat", icon: Package },
+  { href: "/admin/gudang/", label: "Denah Gudang", icon: MapPin },
   { href: "/admin/pengguna/", label: "Pengguna", icon: Users, superAdminOnly: true },
   { href: "/admin/profil/", label: "Profil", icon: UserCog },
   { href: "/admin/pengaturan/", label: "Pengaturan", icon: Settings },
