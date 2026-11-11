@@ -1,25 +1,77 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useTransition } from "react";
+import React, { useState, useEffect, useMemo, useRef, useTransition } from "react";
 import Link from "next/link";
-import { SlidersHorizontal, RefreshCw, LayoutGrid } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import {
+  SlidersHorizontal,
+  RefreshCw,
+  LayoutGrid,
+  ArrowLeft,
+  Search,
+} from "lucide-react";
 import { WarehouseSvgMap } from "@/components/warehouse/warehouse-svg-map";
 import { WarehouseSearchBox } from "@/components/warehouse/warehouse-search-box";
 import { WarehouseBottomDrawer, DrawerDetailData } from "@/components/warehouse/warehouse-bottom-drawer";
 import { BUILDING_LAYOUTS, BuildingLayout, RackCoordinates } from "@/lib/warehouse-map-data";
 import { getWarehouseMapDataAction, SearchableWarehouseItem } from "@/actions/warehouse";
 
-interface LocatorClientViewProps {
-  initialBuildingId?: "SJ" | "TD" | "KT";
-}
+export function MapClientView() {
+  const searchParams = useSearchParams();
+  const paramBuilding = searchParams.get("building")?.toUpperCase() as "SJ" | "TD" | "KT" | null;
+  const paramRack = searchParams.get("rack");
+  const paramLevel = searchParams.get("level");
+  const paramItem = searchParams.get("item");
 
-export function LocatorClientView({
-  initialBuildingId = "SJ",
-}: LocatorClientViewProps) {
-  const [activeBuildingId, setActiveBuildingId] = useState<"SJ" | "TD" | "KT">(initialBuildingId);
-  const [activeRackId, setActiveRackId] = useState<string | null>(null);
-  const [activePlacementData, setActivePlacementData] = useState<DrawerDetailData | null>(null);
+  const initialBuilding = (paramBuilding && ["SJ", "TD", "KT"].includes(paramBuilding))
+    ? paramBuilding
+    : "SJ";
+
+  const initialRack = paramRack
+    ? BUILDING_LAYOUTS[initialBuilding]?.racks.find((r) => r.id === paramRack) || null
+    : null;
+
+  const [activeBuildingId, setActiveBuildingId] = useState<"SJ" | "TD" | "KT">(initialBuilding);
+  const [activeRackId, setActiveRackId] = useState<string | null>(paramRack || null);
+  const [activePlacementData, setActivePlacementData] = useState<DrawerDetailData | null>(() => {
+    if (!initialRack) return null;
+    return {
+      itemName: paramItem || undefined,
+      buildingName: BUILDING_LAYOUTS[initialBuilding]?.name || "Gedung IFK",
+      rackId: initialRack.id,
+      rackName: initialRack.name,
+      corridor: initialRack.corridor || "Area Penyimpanan",
+      levelCode: paramLevel || "T1",
+      locationCode: `${initialRack.id}-${paramLevel || "T1"}`,
+      totalLevels: initialRack.totalLevels || 5,
+    };
+  });
   const [isPending, startTransition] = useTransition();
+
+  const hasAutoSelectedRef = useRef(false);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll ke kontainer denah di mobile view agar denah tidak terhalang header
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const timer = setTimeout(() => {
+      if (window.innerWidth < 768 && mapContainerRef.current) {
+        const mainEl = mapContainerRef.current.closest("main");
+        if (mainEl) {
+          mainEl.scrollTo({
+            top: Math.max(0, mapContainerRef.current.offsetTop - 12),
+            behavior: "smooth",
+          });
+        } else {
+          mapContainerRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [paramRack]);
 
   // Data pemetaan rak dan item dari server
   const [serverMapData, setServerMapData] = useState<{
@@ -51,6 +103,55 @@ export function LocatorClientView({
     });
   }, [activeBuildingId]);
 
+  // Efek auto-select ketika membuka halaman denah dari tautan "Lihat di Denah"
+  useEffect(() => {
+    if (hasAutoSelectedRef.current) return;
+    if (!paramRack || serverMapData.racks.length === 0) return;
+
+    const rack = activeLayout.racks.find((r: RackCoordinates) => r.id === paramRack);
+    if (!rack) return;
+
+    // Cari placement yang cocok dengan level atau nama item
+    const matchedPlacement =
+      serverMapData.placements.find(
+        (p) =>
+          p.rackId === paramRack &&
+          (!paramLevel || p.levelCode === paramLevel) &&
+          (!paramItem || p.item.name.toLowerCase().includes(paramItem.toLowerCase()))
+      ) ||
+      serverMapData.placements.find(
+        (p) => p.rackId === paramRack && (!paramLevel || p.levelCode === paramLevel)
+      ) ||
+      serverMapData.placements.find((p) => p.rackId === paramRack);
+
+    const itemsInSameRack = serverMapData.placements
+      .filter((p) => p.rackId === paramRack && (!matchedPlacement || p.item.id !== matchedPlacement.item.id))
+      .map((p) => ({
+        name: p.item.name,
+        levelCode: p.levelCode,
+        unit: p.item.unit,
+      }));
+
+    setActiveRackId(paramRack);
+    setActivePlacementData({
+      itemName: matchedPlacement ? matchedPlacement.item.name : (paramItem || undefined),
+      itemCode: matchedPlacement ? matchedPlacement.item.code : undefined,
+      itemUnit: matchedPlacement ? matchedPlacement.item.unit : undefined,
+      itemCategory: matchedPlacement ? matchedPlacement.item.category : undefined,
+      buildingName: activeLayout.name,
+      rackId: rack.id,
+      rackName: rack.name,
+      corridor: rack.corridor || "Area Penyimpanan",
+      levelCode: paramLevel || matchedPlacement?.levelCode || "T1",
+      locationCode: matchedPlacement?.locationCode || `${rack.id}-${paramLevel || "T1"}`,
+      totalLevels: rack.totalLevels || 5,
+      notes: matchedPlacement?.notes || "Posisi rak fisik",
+      itemsOnSameRack: itemsInSameRack,
+    });
+
+    hasAutoSelectedRef.current = true;
+  }, [paramRack, paramLevel, paramItem, serverMapData, activeLayout]);
+
   // Hitung jumlah item per rak untuk badge di denah SVG
   const rackItemCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -60,7 +161,7 @@ export function LocatorClientView({
     return counts;
   }, [serverMapData.placements]);
 
-  // Saat item dipilih dari search box
+  // Saat item dipilih dari search box denah
   const handleSelectItemFromSearch = (
     item: SearchableWarehouseItem,
     selectedPlacement: SearchableWarehouseItem["placements"][0]
@@ -139,31 +240,47 @@ export function LocatorClientView({
     { id: "KT", label: "Kantor (KT)", desc: "Vaksin & Cold Chain" },
   ];
 
+  // ponytail: Auto-scroll mobile ke kontainer denah; upgrade to fullscreen mode jika staf minta sembunyikan topbar.
   return (
-    <div className="relative flex flex-col h-[calc(100dvh-5.5rem)] min-h-[550px] w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
+    <div
+      ref={mapContainerRef}
+      className="relative flex flex-col h-[calc(100dvh-5.5rem)] min-h-[550px] w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm scroll-mt-3"
+    >
       {/* Top Controls Toolbar */}
       <div className="z-30 p-3 sm:p-4 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-zinc-800 flex flex-col gap-3">
-        {/* Row 1: Building Selector Tabs & Manage Button */}
+        {/* Row 1: Back to Search List Button, Building Selector Tabs & Nav Actions */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-zinc-800">
-            {buildings.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                onClick={() => {
-                  setActiveBuildingId(b.id);
-                  setActiveRackId(null);
-                  setActivePlacementData(null);
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  activeBuildingId === b.id
-                    ? "bg-[#455a26] text-white shadow-sm"
-                    : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
-                }`}
-              >
-                {b.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/gudang"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-zinc-200 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors shadow-sm"
+              title="Kembali ke Daftar Obat"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Daftar Obat</span>
+            </Link>
+
+            {/* Building Tabs */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-zinc-800">
+              {buildings.map((b) => (
+                <button
+                  key={b.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveBuildingId(b.id);
+                    setActiveRackId(null);
+                    setActivePlacementData(null);
+                  }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    activeBuildingId === b.id
+                      ? "bg-[#455a26] text-white shadow-sm"
+                      : "text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white"
+                  }`}
+                >
+                  {b.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -180,7 +297,7 @@ export function LocatorClientView({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors shadow-sm"
             >
               <SlidersHorizontal className="w-3.5 h-3.5 text-[#455a26] dark:text-[#6e903c]" />
-              <span className="hidden sm:inline">Kelola Rak & Ambalan</span>
+              <span className="hidden sm:inline">Kelola Rak</span>
               <span className="sm:hidden">Kelola</span>
             </Link>
           </div>

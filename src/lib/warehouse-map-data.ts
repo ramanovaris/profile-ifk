@@ -272,7 +272,7 @@ export function clampPanZoom(
   state: { x: number; y: number; scale: number },
   container: { width: number; height: number },
   layout: BuildingLayout,
-  minScale = 0.6,
+  minScale = 0.35,
   maxScale = 3.5
 ): { x: number; y: number; scale: number } {
   const clampedScale = Math.min(Math.max(state.scale, minScale), maxScale);
@@ -281,14 +281,14 @@ export function clampPanZoom(
   const contentWidth = layout.width * clampedScale;
   const contentHeight = layout.height * clampedScale;
 
-  const minX = container.width - contentWidth - 150;
-  const maxX = 150;
-  const minY = container.height - contentHeight - 150;
-  const maxY = 150;
+  const minX = container.width - contentWidth - 200;
+  const maxX = 200;
+  const minY = container.height - contentHeight - 200;
+  const maxY = 200;
 
   return {
     scale: clampedScale,
-    x: Math.min(Math.max(state.x, minX), maxX),
-    y: Math.min(Math.max(state.y, minY), maxY),
+    x: Math.min(Math.max(state.x, Math.min(minX, maxX)), Math.max(minX, maxX)),
+    y: Math.min(Math.max(state.y, Math.min(minY, maxY)), Math.max(minY, maxY)),
   };
 }

@@ -62,15 +62,15 @@ async function main() {
 
   // 5. Uji clamping pan & zoom batas aman
   const clampedScaleMin = clampPanZoom({ x: 0, y: 0, scale: 0.2 }, container, sj);
-  if (clampedScaleMin.scale < 0.6) {
-    throw new Error(`Zoom minimum harus dibatasi >= 0.6, got: ${clampedScaleMin.scale}`);
+  if (clampedScaleMin.scale < 0.35) {
+    throw new Error(`Zoom minimum harus dibatasi >= 0.35, got: ${clampedScaleMin.scale}`);
   }
 
   const clampedScaleMax = clampPanZoom({ x: 0, y: 0, scale: 10.0 }, container, sj);
   if (clampedScaleMax.scale > 3.5) {
     throw new Error(`Zoom maksimum harus dibatasi <= 3.5, got: ${clampedScaleMax.scale}`);
   }
-  console.log(`- Clamping batas aman zoom min/max: LULUS (min 0.6x, max 3.5x)`);
+  console.log(`- Clamping batas aman zoom min/max: LULUS (min 0.35x, max 3.5x)`);
 
   console.log("Semua pengujian tata letak spasial dan pan-zoom denah: LULUS (100% PASS)\n");
 }

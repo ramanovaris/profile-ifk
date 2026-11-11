@@ -27,23 +27,14 @@ export function WarehouseSvgMap({
     reset,
     zoomIn,
     zoomOut,
-    focusOnTarget,
     bind,
   } = useSvgPanZoom({
     layout,
+    activeRackId,
     initialScale: 1.0,
-    minScale: 0.5,
+    minScale: 0.35,
     maxScale: 3.5,
   });
-
-  // Saat activeRackId berubah, auto-pan dan fokus ke koordinat rak target
-  useEffect(() => {
-    if (!activeRackId) return;
-    const target = layout.racks.find((r) => r.id === activeRackId);
-    if (target) {
-      focusOnTarget(target.centerX, target.centerY, 1.85);
-    }
-  }, [activeRackId, layout.racks, focusOnTarget]);
 
   return (
     <div

@@ -67,7 +67,11 @@ export function AdminTablePagination({
           <span>Sebelumnya</span>
         </button>
 
-        <div className="flex items-center gap-1 px-1">
+        <span className="text-xs text-[var(--admin-muted)] px-1 sm:hidden">
+          {currentPage} / {totalPages}
+        </span>
+
+        <div className="hidden sm:flex items-center gap-1 px-1">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
