@@ -6,6 +6,7 @@ import { Layers } from "lucide-react";
 interface RackTierVisualizerProps {
   totalLevels: number;
   activeLevel?: string | null; // e.g. "T2"
+  itemCountsByLevel?: Record<string, number>;
   onSelectLevel?: (level: string) => void;
   className?: string;
 }
@@ -13,6 +14,7 @@ interface RackTierVisualizerProps {
 export function RackTierVisualizer({
   totalLevels = 5,
   activeLevel,
+  itemCountsByLevel,
   onSelectLevel,
   className = "",
 }: RackTierVisualizerProps) {
@@ -38,6 +40,7 @@ export function RackTierVisualizer({
         {levels.map((lvl) => {
           const isActive = activeLevel?.toUpperCase() === lvl.toUpperCase();
           const levelNumber = lvl.replace("T", "");
+          const count = itemCountsByLevel ? itemCountsByLevel[lvl] ?? 0 : null;
 
           return (
             <button
@@ -63,15 +66,27 @@ export function RackTierVisualizer({
                 <span>Tingkat {levelNumber}</span>
               </div>
 
-              {isActive ? (
-                <span className="text-[10px] uppercase font-bold tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
-                  Target Obat
-                </span>
-              ) : (
-                <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-normal">
-                  Ambalan {lvl}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5">
+                {count !== null && (
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                      isActive
+                        ? "bg-amber-600 text-white"
+                        : count > 0
+                        ? "bg-slate-100 dark:bg-zinc-700 text-slate-700 dark:text-zinc-200 border border-slate-200/80 dark:border-zinc-600"
+                        : "bg-transparent text-slate-400 dark:text-zinc-500 font-normal"
+                    }`}
+                  >
+                    {count > 0 ? `${count} Obat` : "Kosong"}
+                  </span>
+                )}
+
+                {isActive && (
+                  <span className="text-[10px] uppercase font-bold tracking-wider bg-white/20 px-2 py-0.5 rounded-full">
+                    Aktif
+                  </span>
+                )}
+              </div>
             </button>
           );
         })}
