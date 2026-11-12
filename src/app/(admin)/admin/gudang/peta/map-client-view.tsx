@@ -314,26 +314,29 @@ export function MapClientView() {
           setActiveRackId(null);
         }}
         onSelectLevel={(level) => {
-          if (activePlacementData) {
-            const itemsInLevel = activePlacementData.itemsByLevel?.[level] || [];
-            const nextItem = itemsInLevel[0] || activePlacementData.activeItem;
-            setActivePlacementData({
-              ...activePlacementData,
+          setActivePlacementData((prev) => {
+            if (!prev) return null;
+            const itemsInLevel = prev.itemsByLevel?.[level] || [];
+            const isCurrentInLevel = prev.activeItem?.levelCode === level;
+            const nextItem = isCurrentInLevel ? prev.activeItem : (itemsInLevel[0] || prev.activeItem);
+            return {
+              ...prev,
               activeLevelCode: level,
               activeItem: nextItem,
-              locationCode: `${activePlacementData.rackId}-${level}`,
-            });
-          }
+              locationCode: nextItem?.locationCode || `${prev.rackId}-${level}`,
+            };
+          });
         }}
         onSelectItem={(item) => {
-          if (activePlacementData) {
-            setActivePlacementData({
-              ...activePlacementData,
+          setActivePlacementData((prev) => {
+            if (!prev) return null;
+            return {
+              ...prev,
               activeLevelCode: item.levelCode,
               activeItem: item,
               locationCode: item.locationCode,
-            });
-          }
+            };
+          });
         }}
       />
     </div>

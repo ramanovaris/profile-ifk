@@ -316,10 +316,11 @@ export function WarehouseBottomDrawer({
                               return (
                                 <div
                                   key={item.id}
-                                  className={`p-2.5 rounded-lg border text-xs transition-all ${
+                                  onClick={() => onSelectItem?.(item)}
+                                  className={`p-2.5 rounded-lg border text-xs transition-all cursor-pointer ${
                                     isSelected
                                       ? "bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 shadow-xs"
-                                      : "bg-slate-50/70 dark:bg-zinc-900/60 border-slate-200/70 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700"
+                                      : "bg-slate-50/70 dark:bg-zinc-900/60 border-slate-200/70 dark:border-zinc-800 hover:border-slate-300 dark:hover:border-zinc-700 hover:bg-slate-100/70 dark:hover:bg-zinc-800/60"
                                   }`}
                                 >
                                   <div className="flex items-start justify-between gap-2">
@@ -353,9 +354,9 @@ export function WarehouseBottomDrawer({
 
                                     <button
                                       type="button"
-                                      onClick={() => {
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         onSelectItem?.(item);
-                                        onSelectLevel?.(lvl);
                                       }}
                                       className={`shrink-0 px-2 py-1 rounded-md text-[11px] font-semibold transition-colors ${
                                         isSelected
@@ -363,7 +364,7 @@ export function WarehouseBottomDrawer({
                                           : "bg-white dark:bg-zinc-800 text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-700"
                                       }`}
                                     >
-                                      {isSelected ? "Aktif" : "Pilih"}
+                                      {isSelected ? "Aktif" : "Lihat"}
                                     </button>
                                   </div>
                                 </div>
